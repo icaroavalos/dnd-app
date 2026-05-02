@@ -1,0 +1,56 @@
+{
+  "abilities": {
+    "count": 0
+  },
+  "alignments": {
+    "count": 0
+  },
+  "armor": {
+    "count": 12
+  },
+  "backgrounds": {
+    "count": 1
+  },
+  "classes": {
+    "count": 24
+  },
+  "conditions": {
+    "count": 0
+  },
+  "damagetypes": {
+    "count": 0
+  },
+  "feats": {
+    "count": 1
+  },
+  "items": {
+    "count": 440
+  },
+  "itemcategories": {
+    "count": 24
+  },
+  "languages": {
+    "count": 0
+  },
+  "rules": {
+    "count": 227
+  },
+  "skills": {
+    "count": 20
+  },
+  "species": {
+    "count": 13
+  },
+  "spells": {
+    "count": 319
+  },
+  "spellschools": {
+    "count": 0
+  },
+  "weapons": {
+    "count": 75
+  },
+  "weaponproperties": {
+    "count": 12
+  }
+}
