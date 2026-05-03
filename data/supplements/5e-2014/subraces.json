@@ -1,0 +1,16 @@
+{
+  "source": "local-curated-supplement",
+  "reason": "Public SRD APIs expose a limited set of species/subrace data. This supplement keeps the character builder aligned with common 5e 2014 character creation options.",
+  "races": {
+    "dragonborn": ["Dragonborn"],
+    "dwarf": ["Hill Dwarf", "Mountain Dwarf"],
+    "elf": ["High Elf", "Wood Elf", "Dark Elf"],
+    "gnome": ["Forest Gnome", "Rock Gnome"],
+    "half-elf": ["Half Elf"],
+    "half-orc": ["Half Orc"],
+    "halfling": ["Lightfoot Halfling", "Stout Halfling"],
+    "human": ["Human"],
+    "tiefling": ["Tiefling"],
+    "Turtle": ["Turtle"]
+  }
+}

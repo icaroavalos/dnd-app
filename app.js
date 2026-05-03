@@ -1,5 +1,5 @@
-const API_5E = "https://www.dnd5eapi.co/api/2014";
-const API_OPEN5E = "https://api.open5e.com/v2";
+const DATA_SOURCE = "data/5etools/5e-2024";
+const DATA_SOURCE_LABEL = "5etools 2024";
 
 const ABILITIES = [
   ["str", "Strength"],
@@ -9,6 +9,16 @@ const ABILITIES = [
   ["wis", "Wisdom"],
   ["cha", "Charisma"],
 ];
+
+const ABILITY_METHODS = [
+  ["standard", "Standard Array"],
+  ["manual", "Manual/Rolled"],
+  ["pointBuy", "Point Buy"],
+];
+
+const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8];
+const POINT_BUY_COSTS = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
+const POINT_BUY_BUDGET = 27;
 
 const SKILLS = [
   ["Athletics", "str"],
@@ -131,9 +141,7 @@ const STARTER_ATTACKS = {
   ],
 };
 
-const SPELLCASTERS = new Set(["bard", "cleric", "druid", "sorcerer", "warlock", "wizard", "paladin", "ranger"]);
 const HALF_CASTER = new Set(["paladin", "ranger"]);
-const PREPARED_CASTERS = new Set(["cleric", "druid", "paladin", "wizard"]);
 const CLASS_DECKS = {
   bard: "bard",
   cleric: "cleric",
@@ -144,40 +152,6 @@ const CLASS_DECKS = {
   sorcerer: "arcane",
   wizard: "arcane",
 };
-
-const FALLBACK_SPELL_OPTIONS = [
-  { name: "Guidance", level: 0, classes: ["cleric", "druid"] },
-  { name: "Druidcraft", level: 0, classes: ["druid"] },
-  { name: "Light", level: 0, classes: ["bard", "cleric", "sorcerer", "wizard"] },
-  { name: "Mending", level: 0, classes: ["bard", "cleric", "druid", "sorcerer", "wizard"] },
-  { name: "Poison Spray", level: 0, classes: ["druid", "sorcerer", "warlock", "wizard"] },
-  { name: "Produce Flame", level: 0, classes: ["druid"] },
-  { name: "Resistance", level: 0, classes: ["cleric", "druid"] },
-  { name: "Shillelagh", level: 0, classes: ["druid"] },
-  { name: "Thorn Whip", level: 0, classes: ["druid"] },
-  { name: "Fire Bolt", level: 0, classes: ["sorcerer", "wizard"] },
-  { name: "Mage Hand", level: 0, classes: ["bard", "sorcerer", "warlock", "wizard"] },
-  { name: "Sacred Flame", level: 0, classes: ["cleric"] },
-  { name: "Charm Person", level: 1, classes: ["bard", "druid", "sorcerer", "warlock", "wizard"] },
-  { name: "Create or Destroy Water", level: 1, classes: ["cleric", "druid"] },
-  { name: "Cure Wounds", level: 1, classes: ["bard", "cleric", "druid", "paladin", "ranger"] },
-  { name: "Detect Magic", level: 1, classes: ["bard", "cleric", "druid", "paladin", "ranger", "sorcerer", "wizard"] },
-  { name: "Detect Poison and Disease", level: 1, classes: ["cleric", "druid", "paladin", "ranger"] },
-  { name: "Entangle", level: 1, classes: ["druid"] },
-  { name: "Faerie Fire", level: 1, classes: ["bard", "druid"] },
-  { name: "Fog Cloud", level: 1, classes: ["druid", "ranger", "sorcerer", "wizard"] },
-  { name: "Goodberry", level: 1, classes: ["druid", "ranger"] },
-  { name: "Healing Word", level: 1, classes: ["bard", "cleric", "druid"] },
-  { name: "Jump", level: 1, classes: ["druid", "ranger", "sorcerer", "wizard"] },
-  { name: "Longstrider", level: 1, classes: ["bard", "druid", "ranger", "wizard"] },
-  { name: "Purify Food and Drink", level: 1, classes: ["cleric", "druid", "paladin"] },
-  { name: "Speak with Animals", level: 1, classes: ["bard", "druid", "ranger"] },
-  { name: "Thunderwave", level: 1, classes: ["bard", "druid", "sorcerer", "wizard"] },
-  { name: "Shield", level: 1, classes: ["sorcerer", "wizard"] },
-  { name: "Burning Hands", level: 1, classes: ["sorcerer", "wizard"] },
-  { name: "Fireball", level: 3, classes: ["sorcerer", "wizard"] },
-  { name: "Animate Objects", level: 5, classes: ["bard", "sorcerer", "wizard"] },
-];
 
 const STEPS = [
   ["lineage", "Origem"],
@@ -191,7 +165,8 @@ const TABS = [
   ["skills", "Skills"],
   ["attacks", "Ataques"],
   ["spells", "Magia"],
-  ["features", "Notas"],
+  ["inventory", "Inventory"],
+  ["features", "Features"],
 ];
 
 const defaultState = {
@@ -199,7 +174,19 @@ const defaultState = {
   tab: "summary",
   dataStatus: "local",
   selectedSpell: "",
-  api: { classes: {}, levels: {}, races: {}, spells: [], classSpells: {}, spellDetails: {} },
+  actionFilter: "all",
+  selectedAction: "",
+  featureFilter: "all",
+  selectedFeature: "",
+  validationMessage: "",
+  builderVisible: true,
+  levelUpMode: false,
+  levelUpFrom: 1,
+  levelUpHpBase: 0,
+  levelUpHpGain: 0,
+  levelUpSnapshot: null,
+  levelUpClassMode: "same",
+  api: { classes: {}, levels: {}, races: {}, spells: [], classSpells: {}, spellDetails: {}, source: {} },
   activeCharacterId: "default",
   characters: [],
   character: {
@@ -211,6 +198,15 @@ const defaultState = {
     background: "Hermit",
     alignment: "Neutral",
     experience: 0,
+    abilityMethod: "standard",
+    classFeatureChoices: {},
+    asiChoices: {},
+    equipmentChoices: {},
+    inventory: [],
+    equippedItems: [],
+    spellSlots: {},
+    resources: {},
+    creationComplete: false,
     hp: 95,
     armorClass: 17,
     speed: 45,
@@ -232,6 +228,7 @@ const defaultState = {
 let state = loadState();
 
 const els = {
+  app: document.querySelector("#app"),
   form: document.querySelector("#builderForm"),
   stepNav: document.querySelector("#stepNav"),
   sheetTabs: document.querySelector("#sheetTabs"),
@@ -277,7 +274,9 @@ function loadState() {
 
 function persist() {
   syncActiveCharacter();
-  localStorage.setItem("dnd-sheet-builder", JSON.stringify(state));
+  const savedState = structuredClone(state);
+  savedState.api = structuredClone(defaultState.api);
+  localStorage.setItem("dnd-sheet-builder", JSON.stringify(savedState));
 }
 
 function ensureRosterState() {
@@ -292,10 +291,13 @@ function ensureRosterState() {
     state.activeCharacterId = state.characters[0].id;
     state.character = structuredClone(state.characters[0]);
   }
+  state.creationComplete = Boolean(state.character.creationComplete ?? state.creationComplete);
+  if (state.creationComplete && !state.levelUpMode) state.builderVisible = false;
 }
 
 function syncActiveCharacter() {
   state.character.id ??= state.activeCharacterId ?? crypto.randomUUID();
+  state.character.creationComplete = Boolean(state.creationComplete || state.character.creationComplete);
   state.activeCharacterId = state.character.id;
   const index = state.characters.findIndex((character) => character.id === state.character.id);
   if (index >= 0) state.characters[index] = structuredClone(state.character);
@@ -323,13 +325,22 @@ function createStartingCharacter() {
   character.id = crypto.randomUUID();
   character.name = "Nova Ficha";
   character.level = 1;
-  character.hp = 10;
-  character.armorClass = 10;
-  character.speed = 30;
+  character.abilityMethod = "standard";
+  character.abilities = Object.fromEntries(ABILITIES.map(([key], index) => [key, STANDARD_ARRAY[index]]));
+  character.classFeatureChoices = {};
+  character.asiChoices = {};
+  character.equipmentChoices = {};
+  character.inventory = [];
+  character.equippedItems = [];
+  character.spellSlots = {};
+  character.resources = {};
   character.race = "human";
   character.subrace = "Human";
   character.class = "fighter";
   character.background = "Acolyte";
+  character.hp = maxLevelOneHp(character.class, character.abilities);
+  character.armorClass = 10 + Math.floor(((character.abilities.dex ?? 10) - 10) / 2);
+  character.speed = 30;
   character.attacks = [];
   character.spells = [];
   character.notes = "";
@@ -347,6 +358,9 @@ function createNewCharacter() {
   state.characters.push(structuredClone(fresh));
   state.step = "lineage";
   state.selectedSpell = "";
+  state.levelUpMode = false;
+  state.creationComplete = false;
+  state.builderVisible = true;
   persist();
   render();
 }
@@ -358,119 +372,231 @@ function switchCharacter(characterId) {
   state.activeCharacterId = character.id;
   state.character = structuredClone(character);
   state.selectedSpell = state.character.spells[0] ?? "";
+  state.levelUpMode = false;
+  state.creationComplete = Boolean(state.character.creationComplete);
+  if (state.creationComplete) state.builderVisible = false;
+  normalizeCharacterState();
+  persist();
+  render();
+}
+
+function deleteCharacter(characterId) {
+  syncActiveCharacter();
+  state.characters = state.characters.filter((character) => character.id !== characterId);
+  if (!state.characters.length) {
+    const fresh = createStartingCharacter();
+    state.characters = [structuredClone(fresh)];
+    state.character = fresh;
+    state.activeCharacterId = fresh.id;
+  } else if (state.activeCharacterId === characterId) {
+    state.activeCharacterId = state.characters[0].id;
+    state.character = structuredClone(state.characters[0]);
+  }
   normalizeCharacterState();
   persist();
   render();
 }
 
 async function hydrateApiData() {
-  state.dataStatus = "carregando APIs";
+  state.dataStatus = "carregando 5etools 2024";
   renderChrome();
-  const [classesResult, spellsResult] = await Promise.allSettled([
-    fetchJson(`${API_5E}/classes`),
-    fetchJson(`${API_OPEN5E}/spells/?limit=30`),
-  ]);
-
-  if (classesResult.status === "fulfilled") {
-    state.api.classList = classesResult.value.results ?? [];
-  }
-
-  if (spellsResult.status === "fulfilled") {
-    state.api.spells = (spellsResult.value.results ?? []).map((spell) => spell.name).filter(Boolean).slice(0, 30);
-  }
-
   try {
-    if (classesResult.status === "fulfilled") {
-      await loadClassData(state.character.class);
-    }
-    const loadedOpen5e = spellsResult.status === "fulfilled";
-    const loaded5e = classesResult.status === "fulfilled" && Boolean(state.api.levels[state.character.class]);
-    if (loaded5e && loadedOpen5e) state.dataStatus = "API 5e + Open5e";
-    else if (loaded5e) state.dataStatus = "API 5e";
-    else if (loadedOpen5e) state.dataStatus = "Open5e + local";
-    else state.dataStatus = "local fallback";
+    const [classes, races, subraces, backgrounds, equipment, spells, classSpells, classFeatures, subclasses, feats] = await Promise.all([
+      fetchJson(`${DATA_SOURCE}/classes.json`),
+      fetchJson(`${DATA_SOURCE}/races.json`),
+      fetchJson(`${DATA_SOURCE}/subraces.json`),
+      fetchJson(`${DATA_SOURCE}/backgrounds.json`),
+      fetchJson(`${DATA_SOURCE}/equipment.json`),
+      fetchJson(`${DATA_SOURCE}/spells.json`),
+      fetchJson(`${DATA_SOURCE}/class-spells.json`),
+      fetchJson(`${DATA_SOURCE}/class-features.json`),
+      fetchJson(`${DATA_SOURCE}/subclasses.json`),
+      fetchJson(`${DATA_SOURCE}/feats.json`),
+    ]);
+    hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment, spells, classSpells, classFeatures, subclasses, feats });
+    state.dataStatus = DATA_SOURCE_LABEL;
     normalizeCharacterState();
     persist();
   } catch {
-    state.dataStatus = "local fallback";
+    state.dataStatus = "erro 5etools 2024";
   }
 }
 
 async function loadClassData(className) {
   if (!className) return;
-  if (state.api.classes[className]) {
-    await loadClassSpellOptions(className);
-    return;
-  }
-  try {
-    const [details, levels] = await Promise.all([
-      fetchJson(`${API_5E}/classes/${className}`),
-      fetchJson(`${API_5E}/classes/${className}/levels`),
-    ]);
-    state.api.classes[className] = details;
-    state.api.levels[className] = levels;
-    await loadClassSpellOptions(className);
-  } catch {
-    state.dataStatus = "local fallback";
-  }
+  await loadClassSpellOptions(className);
 }
 
 async function loadRaceData(raceName) {
-  const index = String(raceName).toLowerCase();
-  if (!index || index === "turtle" || state.api.races[index]) return;
-  try {
-    const [details, subraces] = await Promise.all([
-      fetchJson(`${API_5E}/races/${index}`),
-      fetchJson(`${API_5E}/races/${index}/subraces`),
-    ]);
-    state.api.races[index] = {
-      details,
-      subraces: (subraces.results ?? []).map((subrace) => subrace.name).filter(Boolean),
-    };
-  } catch {
-    state.api.races[index] = { subraces: [] };
-  }
+  return raceName;
 }
 
 async function loadClassSpellOptions(className) {
-  if (!SPELLCASTERS.has(className)) return;
-  if (Array.isArray(state.api.classSpells[className]) && state.api.classSpells[className].length > 0) return;
-  try {
-    const spells = await fetchJson(`${API_5E}/classes/${className}/spells`);
-    const details = await Promise.allSettled(
-      (spells.results ?? []).map((spell) => fetchJson(`${API_5E}${spell.url}`))
-    );
-    state.api.classSpells[className] = details
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => ({ name: result.value.name, level: result.value.level }))
-      .filter((spell) => spell.name && Number.isFinite(spell.level));
-  } catch {
-    state.api.classSpells[className] = [];
-  }
+  return className;
 }
 
 async function loadSpellDetails(spellName) {
   if (!spellName || state.api.spellDetails[spellName]) return;
-  const index = spellIndex(spellName);
-
-  try {
-    const detail = await fetchJson(`${API_5E}/spells/${index}`);
-    state.api.spellDetails[spellName] = normalizeDndSpell(detail, spellName);
+  const detail = state.api.source?.spellDetails?.[spellName.toLowerCase()];
+  if (detail) {
+    state.api.spellDetails[spellName] = detail;
     persist();
-    return;
-  } catch {
-    // Open5e is used as a secondary source because some spells are not in the SRD API.
   }
+}
 
-  try {
-    const search = await fetchJson(`${API_OPEN5E}/spells/?search=${encodeURIComponent(spellName)}&limit=12`);
-    const detail = (search.results ?? []).find((spell) => String(spell.name).toLowerCase() === spellName.toLowerCase());
-    if (!detail) throw new Error("Spell not found");
-    state.api.spellDetails[spellName] = normalizeOpen5eSpell(detail, spellName);
-  } catch {
-    state.api.spellDetails[spellName] = fallbackSpell(spellName);
+function hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment, spells, classSpells, classFeatures, subclasses, feats }) {
+  const classResults = classes.results ?? [];
+  const raceResults = races.results ?? [];
+  const subraceResults = subraces.results ?? [];
+  const backgroundResults = backgrounds.results ?? [];
+  const equipmentResults = equipment.results ?? [];
+  const spellResults = spells.results ?? [];
+  const classSpellResults = classSpells.results ?? {};
+  const classFeatureResults = classFeatures.results ?? [];
+  const subclassResults = subclasses.results ?? [];
+  const featResults = feats.results ?? [];
+  const spellByKey = new Map(spellResults.map((spell) => [`${spell.name.toLowerCase()}|${spell.source.toLowerCase()}`, spell]));
+
+  state.api = {
+    classes: Object.fromEntries(classResults.map((klass) => [slugifyName(klass.name), normalize5etoolsClass(klass)])),
+    levels: Object.fromEntries(classResults.map((klass) => [slugifyName(klass.name), build5etoolsLevels(klass)])),
+    races: Object.fromEntries(raceResults.map((race) => [slugifyName(race.name), normalize5etoolsRace(race, subraceResults)])),
+    spells: spellResults.map((spell) => spell.name),
+    classSpells: Object.fromEntries(Object.values(classSpellResults).map((list) => {
+      const classKey = slugifyName(list.className);
+      const options = (list.spells ?? [])
+        .map((ref) => spellByKey.get(`${ref.name.toLowerCase()}|${ref.source.toLowerCase()}`))
+        .filter(Boolean)
+        .map((spell) => ({ name: spell.name, level: spell.level, source: spell.source }))
+        .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+      return [classKey, options];
+    })),
+    spellDetails: {},
+    source: {
+      classOptions: classResults.map((klass) => [slugifyName(klass.name), klass.name]).sort((a, b) => a[1].localeCompare(b[1])),
+      raceOptions: raceResults.map((race) => [slugifyName(race.name), race.name]).sort((a, b) => a[1].localeCompare(b[1])),
+      backgroundOptions: backgroundResults.map((background) => [background.name, background.name]).sort((a, b) => a[1].localeCompare(b[1])),
+      backgroundDetails: Object.fromEntries(backgroundResults.map((background) => [background.name.toLowerCase(), background])),
+      itemDetails: Object.fromEntries(equipmentResults.map((item) => [itemKey(item.name, item.source), item])),
+      classFeatures: classFeatureResults.map(normalize5etoolsFeature),
+      subclasses: subclassResults,
+      featDetails: Object.fromEntries(featResults.map((feat) => [slugifyName(feat.name), normalize5etoolsFeature({ ...feat, type: "feat" })])),
+      spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), normalize5etoolsSpell(spell)])),
+    },
+  };
+}
+
+function normalize5etoolsFeature(feature) {
+  return {
+    name: feature.name,
+    source: feature.source,
+    className: feature.className,
+    classSource: feature.classSource,
+    level: feature.level,
+    category: feature.category,
+    ability: feature.ability,
+    prerequisite: feature.prerequisite,
+    type: feature.type ?? "feature",
+    entries: feature.entries,
+    body: entriesToText(feature.entries),
+  };
+}
+
+function normalize5etoolsClass(klass) {
+  return {
+    name: klass.name,
+    index: slugifyName(klass.name),
+    source: klass.source,
+    hit_die: Number(String(klass.hitDie).replace(/\D/g, "")) || 8,
+    proficiency: klass.proficiency ?? [],
+    saving_throws: (klass.proficiency ?? []).map((save) => ({ index: save })),
+    spellcastingAbility: klass.spellcastingAbility,
+    casterProgression: klass.casterProgression,
+    cantripProgression: klass.cantripProgression ?? [],
+    preparedSpellsProgression: klass.preparedSpellsProgression ?? [],
+    startingProficiencies: klass.startingProficiencies ?? {},
+    classTableGroups: klass.classTableGroups ?? [],
+  };
+}
+
+function build5etoolsLevels(klass) {
+  const slotRows = (klass.classTableGroups ?? []).find((group) => Array.isArray(group.rowsSpellProgression))?.rowsSpellProgression ?? [];
+  const preparedRows = klass.preparedSpellsProgression ?? [];
+  const cantripRows = klass.cantripProgression ?? [];
+  return Array.from({ length: 20 }, (_, index) => {
+    const slots = slotRows[index] ?? [];
+    const spellcasting = {
+      cantrips_known: cantripRows[index] ?? 0,
+      prepared_spells: preparedRows[index] ?? 0,
+    };
+    slots.forEach((count, slotIndex) => {
+      spellcasting[`spell_slots_level_${slotIndex + 1}`] = count;
+    });
+    return {
+      level: index + 1,
+      prof_bonus: proficiencyForLevel(index + 1),
+      features: [],
+      spellcasting,
+    };
+  });
+}
+
+function normalize5etoolsRace(race, subraceResults) {
+  const explicitSubraces = subraceResults
+    .filter((subrace) => subrace.raceName === race.name)
+    .map((subrace) => subrace.name);
+  const ancestryOptions = inferAncestryOptionsFromEntries(race.entries);
+  return {
+    details: race,
+    subraces: explicitSubraces.length ? explicitSubraces : ancestryOptions,
+  };
+}
+
+function normalize5etoolsSpell(spell) {
+  const levelLine = spell.level === 0
+    ? `${spellSchoolName(spell.school)} cantrip`.trim()
+    : `${spell.level}${ordinalSuffix(spell.level)}-level ${spellSchoolName(spell.school)}`.trim();
+  return {
+    name: spell.name,
+    level: spell.level,
+    levelLine,
+    castingTime: format5etoolsTime(spell.time),
+    range: format5etoolsRange(spell.range),
+    components: format5etoolsComponents(spell.components),
+    duration: format5etoolsDuration(spell.duration),
+    material: typeof spell.components?.m === "string" ? clean5etoolsText(spell.components.m) : "",
+    description: entriesToText(spell.entries),
+    higherLevel: entriesToText(spell.entriesHigherLevel),
+  };
+}
+
+function inferAncestryOptionsFromEntries(entries) {
+  const names = [];
+  walkEntries(entries, (item) => {
+    if (item?.type === "table" && Array.isArray(item.rows)) {
+      const caption = String(item.caption ?? "").toLowerCase();
+      if (!/(lineage|ancestor|legacy)/.test(caption)) return;
+      item.rows.forEach((row) => {
+        if (typeof row?.[0] === "string") names.push(row[0]);
+      });
+    }
+    if (item?.type === "entries" && /(lineage|ancestor|legacy)/i.test(item.name ?? "")) {
+      walkEntries(item.entries, (child) => {
+        if (child?.type === "item" && child.name) names.push(child.name);
+      });
+    }
+  });
+  return [...new Set(names)];
+}
+
+function walkEntries(value, visitor) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => walkEntries(item, visitor));
+    return;
   }
-  persist();
+  if (!value || typeof value !== "object") return;
+  visitor(value);
+  Object.values(value).forEach((item) => walkEntries(item, visitor));
 }
 
 async function fetchJson(url) {
@@ -485,83 +611,19 @@ async function fetchJson(url) {
   }
 }
 
-function normalizeDndSpell(spell, fallbackName) {
-  const school = spell.school?.name ? `${spell.school.name} ` : "";
-  const levelLine = spell.level === 0 ? `${school}cantrip` : `${spell.level}${ordinalSuffix(spell.level)}-level ${school}`.trim();
-  return {
-    name: spell.name ?? fallbackName,
-    level: spell.level,
-    levelLine,
-    castingTime: spell.casting_time,
-    range: spell.range,
-    components: (spell.components ?? []).join(", "),
-    duration: spell.duration,
-    material: spell.material ?? "",
-    description: (spell.desc ?? []).join("\n\n"),
-    higherLevel: (spell.higher_level ?? []).join("\n\n"),
-  };
-}
-
-function normalizeOpen5eSpell(spell, fallbackName) {
-  const school = spell.school ? `${spell.school} ` : "";
-  const level = Number(spell.level);
-  const levelLine = Number.isFinite(level)
-    ? level === 0 ? `${school}cantrip` : `${level}${ordinalSuffix(level)}-level ${school}`.trim()
-    : "Spell";
-  return {
-    name: spell.name ?? fallbackName,
-    level: Number.isFinite(level) ? level : undefined,
-    levelLine,
-    castingTime: spell.casting_time,
-    range: spell.range,
-    components: Array.isArray(spell.components) ? spell.components.join(", ") : spell.components,
-    duration: spell.duration,
-    material: typeof spell.material === "string" ? spell.material : "",
-    description: spell.desc ?? spell.description ?? "",
-    higherLevel: spell.higher_level ?? spell.higher_level_text ?? "",
-  };
-}
-
-function fallbackSpell(spellName) {
-  if (spellName.toLowerCase() === "elementalism") {
-    return {
-      name: "Elementalism",
-      level: 0,
-      levelLine: "Transmutation cantrip",
-      castingTime: "1 action",
-      range: "30 feet",
-      components: "V, S",
-      duration: "Instantaneous",
-      material: "",
-      description: "Manipule um pequeno efeito elemental apropriado para a cena. Esta magia ainda depende da fonte escolhida pela mesa, entao revise o texto oficial antes de publicar a ficha final.",
-      higherLevel: "",
-    };
-  }
-
-  return {
-    name: spellName,
-    level: undefined,
-    levelLine: "Spell",
-    castingTime: "-",
-    range: "-",
-    components: "-",
-    duration: "-",
-    material: "",
-    description: "Descricao indisponivel nas APIs configuradas. Mantenha a magia na lista e adicione o texto oficial quando a fonte da campanha estiver definida.",
-    higherLevel: "",
-  };
-}
-
 function render() {
   renderChrome();
   renderCharacterMenu();
-  renderSteps();
-  renderForm();
+  if (state.builderVisible !== false) {
+    renderSteps();
+    renderForm();
+  }
   renderTabs();
   renderSheet();
 }
 
 function renderChrome() {
+  els.app.classList.toggle("sheet-only", state.builderVisible === false);
   els.topbarName.textContent = state.character.name || "Nova Ficha";
   els.syncState.textContent = state.dataStatus;
 }
@@ -578,6 +640,8 @@ function renderCharacterMenu() {
     <div class="menu-actions">
       <button type="button" class="primary-button" data-menu-new>Nova ficha</button>
       <button type="button" class="secondary-button" data-menu-level-up ${state.character.level >= 20 ? "disabled" : ""}>Subir nivel</button>
+      ${state.builderVisible === false ? `<button type="button" class="secondary-button" data-menu-toggle-builder>Mostrar criador</button>` : ""}
+      <button type="button" class="danger-button" data-menu-delete-active>Excluir ficha</button>
     </div>
     <div class="menu-current">
       <span>Nivel ${state.character.level}</span>
@@ -586,8 +650,8 @@ function renderCharacterMenu() {
     <div class="roster-list menu-roster">
       ${state.characters.map((character) => `
         <button type="button" class="roster-button ${character.id === state.activeCharacterId ? "active" : ""}" data-menu-roster-id="${character.id}">
-          <strong>${escapeHtml(character.name || "Nova Ficha")}</strong>
-          <span>${titleCase(character.subrace || character.race)} ${titleCase(character.class)} ${character.level}</span>
+          <span class="roster-main"><strong>${escapeHtml(character.name || "Nova Ficha")}</strong><span>${titleCase(character.subrace || character.race)} ${titleCase(character.class)} ${character.level}</span></span>
+          <span class="delete-character" data-menu-delete-id="${character.id}" aria-label="Excluir ficha">x</span>
         </button>
       `).join("")}
     </div>
@@ -602,13 +666,31 @@ function bindCharacterMenuEvents() {
     closeCharacterMenu();
   });
   els.characterMenu.querySelector("[data-menu-level-up]")?.addEventListener("click", () => {
-    levelUpCharacter();
+    startLevelUpAssistant();
     persist();
     render();
+    closeCharacterMenu();
+  });
+  els.characterMenu.querySelector("[data-menu-toggle-builder]")?.addEventListener("click", () => {
+    state.builderVisible = state.builderVisible === false;
+    persist();
+    render();
+    closeCharacterMenu();
+  });
+  els.characterMenu.querySelector("[data-menu-delete-active]")?.addEventListener("click", () => {
+    deleteCharacter(state.activeCharacterId);
+    closeCharacterMenu();
   });
   els.characterMenu.querySelectorAll("[data-menu-roster-id]").forEach((button) => {
     button.addEventListener("click", () => {
       switchCharacter(button.dataset.menuRosterId);
+      closeCharacterMenu();
+    });
+  });
+  els.characterMenu.querySelectorAll("[data-menu-delete-id]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      deleteCharacter(button.dataset.menuDeleteId);
       closeCharacterMenu();
     });
   });
@@ -629,11 +711,23 @@ function closeCharacterMenu() {
 }
 
 function renderSteps() {
+  if (state.levelUpMode) {
+    els.stepNav.innerHTML = `<button type="button" class="step-button active" data-step="leveling">Subir nivel</button>`;
+    return;
+  }
   els.stepNav.innerHTML = STEPS.map(([id, label]) => (
     `<button type="button" class="step-button ${state.step === id ? "active" : ""}" data-step="${id}">${label}</button>`
   )).join("");
   els.stepNav.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
+      const currentIndex = STEPS.findIndex(([id]) => id === state.step);
+      const nextIndex = STEPS.findIndex(([id]) => id === button.dataset.step);
+      if (nextIndex > currentIndex && !validateStepRange(currentIndex, nextIndex)) {
+        persist();
+        render();
+        return;
+      }
+      state.validationMessage = "";
       state.step = button.dataset.step;
       persist();
       render();
@@ -656,13 +750,19 @@ function renderTabs() {
 }
 
 function renderForm() {
+  if (state.levelUpMode) {
+    state.step = "leveling";
+    els.form.innerHTML = renderLevelingForm();
+    bindFormEvents();
+    return;
+  }
   const renderers = {
     lineage: renderLineageForm,
     abilities: renderAbilitiesForm,
     choices: renderChoicesForm,
     leveling: renderLevelingForm,
   };
-  els.form.innerHTML = `${renderNameField()}${renderers[state.step]()}`;
+  els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${renderers[state.step]()}`;
   bindFormEvents();
 }
 
@@ -677,26 +777,34 @@ function renderNameField() {
 
 function renderLineageForm() {
   const c = state.character;
+  const locked = creationChoicesLocked();
   const subraceOptions = subracesFor(c.race);
+  const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
+  const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
+  const backgroundOptions = state.api.source?.backgroundOptions?.length ? state.api.source.backgroundOptions : BACKGROUNDS.map((item) => [item, item]);
   return `
     <div class="form-grid">
-      ${selectField("class", "Classe", c.class, CLASSES.map((item) => [item, titleCase(item)]))}
-      ${selectField("race", "Raca / especie", c.race, [...RACES, "Turtle"].map((item) => [item, titleCase(item)]))}
-      ${selectField("subrace", "Subraca", c.subrace ?? subraceOptions[0], subraceOptions.map((item) => [item, item]))}
-      ${selectField("background", "Background", c.background, BACKGROUNDS.map((item) => [item, item]))}
-      ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]))}
+      ${selectField("class", "Classe", c.class, classOptions, locked)}
+      ${selectField("race", "Raca / especie", c.race, raceOptions, locked)}
+      ${selectField("subrace", "Subraca", c.subrace ?? subraceOptions[0], subraceOptions.map((item) => [item, item]), locked)}
+      ${selectField("background", "Background", c.background, backgroundOptions, locked)}
+      ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]), locked)}
     </div>
-    <p class="hint">A classe alimenta hit dice, proficiencia, ataques sugeridos, magia e a lista de escolhas por nivel. Quando a API 5e responder, os niveis vem dela.</p>
+    <p class="hint">${locked ? "Origem, classe e background foram definidos na criacao e ficam travados depois que a ficha e finalizada." : "Classe, especie, background, magias e progresso por nivel vem exclusivamente dos dados 5etools 2024."}</p>
     ${navButtons()}
   `;
 }
 
 function renderAbilitiesForm() {
+  const locked = creationChoicesLocked();
   const classSaves = classSavingThrows();
   return `
-    <div class="ability-grid">
-      ${ABILITIES.map(([key, label]) => numberField(`abilities.${key}`, label, state.character.abilities[key], 1, 30)).join("")}
-    </div>
+    <fieldset class="choice-group ability-method-panel">
+      <legend>Ability Scores</legend>
+      ${locked ? `<p class="hint">Atributos de criacao ficam travados depois que a ficha e finalizada.</p>` : selectField("abilityMethod", "Metodo de geracao", state.character.abilityMethod ?? "standard", ABILITY_METHODS)}
+      ${locked ? "" : renderAbilityMethodControls()}
+    </fieldset>
+    ${renderAbilityScoreCalculations()}
     <fieldset class="choice-group">
       <legend>Saving throws da classe</legend>
       <p class="choice-counter complete">${classSaves.length}/${classSaves.length} fixos por ${titleCase(state.character.class)}</p>
@@ -709,20 +817,128 @@ function renderAbilitiesForm() {
   `;
 }
 
+function renderAbilityMethodControls() {
+  const method = state.character.abilityMethod ?? "standard";
+  if (method === "standard") return renderStandardArrayControls();
+  if (method === "pointBuy") return renderPointBuyControls();
+  return `
+    <div class="ability-grid">
+      ${ABILITIES.map(([key, label]) => numberField(`abilities.${key}`, label, state.character.abilities[key], 1, 30)).join("")}
+    </div>
+    <p class="hint">Use Manual/Rolled para digitar valores rolados na mesa ou qualquer distribuicao definida pelo mestre.</p>
+  `;
+}
+
+function renderStandardArrayControls() {
+  return `
+    <div class="standard-array-grid">
+      ${ABILITIES.map(([key, label]) => standardArrayCard(key, label)).join("")}
+    </div>
+    <p class="hint">Arraste um atributo sobre outro para trocar os valores entre eles.</p>
+  `;
+}
+
+function standardArrayCard(key, label) {
+  return `
+    <button type="button" class="standard-array-card" draggable="true" data-standard-ability="${key}">
+      <span>${label}</span>
+      <strong>${state.character.abilities[key]}</strong>
+      <em>${signed(mod(key))}</em>
+    </button>
+  `;
+}
+
+function renderPointBuyControls() {
+  const spent = pointBuySpent();
+  const remaining = POINT_BUY_BUDGET - spent;
+  return `
+    <div class="point-buy-head">
+      <strong>${remaining} pontos restantes</strong>
+      <span>${spent}/${POINT_BUY_BUDGET} gastos</span>
+    </div>
+    <div class="point-buy-grid">
+      ${ABILITIES.map(([key, label]) => pointBuyRow(key, label, remaining)).join("")}
+    </div>
+    <p class="hint">Point Buy usa valores de 8 a 15 antes dos bonus de especie/background. Aumentar de 13 para 14 ou 15 custa mais.</p>
+  `;
+}
+
+function pointBuyRow(key, label, remaining) {
+  const score = Number(state.character.abilities[key]) || 8;
+  const nextCost = pointBuyCost(score + 1) - pointBuyCost(score);
+  const canIncrease = score < 15 && remaining >= nextCost;
+  return `
+    <article class="point-buy-row">
+      <div>
+        <strong>${label}</strong>
+        <span>Custo ${pointBuyCost(score)} | Mod ${signed(mod(key))}</span>
+      </div>
+      <div class="score-stepper">
+        <button type="button" class="mini-button" data-ability-adjust="${key}" data-delta="-1" ${score <= 8 ? "disabled" : ""}>-</button>
+        <output>${score}</output>
+        <button type="button" class="mini-button" data-ability-adjust="${key}" data-delta="1" ${canIncrease ? "" : "disabled"}>+</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderAbilityScoreCalculations() {
+  return `
+    <section class="score-calculations">
+      <h3>Score Calculations</h3>
+      <div class="score-card-grid">
+        ${ABILITIES.map(([key, label]) => scoreCalculationCard(key, label)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function scoreCalculationCard(key, label) {
+  const score = Number(state.character.abilities[key]) || 10;
+  const bonus = abilityBonusFromChoices(key);
+  return `
+    <article class="score-calc-card">
+      <h4>${label}</h4>
+      <div><span>Total Score</span><strong>${abilityScore(key)}</strong></div>
+      <div><span>Modifier</span><strong>${signed(mod(key))}</strong></div>
+      <div><span>Base Score</span><strong>${score}</strong></div>
+      <div><span>Bonus</span><strong>${signed(bonus)}</strong></div>
+    </article>
+  `;
+}
+
 function renderChoicesForm() {
   const classSkill = classSkillRule();
+  const backgroundSkills = backgroundSkillProficiencies();
   const selected = state.character.classSkillChoices ?? [];
   const selectedCount = selected.length;
+  const skillOptions = [...new Set([...backgroundSkills, ...classSkill.options])];
+  const classChoices = classCreationChoiceRules();
+  const locked = creationChoicesLocked();
   return `
     <fieldset class="choice-group">
-      <legend>Skills da classe</legend>
+      <legend>Skills</legend>
       <p class="choice-counter ${selectedCount === classSkill.choose ? "complete" : selectedCount > classSkill.choose ? "invalid" : ""}">
-        ${selectedCount}/${classSkill.choose} escolhidas
+        ${selectedCount}/${classSkill.choose} escolhas da classe${backgroundSkills.length ? ` • ${backgroundSkills.length} do background` : ""}
       </p>
       <div class="choice-list">
-        ${classSkill.options.map((name) => checkbox("classSkillChoices", name, name, selected.includes(name), selectedCount >= classSkill.choose && !selected.includes(name))).join("")}
+        ${skillOptions.map((name) => {
+          const fromBackground = backgroundSkills.includes(name);
+          const isClassOption = classSkill.options.includes(name);
+          const isSelected = selected.includes(name);
+          return checkbox(
+            "classSkillChoices",
+            name,
+            `${escapeHtml(name)}${fromBackground ? " <small class=\"choice-source\">Background</small>" : ""}`,
+            isSelected || fromBackground,
+            !isClassOption || (selectedCount >= classSkill.choose && !isSelected),
+            locked || fromBackground
+          );
+        }).join("")}
       </div>
     </fieldset>
+    ${classChoices.map(renderClassCreationChoice).join("")}
+    ${equipmentChoiceRules().map(renderEquipmentChoice).join("")}
     <fieldset class="choice-group">
       <legend>Ataques</legend>
       <div id="attackEditor">
@@ -735,34 +951,145 @@ function renderChoicesForm() {
   `;
 }
 
-function renderLevelingForm() {
-  const items = getLevelPlan();
-  const spellRule = spellChoiceRule();
-  const selectedSpellCount = state.character.spells.length;
-  const spellLimitReached = spellRule.totalMax > 0 && selectedSpellCount >= spellRule.totalMax;
+function renderEquipmentChoice(rule) {
+  const selected = state.character.equipmentChoices?.[rule.id] ?? "";
+  const locked = creationChoicesLocked();
   return `
-    <div class="level-list">
-      ${items.map((item) => `
-        <article class="level-card">
-          <h3>Nivel ${item.level}: ${item.title}</h3>
-          <p>${item.summary}</p>
-          ${item.choices.length ? `<ul>${item.choices.map((choice) => `<li>${choice}</li>`).join("")}</ul>` : ""}
-        </article>
-      `).join("")}
-    </div>
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="choice-counter ${selected ? "complete" : ""}">${selected ? "1" : "0"}/1 escolhida</p>
+      <p class="hint">${escapeHtml(rule.summary)}</p>
+      <div class="choice-list">
+        ${rule.options.map((option) => `
+          <label>
+            <input type="radio" name="equipment-${rule.id}" data-equipment-choice="${rule.id}" value="${escapeHtml(option.value)}" ${selected === option.value ? "checked" : ""} ${locked ? "disabled" : ""} />
+            <span><strong>${escapeHtml(option.label)}</strong><small>${escapeHtml(option.hint)}</small></span>
+          </label>
+        `).join("")}
+      </div>
+    </fieldset>
+  `;
+}
+
+function renderClassCreationChoice(rule) {
+  if (rule.type === "asi") return renderAsiChoice(rule);
+  const selected = state.character.classFeatureChoices?.[rule.id] ?? "";
+  return `
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="choice-counter ${selected ? "complete" : ""}">${selected ? "1" : "0"}/${rule.count} escolhida</p>
+      <p class="hint">${escapeHtml(rule.summary)}</p>
+      <div class="choice-list">
+        ${rule.options.map((option) => `
+          <label>
+            <input type="radio" name="class-feature-${rule.id}" data-class-feature-choice="${rule.id}" value="${escapeHtml(option.value)}" ${selected === option.value ? "checked" : ""} ${choiceLocked(rule) ? "disabled" : ""} />
+            <span><strong>${escapeHtml(option.label)}</strong>${option.hint ? `<small>${escapeHtml(option.hint)}</small>` : ""}</span>
+          </label>
+        `).join("")}
+      </div>
+    </fieldset>
+  `;
+}
+
+function renderAsiChoice(rule) {
+  const rawChoice = state.character.asiChoices?.[rule.id];
+  const choice = normalizedAsiChoice(rule);
+  const featOptions = qualifiedFeatOptions(rule.featCategory);
+  return `
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="choice-counter ${isAsiChoiceComplete(rule) ? "complete" : ""}">${isAsiChoiceComplete(rule) ? "1" : "0"}/1 escolhida</p>
+      <p class="hint">${escapeHtml(rule.summary)}</p>
+      <div class="choice-list">
+        <label>
+          <input type="radio" name="asi-mode-${rule.id}" data-asi-mode="${rule.id}" value="asi" ${rawChoice?.mode === "asi" ? "checked" : ""} ${choiceLocked(rule) ? "disabled" : ""} />
+          <span><strong>Ability Score Improvement</strong><small>+2 em um atributo, ou +1 em dois atributos, maximo 20.</small></span>
+        </label>
+        <label>
+          <input type="radio" name="asi-mode-${rule.id}" data-asi-mode="${rule.id}" value="feat" ${rawChoice?.mode === "feat" ? "checked" : ""} ${choiceLocked(rule) ? "disabled" : ""} />
+          <span><strong>Escolher feat</strong><small>Mostra feats para as quais o personagem qualifica.</small></span>
+        </label>
+      </div>
+      ${rawChoice?.mode === "feat" ? `
+        ${selectField(`asiChoices.${rule.id}.feat`, "Feat", choice.feat, [["", "Escolha um feat"], ...featOptions], choiceLocked(rule))}
+      ` : rawChoice?.mode === "asi" ? `
+        ${selectField(`asiChoices.${rule.id}.pattern`, "Bonus", choice.pattern, [["plus2", "+2 em um atributo"], ["plus1plus1", "+1 em dois atributos"]], choiceLocked(rule))}
+        <div class="form-grid">
+          ${selectField(`asiChoices.${rule.id}.ability1`, "Atributo 1", choice.ability1, asiAbilityOptions(), choiceLocked(rule))}
+          ${choice.pattern === "plus1plus1" ? selectField(`asiChoices.${rule.id}.ability2`, "Atributo 2", choice.ability2, asiAbilityOptions(choice.ability1), choiceLocked(rule)) : ""}
+        </div>
+      ` : ""}
+    </fieldset>
+  `;
+}
+
+function renderLevelingForm() {
+  const spellRule = spellChoiceRule();
+  const spellCounts = selectedSpellCounts();
+  const spellComplete = spellCounts.cantrips === spellRule.cantrips && spellCounts.leveled === spellRule.spellsMax;
+  const spellInvalid = spellCounts.cantrips > spellRule.cantrips || spellCounts.leveled > spellRule.spellsMax;
+  const classChoices = levelScopedChoiceRules();
+  return `
+    ${state.levelUpMode ? `
+      <section class="level-up-banner">
+        <strong>Level up: ${state.levelUpFrom} → ${state.character.level}</strong>
+        <span>Este fluxo mostra apenas o que pode mudar neste nivel.</span>
+      </section>
+      ${renderLevelUpClassChoice()}
+      ${renderLevelUpHpControl()}
+    ` : ""}
+    ${classChoices.length ? classChoices.map(renderClassCreationChoice).join("") : ""}
     <fieldset class="choice-group">
       <legend>Magias conhecidas / preparadas</legend>
-      <p class="choice-counter ${selectedSpellCount === spellRule.totalMax ? "complete" : selectedSpellCount > spellRule.totalMax ? "invalid" : ""}">
-        ${selectedSpellCount}/${spellRule.totalMax} ${spellRule.label}
+      <p class="choice-counter ${spellComplete ? "complete" : spellInvalid ? "invalid" : ""}">
+        Cantrips ${spellCounts.cantrips}/${spellRule.cantrips} | Magias ${spellCounts.leveled}/${spellRule.spellsMax}
       </p>
       <p class="hint">${spellRule.hint}</p>
-      ${renderSpellChoiceGroups(spellRule, spellLimitReached)}
+      ${renderSpellChoiceGroups(spellRule, spellCounts)}
     </fieldset>
-    <div class="field">
-      <label for="notes">Features e notas</label>
-      <textarea id="notes" data-path="notes">${escapeHtml(state.character.notes)}</textarea>
-    </div>
-    ${navButtons()}
+    ${state.levelUpMode ? levelUpNavButtons() : navButtons()}
+  `;
+}
+
+function renderLevelUpClassChoice() {
+  return `
+    <fieldset class="choice-group">
+      <legend>Classe deste nivel</legend>
+      <p class="choice-counter complete">1/1 escolhida</p>
+      <div class="choice-list">
+        <label>
+          <input type="radio" name="level-up-class-mode" data-level-up-class-mode value="same" checked />
+          <span><strong>${titleCase(state.character.class)}</strong><small>Nivel ${state.character.level}</small></span>
+        </label>
+        <label class="disabled">
+          <input type="radio" name="level-up-class-mode" value="multiclass" disabled />
+          <span><strong>Multiclasse</strong><small>Vai exigir suporte de niveis por classe antes de aplicar regras corretamente.</small></span>
+        </label>
+      </div>
+    </fieldset>
+  `;
+}
+
+function renderLevelUpHpControl() {
+  const con = mod("con");
+  const die = hitDie();
+  const fixed = fixedHpGain();
+  const min = Math.max(1, 1 + con);
+  const max = Math.max(1, die + con);
+  return `
+    <fieldset class="choice-group hp-level-group">
+      <legend>Hit Points deste nivel</legend>
+      <p class="hint">D&D 2024: ao subir de nivel, escolha rolar 1d${die} ou usar o valor fixo ${fixed - con}; depois some seu modificador de Constitution (${signed(con)}). O ganho minimo e 1.</p>
+      <div class="hp-gain-row">
+        <button type="button" class="mini-button" data-hp-preset="${fixed}">Fixo ${fixed}</button>
+        <button type="button" class="mini-button" data-hp-preset="${max}">Max ${max}</button>
+        <label>
+          Ganho de HP
+          <input type="number" min="${min}" max="${max}" value="${state.levelUpHpGain || fixed}" data-level-hp-gain />
+        </label>
+      </div>
+      <p class="choice-counter complete">HP: ${state.levelUpHpBase || state.character.hp - (state.levelUpHpGain || 0)} + ${state.levelUpHpGain || fixed} = ${state.character.hp}</p>
+    </fieldset>
   `;
 }
 
@@ -776,12 +1103,12 @@ function numberField(path, label, value, min, max) {
   return `<div class="field"><label for="${id}">${label}</label><input id="${id}" data-path="${path}" type="number" min="${min}" max="${max}" value="${value}" /></div>`;
 }
 
-function selectField(path, label, value, options) {
+function selectField(path, label, value, options, disabled = false) {
   const id = path.replace(".", "-");
   return `
     <div class="field">
       <label for="${id}">${label}</label>
-      <select id="${id}" data-path="${path}">
+      <select id="${id}" data-path="${path}" ${disabled ? "disabled" : ""}>
         ${options.map(([optionValue, optionLabel]) => `<option value="${optionValue}" ${String(optionValue).toLowerCase() === String(value).toLowerCase() ? "selected" : ""}>${optionLabel}</option>`).join("")}
       </select>
     </div>
@@ -789,17 +1116,103 @@ function selectField(path, label, value, options) {
 }
 
 function checkbox(path, value, label, checked, disabled = false, locked = false) {
-  return `<label class="${disabled ? "disabled" : ""} ${locked ? "locked" : ""}"><input type="checkbox" data-list="${path}" value="${escapeHtml(value)}" ${checked ? "checked" : ""} ${disabled || locked ? "disabled" : ""} /> ${label}</label>`;
+  return `<label class="${disabled ? "disabled" : ""} ${locked ? "locked" : ""}"><input type="checkbox" data-list="${path}" value="${escapeHtml(value)}" ${checked ? "checked" : ""} ${disabled || locked ? "disabled" : ""} /><span class="checkbox-label">${label}</span></label>`;
 }
 
 function navButtons() {
   const index = STEPS.findIndex(([id]) => id === state.step);
+  const isLast = index === STEPS.length - 1;
   return `
+    ${state.validationMessage ? `<p class="validation-message">${escapeHtml(state.validationMessage)}</p>` : ""}
     <div class="nav-row">
       <button type="button" class="secondary-button" data-move="${Math.max(0, index - 1)}">Voltar</button>
-      <button type="button" class="primary-button" data-move="${Math.min(STEPS.length - 1, index + 1)}">Continuar</button>
+      <button type="button" class="primary-button" data-move="${Math.min(STEPS.length - 1, index + 1)}" ${isLast ? "data-finish-builder" : ""}>${isLast ? "Finalizar" : "Continuar"}</button>
     </div>
   `;
+}
+
+function levelUpNavButtons() {
+  return `
+    ${state.validationMessage ? `<p class="validation-message">${escapeHtml(state.validationMessage)}</p>` : ""}
+    <div class="nav-row">
+      <button type="button" class="secondary-button" data-cancel-level-up>Cancelar</button>
+      <button type="button" class="primary-button" data-apply-level-up>Aplicar</button>
+    </div>
+  `;
+}
+
+function validateStepRange(fromIndex, toIndex) {
+  for (let index = fromIndex; index < toIndex; index += 1) {
+    if (!validateStep(STEPS[index][0])) return false;
+  }
+  return true;
+}
+
+function validateStep(step) {
+  const missing = missingChoicesForStep(step);
+  if (missing.length) {
+    state.validationMessage = `Ainda falta: ${missing.join(", ")}.`;
+    return false;
+  }
+  state.validationMessage = "";
+  return true;
+}
+
+function missingChoicesForStep(step) {
+  if (step === "lineage") {
+    const missing = [];
+    if (!state.character.name?.trim()) missing.push("nome da ficha");
+    if (!state.character.class) missing.push("classe");
+    if (!state.character.race) missing.push("raca/especie");
+    if (!state.character.subrace) missing.push("subraca/linhagem");
+    if (!state.character.background) missing.push("background");
+    return missing;
+  }
+
+  if (step === "abilities") {
+    const missing = ABILITIES.filter(([key]) => !Number.isFinite(Number(state.character.abilities[key]))).map(([, label]) => label);
+    if ((state.character.abilityMethod ?? "standard") === "pointBuy" && pointBuySpent() !== POINT_BUY_BUDGET) {
+      missing.push(`${POINT_BUY_BUDGET - pointBuySpent()} pontos de Point Buy`);
+    }
+    return missing;
+  }
+
+  if (step === "choices") return missingCreationChoices();
+  if (step === "leveling") return [...missingLevelUpChoices(), ...missingCreationChoices(), ...missingSpellChoices()];
+  return [];
+}
+
+function missingCreationChoices() {
+  if (!state.levelUpMode && creationChoicesLocked()) return [];
+  const missing = [];
+  const skillRule = classSkillRule();
+  if (!state.levelUpMode && !state.creationComplete && (state.character.classSkillChoices ?? []).length !== skillRule.choose) missing.push(`${skillRule.choose} skill(s) da classe`);
+  activeChoiceRulesForValidation().forEach((rule) => {
+    if (rule.type === "asi") {
+      if (!isAsiChoiceComplete(rule)) missing.push(rule.name);
+      return;
+    }
+    if (!state.character.classFeatureChoices?.[rule.id]) missing.push(rule.name);
+  });
+  if (!state.levelUpMode && !state.creationComplete) equipmentChoiceRules().forEach((rule) => {
+    if (!state.character.equipmentChoices?.[rule.id]) missing.push(rule.name);
+  });
+  return missing;
+}
+
+function missingSpellChoices() {
+  const rule = spellChoiceRule();
+  if (rule.totalMax === 0) return [];
+  const counts = selectedSpellCounts();
+  const missing = [];
+  if (counts.cantrips !== rule.cantrips) missing.push(`${rule.cantrips} cantrip(s)`);
+  if (counts.leveled !== rule.spellsMax) missing.push(`${rule.spellsMax} magia(s) de nivel 1+`);
+  return missing;
+}
+
+function missingLevelUpChoices() {
+  if (!state.levelUpMode) return [];
+  return state.levelUpHpGain ? [] : ["ganho de HP do nivel"];
 }
 
 function attackEditorRow(attack, index) {
@@ -818,15 +1231,34 @@ function bindFormEvents() {
   els.form.querySelectorAll("[data-path]").forEach((input) => {
     input.addEventListener("input", async () => {
       setByPath(state.character, input.dataset.path, input.type === "number" ? Number(input.value) : input.value);
-      const needsFullRender = input.dataset.path === "class" || input.dataset.path === "race" || input.dataset.path === "subrace";
+      const needsFullRender = input.dataset.path === "class" || input.dataset.path === "race" || input.dataset.path === "subrace" || input.dataset.path === "background" || input.dataset.path === "abilityMethod" || input.dataset.path.startsWith("abilities.") || input.dataset.path.startsWith("asiChoices.");
       if (input.dataset.path === "class") {
         await loadClassData(input.value);
         state.character.savingThrows = defaultSaves(input.value);
         state.character.classSkillChoices = [];
+        state.character.classFeatureChoices = {};
+        state.character.asiChoices = {};
+        state.character.equipmentChoices = {};
+        state.character.inventory = [];
+        state.character.equippedItems = [];
+        if (state.character.level === 1) state.character.hp = maxLevelOneHp(input.value, state.character.abilities);
+      }
+      if (input.dataset.path.startsWith("abilities.") && state.character.level === 1) {
+        state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
+      }
+      if (input.dataset.path === "abilityMethod") {
+        applyAbilityMethod(input.value);
       }
       if (input.dataset.path === "race") {
         await loadRaceData(input.value);
         state.character.subrace = defaultSubrace(input.value);
+      }
+      if (input.dataset.path === "background") {
+        const backgroundSkills = backgroundSkillProficiencies(input.value);
+        state.character.classSkillChoices = (state.character.classSkillChoices ?? []).filter((skill) => !backgroundSkills.includes(skill));
+        state.character.equipmentChoices = {};
+        state.character.inventory = [];
+        state.character.equippedItems = [];
       }
       normalizeCharacterState();
       persist();
@@ -834,6 +1266,87 @@ function bindFormEvents() {
       if (needsFullRender) render();
       else renderSheet();
     });
+  });
+
+  els.form.querySelectorAll("[data-ability-adjust]").forEach((button) => {
+    button.addEventListener("click", () => {
+      adjustPointBuyAbility(button.dataset.abilityAdjust, Number(button.dataset.delta));
+      normalizeCharacterState();
+      persist();
+      render();
+    });
+  });
+
+  bindStandardArrayDrag();
+
+  els.form.querySelectorAll("[data-class-feature-choice]").forEach((input) => {
+    input.addEventListener("change", () => {
+      state.character.classFeatureChoices ??= {};
+      state.character.classFeatureChoices[input.dataset.classFeatureChoice] = input.value;
+      normalizeCharacterState();
+      persist();
+      render();
+    });
+  });
+
+  els.form.querySelectorAll("[data-asi-mode]").forEach((input) => {
+    input.addEventListener("change", () => {
+      state.character.asiChoices ??= {};
+      const ruleId = input.dataset.asiMode;
+      state.character.asiChoices[ruleId] = { ...normalizedAsiChoice({ id: ruleId }), mode: input.value };
+      normalizeCharacterState();
+      persist();
+      render();
+    });
+  });
+
+  els.form.querySelectorAll("[data-equipment-choice]").forEach((input) => {
+    input.addEventListener("change", () => {
+      state.character.equipmentChoices ??= {};
+      state.character.equipmentChoices[input.dataset.equipmentChoice] = input.value;
+      rebuildInventoryFromChoices();
+      normalizeCharacterState();
+      persist();
+      render();
+    });
+  });
+
+  els.form.querySelectorAll("[data-level-hp-gain]").forEach((input) => {
+    input.addEventListener("input", () => {
+      setLevelUpHpGain(Number(input.value));
+      persist();
+      render();
+    });
+  });
+
+  els.form.querySelectorAll("[data-hp-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setLevelUpHpGain(Number(button.dataset.hpPreset));
+      persist();
+      render();
+    });
+  });
+
+  els.form.querySelector("[data-cancel-level-up]")?.addEventListener("click", () => {
+    cancelLevelUpAssistant();
+    persist();
+    render();
+  });
+
+  els.form.querySelector("[data-apply-level-up]")?.addEventListener("click", () => {
+    if (!validateStep("leveling")) {
+      persist();
+      render();
+      return;
+    }
+    state.validationMessage = "";
+    state.creationComplete = true;
+    state.character.creationComplete = true;
+    state.builderVisible = false;
+    state.levelUpMode = false;
+    state.levelUpSnapshot = null;
+    persist();
+    render();
   });
 
   els.form.querySelectorAll("[data-list]").forEach((input) => {
@@ -847,7 +1360,23 @@ function bindFormEvents() {
 
   els.form.querySelectorAll("[data-move]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.step = STEPS[Number(button.dataset.move)][0];
+      const index = STEPS.findIndex(([id]) => id === state.step);
+      const nextIndex = Number(button.dataset.move);
+      const finishing = button.dataset.finishBuilder !== undefined;
+      if ((nextIndex > index || finishing) && !validateStepRange(index, finishing ? STEPS.length : nextIndex)) {
+        persist();
+        render();
+        return;
+      }
+      state.validationMessage = "";
+      if (finishing) {
+        state.creationComplete = true;
+        state.character.creationComplete = true;
+        state.builderVisible = false;
+        state.levelUpMode = false;
+      } else {
+        state.step = STEPS[nextIndex][0];
+      }
       persist();
       render();
     });
@@ -881,12 +1410,69 @@ function bindFormEvents() {
 
 }
 
+function bindStandardArrayDrag() {
+  let draggedAbility = "";
+  let selectedAbility = "";
+  els.form.querySelectorAll("[data-standard-ability]").forEach((card) => {
+    card.addEventListener("dragstart", (event) => {
+      draggedAbility = card.dataset.standardAbility;
+      card.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", draggedAbility);
+    });
+    card.addEventListener("dragend", () => {
+      draggedAbility = "";
+      card.classList.remove("dragging");
+      els.form.querySelectorAll("[data-standard-ability]").forEach((item) => item.classList.remove("drag-over"));
+    });
+    card.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      if (card.dataset.standardAbility !== draggedAbility) card.classList.add("drag-over");
+      event.dataTransfer.dropEffect = "move";
+    });
+    card.addEventListener("dragleave", () => {
+      card.classList.remove("drag-over");
+    });
+    card.addEventListener("drop", (event) => {
+      event.preventDefault();
+      const from = event.dataTransfer.getData("text/plain") || draggedAbility;
+      const to = card.dataset.standardAbility;
+      swapStandardArrayAbilities(from, to);
+    });
+    card.addEventListener("click", () => {
+      const ability = card.dataset.standardAbility;
+      if (!selectedAbility) {
+        selectedAbility = ability;
+        card.classList.add("selected");
+        return;
+      }
+      if (selectedAbility === ability) {
+        selectedAbility = "";
+        card.classList.remove("selected");
+        return;
+      }
+      swapStandardArrayAbilities(selectedAbility, ability);
+    });
+  });
+}
+
+function swapStandardArrayAbilities(from, to) {
+  if (!from || !to || from === to) return;
+  const fromValue = state.character.abilities[from];
+  state.character.abilities[from] = state.character.abilities[to];
+  state.character.abilities[to] = fromValue;
+  normalizeCharacterState();
+  persist();
+  render();
+}
+
 function renderSheet() {
   const renderers = {
     summary: renderSummarySheet,
     skills: renderSkillsSheet,
     attacks: renderAttacksSheet,
     spells: renderSpellsSheet,
+    inventory: renderInventorySheet,
     features: renderFeaturesSheet,
   };
   els.sheetView.innerHTML = renderers[state.tab]();
@@ -896,7 +1482,14 @@ function renderSheet() {
 function bindSheetEvents() {
   els.sheetView.querySelectorAll("[data-spell-name]").forEach((button) => {
     button.addEventListener("click", async () => {
-      state.selectedSpell = button.dataset.spellName;
+      const spellName = button.dataset.spellName;
+      if (state.selectedSpell === spellName) {
+        state.selectedSpell = "";
+        persist();
+        renderSheet();
+        return;
+      }
+      state.selectedSpell = spellName;
       persist();
       renderSheet();
       await loadSpellDetails(state.selectedSpell);
@@ -912,6 +1505,85 @@ function bindSheetEvents() {
       renderSheet();
     });
   }
+
+  els.sheetView.querySelectorAll("[data-feature-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.featureFilter = button.dataset.featureFilter;
+      state.selectedFeature = "";
+      persist();
+      renderSheet();
+    });
+  });
+
+  els.sheetView.querySelectorAll("[data-feature-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const featureId = button.dataset.featureId;
+      state.selectedFeature = state.selectedFeature === featureId ? "" : featureId;
+      persist();
+      renderSheet();
+    });
+  });
+
+  els.sheetView.querySelectorAll("[data-action-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.actionFilter = button.dataset.actionFilter;
+      state.selectedAction = "";
+      persist();
+      renderSheet();
+    });
+  });
+
+  els.sheetView.querySelectorAll("[data-action-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.actionId;
+      state.selectedAction = state.selectedAction === id ? "" : id;
+      persist();
+      renderSheet();
+    });
+  });
+
+  els.sheetView.querySelectorAll("[data-use-resource]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      useResource(button.dataset.useResource);
+      persist();
+      render();
+    });
+  });
+
+  const closeFeatureButton = els.sheetView.querySelector("[data-close-feature]");
+  if (closeFeatureButton) {
+    closeFeatureButton.addEventListener("click", () => {
+      state.selectedFeature = "";
+      persist();
+      renderSheet();
+    });
+  }
+
+  els.sheetView.querySelectorAll("[data-toggle-equip]").forEach((button) => {
+    button.addEventListener("click", () => {
+      toggleEquipItem(button.dataset.toggleEquip);
+      normalizeCharacterState();
+      persist();
+      render();
+    });
+  });
+
+  els.sheetView.querySelectorAll("[data-cast-spell-level]").forEach((button) => {
+    button.addEventListener("click", () => {
+      castSpell(Number(button.dataset.castSpellLevel));
+      persist();
+      renderSheet();
+    });
+  });
+
+  els.sheetView.querySelectorAll("[data-rest-type]").forEach((button) => {
+    button.addEventListener("click", () => {
+      applyRest(button.dataset.restType);
+      persist();
+      render();
+    });
+  });
 }
 
 function renderSummarySheet() {
@@ -931,6 +1603,10 @@ function renderSummarySheet() {
       ${smallStat("Armor Class", c.armorClass)}
       ${smallStat("Proficiency", signed(proficiency()))}
     </div>
+    <div class="rest-actions">
+      <button type="button" class="secondary-button" data-rest-type="short">Short Rest</button>
+      <button type="button" class="primary-button" data-rest-type="long">Long Rest</button>
+    </div>
     <div class="abilities">
       ${ABILITIES.map(([key, label]) => abilityCard(key, label)).join("")}
     </div>
@@ -948,42 +1624,412 @@ function renderSkillsSheet() {
 }
 
 function renderAttacksSheet() {
-  const c = state.character;
-  const attackAbility = c.class === "monk" || c.class === "rogue" ? "dex" : "str";
+  const filter = state.actionFilter ?? "all";
+  const actions = currentActionItems();
+  const filtered = filter === "all" ? actions : actions.filter((action) => action.kind === filter);
+  const filters = [
+    ["all", "All"],
+    ["attack", "Attack"],
+    ["action", "Action"],
+    ["bonus", "Bonus Action"],
+    ["reaction", "Reaction"],
+    ["other", "Other"],
+    ["limited", "Limited Use"],
+  ];
   return `
-    <div class="metric-row">
-      ${smallStat("Proficiency", signed(proficiency()))}
-      ${smallStat(titleCase(attackAbility), signed(mod(attackAbility)))}
-      ${smallStat(c.class === "monk" ? "Ki Points" : "Level", c.class === "monk" ? c.level : c.level)}
+    <div class="action-filter-row">
+      ${filters.map(([id, label]) => `<button type="button" class="action-filter ${filter === id ? "active" : ""}" data-action-filter="${id}">${label}</button>`).join("")}
     </div>
-    <div class="sheet-view">
-      ${c.attacks.map((attack) => `
-        <div class="attack-row">
-          <div class="orange-pill attack-name">${escapeHtml(attack.name)}</div>
-          <div class="orange-pill">${escapeHtml(attack.range)}</div>
-          <div class="orange-pill">${escapeHtml(attack.type)}</div>
-          <span class="delete-dot">x</span>
-          <div class="pink-pill">${signed(proficiency() + mod(attackAbility))}</div>
-          <div class="pink-pill">${escapeHtml(attack.damage)}${signed(mod(attackAbility))}</div>
-        </div>
-      `).join("") || `<div class="empty-state">Adicione ataques na etapa Escolhas.</div>`}
-      <button type="button" class="mini-button">New</button>
+    ${filter === "all" ? renderActionSections(actions) : renderActionSection(actionFilterTitle(filter), filtered, filter)}
+  `;
+}
+
+function renderActionSections(actions) {
+  return ["attack", "action", "bonus", "reaction", "other", "limited"]
+    .map((kind) => renderActionSection(actionFilterTitle(kind), actions.filter((action) => action.kind === kind), kind))
+    .join("");
+}
+
+function renderActionSection(title, actions, kind) {
+  if (!actions.length) return "";
+  return `
+    <div class="actions-heading"><strong>${escapeHtml(title)}</strong>${kind === "attack" ? `<span>Attacks per Action: 1</span>` : ""}</div>
+    <div class="actions-table">
+      <div class="actions-table-head">
+        <span>Attack</span><span>Range</span><span>Hit / DC</span><span>Damage</span><span>Notes</span>
+      </div>
+      ${actions.map(renderActionRow).join("")}
     </div>
   `;
 }
 
+function renderActionRow(action) {
+  const open = state.selectedAction === action.id;
+  return `
+    <article class="action-entry">
+      <button type="button" class="action-row ${open ? "active" : ""}" data-action-id="${escapeHtml(action.id)}">
+        <span class="action-icon" aria-hidden="true">${escapeHtml(action.icon)}</span>
+        <span class="action-name">
+          <strong>${escapeHtml(action.name)}</strong>
+          <span>${escapeHtml(action.subtitle)}</span>
+        </span>
+        <span class="action-range"><strong>${escapeHtml(action.range)}</strong><span>${escapeHtml(action.rangeLabel)}</span></span>
+        <span class="action-hit">${escapeHtml(action.hit)}</span>
+        <span class="action-damage">${action.damage.map((damage) => `<span>${escapeHtml(damage)}</span>`).join("") || "--"}</span>
+        <span class="action-notes">${escapeHtml(action.notes)}</span>
+      </button>
+      ${open ? renderActionDetail(action) : ""}
+    </article>
+  `;
+}
+
+function renderActionDetail(action) {
+  return `
+    <div class="action-detail">
+      ${action.detail ? paragraphs(action.detail) : `<p>${escapeHtml(action.notes || "Sem detalhes adicionais.")}</p>`}
+      ${action.resource ? renderResourceUse(action.resource) : ""}
+    </div>
+  `;
+}
+
+function renderResourceUse(resourceId) {
+  const resource = state.character.resources?.[resourceId];
+  if (!resource) return "";
+  const remaining = Math.max(0, resource.max - resource.used);
+  return `
+    <div class="resource-use">
+      <button type="button" class="cast-button" data-use-resource="${escapeHtml(resourceId)}" ${remaining ? "" : "disabled"}>Use</button>
+      <span>${remaining}/${resource.max} disponivel - recupera em ${resource.recovery === "short" ? "Short Rest" : "Long Rest"}</span>
+    </div>
+  `;
+}
+
+function actionFilterTitle(filter) {
+  const labels = {
+    all: "Actions",
+    attack: "Actions",
+    action: "Actions",
+    bonus: "Bonus Actions",
+    reaction: "Reactions",
+    other: "Other",
+    limited: "Limited Use",
+  };
+  return labels[filter] ?? "Actions";
+}
+
+function currentActionItems() {
+  return [
+    ...currentAttackActions(),
+    ...currentSpellActions(),
+    ...rulesActionItems(),
+    ...featureActionItems(),
+  ];
+}
+
+function currentAttackActions() {
+  const attackAbility = state.character.class === "monk" || state.character.class === "rogue" ? "dex" : "str";
+  return (state.character.attacks ?? []).map((attack, index) => {
+    const item = (state.character.inventory ?? []).find((entry) => entry.id === attack.itemId);
+    return {
+      id: `attack:${index}:${slugifyName(attack.name)}`,
+      kind: "attack",
+      icon: "⚔",
+      name: attack.name,
+      subtitle: item ? itemTypeLabel(item) : "Weapon / Attack",
+      range: compactRange(attack.range),
+      rangeLabel: rangeLabel(attack.range),
+      hit: signed(proficiency() + mod(attackAbility)),
+      damage: [`${attack.damage}${signed(mod(attackAbility))}`],
+      notes: item ? itemTags(item).join(", ") : attack.type,
+      detail: item ? entriesToText(item.entries) : "",
+    };
+  });
+}
+
+function currentSpellActions() {
+  return (state.character.spells ?? [])
+    .map((name) => state.api.source?.spellDetails?.[name.toLowerCase()] ?? state.api.spellDetails?.[name] ?? null)
+    .filter(Boolean)
+    .filter((spell) => spellActionVisible(spell))
+    .map((spell) => {
+      const kind = actionKindForSpell(spell);
+      return {
+        id: `spell-action:${slugifyName(spell.name)}`,
+        kind,
+        icon: "✦",
+        name: spell.name,
+        subtitle: spell.level === 0 ? "Cantrip" : `Magia nivel ${spell.level}`,
+        range: compactRange(spell.range),
+        rangeLabel: spell.range === "Self" ? "Self" : "Range",
+        hit: spellHitOrDc(spell),
+      damage: spellDamageChips(spell.description),
+      notes: spell.components || spell.levelLine || "Magic",
+      detail: spell.description,
+      };
+    });
+}
+
+function rulesActionItems() {
+  return [
+    {
+      id: "rule:attack",
+      kind: "action",
+      icon: "A",
+      name: "Attack",
+      subtitle: "Combat Action",
+      range: "--",
+      rangeLabel: "Varies",
+      hit: "--",
+      damage: [],
+      notes: "Make one attack with a weapon or an Unarmed Strike.",
+      detail: "When you take the Attack action, you can make one attack roll with a weapon or an Unarmed Strike.",
+    },
+    {
+      id: "rule:dash",
+      kind: "action",
+      icon: "A",
+      name: "Dash",
+      subtitle: "Combat Action",
+      range: "Self",
+      rangeLabel: "Move",
+      hit: "--",
+      damage: [],
+      notes: "Gain extra movement for the current turn.",
+      detail: "When you take the Dash action, you gain extra movement for the current turn. The increase equals your Speed after applying any modifiers.",
+    },
+    {
+      id: "rule:dodge",
+      kind: "action",
+      icon: "A",
+      name: "Dodge",
+      subtitle: "Combat Action",
+      range: "Self",
+      rangeLabel: "Defense",
+      hit: "--",
+      damage: [],
+      notes: "Attacks against you have Disadvantage.",
+      detail: "Until the start of your next turn, any attack roll made against you has Disadvantage if you can see the attacker, and you make Dexterity saving throws with Advantage.",
+    },
+    {
+      id: "rule:two-weapon",
+      kind: "bonus",
+      icon: "BA",
+      name: "Two-Weapon Fighting",
+      subtitle: "Bonus Action",
+      range: "Melee",
+      rangeLabel: "Weapon",
+      hit: "--",
+      damage: [],
+      notes: "Extra attack with eligible Light weapons.",
+      detail: "When you make the extra attack of the Light property, you don't add your ability modifier to the extra attack's damage unless that modifier is negative.",
+    },
+    {
+      id: "rule:opportunity",
+      kind: "reaction",
+      icon: "R",
+      name: "Opportunity Attack",
+      subtitle: "Reaction",
+      range: "Reach",
+      rangeLabel: "Melee",
+      hit: "--",
+      damage: [],
+      notes: "A creature leaves your reach.",
+      detail: "You can make an Opportunity Attack when a creature that you can see leaves your reach using its action, Bonus Action, Reaction, or movement.",
+    },
+    {
+      id: "rule:interact",
+      kind: "other",
+      icon: "O",
+      name: "Interact with an Object",
+      subtitle: "Other",
+      range: "Touch",
+      rangeLabel: "Object",
+      hit: "--",
+      damage: [],
+      notes: "Interact with one object or feature.",
+      detail: "You normally interact with one object or feature of the environment for free, during either your move or your action.",
+    },
+  ];
+}
+
+function featureActionItems() {
+  const items = [];
+  const wildShape = currentClassFeatureItems().find((feature) => feature.name === "Wild Shape");
+  if (wildShape) {
+    const resource = state.character.resources?.wildShape;
+    const remaining = resource ? Math.max(0, resource.max - resource.used) : 0;
+    items.push({
+      id: "feature:wild-shape",
+      kind: "bonus",
+      icon: "BA",
+      name: "Wild Shape",
+      subtitle: "Druid Feature",
+      range: "Self",
+      rangeLabel: "Bonus",
+      hit: "--",
+      damage: [],
+      notes: `${remaining}/${resource?.max ?? 0} uses`,
+      detail: wildShape.body,
+      resource: "wildShape",
+    });
+    items.push({
+      id: "limited:wild-shape",
+      kind: "limited",
+      icon: "LU",
+      name: "Wild Shape Uses",
+      subtitle: "Short Rest Resource",
+      range: "Self",
+      rangeLabel: "Resource",
+      hit: "--",
+      damage: [],
+      notes: `${remaining}/${resource?.max ?? 0} disponivel`,
+      detail: "Controle de usos de Wild Shape. Voce recupera um uso em Short Rest e todos em Long Rest, conforme os dados 5etools 2024.",
+      resource: "wildShape",
+    });
+  }
+  return items;
+}
+
+function spellActionVisible(spell) {
+  const kind = actionKindForSpell(spell);
+  if (kind === "bonus" || kind === "reaction") return true;
+  const damage = spellDamageChips(spell.description);
+  const hit = spellHitOrDc(spell);
+  if (kind === "attack") return damage.length || hit !== "--";
+  return spell.level > 0 || (spell.level === 0 && kind === "action");
+}
+
+function actionKindForSpell(spell) {
+  const text = String(spell.castingTime).toLowerCase();
+  if (text.includes("bonus")) return "bonus";
+  if (text.includes("reaction")) return "reaction";
+  if (spellDamageChips(spell.description).length || spellHitOrDc(spell) !== "--") return "attack";
+  if (/ritual/i.test(`${spell.name} ${spell.description}`)) return "other";
+  return actionKindFromCastingTime(spell.castingTime);
+}
+
+function actionKindFromCastingTime(castingTime = "") {
+  const text = String(castingTime).toLowerCase();
+  if (text.includes("bonus")) return "bonus";
+  if (text.includes("reaction")) return "reaction";
+  if (text.includes("action")) return "action";
+  return "other";
+}
+
+function spellHitOrDc(spell) {
+  const description = String(spell.description ?? "").toLowerCase();
+  if (description.includes("saving throw")) return String(8 + proficiency() + mod(spellAbility()));
+  if (description.includes("spell attack")) return signed(proficiency() + mod(spellAbility()));
+  return "--";
+}
+
+function spellDamageChips(description = "") {
+  const matches = [...String(description).matchAll(/\b\d+d\d+(?:\s*[+-]\s*\d+)?\b/gi)].map((match) => match[0].replace(/\s+/g, ""));
+  return [...new Set(matches)].slice(0, 2);
+}
+
+function compactRange(range = "") {
+  return String(range).replace(/\bfeet\b/i, "ft.").replace(/\bfoot\b/i, "ft.");
+}
+
+function rangeLabel(range = "") {
+  return /feet|ft\.?/i.test(String(range)) ? "Reach" : "Range";
+}
+
 function renderSpellsSheet() {
-  const spells = state.character.spells.length ? state.character.spells : ["Elementalism"];
+  const spells = state.character.spells;
   const selected = state.selectedSpell && spells.includes(state.selectedSpell) ? state.selectedSpell : "";
+  const knownSpells = spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level));
   return `
     <div class="metric-row">
       ${smallStat("C Level", casterLevel())}
       ${smallStat("Spell Attack", signed(proficiency() + mod(spellAbility())))}
       ${smallStat("Spell DC", 8 + proficiency() + mod(spellAbility()))}
     </div>
-    <div class="spell-strip">Cantrips</div>
-    ${spells.map((spell) => `<button type="button" class="purple-strip spell-button ${spell === selected ? "active" : ""}" data-spell-name="${escapeHtml(spell)}">${escapeHtml(spell)}</button>`).join("")}
-    ${selected ? renderSpellCard(selected) : `<div class="empty-state">Clique no nome de uma magia para abrir a descricao.</div>`}
+    ${renderSpellSheetGroups(knownSpells, selected)}
+    ${spells.length ? "" : `<div class="empty-state">Nenhuma magia selecionada para esta ficha.</div>`}
+  `;
+}
+
+function renderSpellSheetGroups(spells, selected) {
+  const cantrips = spells.filter((spell) => spell.level === 0).sort((a, b) => a.name.localeCompare(b.name));
+  const leveled = spells.filter((spell) => spell.level > 0).sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+  const slotLevels = Object.keys(spellSlotsMaxByLevel()).map(Number).sort((a, b) => a - b);
+  const fallbackLevels = [...new Set(leveled.map((spell) => spell.level))].sort((a, b) => a - b);
+  return [
+    cantrips.length ? renderSpellSheetGroup(0, cantrips, selected) : "",
+    ...(slotLevels.length ? slotLevels : fallbackLevels).map((slotLevel) =>
+      renderSpellSheetGroup(slotLevel, leveled.filter((spell) => spell.level <= slotLevel), selected)
+    ),
+  ].join("");
+}
+
+function renderSpellSheetGroup(level, spells, selected) {
+  if (!spells.length) return "";
+  return `
+    <section class="spell-sheet-group">
+      <div class="spell-strip">
+        <span>${spellLevelLabel(level)}</span>
+        ${level > 0 ? renderSpellSlotTrack(level) : ""}
+      </div>
+      ${spells.map((spell) => renderSpellSheetRow(spell, selected, level)).join("")}
+    </section>
+  `;
+}
+
+function renderSpellSheetRow(spell, selected, slotLevel = spell.level) {
+  const isSelected = spell.name === selected;
+  const canCast = spell.level > 0 && availableSpellSlotsAtLevel(slotLevel) > 0;
+  const badge = spell.level > 0 && spell.level !== slotLevel ? `<span class="spell-level-badge">${ordinalLabel(spell.level)}</span>` : "";
+  return `
+    <div class="spell-row">
+      ${spell.level > 0 ? `<button type="button" class="cast-button" data-cast-spell-level="${slotLevel}" ${canCast ? "" : "disabled"}>${badge}Cast</button>` : `<span class="spell-at-will">At Will</span>`}
+      <button type="button" class="purple-strip spell-button ${isSelected ? "active" : ""}" data-spell-name="${escapeHtml(spell.name)}">${escapeHtml(spell.name)}</button>
+    </div>
+    ${isSelected ? renderSpellCard(spell.name) : ""}
+  `;
+}
+
+function renderSpellSlotTrack(level) {
+  const slot = state.character.spellSlots?.[level] ?? { max: spellSlotsMaxByLevel()[level] ?? 0, used: 0 };
+  if (!slot.max) return "";
+  return `
+    <span class="spell-slots" aria-label="Slots nivel ${level}">
+      ${Array.from({ length: slot.max }, (_, index) => `<span class="slot-box ${index < slot.used ? "used" : ""}"></span>`).join("")}
+      <strong>Slots</strong>
+    </span>
+  `;
+}
+
+function renderInventorySheet() {
+  const inventory = state.character.inventory ?? [];
+  const weight = inventory.reduce((total, item) => total + (Number(item.weight) || 0) * (Number(item.quantity) || 1), 0);
+  const gold = inventory.filter((item) => item.kind === "currency").reduce((total, item) => total + (Number(item.gp) || 0), 0);
+  return `
+    <div class="inventory-head">
+      <div><strong>Weight Carried: ${weight.toFixed(1)} lb.</strong><span>Inventory pessoal</span></div>
+      <strong>${gold} GP</strong>
+    </div>
+    <div class="inventory-list">
+      ${inventory.length ? inventory.map(renderInventoryRow).join("") : `<div class="empty-state">Escolha o equipamento inicial na etapa Escolhas.</div>`}
+    </div>
+  `;
+}
+
+function renderInventoryRow(item) {
+  const equipped = state.character.equippedItems?.includes(item.id);
+  const equipable = isEquipableItem(item);
+  return `
+    <div class="inventory-row">
+      <button type="button" class="equip-box ${equipped ? "equipped" : ""}" data-toggle-equip="${item.id}" ${equipable ? "" : "disabled"} aria-label="Equipar ${escapeHtml(item.name)}"></button>
+      <div>
+        <strong>${escapeHtml(item.name)}${item.quantity > 1 ? ` x${item.quantity}` : ""}</strong>
+        <span>${escapeHtml(item.typeLabel ?? item.kind ?? "Item")}</span>
+      </div>
+      <span>${item.weight ? `${item.weight} lb.` : "--"}</span>
+      <span>${item.valueGp ? `${item.valueGp} GP` : "--"}</span>
+      <em>${escapeHtml(itemTags(item).join(", "))}</em>
+    </div>
   `;
 }
 
@@ -1021,22 +2067,72 @@ function spellFact(label, value) {
 }
 
 function renderFeaturesSheet() {
-  const c = state.character;
-  const traits = RACE_TRAITS[String(c.race).toLowerCase()] ?? (String(c.race).toLowerCase() === "turtle" ? ["Natural Armor", "Shell Defense", "Survival Instinct"] : []);
+  const items = currentFeatureItems();
+  const filter = state.featureFilter ?? "all";
+  const filtered = filter === "all" ? items : items.filter((item) => item.kind === filter);
+  const filters = [
+    ["all", "All"],
+    ["class", "Class Features"],
+    ["species", "Species Traits"],
+    ["feat", "Feats"],
+  ];
   return `
-    <div class="info-grid">
-      <div class="info-card full"><h3>Class</h3><div>${titleCase(c.class)} ${c.level}</div></div>
-      <div class="info-card"><h3>Race</h3><div>${escapeHtml(c.subrace || titleCase(c.race))}</div></div>
-      <div class="info-card"><h3>Background</h3><div>${escapeHtml(c.background)}</div></div>
-      <div class="info-card"><h3>Alignment</h3><div>${escapeHtml(c.alignment)}</div></div>
-      <div class="info-card"><h3>Experience</h3><div>${c.experience}</div></div>
+    <div class="feature-filter-row">
+      ${filters.map(([id, label]) => `<button type="button" class="feature-filter ${filter === id ? "active" : ""}" data-feature-filter="${id}">${label}</button>`).join("")}
     </div>
-    <div class="feature-box"><strong>Features</strong>
-${traits.map((trait) => `- ${trait}`).join("\n")}
-${classFeatureSummary()}
-
-${escapeHtml(c.notes)}</div>
+    <div class="feature-section-list">
+      ${renderFeatureSection("Class Features", filtered.filter((item) => item.kind === "class"))}
+      ${renderFeatureSection("Species Traits", filtered.filter((item) => item.kind === "species"))}
+      ${renderFeatureSection("Feats", filtered.filter((item) => item.kind === "feat"))}
+    </div>
+    ${filtered.length ? "" : `<div class="empty-state">Nenhuma feature nesta categoria.</div>`}
   `;
+}
+
+function renderFeatureSection(title, items) {
+  if (!items.length) return "";
+  return `
+    <section class="feature-section">
+      <h3>${title}</h3>
+      <div class="feature-button-list">
+        ${items.map((item) => `
+          <button type="button" class="feature-button ${state.selectedFeature === item.id ? "active" : ""}" data-feature-id="${item.id}">
+            <strong>${escapeHtml(item.name)}</strong>
+            <span>${escapeHtml(item.meta)}</span>
+          </button>
+          ${state.selectedFeature === item.id ? renderFeatureDetail(item) : ""}
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderFeatureDetail(item) {
+  const choiceLines = featureChoiceSummary(item);
+  return `
+    <article class="feature-detail-card">
+      <button type="button" class="spell-close" data-close-feature aria-label="Fechar detalhe">x</button>
+      <h3>${escapeHtml(item.name)}</h3>
+      <p>${escapeHtml(item.meta)}</p>
+      ${choiceLines.length ? `<div class="feature-choice-summary">${choiceLines.map((line) => `<strong>${escapeHtml(line)}</strong>`).join("")}</div>` : ""}
+      <div>${paragraphs(item.body || "Detalhe indisponivel nos dados 5etools 2024.")}</div>
+    </article>
+  `;
+}
+
+function featureChoiceSummary(item) {
+  const summaries = [];
+  const featureSlug = item.id.split(":")[1];
+  const matchingRule = classCreationChoiceRules().find((rule) => slugifyName(rule.name) === featureSlug || rule.id === featureSlug);
+  const selected = matchingRule ? state.character.classFeatureChoices?.[matchingRule.id] : "";
+  if (matchingRule && selected) {
+    const option = matchingRule.options?.find((entry) => entry.value === selected);
+    if (option) summaries.push(`Escolha: ${option.label}`);
+  }
+  if (item.kind === "species" && /lineage|ancestry|legacy/i.test(item.name) && state.character.subrace) {
+    summaries.push(`Escolha: ${state.character.subrace}`);
+  }
+  return summaries;
 }
 
 function bigStat(label, value) {
@@ -1053,7 +2149,7 @@ function abilityCard(key, label) {
     <article class="ability-card">
       <h3>${label}</h3>
       <div class="ability-values">
-        <div><span>Score</span><strong>${state.character.abilities[key]}</strong></div>
+        <div><span>Score</span><strong>${abilityScore(key)}</strong></div>
         <div><span>Modifier</span><strong>${signed(mod(key))}</strong></div>
         <div><span>Save</span><strong>${signed(save)}</strong></div>
       </div>
@@ -1075,15 +2171,7 @@ function getLevelPlan() {
     }));
   }
 
-  return Array.from({ length: state.character.level }, (_, index) => {
-    const level = index + 1;
-    return {
-      level,
-      title: `${titleCase(state.character.class)} progression`,
-      summary: `Proficiency ${signed(proficiencyForLevel(level))}.`,
-      choices: fallbackChoicesForLevel(state.character.class, level),
-    };
-  });
+  return [];
 }
 
 function classSpecificChoices(level) {
@@ -1094,24 +2182,485 @@ function classSpecificChoices(level) {
   return details;
 }
 
-function fallbackChoicesForLevel(className, level) {
-  const choices = [];
-  if (level === 1) choices.push("Escolher proficiencias iniciais", "Escolher equipamento inicial");
-  if (["bard", "cleric", "druid", "sorcerer", "warlock", "wizard"].includes(className) && level === 1) choices.push("Escolher cantrips e magias iniciais");
-  if (["paladin", "ranger"].includes(className) && level === 2) choices.push("Escolher estilo de luta e magias");
-  if ([3].includes(level)) choices.push("Escolher subclasse / caminho");
-  if ([4, 8, 12, 16, 19].includes(level)) choices.push("Escolher ASI ou feat");
-  if (className === "monk" && level >= 2) choices.push(`Ki Points: ${level}`);
-  return choices;
+function currentFeatureItems() {
+  return [
+    ...currentClassFeatureItems(),
+    ...currentSpeciesTraitItems(),
+    ...currentFeatItems(),
+  ];
+}
+
+function currentClassFeatureItems() {
+  const className = state.api.classes[state.character.class]?.name ?? titleCase(state.character.class);
+  const unselectedOptionNames = new Set(classCreationChoiceRules().filter((rule) => Array.isArray(rule.options)).flatMap((rule) =>
+    rule.options
+      .filter((option) => state.character.classFeatureChoices?.[rule.id] !== option.value)
+      .map((option) => option.label)
+  ));
+  return (state.api.source?.classFeatures ?? [])
+    .filter((feature) => slugifyName(feature.className) === state.character.class && Number(feature.level) <= state.character.level)
+    .filter((feature) => !unselectedOptionNames.has(feature.name))
+    .map((feature) => ({
+      id: `class:${slugifyName(feature.name)}:${feature.level}`,
+      kind: "class",
+      name: feature.name,
+      meta: `${className} ${feature.level} • ${feature.source}`,
+      body: feature.body,
+    }));
+}
+
+function classCreationChoiceRules() {
+  return sortChoiceRules([
+    ...asiChoiceRules(),
+    ...featPickRules(),
+    ...classFeatureOptionRules(),
+    ...dependentClassChoiceRules(),
+    ...subclassChoiceRules(),
+    ...fightingStyleRules(),
+  ]);
+}
+
+function activeChoiceRulesForValidation() {
+  return state.levelUpMode ? levelScopedChoiceRules() : classCreationChoiceRules();
+}
+
+function levelScopedChoiceRules() {
+  const from = Number(state.levelUpFrom) || 0;
+  return classCreationChoiceRules().filter((rule) => Number(rule.level ?? 1) > from && Number(rule.level ?? 1) <= state.character.level);
+}
+
+function sortChoiceRules(rules) {
+  return [...rules].sort((a, b) => (Number(a.level ?? 1) - Number(b.level ?? 1)) || String(a.name).localeCompare(String(b.name)));
+}
+
+function choiceLocked(rule) {
+  if (state.levelUpMode) return false;
+  if (creationChoicesLocked()) return true;
+  if (state.builderVisible !== false) return false;
+  return isRuleComplete(rule);
+}
+
+function creationChoicesLocked() {
+  return !state.levelUpMode && (Boolean(state.creationComplete || state.character.creationComplete) || Number(state.character.level) > 1);
+}
+
+function isRuleComplete(rule) {
+  if (rule.type === "asi") return isAsiChoiceComplete(rule);
+  return Boolean(state.character.classFeatureChoices?.[rule.id]);
+}
+
+function featPickRules() {
+  return (state.api.source?.classFeatures ?? [])
+    .filter((feature) =>
+      slugifyName(feature.className) === state.character.class &&
+      Number(feature.level) <= state.character.level &&
+      /epic boon/i.test(feature.name)
+    )
+    .map((feature) => ({
+      id: `feat-${feature.level}-${slugifyName(feature.name)}`,
+      name: `${feature.name} (Nivel ${feature.level})`,
+      count: 1,
+      level: Number(feature.level),
+      summary: clean5etoolsText(feature.body) || "Escolha um feat qualificado.",
+      options: qualifiedFeatOptions("EB").map(([value, label]) => ({ value, label, hint: state.api.source?.featDetails?.[value]?.body?.split(/\n{2,}|\n/)[0] ?? "" })),
+    }));
+}
+
+function asiChoiceRules() {
+  return (state.api.source?.classFeatures ?? [])
+    .filter((feature) =>
+      slugifyName(feature.className) === state.character.class &&
+      Number(feature.level) <= state.character.level &&
+      /ability score improvement/i.test(feature.name)
+    )
+    .map((feature) => ({
+      id: `asi-${feature.level}`,
+      type: "asi",
+      name: `${feature.name} (Nivel ${feature.level})`,
+      count: 1,
+      level: Number(feature.level),
+      featCategory: Number(feature.level) >= 19 ? "EB" : "G",
+      summary: clean5etoolsText(feature.body) || "Escolha aumentar atributos ou selecionar um feat qualificado.",
+    }));
+}
+
+function subclassChoiceRules() {
+  const subclassFeature = (state.api.source?.classFeatures ?? []).find((feature) =>
+    slugifyName(feature.className) === state.character.class &&
+    Number(feature.level) <= state.character.level &&
+    /subclass/i.test(feature.name)
+  );
+  if (!subclassFeature) return [];
+  const className = state.api.classes[state.character.class]?.name ?? titleCase(state.character.class);
+  const options = (state.api.source?.subclasses ?? [])
+    .filter((subclass) => subclass.className === className && subclass.source === "XPHB")
+    .map((subclass) => ({
+      value: slugifyName(subclass.name),
+      label: subclass.name,
+      hint: `${subclass.source}`,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  if (!options.length) return [];
+  return [{
+    id: "subclass",
+    name: subclassFeature.name,
+    count: 1,
+    level: Number(subclassFeature.level),
+    summary: `Escolha a subclasse de ${className} liberada no nivel ${subclassFeature.level}.`,
+    options,
+  }];
+}
+
+function dependentClassChoiceRules() {
+  const choices = state.character.classFeatureChoices ?? {};
+  if (state.character.class === "druid" && choices["primal-order"] === "magician") {
+    return [{
+      id: "magician-skill",
+      name: "Magician Skill Bonus",
+      count: 1,
+      level: 1,
+      summary: "Escolha Arcana ou Nature para receber bonus igual ao modificador de Wisdom, minimo +1.",
+      options: [
+        { value: "arcana", label: "Arcana", hint: `Bonus atual: ${signed(Math.max(1, mod("wis")))}` },
+        { value: "nature", label: "Nature", hint: `Bonus atual: ${signed(Math.max(1, mod("wis")))}` },
+      ],
+    }];
+  }
+  return [];
+}
+
+function classFeatureOptionRules() {
+  return (state.api.source?.classFeatures ?? [])
+    .filter((feature) => slugifyName(feature.className) === state.character.class && Number(feature.level) <= state.character.level)
+    .map((feature) => {
+      const refs = classFeatureOptionRefs(feature.entries);
+      if (!refs.length) return null;
+      return {
+        id: slugifyName(feature.name),
+        name: feature.name,
+        count: 1,
+        level: Number(feature.level),
+        summary: firstTextEntry(feature.entries) || "Escolha uma opcao desta feature.",
+        options: refs.map((ref) => {
+          const optionFeature = classFeatureByRef(ref);
+          return {
+            value: slugifyName(optionFeature?.name ?? ref),
+            label: optionFeature?.name ?? ref.split("|")[0],
+            hint: optionFeature?.body ? optionFeature.body.split(/\n{2,}|\n/)[0] : "",
+          };
+        }),
+      };
+    })
+    .filter(Boolean);
+}
+
+function fightingStyleRules() {
+  const hasFightingStyle = (state.api.source?.classFeatures ?? []).some((feature) =>
+    slugifyName(feature.className) === state.character.class &&
+    feature.name === "Fighting Style" &&
+    Number(feature.level) <= state.character.level
+  );
+  if (!hasFightingStyle) return [];
+  const options = Object.values(state.api.source?.featDetails ?? {})
+    .filter((feat) => feat.category === "FS")
+    .map((feat) => ({
+      value: slugifyName(feat.name),
+      label: feat.name,
+      hint: feat.body.split(/\n{2,}|\n/)[0] ?? "",
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  if (!options.length) return [];
+  return [{
+    id: "fighting-style",
+    name: "Fighting Style",
+    count: 1,
+    level: 1,
+    summary: "Escolha um Fighting Style feat da lista 2024.",
+    options,
+  }];
+}
+
+function normalizedAsiChoice(rule, input = state.character.asiChoices?.[rule.id]) {
+  const choice = input ?? {};
+  const ability1 = choice.ability1 && ABILITIES.some(([key]) => key === choice.ability1) ? choice.ability1 : defaultAsiAbility();
+  const ability2Fallback = ABILITIES.find(([key]) => key !== ability1)?.[0] ?? "dex";
+  return {
+    mode: choice.mode === "feat" ? "feat" : "asi",
+    pattern: choice.pattern === "plus1plus1" ? "plus1plus1" : "plus2",
+    ability1,
+    ability2: choice.ability2 && choice.ability2 !== ability1 && ABILITIES.some(([key]) => key === choice.ability2) ? choice.ability2 : ability2Fallback,
+    feat: choice.feat ?? "",
+  };
+}
+
+function isAsiChoiceComplete(rule) {
+  if (!state.character.asiChoices?.[rule.id]) return false;
+  const choice = normalizedAsiChoice(rule);
+  if (choice.mode === "feat") return Boolean(choice.feat);
+  if (choice.pattern === "plus2") return abilityScoreBeforeAsiRule(choice.ability1, rule.id) <= 18;
+  return Boolean(choice.ability1 && choice.ability2 && choice.ability1 !== choice.ability2);
+}
+
+function qualifiedFeatOptions(category = "G") {
+  const feats = Object.values(state.api.source?.featDetails ?? {})
+    .filter((feat) => feat.category === category || (category === "G" && feat.name === "Ability Score Improvement"))
+    .filter((feat) => qualifiesForFeat(feat))
+    .map((feat) => [slugifyName(feat.name), feat.name])
+    .sort((a, b) => a[1].localeCompare(b[1]));
+  return feats.length ? feats : [["ability-score-improvement", "Ability Score Improvement"]];
+}
+
+function qualifiesForFeat(feat) {
+  const prerequisites = feat.prerequisite ?? [];
+  if (!prerequisites.length) return true;
+  return prerequisites.some((prereq) => {
+    if (prereq.level && state.character.level < prereq.level) return false;
+    if (prereq.ability) {
+      return prereq.ability.some((abilityReq) =>
+        Object.entries(abilityReq).every(([key, value]) => abilityScore(key) >= value)
+      );
+    }
+    if (prereq.spellcasting2020 && !classHasSpellList(state.character.class)) return false;
+    return true;
+  });
+}
+
+function asiAbilityOptions(exclude = "") {
+  return ABILITIES
+    .filter(([key]) => key !== exclude)
+    .map(([key, label]) => [key, `${label} (${abilityScore(key)})`]);
+}
+
+function defaultAsiAbility() {
+  const preferred = spellAbility();
+  return ABILITIES.some(([key]) => key === preferred) ? preferred : "con";
+}
+
+function equipmentChoiceRules() {
+  const rules = [];
+  const classEquipment = state.api.classes[state.character.class]?.startingEquipment;
+  if (classEquipment?.defaultData?.length) {
+    rules.push(equipmentRuleFromData("class-starting-equipment", `${titleCase(state.character.class)} Equipment`, classEquipment));
+  }
+  const background = state.api.source?.backgroundDetails?.[String(state.character.background).toLowerCase()];
+  if (background?.startingEquipment?.length) {
+    rules.push(equipmentRuleFromData("background-starting-equipment", `${state.character.background} Equipment`, { defaultData: background.startingEquipment, entries: background.entries }));
+  }
+  return rules.filter(Boolean);
+}
+
+function equipmentRuleFromData(id, name, data) {
+  const groups = data.defaultData ?? data.startingEquipment ?? [];
+  const choices = groups[0] ?? {};
+  const options = Object.entries(choices).map(([key, items]) => ({
+    value: key,
+    label: `Opcao ${key}`,
+    hint: summarizeEquipmentItems(items),
+    items,
+  }));
+  if (!options.length) return null;
+  return {
+    id,
+    name,
+    summary: entriesToText(data.entries).split("\n")[0] || "Escolha um pacote inicial.",
+    options,
+  };
+}
+
+function summarizeEquipmentItems(items) {
+  return items.map((item) => {
+    if (item.value) return `${Math.floor(item.value / 100)} GP`;
+    if (item.special) return item.special;
+    if (typeof item.item === "object") return summarizeEquipmentItems([item.item]);
+    const parsed = parseItemRef(item.item);
+    return `${item.quantity ? `${item.quantity} ` : ""}${parsed.name}`;
+  }).join(", ");
+}
+
+function rebuildInventoryFromChoices() {
+  const inventory = [];
+  equipmentChoiceRules().forEach((rule) => {
+    const selected = state.character.equipmentChoices?.[rule.id];
+    const option = rule.options.find((item) => item.value === selected);
+    if (!option) return;
+    option.items.forEach((entry, index) => {
+      inventory.push(...inventoryItemsFromEntry(entry, `${rule.id}:${selected}:${index}`));
+    });
+  });
+  state.character.inventory = inventory;
+  state.character.equippedItems = (state.character.equippedItems ?? []).filter((id) => inventory.some((item) => item.id === id));
+}
+
+function inventoryItemsFromEntry(entry, idBase) {
+  if (entry.value) return [{ id: idBase, name: "Gold", kind: "currency", gp: Math.floor(entry.value / 100), quantity: 1 }];
+  if (entry.special) return [{ id: idBase, name: entry.special, kind: "special", quantity: 1 }];
+  if (typeof entry.item === "object") return inventoryItemsFromEntry(entry.item, idBase);
+  if (!entry.item) return [];
+  const parsed = parseItemRef(entry.item);
+  const detail = itemDetail(parsed.name, parsed.source);
+  return [normalizeInventoryItem(detail, parsed, entry.quantity ?? 1, idBase)];
+}
+
+function normalizeInventoryItem(detail, parsed, quantity, id) {
+  const name = displayItemName(detail?.name ?? parsed.name);
+  return {
+    id,
+    name,
+    source: detail?.source ?? parsed.source,
+    quantity,
+    kind: "item",
+    type: detail?.type,
+    typeLabel: itemTypeLabel(detail),
+    weight: detail?.weight ?? 0,
+    valueGp: detail?.value ? detail.value / 100 : 0,
+    ac: detail?.ac,
+    damage: detail?.dmg1,
+    damageType: detail?.dmgType,
+    property: detail?.property ?? [],
+    entries: detail?.entries ?? [],
+  };
+}
+
+function parseItemRef(ref) {
+  const [rawName, rawSource = "xphb"] = String(ref).split("|");
+  return { name: titleCase(rawName), source: rawSource.toUpperCase() };
+}
+
+function itemDetail(name, source = "XPHB") {
+  return state.api.source?.itemDetails?.[itemKey(displayItemName(name), source)] ?? state.api.source?.itemDetails?.[itemKey(name, source)];
+}
+
+function itemKey(name, source = "XPHB") {
+  return `${String(name).toLowerCase()}|${String(source).toLowerCase()}`;
+}
+
+function displayItemName(name) {
+  if (String(name).toLowerCase() === "druidic focus") return "Quarterstaff";
+  return name;
+}
+
+function itemTypeLabel(item) {
+  const type = String(item?.type ?? "");
+  if (type.startsWith("S")) return "Shield";
+  if (type.includes("A")) return "Armor";
+  if (type.startsWith("M") || type.startsWith("R")) return "Weapon";
+  if (type.includes("SCF")) return "Focus";
+  return "Gear";
+}
+
+function itemTags(item) {
+  const tags = [];
+  if (item.ac) tags.push(`+${item.ac} AC`);
+  if (item.damage) tags.push(`${item.damage} ${damageTypeLabel(item.damageType)}`);
+  (item.property ?? []).forEach((prop) => tags.push(propertyLabel(prop)));
+  return tags.filter(Boolean);
+}
+
+function classFeatureOptionRefs(entries) {
+  const refs = [];
+  walkEntries(entries, (entry) => {
+    if (entry?.type !== "options") return;
+    (entry.entries ?? []).forEach((option) => {
+      if (option.type === "refClassFeature" && option.classFeature) refs.push(option.classFeature);
+    });
+  });
+  return refs;
+}
+
+function classFeatureByRef(ref) {
+  const [name, className, classSource, level] = String(ref).split("|");
+  return (state.api.source?.classFeatures ?? []).find((feature) =>
+    feature.name === name &&
+    feature.className === className &&
+    feature.classSource === classSource &&
+    String(feature.level) === String(level)
+  );
+}
+
+function firstTextEntry(entries) {
+  return (entries ?? []).find((entry) => typeof entry === "string") ?? "";
+}
+
+function currentSpeciesTraitItems() {
+  const race = state.api.races[state.character.race]?.details;
+  if (!race) return [];
+  return entriesNamedItems(race.entries).map((entry) => ({
+    id: `species:${slugifyName(entry.name)}`,
+    kind: "species",
+    name: entry.name,
+    meta: `${race.name} • ${race.source}`,
+    body: entry.body,
+  }));
+}
+
+function currentFeatItems() {
+  const background = state.api.source?.backgroundDetails?.[String(state.character.background).toLowerCase()];
+  const featRefs = (background?.feats ?? []).flatMap((group) => Object.keys(group));
+  const backgroundFeats = featRefs.map((ref) => {
+    const parsed = parseFeatRef(ref);
+    const detail = state.api.source?.featDetails?.[parsed.slug];
+    return {
+      id: `feat:${parsed.slug}:${slugifyName(parsed.variant)}`,
+      kind: "feat",
+      name: parsed.variant ? `${parsed.name} (${titleCase(parsed.variant)})` : parsed.name,
+      meta: `${state.character.background} • ${detail?.source ?? "XPHB"}`,
+      body: detail?.body ?? "",
+    };
+  });
+  const chosenFeats = Object.entries(state.character.asiChoices ?? {})
+    .filter(([, choice]) => choice?.mode === "feat" && choice.feat)
+    .map(([ruleId, choice]) => {
+      const detail = state.api.source?.featDetails?.[choice.feat];
+      return {
+        id: `feat:${ruleId}:${choice.feat}`,
+        kind: "feat",
+        name: detail?.name ?? titleCase(choice.feat),
+        meta: `Level ${ruleId.replace("asi-", "")} • ${detail?.source ?? "XPHB"}`,
+        body: detail?.body ?? "",
+      };
+    });
+  const pickedFeats = Object.entries(state.character.classFeatureChoices ?? {})
+    .filter(([ruleId]) => ruleId.startsWith("feat-"))
+    .map(([ruleId, featSlug]) => {
+      const detail = state.api.source?.featDetails?.[featSlug];
+      return {
+        id: `feat:${ruleId}:${featSlug}`,
+        kind: "feat",
+        name: detail?.name ?? titleCase(featSlug),
+        meta: `Class Feature • ${detail?.source ?? "XPHB"}`,
+        body: detail?.body ?? "",
+      };
+    });
+  return [...backgroundFeats, ...chosenFeats, ...pickedFeats];
+}
+
+function entriesNamedItems(entries) {
+  return (entries ?? [])
+    .filter((entry) => entry?.type === "entries" && entry.name)
+    .map((entry) => ({
+      name: entry.name,
+      body: entriesToText(entry.entries),
+    }));
+}
+
+function parseFeatRef(ref) {
+  const [namePart] = String(ref).split("|");
+  const [name, variant = ""] = namePart.split(";");
+  const cleanName = titleCase(name.trim());
+  return {
+    name: cleanName,
+    variant: variant.trim(),
+    slug: slugifyName(name.trim()),
+  };
 }
 
 function spellOptions() {
-  if (!SPELLCASTERS.has(state.character.class)) return state.character.spells;
+  if (!classHasSpellList(state.character.class)) return state.character.spells;
   const legalOptions = legalSpellOptions();
   return [...new Set([...state.character.spells.filter((name) => legalSpellNames().has(name)), ...legalOptions.map((spell) => spell.name)])].slice(0, 60);
 }
 
-function renderSpellChoiceGroups(spellRule, spellLimitReached) {
+function renderSpellChoiceGroups(spellRule, spellCounts) {
   const legalByName = new Map(legalSpellOptions().map((spell) => [spell.name, spell]));
   const selectedLegal = state.character.spells
     .filter((name) => legalSpellNames().has(name))
@@ -1123,12 +2672,24 @@ function renderSpellChoiceGroups(spellRule, spellLimitReached) {
 
   return grouped.map(([level, spells]) => `
     <section class="spell-choice-group">
-      <h3>${spellLevelLabel(level)}</h3>
+      <h3>${spellLevelLabel(level)} <span>${spellGroupCounter(level, spellRule, spellCounts)}</span></h3>
       <div class="choice-list">
-        ${spells.map((spell) => checkbox("spells", spell.name, spell.name, state.character.spells.includes(spell.name), spellRule.totalMax === 0 || (spellLimitReached && !state.character.spells.includes(spell.name)))).join("")}
+        ${spells.map((spell) => checkbox("spells", spell.name, spell.name, state.character.spells.includes(spell.name), spellChoiceDisabled(spell, spellRule, spellCounts))).join("")}
       </div>
     </section>
   `).join("");
+}
+
+function spellGroupCounter(level, spellRule, spellCounts) {
+  if (level === 0) return `${spellCounts.cantrips}/${spellRule.cantrips}`;
+  return `${spellCounts.leveled}/${spellRule.spellsMax}`;
+}
+
+function spellChoiceDisabled(spell, spellRule, spellCounts) {
+  if (spellRule.totalMax === 0) return true;
+  if (state.character.spells.includes(spell.name)) return false;
+  if (spell.level === 0) return spellCounts.cantrips >= spellRule.cantrips;
+  return spellCounts.leveled >= spellRule.spellsMax;
 }
 
 function legalSpellOptions() {
@@ -1139,11 +2700,7 @@ function legalSpellOptions() {
     .map((spell) => typeof spell === "string" ? spellFromKnownData(spell) : spell)
     .filter((spell) => spell?.name && Number.isFinite(spell.level));
 
-  const source = normalizedClassSpells.length
-    ? normalizedClassSpells
-    : FALLBACK_SPELL_OPTIONS.filter((spell) => spell.classes.includes(className));
-
-  return source
+  return normalizedClassSpells
     .filter((spell) => spell.level <= maxLevel)
     .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
 }
@@ -1167,17 +2724,160 @@ function spellLevelLabel(level) {
   return level === 0 ? "Cantrips" : `Magias de nivel ${level}`;
 }
 
+function ordinalLabel(level) {
+  const labels = { 1: "1st", 2: "2nd", 3: "3rd" };
+  return labels[level] ?? `${level}th`;
+}
+
 function legalSpellNames() {
   return new Set(legalSpellOptions().map((spell) => spell.name));
+}
+
+function selectedSpellCounts(spells = state.character.spells) {
+  return spellListCounts(spells.map((name) => spellFromKnownData(name)).filter((spell) => spell?.name && Number.isFinite(spell.level)));
+}
+
+function spellListCounts(spells) {
+  return spells.reduce((counts, spell) => {
+    if (spell.level === 0) counts.cantrips += 1;
+    else counts.leveled += 1;
+    return counts;
+  }, { cantrips: 0, leveled: 0 });
+}
+
+function spellSlotsMaxByLevel() {
+  const spellcasting = currentLevelRow()?.spellcasting ?? {};
+  return Object.fromEntries(
+    Array.from({ length: 9 }, (_, index) => {
+      const level = index + 1;
+      return [level, Number(spellcasting[`spell_slots_level_${level}`]) || 0];
+    }).filter(([, max]) => max > 0)
+  );
+}
+
+function syncSpellSlots() {
+  state.character.spellSlots ??= {};
+  const maxByLevel = spellSlotsMaxByLevel();
+  const next = {};
+  Object.entries(maxByLevel).forEach(([level, max]) => {
+    const previous = state.character.spellSlots[level] ?? {};
+    next[level] = {
+      max,
+      used: clamp(Number(previous.used) || 0, 0, max),
+    };
+  });
+  state.character.spellSlots = next;
+}
+
+function availableSpellSlotsAtLevel(level) {
+  const slot = state.character.spellSlots?.[level];
+  return Math.max(0, (Number(slot?.max) || 0) - (Number(slot?.used) || 0));
+}
+
+function castSpell(slotLevel) {
+  if (!slotLevel || slotLevel <= 0) return;
+  syncSpellSlots();
+  const slot = state.character.spellSlots?.[slotLevel];
+  if (!slot || Number(slot.used) >= Number(slot.max)) return;
+  slot.used += 1;
+}
+
+function resetSpellSlots(options = {}) {
+  syncSpellSlots();
+  Object.values(state.character.spellSlots ?? {}).forEach((slot) => {
+    if (options.pactOnly && state.api.classes[state.character.class]?.casterProgression !== "pact") return;
+    slot.used = 0;
+  });
+}
+
+function syncResources() {
+  state.character.resources ??= {};
+  const next = {};
+  const wildShapeMax = wildShapeUsesMax();
+  if (wildShapeMax > 0) {
+    const previous = state.character.resources.wildShape ?? {};
+    next.wildShape = {
+      name: "Wild Shape",
+      max: wildShapeMax,
+      used: clamp(Number(previous.used) || 0, 0, wildShapeMax),
+      recovery: "short",
+    };
+  }
+  state.character.resources = next;
+}
+
+function useResource(resourceId) {
+  syncResources();
+  const resource = state.character.resources?.[resourceId];
+  if (!resource || resource.used >= resource.max) return;
+  resource.used += 1;
+}
+
+function recoverShortRestResources() {
+  const wildShape = state.character.resources?.wildShape;
+  if (wildShape) wildShape.used = Math.max(0, wildShape.used - 1);
+}
+
+function recoverLongRestResources() {
+  Object.values(state.character.resources ?? {}).forEach((resource) => {
+    resource.used = 0;
+  });
+}
+
+function wildShapeUsesMax() {
+  if (state.character.class !== "druid" || state.character.level < 2) return 0;
+  const druid = state.api.classes.druid;
+  const group = (druid?.classTableGroups ?? []).find((table) =>
+    (table.colLabels ?? []).some((label) => /wild shape/i.test(clean5etoolsText(label)))
+  );
+  const wildShapeIndex = (group?.colLabels ?? []).findIndex((label) => /wild shape/i.test(clean5etoolsText(label)));
+  const value = group?.rows?.[state.character.level - 1]?.[wildShapeIndex];
+  return Number(value) || 2;
+}
+
+function applyRest(type) {
+  const isLong = type === "long";
+  const label = isLong ? "Long Rest" : "Short Rest";
+  const message = isLong
+    ? "Confirmar Long Rest? Isso restaura HP ao maximo e recupera todos os slots de magia."
+    : "Confirmar Short Rest? Isso recupera recursos de descanso curto, como Pact Magic quando aplicavel.";
+  if (!window.confirm(message)) return;
+  if (isLong) {
+    state.character.hp = Math.max(state.character.hp, maxHitPoints());
+    resetSpellSlots();
+    recoverLongRestResources();
+  } else {
+    resetSpellSlots({ pactOnly: true });
+    recoverShortRestResources();
+  }
+  state.validationMessage = `${label} aplicado.`;
+}
+
+function maxHitPoints() {
+  const level = Number(state.character.level) || 1;
+  const die = hitDie();
+  const first = Math.max(1, die + mod("con"));
+  const later = Math.max(1, fixedHpGain());
+  return first + Math.max(0, level - 1) * later;
 }
 
 function spellFromKnownData(name) {
   const detail = state.api.spellDetails?.[name];
   if (detail && Number.isFinite(detail.level)) return { name, level: detail.level };
-  return FALLBACK_SPELL_OPTIONS.find((spell) => spell.name === name) ?? { name, level: Infinity };
+  const sourceDetail = state.api.source?.spellDetails?.[String(name).toLowerCase()];
+  if (sourceDetail && Number.isFinite(sourceDetail.level)) return { name: sourceDetail.name, level: sourceDetail.level };
+  return { name, level: Infinity };
 }
 
 function classSkillRule() {
+  const skillChoice = state.api.classes[state.character.class]?.startingProficiencies?.skills?.find((entry) => entry.choose?.from);
+  if (skillChoice) {
+    return {
+      choose: skillChoice.choose.count ?? 1,
+      options: skillChoice.choose.from.map(skillNameFromSlug),
+    };
+  }
+
   const apiChoice = state.api.classes[state.character.class]?.proficiency_choices?.find((choice) =>
     choice.type === "proficiencies" && optionNames(choice).some((name) => name.startsWith("Skill:"))
   );
@@ -1189,14 +2889,13 @@ function classSkillRule() {
     };
   }
 
-  return CLASS_SKILLS[state.character.class] ?? CLASS_SKILLS.fighter;
+  return { choose: 0, options: [] };
 }
 
 function subracesFor(raceName) {
   const key = String(raceName);
   const apiSubraces = state.api.races[key.toLowerCase()]?.subraces ?? [];
-  const fallback = SUBRACES[key] ?? SUBRACES[key.toLowerCase()] ?? [titleCase(key)];
-  return apiSubraces.length ? apiSubraces : fallback;
+  return apiSubraces.length ? apiSubraces : [titleCase(key)];
 }
 
 function defaultSubrace(raceName) {
@@ -1206,8 +2905,59 @@ function defaultSubrace(raceName) {
 function levelUpCharacter() {
   if (state.character.level >= 20) return;
   state.character.level += 1;
-  state.character.hp += Math.max(1, Math.ceil(hitDie() / 2) + 1 + mod("con"));
+  const gain = fixedHpGain();
+  state.character.hp += gain;
   normalizeCharacterState();
+  return gain;
+}
+
+function startLevelUpAssistant() {
+  if (state.character.level >= 20) return;
+  if (state.levelUpMode) return;
+  state.levelUpMode = true;
+  state.levelUpFrom = state.character.level;
+  state.levelUpHpBase = state.character.hp;
+  state.levelUpSnapshot = structuredClone(state.character);
+  state.levelUpClassMode = "same";
+  state.builderVisible = true;
+  state.creationComplete = true;
+  state.character.creationComplete = true;
+  const gain = levelUpCharacter();
+  state.levelUpHpGain = gain;
+  state.step = "leveling";
+}
+
+function cancelLevelUpAssistant() {
+  if (state.levelUpSnapshot) {
+    state.character = structuredClone(state.levelUpSnapshot);
+    state.activeCharacterId = state.character.id;
+  }
+  state.levelUpMode = false;
+  state.levelUpSnapshot = null;
+  state.levelUpHpGain = 0;
+  state.levelUpHpBase = 0;
+  state.levelUpClassMode = "same";
+  state.creationComplete = Boolean(state.character.creationComplete);
+  if (state.creationComplete) state.builderVisible = false;
+  normalizeCharacterState();
+}
+
+function setLevelUpHpGain(value) {
+  if (!state.levelUpMode) return;
+  const con = mod("con");
+  const min = Math.max(1, 1 + con);
+  const max = Math.max(1, hitDie() + con);
+  state.levelUpHpGain = clamp(Number(value) || min, min, max);
+  state.character.hp = (state.levelUpHpBase || state.character.hp - state.levelUpHpGain) + state.levelUpHpGain;
+}
+
+function fixedHpGain() {
+  return Math.max(1, Math.floor(hitDie() / 2) + 1 + mod("con"));
+}
+
+function maxLevelOneHp(className, abilities = state.character.abilities) {
+  const die = state.api.classes?.[className]?.hit_die ?? CLASS_HIT_DIE[className] ?? 8;
+  return Math.max(1, die + Math.floor(((abilities.con ?? 10) - 10) / 2));
 }
 
 function normalizeSubrace() {
@@ -1218,21 +2968,21 @@ function normalizeSubrace() {
 function spellChoiceRule() {
   const className = state.character.class;
   const levelRow = currentLevelRow();
-  const spellcasting = levelRow?.spellcasting ?? fallbackSpellcasting(className, state.character.level);
-  const cantrips = spellcasting.cantrips_known ?? 0;
+  const spellcasting = levelRow?.spellcasting;
+  const cantrips = (spellcasting?.cantrips_known ?? 0) + classFeatureCantripBonus();
 
-  if (!SPELLCASTERS.has(className) || casterLevel() === 0) {
+  if (!spellcasting || !classHasSpellList(className) || casterLevel() === 0) {
     return {
-      cantrips,
+      cantrips: 0,
       spellsMax: 0,
       totalMax: 0,
       label: "permitidas pela classe",
-      hint: "Esta classe nao recebe conjuracao pela API 5e 2014 neste nivel.",
+      hint: "Esta classe nao recebe conjuracao pelos dados 5etools 2024 neste nivel.",
     };
   }
 
-  if (PREPARED_CASTERS.has(className)) {
-    const prepared = preparedSpellLimit(className);
+  if (Number.isFinite(spellcasting.prepared_spells)) {
+    const prepared = spellcasting.prepared_spells;
     return {
       cantrips,
       spellsMax: prepared,
@@ -1248,13 +2998,21 @@ function spellChoiceRule() {
     spellsMax: known,
     totalMax: cantrips + known,
     label: "cantrips + conhecidas",
-    hint: `${titleCase(className)} conhece ${known} magia(s) e ${cantrips} cantrip(s) neste nivel, conforme a tabela da API.`,
+    hint: `${titleCase(className)} conhece ${known} magia(s) e ${cantrips} cantrip(s) neste nivel, conforme os dados 5etools 2024.`,
   };
+}
+
+function classFeatureCantripBonus() {
+  const choices = state.character.classFeatureChoices ?? {};
+  let bonus = 0;
+  if (state.character.class === "druid" && choices["primal-order"] === "magician") bonus += 1;
+  if (state.character.class === "cleric" && choices["divine-order"] === "thaumaturge") bonus += 1;
+  return bonus;
 }
 
 function maxSpellLevelAvailable() {
   const className = state.character.class;
-  if (!SPELLCASTERS.has(className) || casterLevel() === 0) return 0;
+  if (!classHasSpellList(className) || casterLevel() === 0) return 0;
   const spellcasting = currentLevelRow()?.spellcasting;
   if (spellcasting) {
     for (let level = 9; level >= 1; level -= 1) {
@@ -1262,43 +3020,7 @@ function maxSpellLevelAvailable() {
     }
     return (spellcasting.cantrips_known ?? 0) > 0 ? 0 : 0;
   }
-  return fallbackMaxSpellLevel(className, state.character.level);
-}
-
-function fallbackMaxSpellLevel(className, level) {
-  const characterLevel = Math.max(1, Math.min(20, Number(level) || 1));
-  if (className === "paladin" || className === "ranger") return characterLevel < 2 ? 0 : Math.ceil(characterLevel / 4);
-  if (className === "warlock") return Math.min(5, Math.ceil(characterLevel / 2));
-  return Math.min(9, Math.ceil(characterLevel / 2));
-}
-
-function fallbackSpellcasting(className, level) {
-  const capped = Math.max(1, Math.min(20, Number(level) || 1));
-  const known = {
-    bard: [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 15, 16, 18, 19, 19, 20, 22, 22, 22],
-    ranger: [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11],
-    sorcerer: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15],
-    warlock: [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15],
-  };
-  const cantrips = {
-    bard: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-    cleric: [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-    druid: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-    sorcerer: [4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-    warlock: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-    wizard: [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  };
-
-  return {
-    cantrips_known: cantrips[className]?.[capped - 1] ?? 0,
-    spells_known: known[className]?.[capped - 1] ?? 0,
-  };
-}
-
-function preparedSpellLimit(className) {
-  const abilityMod = mod(spellAbility());
-  if (className === "paladin") return Math.max(1, Math.floor(state.character.level / 2) + abilityMod);
-  return Math.max(1, state.character.level + abilityMod);
+  return 0;
 }
 
 function currentLevelRow() {
@@ -1317,39 +3039,277 @@ function optionNames(choice) {
 }
 
 function normalizeCharacterState() {
+  normalizeSourceSelections();
+  state.character.abilityMethod ??= "standard";
+  normalizeAbilityMethodState();
+  if (state.character.level === 1) state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
   normalizeSubrace();
   state.character.classSkillChoices ??= deriveClassSkillChoices();
+  state.character.classFeatureChoices ??= {};
+  state.character.asiChoices ??= {};
+  state.character.equipmentChoices ??= {};
+  state.character.inventory ??= [];
+  state.character.equippedItems ??= [];
+  state.character.spellSlots ??= {};
+  state.character.resources ??= {};
   state.character.savingThrows = classSavingThrows();
+  if (hasLoadedRules()) {
+    enforceClassFeatureChoices();
+    enforceEquipmentChoices();
+  }
   enforceClassSkillLimit();
   syncSkillProficiencies();
   enforceSpellLimit();
+  syncSpellSlots();
+  syncResources();
+  syncInventoryEffects();
+}
+
+function hasLoadedRules() {
+  return Boolean(state.api.source?.classFeatures?.length && Object.keys(state.api.classes ?? {}).length);
+}
+
+function normalizeAbilityMethodState() {
+  if (state.character.abilityMethod === "standard" && !isStandardArrayPermutation()) {
+    state.character.abilities = Object.fromEntries(ABILITIES.map(([key], index) => [key, STANDARD_ARRAY[index]]));
+  }
+}
+
+function isStandardArrayPermutation() {
+  const current = ABILITIES.map(([key]) => Number(state.character.abilities[key])).sort((a, b) => a - b);
+  return current.join(",") === [...STANDARD_ARRAY].sort((a, b) => a - b).join(",");
+}
+
+function enforceClassFeatureChoices() {
+  const rules = classCreationChoiceRules();
+  const nonAsiRules = rules.filter((rule) => rule.type !== "asi");
+  const validRuleIds = new Set(nonAsiRules.map((rule) => rule.id));
+  state.character.classFeatureChoices = Object.fromEntries(
+    Object.entries(state.character.classFeatureChoices ?? {}).filter(([ruleId, value]) => {
+      const rule = nonAsiRules.find((item) => item.id === ruleId);
+      return validRuleIds.has(ruleId) && rule?.options.some((option) => option.value === value);
+    })
+  );
+  enforceAsiChoices(rules.filter((rule) => rule.type === "asi"));
+}
+
+function enforceAsiChoices(rules) {
+  const validRuleIds = new Set(rules.map((rule) => rule.id));
+  state.character.asiChoices = Object.fromEntries(
+    Object.entries(state.character.asiChoices ?? {})
+      .filter(([ruleId]) => validRuleIds.has(ruleId))
+      .map(([ruleId, choice]) => {
+        const rule = rules.find((item) => item.id === ruleId);
+        const normalized = normalizedAsiChoice(rule, choice);
+        if (normalized.mode === "feat" && !qualifiedFeatOptions(rule.featCategory).some(([value]) => value === normalized.feat)) {
+          normalized.feat = "";
+        }
+        return [ruleId, normalized];
+      })
+  );
+}
+
+function enforceEquipmentChoices() {
+  const rules = equipmentChoiceRules();
+  const valid = new Set(rules.map((rule) => rule.id));
+  const before = JSON.stringify(state.character.equipmentChoices ?? {});
+  state.character.equipmentChoices = Object.fromEntries(
+    Object.entries(state.character.equipmentChoices ?? {}).filter(([ruleId, value]) => {
+      const rule = rules.find((item) => item.id === ruleId);
+      return valid.has(ruleId) && rule?.options.some((option) => option.value === value);
+    })
+  );
+  const after = JSON.stringify(state.character.equipmentChoices ?? {});
+  if (before !== after || !(state.character.inventory ?? []).length) rebuildInventoryFromChoices();
+}
+
+function normalizeSourceSelections() {
+  const classOptions = state.api.source?.classOptions ?? [];
+  if (classOptions.length && !classOptions.some(([value]) => value === state.character.class)) {
+    state.character.class = classOptions[0][0];
+  }
+  const raceOptions = state.api.source?.raceOptions ?? [];
+  if (raceOptions.length && !raceOptions.some(([value]) => value === state.character.race)) {
+    state.character.race = raceOptions[0][0];
+  }
+  const backgroundOptions = state.api.source?.backgroundOptions ?? [];
+  if (backgroundOptions.length && !backgroundOptions.some(([value]) => value === state.character.background)) {
+    state.character.background = backgroundOptions[0][0];
+  }
 }
 
 function deriveClassSkillChoices() {
   const rule = classSkillRule();
-  return (state.character.skillProficiencies ?? []).filter((skill) => rule.options.includes(skill)).slice(0, rule.choose);
+  const backgroundSkills = backgroundSkillProficiencies();
+  return (state.character.skillProficiencies ?? [])
+    .filter((skill) => rule.options.includes(skill) && !backgroundSkills.includes(skill))
+    .slice(0, rule.choose);
 }
 
 function enforceClassSkillLimit() {
   const rule = classSkillRule();
+  const backgroundSkills = backgroundSkillProficiencies();
   state.character.classSkillChoices = [...new Set(state.character.classSkillChoices ?? [])]
-    .filter((skill) => rule.options.includes(skill))
+    .filter((skill) => rule.options.includes(skill) && !backgroundSkills.includes(skill))
     .slice(0, rule.choose);
 }
 
 function syncSkillProficiencies() {
   const rule = classSkillRule();
-  const existingNonClass = (state.character.skillProficiencies ?? []).filter((skill) => !rule.options.includes(skill));
-  state.character.skillProficiencies = [...new Set([...existingNonClass, ...state.character.classSkillChoices])];
+  const backgroundSkills = backgroundSkillProficiencies();
+  const existingOtherSkills = (state.character.skillProficiencies ?? [])
+    .filter((skill) => !rule.options.includes(skill))
+    .filter((skill) => !backgroundSkills.includes(skill));
+  state.character.skillProficiencies = [...new Set([...backgroundSkills, ...existingOtherSkills, ...state.character.classSkillChoices])];
+}
+
+function backgroundSkillProficiencies(backgroundName = state.character.background) {
+  const background = state.api.source?.backgroundDetails?.[String(backgroundName).toLowerCase()];
+  return [...new Set((background?.skillProficiencies ?? []).flatMap((group) => {
+    if (!group || typeof group !== "object") return [];
+    return Object.entries(group)
+      .filter(([, enabled]) => enabled === true)
+      .map(([slug]) => skillNameFromSlug(slug));
+  }))];
 }
 
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
   const legalNames = legalSpellNames();
-  state.character.spells = [...new Set(state.character.spells ?? [])]
+  const next = [];
+  let cantrips = 0;
+  let leveled = 0;
+  [...new Set(state.character.spells ?? [])]
     .filter((name) => legalNames.size === 0 ? true : legalNames.has(name))
-    .slice(0, rule.totalMax);
+    .forEach((name) => {
+      const spell = spellFromKnownData(name);
+      if (!spell || !Number.isFinite(spell.level)) return;
+      if (spell.level === 0) {
+        if (cantrips >= rule.cantrips) return;
+        cantrips += 1;
+      } else {
+        if (leveled >= rule.spellsMax) return;
+        leveled += 1;
+      }
+      next.push(name);
+    });
+  state.character.spells = next;
   if (state.selectedSpell && !state.character.spells.includes(state.selectedSpell)) state.selectedSpell = state.character.spells[0] ?? "";
+}
+
+function syncInventoryEffects() {
+  const inventory = state.character.inventory ?? [];
+  state.character.equippedItems ??= [];
+  const equipped = inventory.filter((item) => state.character.equippedItems.includes(item.id));
+  const armor = equipped.find((item) => isArmorItem(item));
+  const shieldBonus = equipped.filter((item) => isShieldItem(item)).reduce((total, item) => total + (Number(item.ac) || 0), 0);
+  const dex = mod("dex");
+  const armorBase = armor?.ac ? Number(armor.ac) + armorDexBonus(armor, dex) : 10 + dex;
+  state.character.armorClass = armorBase + shieldBonus;
+  const manualAttacks = (state.character.attacks ?? []).filter((attack) => !attack.fromInventory);
+  const itemAttacks = equipped.filter(isWeaponItem).map(attackFromInventoryItem);
+  state.character.attacks = [...manualAttacks, ...itemAttacks];
+}
+
+function toggleEquipItem(id) {
+  const item = (state.character.inventory ?? []).find((entry) => entry.id === id);
+  if (!item || !isEquipableItem(item)) return;
+  state.character.equippedItems ??= [];
+  const equipped = state.character.equippedItems.includes(id);
+  if (equipped) {
+    state.character.equippedItems = state.character.equippedItems.filter((itemId) => itemId !== id);
+    return;
+  }
+  if (isArmorItem(item)) {
+    state.character.equippedItems = state.character.equippedItems.filter((itemId) => {
+      const other = state.character.inventory.find((entry) => entry.id === itemId);
+      return !isArmorItem(other);
+    });
+  }
+  state.character.equippedItems.push(id);
+}
+
+function isEquipableItem(item) {
+  return isShieldItem(item) || isArmorItem(item) || isWeaponItem(item);
+}
+
+function isShieldItem(item) {
+  return String(item?.type ?? "").startsWith("S");
+}
+
+function isArmorItem(item) {
+  return ["LA", "MA", "HA"].some((prefix) => String(item?.type ?? "").startsWith(prefix));
+}
+
+function isWeaponItem(item) {
+  return Boolean(item?.damage);
+}
+
+function armorDexBonus(item, dex) {
+  const type = String(item?.type ?? "");
+  if (type.startsWith("MA")) return Math.min(2, dex);
+  if (type.startsWith("HA")) return 0;
+  return dex;
+}
+
+function attackFromInventoryItem(item) {
+  return {
+    name: item.name,
+    range: "5 feet",
+    type: damageTypeLabel(item.damageType),
+    damage: item.damage,
+    fromInventory: true,
+    itemId: item.id,
+  };
+}
+
+function damageTypeLabel(type) {
+  const labels = { B: "Bludgeoning", P: "Piercing", S: "Slashing" };
+  return labels[type] ?? type ?? "";
+}
+
+function propertyLabel(prop) {
+  const key = String(prop).split("|")[0];
+  const labels = { V: "Versatile", L: "Light", T: "Thrown", F: "Finesse", H: "Heavy", R: "Reach", "2H": "Two-Handed" };
+  return labels[key] ?? key;
+}
+
+function applyAbilityMethod(method) {
+  state.character.abilityMethod = method;
+  if (method === "standard") {
+    state.character.abilities = Object.fromEntries(ABILITIES.map(([key], index) => [key, STANDARD_ARRAY[index]]));
+  }
+  if (method === "pointBuy") {
+    state.character.abilities = Object.fromEntries(ABILITIES.map(([key]) => [key, clamp(Number(state.character.abilities[key]) || 8, 8, 15)]));
+    trimPointBuyToBudget();
+  }
+}
+
+function adjustPointBuyAbility(key, delta) {
+  const current = Number(state.character.abilities[key]) || 8;
+  const next = clamp(current + delta, 8, 15);
+  if (next === current) return;
+  if (delta > 0 && pointBuySpent() + pointBuyCost(next) - pointBuyCost(current) > POINT_BUY_BUDGET) return;
+  state.character.abilities[key] = next;
+}
+
+function trimPointBuyToBudget() {
+  while (pointBuySpent() > POINT_BUY_BUDGET) {
+    const highest = ABILITIES
+      .map(([key]) => key)
+      .filter((key) => state.character.abilities[key] > 8)
+      .sort((a, b) => state.character.abilities[b] - state.character.abilities[a])[0];
+    if (!highest) break;
+    state.character.abilities[highest] -= 1;
+  }
+}
+
+function pointBuySpent() {
+  return ABILITIES.reduce((total, [key]) => total + pointBuyCost(state.character.abilities[key]), 0);
+}
+
+function pointBuyCost(score) {
+  return POINT_BUY_COSTS[clamp(Number(score) || 8, 8, 15)] ?? 0;
 }
 
 function updateChoiceList(listName, value, checked) {
@@ -1392,13 +3352,13 @@ function classSavingThrows() {
   if (Array.isArray(apiSaves) && apiSaves.length) {
     return apiSaves.map((save) => save.index).filter(Boolean);
   }
-  return defaultSaves(state.character.class);
+  return [];
 }
 
 function classFeatureSummary() {
   const className = state.character.class;
   if (className === "monk") return "- Martial Arts\n- Ki\n- Unarmored Movement";
-  if (SPELLCASTERS.has(className)) return "- Spellcasting\n- Class features by level";
+  if (classHasSpellList(className)) return "- Spellcasting\n- Class features by level";
   return "- Class features by level";
 }
 
@@ -1406,18 +3366,54 @@ function setByPath(target, path, value) {
   const parts = path.split(".");
   let cursor = target;
   while (parts.length > 1) {
-    cursor = cursor[parts.shift()];
+    const part = parts.shift();
+    cursor[part] ??= {};
+    cursor = cursor[part];
   }
   cursor[parts[0]] = value;
 }
 
 function mod(key) {
-  return Math.floor(((state.character.abilities[key] ?? 10) - 10) / 2);
+  return Math.floor((abilityScore(key) - 10) / 2);
+}
+
+function abilityScore(key) {
+  return clamp((Number(state.character.abilities[key]) || 10) + abilityBonusFromChoices(key), 1, 30);
+}
+
+function abilityBonusFromChoices(key) {
+  return Object.entries(state.character.asiChoices ?? {}).reduce((total, [ruleId, choice]) => {
+    const normalized = normalizedAsiChoice({ id: ruleId }, choice);
+    if (normalized.mode !== "asi") return total;
+    if (normalized.pattern === "plus2" && normalized.ability1 === key) return total + 2;
+    if (normalized.pattern === "plus1plus1" && (normalized.ability1 === key || normalized.ability2 === key)) return total + 1;
+    return total;
+  }, 0);
+}
+
+function abilityScoreBeforeAsiRule(key, ruleId) {
+  return clamp((Number(state.character.abilities[key]) || 10) + Object.entries(state.character.asiChoices ?? {}).reduce((total, [id, choice]) => {
+    if (id === ruleId) return total;
+    const normalized = normalizedAsiChoice({ id }, choice);
+    if (normalized.mode !== "asi") return total;
+    if (normalized.pattern === "plus2" && normalized.ability1 === key) return total + 2;
+    if (normalized.pattern === "plus1plus1" && (normalized.ability1 === key || normalized.ability2 === key)) return total + 1;
+    return total;
+  }, 0), 1, 30);
 }
 
 function skillBonus(name) {
   const ability = SKILLS.find(([skill]) => skill === name)?.[1] ?? "dex";
-  return mod(ability) + (state.character.skillProficiencies.includes(name) ? proficiency() : 0);
+  return mod(ability) + (state.character.skillProficiencies.includes(name) ? proficiency() : 0) + skillChoiceBonus(name);
+}
+
+function skillChoiceBonus(name) {
+  const choices = state.character.classFeatureChoices ?? {};
+  if (state.character.class === "druid" && choices["primal-order"] === "magician") {
+    const target = choices["magician-skill"];
+    if (target && slugifyName(name) === target) return Math.max(1, mod("wis"));
+  }
+  return 0;
 }
 
 function proficiency() {
@@ -1429,18 +3425,23 @@ function proficiencyForLevel(level) {
 }
 
 function hitDie() {
-  return CLASS_HIT_DIE[state.character.class] ?? 8;
+  return state.api.classes[state.character.class]?.hit_die ?? 8;
 }
 
 function casterLevel() {
   const className = state.character.class;
-  if (!SPELLCASTERS.has(className)) return 0;
+  const progression = state.api.classes[className]?.casterProgression;
+  if (!classHasSpellList(className)) return 0;
+  if (progression === "artificer") return Math.max(0, Math.ceil(state.character.level / 2));
+  if (progression === "pact") return state.character.level;
   if (HALF_CASTER.has(className)) return Math.max(0, Math.floor(state.character.level / 2));
   if (className === "warlock") return state.character.level;
   return state.character.level;
 }
 
 function spellAbility() {
+  const apiAbility = state.api.classes[state.character.class]?.spellcastingAbility;
+  if (apiAbility) return apiAbility;
   const ability = {
     bard: "cha",
     cleric: "wis",
@@ -1476,6 +3477,10 @@ function signed(value) {
   return value >= 0 ? `+${value}` : String(value);
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function titleCase(value) {
   return String(value)
     .split(/[-\s]/)
@@ -1493,6 +3498,113 @@ function ordinalSuffix(value) {
   if (mod10 === 2) return "nd";
   if (mod10 === 3) return "rd";
   return "th";
+}
+
+function classHasSpellList(className) {
+  return (state.api.classSpells?.[className] ?? []).length > 0;
+}
+
+function slugifyName(value) {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replaceAll("'", "")
+    .replaceAll("/", " ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function skillNameFromSlug(value) {
+  const normalized = String(value).toLowerCase();
+  return SKILLS.find(([name]) => slugifyName(name) === slugifyName(normalized))?.[0] ?? titleCase(normalized);
+}
+
+function spellSchoolName(school) {
+  const schools = {
+    A: "Abjuration",
+    C: "Conjuration",
+    D: "Divination",
+    E: "Enchantment",
+    I: "Illusion",
+    N: "Necromancy",
+    T: "Transmutation",
+    V: "Evocation",
+  };
+  return schools[school] ?? school ?? "";
+}
+
+function format5etoolsTime(time) {
+  const first = Array.isArray(time) ? time[0] : time;
+  if (!first) return "-";
+  return `${first.number ?? 1} ${first.unit ?? ""}`.trim();
+}
+
+function format5etoolsRange(range) {
+  const distance = range?.distance;
+  if (!distance) return "-";
+  if (distance.type === "self") return "Self";
+  if (distance.type === "touch") return "Touch";
+  if (distance.type === "sight") return "Sight";
+  if (distance.type === "unlimited") return "Unlimited";
+  if (Number.isFinite(distance.amount)) return `${distance.amount} ${distance.type}`;
+  return titleCase(distance.type ?? range.type ?? "-");
+}
+
+function format5etoolsComponents(components) {
+  if (!components) return "-";
+  const parts = [];
+  if (components.v) parts.push("V");
+  if (components.s) parts.push("S");
+  if (components.m) parts.push("M");
+  return parts.join(", ");
+}
+
+function format5etoolsDuration(duration) {
+  const first = Array.isArray(duration) ? duration[0] : duration;
+  if (!first) return "-";
+  if (first.type === "instant") return "Instantaneous";
+  if (first.type === "permanent") return "Permanent";
+  if (first.type === "special") return "Special";
+  if (first.type === "timed") {
+    const amount = first.duration?.amount ?? 1;
+    const type = first.duration?.type ?? "";
+    return `${first.concentration ? "Concentration, up to " : ""}${amount} ${type}`.trim();
+  }
+  return titleCase(first.type);
+}
+
+function entriesToText(entries) {
+  return (entries ?? [])
+    .map(entryToText)
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function entryToText(entry) {
+  if (typeof entry === "string") return clean5etoolsText(entry);
+  if (Array.isArray(entry)) return entry.map(entryToText).filter(Boolean).join("\n");
+  if (!entry || typeof entry !== "object") return "";
+  if (entry.type === "entries") {
+    const title = entry.name ? `${clean5etoolsText(entry.name)}\n` : "";
+    return `${title}${entriesToText(entry.entries)}`.trim();
+  }
+  if (entry.type === "list") return (entry.items ?? []).map((item) => `- ${entryToText(item)}`).join("\n");
+  if (entry.type === "item") return clean5etoolsText(entry.name ?? entry.entry ?? "");
+  if (entry.type === "table") {
+    const rows = (entry.rows ?? []).map((row) => Array.isArray(row) ? row.map(entryToText).join(" | ") : entryToText(row));
+    return [entry.caption, ...rows].filter(Boolean).map(clean5etoolsText).join("\n");
+  }
+  return clean5etoolsText(entry.name ?? "");
+}
+
+function clean5etoolsText(value) {
+  return String(value ?? "")
+    .replace(/\{@(?:spell|item|condition|skill|sense|variantrule|filter|hazard|scaledamage|damage|feat|action|book)\s+([^|}]+)(?:\|[^}]*)?}/g, "$1")
+    .replace(/\{@(?:dice|hit|d20|chance)\s+([^|}]+)(?:\|[^}]*)?}/g, "$1")
+    .replace(/\{@i\s+([^}]+)}/g, "$1")
+    .replace(/\{@b\s+([^}]+)}/g, "$1")
+    .replace(/\{@[^}]+\}/g, "")
+    .trim();
 }
 
 function paragraphs(value) {
