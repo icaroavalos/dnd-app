@@ -182,6 +182,9 @@ const defaultState = {
   hpModalMode: "damage",
   hpModalAmount: 0,
   hpModalTempAmount: 0,
+ restModalOpen: false,
+ restModalType: null,
+ restModalContent: null,
   validationMessage: "",
   builderVisible: true,
   levelUpMode: false,
@@ -328,8 +331,13 @@ function bindGlobalEvents() {
 
   els.hpModalBackdrop.addEventListener("click", closeHpModal);
 
+document.getElementById("restModalBackdrop")?.addEventListener("click", () => {
+  if (state.restModalOpen) cancelRest();
+});
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && state.hpModalOpen) closeHpModal();
+  if (event.key === "Escape" && state.restModalOpen) cancelRest();
   });
 }
 
@@ -637,6 +645,8 @@ function render() {
   renderTabs();
   renderSheet();
   renderHpModal();
+
+ renderRestModal();
 }
 
 function renderChrome() {
@@ -799,12 +809,12 @@ function renderLineageForm() {
   const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
   const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
   const backgroundOptions = state.api.source?.backgroundOptions?.length ? state.api.source.backgroundOptions : BACKGROUNDS.map((item) => [item, item]);
-  const subraceFieldOptions = subraceOptions.length ? subraceOptions.map((item) => [item, item]) : [["", ""]];
+  const hasSubrace = subraceOptions.length > 0; const subraceFieldOptions = hasSubrace ? subraceOptions.map((item) => [item, item]) : [["", ""]];
   return `
     <div class="form-grid">
       ${selectField("class", "Classe", c.class, classOptions, locked)}
       ${selectField("race", "Raca / especie", c.race, raceOptions, locked)}
-      ${selectField("subrace", "Subraca", c.subrace ?? "", subraceFieldOptions, locked)}
+      ${hasSubrace ? selectField("subrace", "Subraca", c.subrace ?? "", subraceFieldOptions, locked) : ""}
       ${selectField("background", "Background", c.background, backgroundOptions, locked)}
       ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]), locked)}
     </div>
@@ -1685,18 +1695,46 @@ function renderHpModal() {
   });
 }
 
+
+function renderRestModal() {
+    const modal = document.getElementById("restModal");
+    const backdrop = document.getElementById("restModalBackdrop");
+    if (!modal || !backdrop) return;
+
+    if (!state.restModalOpen) {
+        modal.hidden = true;
+        backdrop.hidden = true;
+        modal.innerHTML = "";
+        return;
+    }
+
+    modal.hidden = false;
+    backdrop.hidden = false;
+
+    const content = state.restModalContent || { label: "Rest", description: "" };
+    modal.innerHTML = '<div class="hp-modal-panel"><div class="hp-modal-head"><div><p class="eyebrow">' + content.label + '</p><h2>Confirmar descanso</h2></div><button type="button" class="icon-button" data-close-rest-modal aria-label="Fechar">x</button></div><div class="hp-control-panel"><p class="rest-description">' + content.description + '</p><div class="rest-actions-modal"><button type="button" class="secondary-button" data-confirm-rest-cancel>Cancelar</button><button type="button" class="primary-button" data-confirm-rest-confirm>Confirmar</button></div></div></div>';
+
+    modal.querySelector("[data-close-rest-modal]")?.addEventListener("click", cancelRest);
+    modal.querySelector("[data-confirm-rest-cancel]")?.addEventListener("click", cancelRest);
+    modal.querySelector("[data-confirm-rest-confirm]")?.addEventListener("click", confirmRest);
+}
+
 function openHpModal(mode = "damage") {
   state.hpModalOpen = true;
   state.hpModalMode = mode;
   state.hpModalAmount = 0;
   state.hpModalTempAmount = 0;
   renderHpModal();
+
+ renderRestModal();
 }
 
 function closeHpModal() {
   if (!state.hpModalOpen) return;
   state.hpModalOpen = false;
   renderHpModal();
+
+ renderRestModal();
 }
 
 function applyHpModalAction() {
@@ -3345,24 +3383,11 @@ function recoverLongRestResources() {
   });
 }
 
-function applyRest(type) {
-  const isLong = type === "long";
-  const label = isLong ? "Long Rest" : "Short Rest";
-  const message = isLong
-    ? "Confirmar Long Rest? Isso restaura HP ao maximo e recupera todos os slots de magia."
-    : "Confirmar Short Rest? Isso recupera recursos de descanso curto, como Pact Magic quando aplicavel.";
-  if (!window.confirm(message)) return;
-  if (isLong) {
-    state.character.hp = maxHitPoints();
-    state.character.tempHp = 0;
-    resetSpellSlots();
-    recoverLongRestResources();
-  } else {
-    resetSpellSlots({ pactOnly: true });
-    recoverShortRestResources();
-  }
-  state.validationMessage = `${label} aplicado.`;
-}
+function applyRest(type) { state.restModalType = type; const isLong = type === "long"; const description = isLong ? "Restaura HP ao máximo e recupera todos os slots de magia." : "Recupera recursos de descanso curto, como Pact Magic."; state.restModalContent = { label: isLong ? "Long Rest" : "Short Rest", description }; state.restModalOpen = true; renderSheet(); }
+
+function confirmRest() { const type = state.restModalType; const isLong = type === "long"; if (isLong) { state.character.hp = maxHitPoints(); state.character.tempHp = 0; resetSpellSlots(); recoverLongRestResources(); } else { resetSpellSlots({ pactOnly: true }); recoverShortRestResources(); } state.validationMessage = `${isLong ? "Long Rest" : "Short Rest"} aplicado.`; state.restModalOpen = false; state.restModalContent = null; persist(); render(); }
+
+function cancelRest() { state.restModalOpen = false; state.restModalContent = null; state.restModalType = null; renderSheet(); }
 
 function maxHitPoints() {
   const level = Number(state.character.level) || 1;

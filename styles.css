@@ -2156,3 +2156,15 @@ h1 {
     min-height: 30px;
   }
 }
+
+.rest-description {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.rest-actions-modal {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
