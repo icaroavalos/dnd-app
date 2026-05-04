@@ -178,6 +178,10 @@ const defaultState = {
   selectedAction: "",
   featureFilter: "all",
   selectedFeature: "",
+  hpModalOpen: false,
+  hpModalMode: "damage",
+  hpModalAmount: 0,
+  hpModalTempAmount: 0,
   validationMessage: "",
   builderVisible: true,
   levelUpMode: false,
@@ -206,6 +210,7 @@ const defaultState = {
     equippedItems: [],
     spellSlots: {},
     resources: {},
+    tempHp: 0,
     creationComplete: false,
     hp: 95,
     armorClass: 17,
@@ -237,6 +242,8 @@ const els = {
   characterMenuButton: document.querySelector("#characterMenuButton"),
   characterMenu: document.querySelector("#characterMenu"),
   menuBackdrop: document.querySelector("#menuBackdrop"),
+  hpModalBackdrop: document.querySelector("#hpModalBackdrop"),
+  hpModal: document.querySelector("#hpModal"),
   topbarName: document.querySelector("#topbarName"),
   syncState: document.querySelector("#syncState"),
 };
@@ -317,6 +324,12 @@ function bindGlobalEvents() {
 
   els.menuBackdrop.addEventListener("click", () => {
     closeCharacterMenu();
+  });
+
+  els.hpModalBackdrop.addEventListener("click", closeHpModal);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.hpModalOpen) closeHpModal();
   });
 }
 
@@ -477,6 +490,7 @@ function hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment
       raceOptions: raceResults.map((race) => [slugifyName(race.name), race.name]).sort((a, b) => a[1].localeCompare(b[1])),
       backgroundOptions: backgroundResults.map((background) => [background.name, background.name]).sort((a, b) => a[1].localeCompare(b[1])),
       backgroundDetails: Object.fromEntries(backgroundResults.map((background) => [background.name.toLowerCase(), background])),
+      subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
       itemDetails: Object.fromEntries(equipmentResults.map((item) => [itemKey(item.name, item.source), item])),
       classFeatures: classFeatureResults.map(normalize5etoolsFeature),
       subclasses: subclassResults,
@@ -543,8 +557,9 @@ function build5etoolsLevels(klass) {
 
 function normalize5etoolsRace(race, subraceResults) {
   const explicitSubraces = subraceResults
-    .filter((subrace) => subrace.raceName === race.name)
-    .map((subrace) => subrace.name);
+    .filter((subrace) => slugifyName(subrace.raceName) === slugifyName(race.name))
+    .map((subrace) => subrace.name)
+    .filter(Boolean);
   const ancestryOptions = inferAncestryOptionsFromEntries(race.entries);
   return {
     details: race,
@@ -572,15 +587,16 @@ function normalize5etoolsSpell(spell) {
 
 function inferAncestryOptionsFromEntries(entries) {
   const names = [];
+  const choiceNamePattern = /(lineage|ancestor|ancestry|legacy|legacies|heritage)/i;
   walkEntries(entries, (item) => {
     if (item?.type === "table" && Array.isArray(item.rows)) {
-      const caption = String(item.caption ?? "").toLowerCase();
-      if (!/(lineage|ancestor|legacy)/.test(caption)) return;
+      const caption = String(item.caption ?? "");
+      if (!choiceNamePattern.test(caption)) return;
       item.rows.forEach((row) => {
         if (typeof row?.[0] === "string") names.push(row[0]);
       });
     }
-    if (item?.type === "entries" && /(lineage|ancestor|legacy)/i.test(item.name ?? "")) {
+    if (item?.type === "entries" && choiceNamePattern.test(item.name ?? "")) {
       walkEntries(item.entries, (child) => {
         if (child?.type === "item" && child.name) names.push(child.name);
       });
@@ -620,6 +636,7 @@ function render() {
   }
   renderTabs();
   renderSheet();
+  renderHpModal();
 }
 
 function renderChrome() {
@@ -782,11 +799,12 @@ function renderLineageForm() {
   const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
   const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
   const backgroundOptions = state.api.source?.backgroundOptions?.length ? state.api.source.backgroundOptions : BACKGROUNDS.map((item) => [item, item]);
+  const subraceFieldOptions = subraceOptions.length ? subraceOptions.map((item) => [item, item]) : [["", ""]];
   return `
     <div class="form-grid">
       ${selectField("class", "Classe", c.class, classOptions, locked)}
       ${selectField("race", "Raca / especie", c.race, raceOptions, locked)}
-      ${selectField("subrace", "Subraca", c.subrace ?? subraceOptions[0], subraceOptions.map((item) => [item, item]), locked)}
+      ${selectField("subrace", "Subraca", c.subrace ?? "", subraceFieldOptions, locked)}
       ${selectField("background", "Background", c.background, backgroundOptions, locked)}
       ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]), locked)}
     </div>
@@ -1164,7 +1182,7 @@ function missingChoicesForStep(step) {
     if (!state.character.name?.trim()) missing.push("nome da ficha");
     if (!state.character.class) missing.push("classe");
     if (!state.character.race) missing.push("raca/especie");
-    if (!state.character.subrace) missing.push("subraca/linhagem");
+    if (subracesFor(state.character.race).length && !state.character.subrace) missing.push("subraca/linhagem");
     if (!state.character.background) missing.push("background");
     return missing;
   }
@@ -1229,7 +1247,7 @@ function attackEditorRow(attack, index) {
 
 function bindFormEvents() {
   els.form.querySelectorAll("[data-path]").forEach((input) => {
-    input.addEventListener("input", async () => {
+    const updatePathValue = async () => {
       setByPath(state.character, input.dataset.path, input.type === "number" ? Number(input.value) : input.value);
       const needsFullRender = input.dataset.path === "class" || input.dataset.path === "race" || input.dataset.path === "subrace" || input.dataset.path === "background" || input.dataset.path === "abilityMethod" || input.dataset.path.startsWith("abilities.") || input.dataset.path.startsWith("asiChoices.");
       if (input.dataset.path === "class") {
@@ -1265,7 +1283,9 @@ function bindFormEvents() {
       renderChrome();
       if (needsFullRender) render();
       else renderSheet();
-    });
+    };
+    input.addEventListener("input", updatePathValue);
+    if (input.tagName === "SELECT") input.addEventListener("change", updatePathValue);
   });
 
   els.form.querySelectorAll("[data-ability-adjust]").forEach((button) => {
@@ -1551,6 +1571,12 @@ function bindSheetEvents() {
     });
   });
 
+  els.sheetView.querySelectorAll("[data-open-hp-modal]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openHpModal();
+    });
+  });
+
   const closeFeatureButton = els.sheetView.querySelector("[data-close-feature]");
   if (closeFeatureButton) {
     closeFeatureButton.addEventListener("click", () => {
@@ -1586,8 +1612,132 @@ function bindSheetEvents() {
   });
 }
 
+function renderHpModal() {
+  if (!els.hpModal || !els.hpModalBackdrop) return;
+  els.hpModal.hidden = !state.hpModalOpen;
+  els.hpModalBackdrop.hidden = !state.hpModalOpen;
+  if (!state.hpModalOpen) {
+    els.hpModal.innerHTML = "";
+    return;
+  }
+  const maxHp = maxHitPoints();
+  const currentHp = Number(state.character.hp) || 0;
+  const tempHp = Math.max(0, Number(state.character.tempHp) || 0);
+  const totalHp = currentHp + tempHp;
+  els.hpModal.innerHTML = `
+    <div class="hp-modal-panel">
+      <div class="hp-modal-head">
+        <div>
+          <p class="eyebrow">HP Control</p>
+          <h2>Gerenciar vida</h2>
+        </div>
+        <button type="button" class="icon-button" data-close-hp-modal aria-label="Fechar controle de HP">x</button>
+      </div>
+      <div class="hp-control-panel">
+        <div class="hp-display-shell">
+          <button type="button" class="hp-action-button hp-heal ${state.hpModalMode === "heal" ? "active" : ""}" data-hp-mode="heal">HEAL</button>
+          <label class="hp-quantity-stack">
+            <span>QUANTITY</span>
+            <input type="number" min="0" step="1" value="${Number(state.hpModalAmount) || 0}" data-hp-amount />
+          </label>
+          <button type="button" class="hp-action-button hp-damage ${state.hpModalMode === "damage" ? "active" : ""}" data-hp-mode="damage">DAMAGE</button>
+        </div>
+        <div class="hp-display-grid">
+          <div class="hp-display-cell hp-current-cell">
+            <span>CURRENT</span>
+            <strong>${totalHp}</strong>
+          </div>
+          <div class="hp-display-divider">/</div>
+          <div class="hp-display-cell hp-max-cell">
+            <span>MAX</span>
+            <strong>${maxHp}</strong>
+          </div>
+        </div>
+        <div class="hp-temp-strip">
+          <div class="hp-temp-readout">
+            <span>TEMPORARY HP</span>
+            <strong>${tempHp > 0 ? tempHp : 0}</strong>
+          </div>
+          <label class="hp-temp-stack">
+            <span>THP AMOUNT</span>
+            <input type="number" min="0" step="1" value="${Number(state.hpModalTempAmount) || 0}" data-hp-temp-amount />
+          </label>
+          <button type="button" class="hp-temp-button ${state.hpModalMode === "temp" ? "active" : ""}" data-hp-mode="temp">GAIN THP</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  els.hpModal.querySelectorAll("[data-close-hp-modal]").forEach((button) => {
+    button.addEventListener("click", closeHpModal);
+  });
+  els.hpModal.querySelectorAll("[data-hp-mode]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.hpModalMode = button.dataset.hpMode;
+      applyHpModalAction();
+    });
+  });
+  els.hpModal.querySelector("[data-hp-amount]")?.addEventListener("input", (event) => {
+    state.hpModalAmount = Math.max(0, Math.floor(Number(event.target.value) || 0));
+  });
+  els.hpModal.querySelector("[data-hp-temp-amount]")?.addEventListener("input", (event) => {
+    state.hpModalTempAmount = Math.max(0, Math.floor(Number(event.target.value) || 0));
+  });
+}
+
+function openHpModal(mode = "damage") {
+  state.hpModalOpen = true;
+  state.hpModalMode = mode;
+  state.hpModalAmount = 0;
+  state.hpModalTempAmount = 0;
+  renderHpModal();
+}
+
+function closeHpModal() {
+  if (!state.hpModalOpen) return;
+  state.hpModalOpen = false;
+  renderHpModal();
+}
+
+function applyHpModalAction() {
+  const amount = Math.max(0, Math.floor(Number(state.hpModalAmount) || 0));
+  const tempAmount = Math.max(0, Math.floor(Number(state.hpModalTempAmount) || 0));
+  if (state.hpModalMode === "heal") {
+    state.character.hp = Math.min(maxHitPoints(), (Number(state.character.hp) || 0) + amount);
+  } else if (state.hpModalMode === "temp") {
+    state.character.tempHp = Math.max(Number(state.character.tempHp) || 0, tempAmount);
+  } else {
+    applyDamage(amount);
+  }
+  state.validationMessage = state.hpModalMode === "heal"
+    ? `Curado em ${amount} HP.`
+    : state.hpModalMode === "temp"
+      ? `${tempAmount} Temporary HP aplicados.`
+      : `Recebeu ${amount} de dano.`;
+  closeHpModal();
+  persist();
+  render();
+}
+
+function applyDamage(amount) {
+  let remaining = Math.max(0, Math.floor(Number(amount) || 0));
+  const tempHp = Math.max(0, Number(state.character.tempHp) || 0);
+  if (tempHp > 0) {
+    const absorbed = Math.min(tempHp, remaining);
+    state.character.tempHp = tempHp - absorbed;
+    remaining -= absorbed;
+  }
+  if (remaining > 0) {
+    state.character.hp = Math.max(0, Number(state.character.hp) - remaining);
+  }
+}
+
 function renderSummarySheet() {
   const c = state.character;
+  const maxHp = maxHitPoints();
+  const currentHp = Number(c.hp) || 0;
+  const tempHp = Math.max(0, Number(c.tempHp) || 0);
+  const totalHp = currentHp + tempHp;
   return `
     <div class="pill-row">
       <div class="cream-pill">${escapeHtml(c.name)}</div>
@@ -1595,7 +1745,11 @@ function renderSummarySheet() {
     </div>
     <div class="hero-stats">
       ${bigStat("Initiative", signed(mod("dex")))}
-      <div class="hp-orb"><span>HP</span><strong>${c.hp}</strong></div>
+      <button type="button" class="hp-orb" data-open-hp-modal aria-label="Controle de pontos de vida">
+        <span>HP</span>
+        <strong>${totalHp}<small>${currentHp}/${maxHp}</small></strong>
+        <em>${tempHp > 0 ? `+${tempHp} THP` : "0 THP"}</em>
+      </button>
       ${bigStat("Speed", c.speed)}
     </div>
     <div class="small-grid">
@@ -1696,10 +1850,11 @@ function renderResourceUse(resourceId) {
   const resource = state.character.resources?.[resourceId];
   if (!resource) return "";
   const remaining = Math.max(0, resource.max - resource.used);
+  const recovery = resourceRecoveryLabel(resource.recovery);
   return `
     <div class="resource-use">
       <button type="button" class="cast-button" data-use-resource="${escapeHtml(resourceId)}" ${remaining ? "" : "disabled"}>Use</button>
-      <span>${remaining}/${resource.max} disponivel - recupera em ${resource.recovery === "short" ? "Short Rest" : "Long Rest"}</span>
+      <span>${remaining}/${resource.max} disponivel - recupera em ${recovery.replace(" Resource", "")}</span>
     </div>
   `;
 }
@@ -1854,39 +2009,41 @@ function rulesActionItems() {
 
 function featureActionItems() {
   const items = [];
-  const wildShape = currentClassFeatureItems().find((feature) => feature.name === "Wild Shape");
-  if (wildShape) {
-    const resource = state.character.resources?.wildShape;
+  currentResourceDefinitions().forEach((resourceDef) => {
+    const resource = state.character.resources?.[resourceDef.id];
     const remaining = resource ? Math.max(0, resource.max - resource.used) : 0;
+    const subtitle = resourceDef.kind === "species" ? resourceDef.sourceLabel : `${resourceDef.className} Feature`;
+    if (resourceDef.actionKind) {
+      items.push({
+        id: `feature:${resourceDef.id}`,
+        kind: resourceDef.actionKind,
+        icon: actionIconForKind(resourceDef.actionKind),
+        name: resourceDef.name,
+        subtitle,
+        range: "Self",
+        rangeLabel: "Resource",
+        hit: "--",
+        damage: [],
+        notes: `${remaining}/${resource?.max ?? 0} uses`,
+        detail: resourceDef.body,
+        resource: resourceDef.id,
+      });
+    }
     items.push({
-      id: "feature:wild-shape",
-      kind: "bonus",
-      icon: "BA",
-      name: "Wild Shape",
-      subtitle: "Druid Feature",
-      range: "Self",
-      rangeLabel: "Bonus",
-      hit: "--",
-      damage: [],
-      notes: `${remaining}/${resource?.max ?? 0} uses`,
-      detail: wildShape.body,
-      resource: "wildShape",
-    });
-    items.push({
-      id: "limited:wild-shape",
+      id: `limited:${resourceDef.id}`,
       kind: "limited",
       icon: "LU",
-      name: "Wild Shape Uses",
-      subtitle: "Short Rest Resource",
+      name: `${resourceDef.name} Uses`,
+      subtitle: resourceRecoveryLabel(resourceDef.recovery),
       range: "Self",
       rangeLabel: "Resource",
       hit: "--",
       damage: [],
       notes: `${remaining}/${resource?.max ?? 0} disponivel`,
-      detail: "Controle de usos de Wild Shape. Voce recupera um uso em Short Rest e todos em Long Rest, conforme os dados 5etools 2024.",
-      resource: "wildShape",
+      detail: resourceDef.body,
+      resource: resourceDef.id,
     });
-  }
+  });
   return items;
 }
 
@@ -1936,8 +2093,59 @@ function rangeLabel(range = "") {
   return /feet|ft\.?/i.test(String(range)) ? "Reach" : "Range";
 }
 
+function normalizeComparableText(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function autoGrantedSpellEntries() {
+  const sources = [...currentClassFeatureItems(), ...currentSpeciesTraitItems()];
+  const grants = new Map();
+  const cuePattern = /(you know|you can cast|always have|prepared|regain the ability to cast|regain the ability to do so|regain the ability to cast it|once per day|once per long rest|once with this trait|cantrip|spell)/i;
+  const choicePattern = /(choose|choice|of your choice|of your choosing)/i;
+
+  sources.forEach((feature) => {
+    const body = String(feature.body ?? "");
+    const text = normalizeComparableText(body);
+    if (!cuePattern.test(body)) return;
+    if (!/cantrip|spell/.test(text)) return;
+
+    const spellDetails = state.api.source?.spellDetails ?? {};
+    Object.keys(spellDetails).forEach((spellKey) => {
+      const spell = spellDetails[spellKey];
+      if (!spell?.name) return;
+      const spellText = normalizeComparableText(spell.name);
+      if (!spellText) return;
+      if (!new RegExp(`\\b${escapeRegExp(spellText)}\\b`, "i").test(text)) return;
+      if (choicePattern.test(body) && !/(you know|always have|prepared)/i.test(body)) return;
+      grants.set(spell.name, {
+        name: spell.name,
+        level: Number(spell.level) || 0,
+        origin: feature.name,
+        sourceLabel: feature.meta,
+      });
+    });
+  });
+
+  return [...grants.values()].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+}
+
+function autoGrantedCantripNames() {
+  return autoGrantedSpellEntries().filter((spell) => spell.level === 0).map((spell) => spell.name);
+}
+
+function autoGrantedSpellNameSet() {
+  return new Set(autoGrantedSpellEntries().map((spell) => spell.name));
+}
+
 function renderSpellsSheet() {
-  const spells = state.character.spells;
+  const autoSpells = autoGrantedSpellEntries();
+  const autoLeveledSpells = autoSpells.filter((spell) => spell.level > 0);
+  const autoCantrips = autoGrantedCantripNames();
+  const spells = [...new Set([...state.character.spells, ...autoCantrips])];
   const selected = state.selectedSpell && spells.includes(state.selectedSpell) ? state.selectedSpell : "";
   const knownSpells = spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level));
   return `
@@ -1946,8 +2154,29 @@ function renderSpellsSheet() {
       ${smallStat("Spell Attack", signed(proficiency() + mod(spellAbility())))}
       ${smallStat("Spell DC", 8 + proficiency() + mod(spellAbility()))}
     </div>
+    ${autoLeveledSpells.length ? renderAutoGrantedSpells(autoLeveledSpells) : ""}
     ${renderSpellSheetGroups(knownSpells, selected)}
-    ${spells.length ? "" : `<div class="empty-state">Nenhuma magia selecionada para esta ficha.</div>`}
+    ${spells.length || autoLeveledSpells.length ? "" : `<div class="empty-state">Nenhuma magia selecionada para esta ficha.</div>`}
+  `;
+}
+
+function renderAutoGrantedSpells(spells) {
+  return `
+    <section class="feature-section">
+      <h3>Magias automáticas</h3>
+      <div class="auto-spell-list">
+        ${spells.map((spell) => {
+          const detail = spellFromKnownData(spell.name) ?? spell;
+          return `
+            <article class="auto-spell-card">
+              <strong>${escapeHtml(detail.name)}</strong>
+              <span>${escapeHtml(detail.level === 0 ? "Cantrip" : `${ordinalLabel(detail.level)}-level spell`)}</span>
+              <em>${escapeHtml(spell.origin)}</em>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -2109,12 +2338,14 @@ function renderFeatureSection(title, items) {
 
 function renderFeatureDetail(item) {
   const choiceLines = featureChoiceSummary(item);
+  const resource = resourceDefinitionForFeatureName(item.name);
   return `
     <article class="feature-detail-card">
       <button type="button" class="spell-close" data-close-feature aria-label="Fechar detalhe">x</button>
       <h3>${escapeHtml(item.name)}</h3>
       <p>${escapeHtml(item.meta)}</p>
       ${choiceLines.length ? `<div class="feature-choice-summary">${choiceLines.map((line) => `<strong>${escapeHtml(line)}</strong>`).join("")}</div>` : ""}
+      ${resource ? renderResourceUse(resource.id) : ""}
       <div>${paragraphs(item.body || "Detalhe indisponivel nos dados 5etools 2024.")}</div>
     </article>
   `;
@@ -2207,6 +2438,270 @@ function currentClassFeatureItems() {
       meta: `${className} ${feature.level} • ${feature.source}`,
       body: feature.body,
     }));
+}
+
+function currentClassFeatureData() {
+  const unselectedOptionNames = new Set(classCreationChoiceRules().filter((rule) => Array.isArray(rule.options)).flatMap((rule) =>
+    rule.options
+      .filter((option) => state.character.classFeatureChoices?.[rule.id] !== option.value)
+      .map((option) => option.label)
+  ));
+  return (state.api.source?.classFeatures ?? [])
+    .filter((feature) => slugifyName(feature.className) === state.character.class && Number(feature.level) <= state.character.level)
+    .filter((feature) => !unselectedOptionNames.has(feature.name));
+}
+
+const RESOURCE_META = [
+  { id: "rage", name: "Rage", tableLabels: ["Rages"], match: /^rage(?:$|[:(])/i },
+  { id: "wildShape", name: "Wild Shape", tableLabels: ["Wild Shape"], match: /^wild shape(?:$|[:(])/i },
+  { id: "channelDivinity", name: "Channel Divinity", tableLabels: ["Channel Divinity"], match: /^channel divinity(?:$|[:(])/i },
+  { id: "secondWind", name: "Second Wind", tableLabels: ["Second Wind"], match: /^second wind(?:$|[:(])/i },
+  { id: "actionSurge", name: "Action Surge", tableLabels: ["Action Surge"], match: /^action surge(?:$|[:(])/i },
+  { id: "bardicInspiration", name: "Bardic Inspiration", tableLabels: [], match: /^bardic inspiration(?:$|[:(])/i },
+  { id: "flashOfGenius", name: "Flash of Genius", tableLabels: [], match: /^flash of genius(?:$|[:(])/i },
+  { id: "healingHands", name: "Healing Hands", tableLabels: [], match: /^healing hands(?:$|[:(])/i },
+  { id: "radiantSoul", name: "Radiant Soul", tableLabels: [], match: /^radiant soul(?:$|[:(])/i },
+  { id: "necroticShroud", name: "Necrotic Shroud", tableLabels: [], match: /^necrotic shroud(?:$|[:(])/i },
+  { id: "furyOfTheSmall", name: "Fury of the Small", tableLabels: [], match: /^fury of the small(?:$|[:(])/i },
+  { id: "relentlessEndurance", name: "Relentless Endurance", tableLabels: [], match: /^relentless endurance(?:$|[:(])/i },
+  { id: "stonesEndurance", name: "Stone's Endurance", tableLabels: [], match: /^stone'?s endurance(?:$|[:(])/i },
+  { id: "feyStep", name: "Fey Step", tableLabels: [], match: /^fey step(?:$|[:(])/i },
+  { id: "infernalLegacy", name: "Infernal Legacy", tableLabels: [], match: /^infernal legacy(?:$|[:(])/i },
+];
+
+function currentClassResourceDefinitions() {
+  const byId = new Map();
+  currentClassFeatureData().forEach((feature) => {
+    const resource = resourceDefinitionFromFeature(feature);
+    if (!resource) return;
+    const existing = byId.get(resource.id);
+    byId.set(resource.id, existing ? mergeResourceDefinitions(existing, resource) : resource);
+  });
+  return [...byId.values()].sort((a, b) => (Number(a.level) - Number(b.level)) || a.name.localeCompare(b.name));
+}
+
+function currentSpeciesResourceDefinitions() {
+  const byId = new Map();
+  currentSpeciesTraitItems().forEach((trait) => {
+    const resource = resourceDefinitionFromTraitItem(trait);
+    if (!resource) return;
+    const existing = byId.get(resource.id);
+    byId.set(resource.id, existing ? mergeResourceDefinitions(existing, resource) : resource);
+  });
+  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function currentResourceDefinitions() {
+  return [...currentClassResourceDefinitions(), ...currentSpeciesResourceDefinitions()];
+}
+
+function resourceDefinitionForFeatureName(name) {
+  const normalizedName = clean5etoolsText(name).toLowerCase();
+  return currentResourceDefinitions().find((definition) => definition.name.toLowerCase() === normalizedName) ?? null;
+}
+
+function resourceDefinitionFromFeature(feature) {
+  const meta = resourceMetaFromFeatureName(feature.name);
+  if (!meta) return null;
+  const body = String(feature.body ?? "");
+  const recovery = resourceRecoveryFromBody(body);
+  const actionKind = resourceActionKindFromBody(body);
+  const max = resourceMaxFromBody(body, feature.name, meta, Number(feature.level) || 1);
+  if ((!max || !Number.isFinite(max) || max <= 0) && !Object.keys(recovery).length && !actionKind) return null;
+  return {
+    id: meta.id,
+    name: meta.name,
+    className: state.api.classes[state.character.class]?.name ?? titleCase(state.character.class),
+    feature,
+    body,
+    level: Number(feature.level) || 1,
+    max: max || 0,
+    recovery,
+    actionKind,
+    isCanonical: meta.isCanonical,
+  };
+}
+
+function resourceDefinitionFromTraitItem(trait) {
+  const meta = resourceMetaFromFeatureName(trait.name);
+  const body = String(trait.body ?? "");
+  const recovery = resourceRecoveryFromBody(body);
+  const actionKind = resourceActionKindFromBody(body);
+  const max = resourceMaxFromBody(body, trait.name, meta, 1);
+  if ((!max || !Number.isFinite(max) || max <= 0) && !Object.keys(recovery).length && !actionKind) return null;
+  return {
+    id: trait.id,
+    name: meta?.name ?? trait.name,
+    kind: "species",
+    sourceLabel: trait.meta,
+    body,
+    level: 1,
+    max: max || 0,
+    recovery,
+    actionKind,
+    isCanonical: Boolean(meta?.isCanonical),
+  };
+}
+
+function mergeResourceDefinitions(existing, incoming) {
+  const next = { ...existing, recovery: { ...(existing.recovery ?? {}) } };
+  if (!next.feature && incoming.feature) next.feature = incoming.feature;
+  if (!next.body && incoming.body) next.body = incoming.body;
+  if (!next.sourceLabel && incoming.sourceLabel) next.sourceLabel = incoming.sourceLabel;
+  if (incoming.max && (!next.max || incoming.max > next.max)) next.max = incoming.max;
+  if (!next.actionKind && incoming.actionKind) next.actionKind = incoming.actionKind;
+  if (incoming.recovery?.short && !next.recovery.short) next.recovery.short = incoming.recovery.short;
+  if (incoming.recovery?.long && !next.recovery.long) next.recovery.long = incoming.recovery.long;
+  if (incoming.isCanonical) next.isCanonical = true;
+  return next;
+}
+
+function resourceMetaFromFeatureName(name) {
+  const cleanName = clean5etoolsText(name);
+  const meta = RESOURCE_META.find((entry) => entry.match.test(cleanName));
+  if (!meta) return null;
+  return {
+    ...meta,
+    isCanonical: cleanName.toLowerCase() === meta.name.toLowerCase(),
+  };
+}
+
+function resourceMaxFromBody(body, name = "", meta = null, level = 1) {
+  const text = String(body ?? "");
+  const tableValue = meta ? classTableResourceValue(meta.tableLabels, Number(level) || 1) : 0;
+  if (Number.isFinite(tableValue) && tableValue > 0) return tableValue;
+  if (/\bonce (?:you )?use this (?:trait|feature|ability)\b/i.test(text)) return 1;
+  if (/can't use (?:it|this (?:trait|feature|ability|spell(?: again)?|trait again|ability again)|that spell) again until you finish a short or long rest/i.test(text)) return 1;
+  if (/can't use (?:it|this (?:trait|feature|ability|spell(?: again)?|trait again|ability again)|that spell) again until you finish a (?:short|long) rest/i.test(text)) return 1;
+  if (/once per (?:short|long) rest/i.test(text)) return 1;
+  if (/regain the ability to do so when you finish a (?:short|long) rest/i.test(text)) return 1;
+  if (/regain the ability to cast it when you finish a long rest/i.test(text)) return 1;
+  const modifierMatch = text.match(/number of times equal to your ([A-Za-z]+) modifier/i);
+  if (modifierMatch) return Math.max(1, abilityModifierFromLabel(modifierMatch[1]));
+  const proficiencyMatch = text.match(/(?:number of times|a number of times|uses) equal to your proficiency bonus/i);
+  if (proficiencyMatch) return Math.max(1, proficiency());
+  const fixedMatch = text.match(/\b(once|twice|thrice)\b/i);
+  if (fixedMatch) {
+    const fixed = { once: 1, twice: 2, thrice: 3 }[fixedMatch[1].toLowerCase()];
+    if (fixed) return fixed;
+  }
+  const numericMatch = text.match(/(?:you can use this feature|you can use this class's [^]+?|you can enter your rage|you can confer a bardic inspiration die)[^.\n]*?(\d+)\b/i);
+  if (numericMatch) return Number(numericMatch[1]) || 0;
+  return 0;
+}
+
+function resourceMaxFromFeature(feature, meta) {
+  return resourceMaxFromBody(String(feature.body ?? ""), feature.name, meta, Number(feature.level) || 1);
+}
+
+function classTableResourceValue(labels, level) {
+  const classData = state.api.classes[state.character.class];
+  if (!classData) return 0;
+  const rowIndex = Math.max(0, Number(level) - 1);
+  for (const group of classData.classTableGroups ?? []) {
+    const colIndex = (group.colLabels ?? []).findIndex((label) => labels.some((needle) => clean5etoolsText(label).toLowerCase() === clean5etoolsText(needle).toLowerCase()));
+    if (colIndex === -1) continue;
+    const cell = group.rows?.[rowIndex]?.[colIndex];
+    const numeric = parseTableCellValue(cell);
+    if (numeric) return numeric;
+  }
+  return 0;
+}
+
+function parseTableCellValue(cell) {
+  if (cell == null) return 0;
+  if (typeof cell === "number") return cell;
+  if (typeof cell === "string") {
+    const cleaned = clean5etoolsText(cell);
+    if (!cleaned || cleaned === "—" || /^unlimited$/i.test(cleaned)) return 0;
+    const numeric = Number(cleaned.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(numeric) ? numeric : 0;
+  }
+  if (typeof cell === "object") {
+    if (typeof cell.value === "number") return cell.value;
+    if (typeof cell.value === "string") return parseTableCellValue(cell.value);
+    if (typeof cell.max === "number") return cell.max;
+  }
+  return 0;
+}
+
+function abilityModifierFromLabel(label) {
+  const normalized = String(label ?? "").toLowerCase();
+  const abilityMap = {
+    charisma: "cha",
+    constitution: "con",
+    dexterity: "dex",
+    intelligence: "int",
+    strength: "str",
+    wisdom: "wis",
+    cha: "cha",
+    con: "con",
+    dex: "dex",
+    int: "int",
+    str: "str",
+    wis: "wis",
+  };
+  const key = abilityMap[normalized];
+  return key ? Math.max(1, mod(key)) : proficiency();
+}
+
+function resourceRecoveryFromBody(body) {
+  const text = String(body ?? "");
+  const recovery = {};
+  if (/regain all expended uses when you finish a short rest/i.test(text)) recovery.short = "all";
+  else if (/regain all your expended uses when you finish a short rest/i.test(text)) recovery.short = "all";
+  else if (/regain all of (?:its|their|your) expended uses when you finish a short rest/i.test(text)) recovery.short = "all";
+  else if (/regain one(?: of (?:its|their|your))? expended uses when you finish a short rest/i.test(text)) recovery.short = 1;
+  else if (/regain all(?: your)? expended uses.*finish a (?:short rest(?: or long rest)?|short or long rest)/i.test(text)) recovery.short = "all";
+  else if (/finish a short rest/i.test(text) && /regain all expended uses/i.test(text)) recovery.short = "all";
+  else if (/finish a short rest/i.test(text) && /regain one expended use/i.test(text)) recovery.short = 1;
+  else if (/short or long rest/i.test(text) && /can't use/i.test(text)) {
+    recovery.short = "all";
+    recovery.long = "all";
+  }
+  else if (/finish a short rest/i.test(text) && /can't use (?:it|this trait|this feature|this ability)/i.test(text) && /again/i.test(text)) recovery.short = "all";
+
+  if (/regain all expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/regain all your expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/regain all of (?:its|their|your) expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/finish a long rest/i.test(text) && /regain all expended uses/i.test(text)) recovery.long = "all";
+  else if (/once you use this trait/i.test(text) && /finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/can't use this trait again until you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/can't use (?:it|this trait|this feature|this ability) again until you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/regain the ability to cast it when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/regain the ability to do so when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/you regain the ability to cast it this way when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/you regain the ability to do so when you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/you must finish a long rest in order to cast the spell again/i.test(text)) recovery.long = "all";
+
+  return recovery;
+}
+
+function resourceActionKindFromBody(body) {
+  const text = String(body ?? "").toLowerCase();
+  if (text.includes("bonus action")) return "bonus";
+  if (text.includes("reaction")) return "reaction";
+  if (text.includes("additional action")) return "action";
+  if (text.includes("as an action")) return "action";
+  if (text.includes("magic action")) return "action";
+  return "";
+}
+
+function resourceRecoveryLabel(recovery = {}) {
+  if (recovery.short && recovery.long) return "Short or Long Rest Resource";
+  if (recovery.short) return "Short Rest Resource";
+  if (recovery.long) return "Long Rest Resource";
+  return "Limited Use Resource";
+}
+
+function actionIconForKind(kind) {
+  return {
+    action: "A",
+    bonus: "BA",
+    reaction: "R",
+    other: "O",
+    limited: "LU",
+  }[kind] ?? "LU";
 }
 
 function classCreationChoiceRules() {
@@ -2584,13 +3079,24 @@ function firstTextEntry(entries) {
 function currentSpeciesTraitItems() {
   const race = state.api.races[state.character.race]?.details;
   if (!race) return [];
-  return entriesNamedItems(race.entries).map((entry) => ({
+  const selectedSubrace = selectedSubraceDetails();
+  const entries = new Map();
+  [...entriesNamedItems(race.entries), ...entriesNamedItems(selectedSubrace?.entries)].forEach((entry) => {
+    entries.set(slugifyName(entry.name), entry);
+  });
+  return [...entries.values()].map((entry) => ({
     id: `species:${slugifyName(entry.name)}`,
     kind: "species",
     name: entry.name,
-    meta: `${race.name} • ${race.source}`,
+    meta: `${race.name}${selectedSubrace?.name ? ` • ${selectedSubrace.name}` : ""} • ${selectedSubrace?.source ?? race.source}`,
     body: entry.body,
   }));
+}
+
+function selectedSubraceDetails() {
+  const subraceKey = slugifyName(state.character.subrace ?? "");
+  if (!subraceKey) return null;
+  return state.api.source?.subraceDetails?.[subraceKey] ?? null;
 }
 
 function currentFeatItems() {
@@ -2662,6 +3168,7 @@ function spellOptions() {
 
 function renderSpellChoiceGroups(spellRule, spellCounts) {
   const legalByName = new Map(legalSpellOptions().map((spell) => [spell.name, spell]));
+  const autoGranted = autoGrantedSpellNameSet();
   const selectedLegal = state.character.spells
     .filter((name) => legalSpellNames().has(name))
     .map((name) => legalByName.get(name) ?? spellFromKnownData(name))
@@ -2674,7 +3181,7 @@ function renderSpellChoiceGroups(spellRule, spellCounts) {
     <section class="spell-choice-group">
       <h3>${spellLevelLabel(level)} <span>${spellGroupCounter(level, spellRule, spellCounts)}</span></h3>
       <div class="choice-list">
-        ${spells.map((spell) => checkbox("spells", spell.name, spell.name, state.character.spells.includes(spell.name), spellChoiceDisabled(spell, spellRule, spellCounts))).join("")}
+        ${spells.map((spell) => checkbox("spells", spell.name, spell.name, state.character.spells.includes(spell.name) || autoGranted.has(spell.name), spellChoiceDisabled(spell, spellRule, spellCounts) || autoGranted.has(spell.name))).join("")}
       </div>
     </section>
   `).join("");
@@ -2687,6 +3194,7 @@ function spellGroupCounter(level, spellRule, spellCounts) {
 
 function spellChoiceDisabled(spell, spellRule, spellCounts) {
   if (spellRule.totalMax === 0) return true;
+  if (autoGrantedSpellNameSet().has(spell.name)) return true;
   if (state.character.spells.includes(spell.name)) return false;
   if (spell.level === 0) return spellCounts.cantrips >= spellRule.cantrips;
   return spellCounts.leveled >= spellRule.spellsMax;
@@ -2734,7 +3242,12 @@ function legalSpellNames() {
 }
 
 function selectedSpellCounts(spells = state.character.spells) {
-  return spellListCounts(spells.map((name) => spellFromKnownData(name)).filter((spell) => spell?.name && Number.isFinite(spell.level)));
+  const autoCantrips = autoGrantedCantripNames();
+  return spellListCounts(
+    [...new Set([...spells, ...autoCantrips])]
+      .map((name) => spellFromKnownData(name))
+      .filter((spell) => spell?.name && Number.isFinite(spell.level))
+  );
 }
 
 function spellListCounts(spells) {
@@ -2793,16 +3306,17 @@ function resetSpellSlots(options = {}) {
 function syncResources() {
   state.character.resources ??= {};
   const next = {};
-  const wildShapeMax = wildShapeUsesMax();
-  if (wildShapeMax > 0) {
-    const previous = state.character.resources.wildShape ?? {};
-    next.wildShape = {
-      name: "Wild Shape",
-      max: wildShapeMax,
-      used: clamp(Number(previous.used) || 0, 0, wildShapeMax),
-      recovery: "short",
+  currentResourceDefinitions().forEach((definition) => {
+    const previous = state.character.resources[definition.id] ?? {};
+    const max = Number(definition.max) || 0;
+    if (max <= 0) return;
+    next[definition.id] = {
+      name: definition.name,
+      max,
+      used: clamp(Number(previous.used) || 0, 0, max),
+      recovery: definition.recovery,
     };
-  }
+  });
   state.character.resources = next;
 }
 
@@ -2814,25 +3328,21 @@ function useResource(resourceId) {
 }
 
 function recoverShortRestResources() {
-  const wildShape = state.character.resources?.wildShape;
-  if (wildShape) wildShape.used = Math.max(0, wildShape.used - 1);
+  Object.values(state.character.resources ?? {}).forEach((resource) => {
+    const recovery = resource.recovery?.short;
+    if (!recovery) return;
+    if (recovery === "all") {
+      resource.used = 0;
+      return;
+    }
+    resource.used = Math.max(0, resource.used - Number(recovery || 0));
+  });
 }
 
 function recoverLongRestResources() {
   Object.values(state.character.resources ?? {}).forEach((resource) => {
     resource.used = 0;
   });
-}
-
-function wildShapeUsesMax() {
-  if (state.character.class !== "druid" || state.character.level < 2) return 0;
-  const druid = state.api.classes.druid;
-  const group = (druid?.classTableGroups ?? []).find((table) =>
-    (table.colLabels ?? []).some((label) => /wild shape/i.test(clean5etoolsText(label)))
-  );
-  const wildShapeIndex = (group?.colLabels ?? []).findIndex((label) => /wild shape/i.test(clean5etoolsText(label)));
-  const value = group?.rows?.[state.character.level - 1]?.[wildShapeIndex];
-  return Number(value) || 2;
 }
 
 function applyRest(type) {
@@ -2843,7 +3353,8 @@ function applyRest(type) {
     : "Confirmar Short Rest? Isso recupera recursos de descanso curto, como Pact Magic quando aplicavel.";
   if (!window.confirm(message)) return;
   if (isLong) {
-    state.character.hp = Math.max(state.character.hp, maxHitPoints());
+    state.character.hp = maxHitPoints();
+    state.character.tempHp = 0;
     resetSpellSlots();
     recoverLongRestResources();
   } else {
@@ -2893,13 +3404,13 @@ function classSkillRule() {
 }
 
 function subracesFor(raceName) {
-  const key = String(raceName);
-  const apiSubraces = state.api.races[key.toLowerCase()]?.subraces ?? [];
-  return apiSubraces.length ? apiSubraces : [titleCase(key)];
+  const key = slugifyName(raceName);
+  const apiSubraces = state.api.races[key]?.subraces ?? [];
+  return apiSubraces.length ? apiSubraces : [];
 }
 
 function defaultSubrace(raceName) {
-  return subracesFor(raceName)[0] ?? titleCase(raceName);
+  return subracesFor(raceName)[0] ?? "";
 }
 
 function levelUpCharacter() {
@@ -2962,6 +3473,10 @@ function maxLevelOneHp(className, abilities = state.character.abilities) {
 
 function normalizeSubrace() {
   const options = subracesFor(state.character.race);
+  if (!options.length) {
+    state.character.subrace = "";
+    return;
+  }
   if (!state.character.subrace || !options.includes(state.character.subrace)) state.character.subrace = options[0];
 }
 
@@ -2969,7 +3484,7 @@ function spellChoiceRule() {
   const className = state.character.class;
   const levelRow = currentLevelRow();
   const spellcasting = levelRow?.spellcasting;
-  const cantrips = (spellcasting?.cantrips_known ?? 0) + classFeatureCantripBonus();
+  const cantrips = (spellcasting?.cantrips_known ?? 0) + classFeatureCantripBonus() + autoGrantedCantripNames().length;
 
   if (!spellcasting || !classHasSpellList(className) || casterLevel() === 0) {
     return {
@@ -3042,6 +3557,7 @@ function normalizeCharacterState() {
   normalizeSourceSelections();
   state.character.abilityMethod ??= "standard";
   normalizeAbilityMethodState();
+  state.character.tempHp = Math.max(0, Number(state.character.tempHp) || 0);
   if (state.character.level === 1) state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
   normalizeSubrace();
   state.character.classSkillChoices ??= deriveClassSkillChoices();
@@ -3176,14 +3692,16 @@ function backgroundSkillProficiencies(backgroundName = state.character.backgroun
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
   const legalNames = legalSpellNames();
+  const autoGranted = autoGrantedSpellNameSet();
   const next = [];
-  let cantrips = 0;
+  let cantrips = autoGrantedCantripNames().length;
   let leveled = 0;
   [...new Set(state.character.spells ?? [])]
     .filter((name) => legalNames.size === 0 ? true : legalNames.has(name))
     .forEach((name) => {
       const spell = spellFromKnownData(name);
       if (!spell || !Number.isFinite(spell.level)) return;
+      if (autoGranted.has(name)) return;
       if (spell.level === 0) {
         if (cantrips >= rule.cantrips) return;
         cantrips += 1;
@@ -3512,6 +4030,10 @@ function slugifyName(value) {
     .replaceAll("/", " ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function skillNameFromSlug(value) {
