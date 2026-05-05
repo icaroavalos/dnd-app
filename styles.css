@@ -764,6 +764,37 @@ h1 {
   text-transform: uppercase;
 }
 
+.inventory-modifiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  color: #111;
+  background: #f4efe3;
+  border-bottom: 1px solid #d8cfb8;
+  text-align: left;
+}
+
+.inventory-modifiers strong,
+.inventory-modifiers span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 7px;
+  border: 1px solid #d8cfb8;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.inventory-modifiers strong {
+  color: #6f171b;
+  border-color: transparent;
+  background: transparent;
+  text-transform: uppercase;
+}
+
 .inventory-list {
   display: grid;
   gap: 0;
@@ -847,6 +878,9 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  width: min(100%, 320px);
+  justify-self: center;
+  margin-inline: auto;
 }
 
 .cream-pill,
@@ -1742,6 +1776,15 @@ h1 {
   background: #fafafa;
 }
 
+.action-row.disabled {
+  color: #8b8b8b;
+  background: #f4f4f4;
+}
+
+.action-row.disabled .action-icon {
+  opacity: 0.55;
+}
+
 .action-icon {
   display: grid;
   place-items: center;
@@ -2167,4 +2210,94 @@ h1 {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+}
+
+.hit-dice-section {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--color-surface-1);
+  border-radius: 8px;
+}
+
+.hit-dice-label {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.hit-dice-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.hit-die-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.hit-die-checkbox.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hit-die-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.hit-die-checkbox.disabled input {
+  cursor: not-allowed;
+}
+
+.hit-dice-hint {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.rest-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.hit-dice-section {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--color-surface-1);
+  border-radius: 8px;
+}
+
+.hit-dice-label {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.hit-dice-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.hit-die-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.hit-die-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }

@@ -1,3 +1,8 @@
+import { deriveCharacterSheet } from "./src/core/character/character-projection.js";
+import { deriveAvailableActions } from "./src/core/engine/action-engine.js";
+import { deriveActiveModifiers, modifierTotal } from "./src/core/engine/modifier-engine.js";
+import { RuleRepository } from "./src/core/rules/rule-repository.js";
+
 const DATA_SOURCE = "data/5etools/5e-2024";
 const DATA_SOURCE_LABEL = "5etools 2024";
 
@@ -173,6 +178,7 @@ const defaultState = {
   step: "lineage",
   tab: "summary",
   dataStatus: "local",
+  derived: null,
   selectedSpell: "",
   actionFilter: "all",
   selectedAction: "",
@@ -212,6 +218,7 @@ const defaultState = {
     equipmentChoices: {},
     inventory: [],
     equippedItems: [],
+    hitDiceUsed: 0,
     spellSlots: {},
     resources: {},
     tempHp: 0,
@@ -235,6 +242,7 @@ const defaultState = {
 };
 
 let state = loadState();
+let ruleRepository = new RuleRepository();
 
 const els = {
   app: document.querySelector("#app"),
@@ -287,6 +295,7 @@ function persist() {
   syncActiveCharacter();
   const savedState = structuredClone(state);
   savedState.api = structuredClone(defaultState.api);
+  savedState.derived = null;
   localStorage.setItem("dnd-sheet-builder", JSON.stringify(savedState));
 }
 
@@ -355,6 +364,7 @@ function createStartingCharacter() {
   character.equipmentChoices = {};
   character.inventory = [];
   character.equippedItems = [];
+  character.hitDiceUsed = 0;
   character.spellSlots = {};
   character.resources = {};
   character.race = "human";
@@ -509,6 +519,7 @@ function hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment
       spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), normalize5etoolsSpell(spell)])),
     },
   };
+  ruleRepository = RuleRepository.fromApi(state.api);
 }
 
 function normalize5etoolsFeature(feature) {
@@ -1618,6 +1629,15 @@ function bindSheetEvents() {
     });
   });
 
+  els.sheetView.querySelectorAll("[data-use-action]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      useAction(button.dataset.useAction);
+      persist();
+      render();
+    });
+  });
+
   els.sheetView.querySelectorAll("[data-open-hp-modal]").forEach((button) => {
     button.addEventListener("click", () => {
       openHpModal();
@@ -1734,28 +1754,64 @@ function renderHpModal() {
 
 
 function renderRestModal() {
-    const modal = document.getElementById("restModal");
-    const backdrop = document.getElementById("restModalBackdrop");
-    if (!modal || !backdrop) return;
+  const modal = document.getElementById("restModal");
+  const backdrop = document.getElementById("restModalBackdrop");
+  if (!modal || !backdrop) return;
 
-    if (!state.restModalOpen) {
-        modal.hidden = true;
-        backdrop.hidden = true;
-        modal.innerHTML = "";
-        return;
+  if (!state.restModalOpen) {
+    modal.hidden = true;
+    backdrop.hidden = true;
+    modal.innerHTML = "";
+    return;
+  }
+
+  modal.hidden = false;
+  backdrop.hidden = false;
+
+  const content = state.restModalContent || { label: "Rest", description: "" };
+  const isShortRest = state.restModalType === "short";
+  const className = state.character.class || "fighter";
+  const hitDie = state.api.classes?.[className]?.hit_die || 8;
+  const level = state.character.level || 1;
+  const conMod = mod("con");
+  const hpPerDie = Math.max(1, Math.floor(hitDie / 2) + 1 + conMod);
+  state.restModalHitDice ??= {};
+
+  let hitDiceHtml = '';
+  if (isShortRest) {
+    const checkboxes = [];
+    for (let i = 0; i < level; i++) {
+      const key = 'hd-' + i;
+      const spent = i < (Number(state.character.hitDiceUsed) || 0);
+      const isChecked = state.restModalHitDice?.[key]?.value ? 'checked' : '';
+      checkboxes.push('<label class="hit-die-checkbox ' + (spent ? 'disabled' : '') + '"><input type="checkbox" data-hit-dice="' + key + '" ' + isChecked + ' ' + (spent ? 'disabled' : '') + ' />d' + hitDie + ' (' + hpPerDie + ' HP)</label>');
     }
+    const available = availableHitDice();
+    hitDiceHtml = '<div class="hit-dice-section"><p class="hit-dice-label">Gastar Hit Dice (' + available + '/' + level + ' disponiveis)</p><div class="hit-dice-controls">' + checkboxes.join('') + '</div></div>';
+  }
 
-    modal.hidden = false;
-    backdrop.hidden = false;
+  modal.innerHTML = '<div class="hp-modal-panel"><div class="hp-modal-head"><div><p class="eyebrow">' + content.label + '</p><h2>Confirmar</h2></div><button type="button" class="icon-button" id="restCloseBtn">x</button></div><div class="hp-control-panel">' + hitDiceHtml + '<div class="rest-actions"><button type="button" class="secondary-button" id="restCancelBtn">Cancelar</button><button type="button" class="primary-button" id="restConfirmBtn">Confirmar</button></div></div></div>';
 
-    const content = state.restModalContent || { label: "Rest", description: "" };
-    modal.innerHTML = '<div class="hp-modal-panel"><div class="hp-modal-head"><div><p class="eyebrow">' + content.label + '</p><h2>Confirmar descanso</h2></div><button type="button" class="icon-button" data-close-rest-modal aria-label="Fechar">x</button></div><div class="hp-control-panel"><p class="rest-description">' + content.description + '</p><div class="rest-actions-modal"><button type="button" class="secondary-button" data-confirm-rest-cancel>Cancelar</button><button type="button" class="primary-button" data-confirm-rest-confirm>Confirmar</button></div></div></div>';
+  // Bind buttons
+  const closeBtn = document.getElementById("restCloseBtn");
+  const cancelBtn = document.getElementById("restCancelBtn");
+  const confirmBtn = document.getElementById("restConfirmBtn");
 
-    modal.querySelector("[data-close-rest-modal]")?.addEventListener("click", cancelRest);
-    modal.querySelector("[data-confirm-rest-cancel]")?.addEventListener("click", cancelRest);
-    modal.querySelector("[data-confirm-rest-confirm]")?.addEventListener("click", confirmRest);
+  if (closeBtn) closeBtn.onclick = () => { cancelRest(); };
+  if (cancelBtn) cancelBtn.onclick = () => { cancelRest(); };
+  if (confirmBtn) confirmBtn.onclick = () => { confirmRest(); };
+
+  // Bind Hit Dice
+  if (isShortRest) {
+    document.querySelectorAll("[data-hit-dice]").forEach(cb => {
+      cb.onchange = (e) => {
+        const key = e.target.dataset.hitDice;
+        state.restModalHitDice ??= {};
+        state.restModalHitDice[key] = { value: e.target.checked ? 1 : 0 };
+      };
+    });
+  }
 }
-
 function openHpModal(mode = "damage") {
   state.hpModalOpen = true;
   state.hpModalMode = mode;
@@ -1813,6 +1869,7 @@ function renderSummarySheet() {
   const currentHp = Number(c.hp) || 0;
   const tempHp = Math.max(0, Number(c.tempHp) || 0);
   const totalHp = currentHp + tempHp;
+  const hitDiceAvailable = availableHitDice();
   return `
     <div class="pill-row">
       <div class="cream-pill">${escapeHtml(c.name)}</div>
@@ -1828,7 +1885,7 @@ function renderSummarySheet() {
       ${bigStat("Speed", c.speed)}
     </div>
     <div class="small-grid">
-      ${smallStat("Hit Dice", `${c.level}d${hitDie()}`)}
+      ${smallStat("Hit Dice", `${hitDiceAvailable}/${c.level}d${hitDie()}`)}
       ${smallStat("Armor Class", c.armorClass)}
       ${smallStat("Proficiency", signed(proficiency()))}
     </div>
@@ -1896,7 +1953,7 @@ function renderActionRow(action) {
   const open = state.selectedAction === action.id;
   return `
     <article class="action-entry">
-      <button type="button" class="action-row ${open ? "active" : ""}" data-action-id="${escapeHtml(action.id)}">
+      <button type="button" class="action-row ${open ? "active" : ""} ${action.disabled ? "disabled" : ""}" data-action-id="${escapeHtml(action.id)}" aria-disabled="${action.disabled ? "true" : "false"}">
         <span class="action-icon" aria-hidden="true">${escapeHtml(action.icon)}</span>
         <span class="action-name">
           <strong>${escapeHtml(action.name)}</strong>
@@ -1916,9 +1973,23 @@ function renderActionDetail(action) {
   return `
     <div class="action-detail">
       ${action.detail ? paragraphs(action.detail) : `<p>${escapeHtml(action.notes || "Sem detalhes adicionais.")}</p>`}
-      ${action.resource ? renderResourceUse(action.resource) : ""}
+      ${renderActionUse(action)}
     </div>
   `;
+}
+
+function renderActionUse(action) {
+  if (action.resource) return renderResourceUse(action.resource);
+  if (action.slotLevel) {
+    const remaining = availableSpellSlotsAtLevel(action.slotLevel);
+    return `
+      <div class="resource-use">
+        <button type="button" class="cast-button" data-use-action="${escapeHtml(action.id)}" ${remaining ? "" : "disabled"}>Cast</button>
+        <span>${remaining} slot(s) de nivel ${action.slotLevel} disponivel</span>
+      </div>
+    `;
+  }
+  return "";
 }
 
 function renderResourceUse(resourceId) {
@@ -1948,12 +2019,25 @@ function actionFilterTitle(filter) {
 }
 
 function currentActionItems() {
-  return [
-    ...currentAttackActions(),
-    ...currentSpellActions(),
-    ...rulesActionItems(),
-    ...featureActionItems(),
-  ];
+  return deriveAvailableActions(actionEngineContext());
+}
+
+function actionEngineContext() {
+  return {
+    character: { ...state.character, spells: currentKnownSpellNames() },
+    projection: state.derived,
+    resourceDefinitions: currentResourceDefinitions(),
+    spellDetails: state.api.source?.spellDetails ?? {},
+    loadedSpellDetails: state.api.spellDetails ?? {},
+    compactRange,
+    rangeLabel,
+    signed,
+    slugify: slugifyName,
+    itemTypeLabel,
+    itemTags,
+    entriesToText,
+    resourceRecoveryLabel,
+  };
 }
 
 function currentAttackActions() {
@@ -1977,7 +2061,7 @@ function currentAttackActions() {
 }
 
 function currentSpellActions() {
-  return (state.character.spells ?? [])
+  return currentKnownSpellNames()
     .map((name) => state.api.source?.spellDetails?.[name.toLowerCase()] ?? state.api.spellDetails?.[name] ?? null)
     .filter(Boolean)
     .filter((spell) => spellActionVisible(spell))
@@ -2179,23 +2263,18 @@ function normalizeComparableText(value) {
 function autoGrantedSpellEntries() {
   const sources = [...currentClassFeatureItems(), ...currentSpeciesTraitItems()];
   const grants = new Map();
-  const cuePattern = /(you know|you can cast|always have|prepared|regain the ability to cast|regain the ability to do so|regain the ability to cast it|once per day|once per long rest|once with this trait|cantrip|spell)/i;
   const choicePattern = /(choose|choice|of your choice|of your choosing)/i;
 
   sources.forEach((feature) => {
     const body = String(feature.body ?? "");
-    const text = normalizeComparableText(body);
-    if (!cuePattern.test(body)) return;
-    if (!/cantrip|spell/.test(text)) return;
+    const refs = explicitSpellRefsFromText(body);
+    if (!refs.length) return;
+    if (choicePattern.test(body) && !/(you know|always have|prepared)/i.test(body)) return;
 
     const spellDetails = state.api.source?.spellDetails ?? {};
-    Object.keys(spellDetails).forEach((spellKey) => {
-      const spell = spellDetails[spellKey];
+    refs.forEach((spellName) => {
+      const spell = spellDetails[spellName.toLowerCase()];
       if (!spell?.name) return;
-      const spellText = normalizeComparableText(spell.name);
-      if (!spellText) return;
-      if (!new RegExp(`\\b${escapeRegExp(spellText)}\\b`, "i").test(text)) return;
-      if (choicePattern.test(body) && !/(you know|always have|prepared)/i.test(body)) return;
       grants.set(spell.name, {
         name: spell.name,
         level: Number(spell.level) || 0,
@@ -2206,6 +2285,12 @@ function autoGrantedSpellEntries() {
   });
 
   return [...grants.values()].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+}
+
+function explicitSpellRefsFromText(text) {
+  return [...String(text ?? "").matchAll(/\{@spell ([^|}]+)(?:\|[^}]*)?\}/gi)]
+    .map((match) => clean5etoolsText(match[1]).trim())
+    .filter(Boolean);
 }
 
 function autoGrantedCantripNames() {
@@ -2220,7 +2305,8 @@ function renderSpellsSheet() {
   const autoSpells = autoGrantedSpellEntries();
   const autoLeveledSpells = autoSpells.filter((spell) => spell.level > 0);
   const autoCantrips = autoGrantedCantripNames();
-  const spells = [...new Set([...state.character.spells, ...autoCantrips])];
+  const backgroundSpells = backgroundSelectedSpellNames();
+  const spells = currentKnownSpellNames();
   const selected = state.selectedSpell && spells.includes(state.selectedSpell) ? state.selectedSpell : "";
   const knownSpells = spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level));
   return `
@@ -2231,7 +2317,36 @@ function renderSpellsSheet() {
     </div>
     ${autoLeveledSpells.length ? renderAutoGrantedSpells(autoLeveledSpells) : ""}
     ${renderSpellSheetGroups(knownSpells, selected)}
+    ${backgroundSpells.length ? renderBackgroundSpellSource(backgroundSpells) : ""}
     ${spells.length || autoLeveledSpells.length ? "" : `<div class="empty-state">Nenhuma magia selecionada para esta ficha.</div>`}
+  `;
+}
+
+function currentKnownSpellNames() {
+  return [...new Set([
+    ...(state.character.spells ?? []),
+    ...backgroundSelectedSpellNames(),
+    ...autoGrantedCantripNames(),
+  ])];
+}
+
+function renderBackgroundSpellSource(spells) {
+  return `
+    <section class="feature-section">
+      <h3>Magias de background</h3>
+      <div class="auto-spell-list">
+        ${spells.map((name) => {
+          const detail = spellFromKnownData(name);
+          return `
+            <article class="auto-spell-card">
+              <strong>${escapeHtml(name)}</strong>
+              <span>${escapeHtml(detail?.level === 0 ? "Cantrip" : `${ordinalLabel(detail?.level ?? 1)}-level spell`)}</span>
+              <em>Magic Initiate</em>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -2307,15 +2422,33 @@ function renderSpellSlotTrack(level) {
 
 function renderInventorySheet() {
   const inventory = state.character.inventory ?? [];
+  const activeModifiers = state.derived?.activeModifiers ?? deriveActiveModifiers(state.character);
+  const encumbrance = state.derived?.encumbrance;
   const weight = inventory.reduce((total, item) => total + (Number(item.weight) || 0) * (Number(item.quantity) || 1), 0);
   const gold = inventory.filter((item) => item.kind === "currency").reduce((total, item) => total + (Number(item.gp) || 0), 0);
   return `
     <div class="inventory-head">
-      <div><strong>Weight Carried: ${weight.toFixed(1)} lb.</strong><span>Inventory pessoal</span></div>
+      <div>
+        <strong>Weight Carried: ${weight.toFixed(1)} lb.${encumbrance ? ` / ${encumbrance.carryingCapacity} lb.` : ""}</strong>
+        <span>${encumbrance?.encumbered ? "Encumbered" : "Inventory pessoal"}</span>
+      </div>
       <strong>${gold} GP</strong>
     </div>
+    ${renderActiveModifierSummary(activeModifiers)}
     <div class="inventory-list">
       ${inventory.length ? inventory.map(renderInventoryRow).join("") : `<div class="empty-state">Escolha o equipamento inicial na etapa Escolhas.</div>`}
+    </div>
+  `;
+}
+
+function renderActiveModifierSummary(modifiers) {
+  if (!modifiers.length) return "";
+  return `
+    <div class="inventory-modifiers">
+      <strong>Modificadores ativos</strong>
+      ${modifiers.map((modifier) => `
+        <span>${escapeHtml(modifier.sourceName ?? modifier.sourceId ?? "Fonte")}: ${escapeHtml(modifier.target)} ${signed(Number(modifier.value) || 0)}</span>
+      `).join("")}
     </div>
   `;
 }
@@ -2450,7 +2583,7 @@ function smallStat(label, value) {
 }
 
 function abilityCard(key, label) {
-  const save = mod(key) + (state.character.savingThrows.includes(key) ? proficiency() : 0);
+  const save = state.derived?.savingThrows?.[key] ?? mod(key) + (state.character.savingThrows.includes(key) ? proficiency() : 0);
   return `
     <article class="ability-card">
       <h3>${label}</h3>
@@ -3431,10 +3564,24 @@ function useResource(resourceId) {
   resource.used += 1;
 }
 
+function useAction(actionId) {
+  const action = currentActionItems().find((item) => item.id === actionId);
+  if (!action || action.disabled) return;
+  if (action.slotLevel) {
+    castSpell(action.slotLevel);
+    return;
+  }
+  if (action.resource) useResource(action.resource);
+}
+
 function recoverShortRestResources() {
-  Object.values(state.character.resources ?? {}).forEach((resource) => {
+  Object.entries(state.character.resources ?? {}).forEach(([resourceId, resource]) => {
     const recovery = resource.recovery?.short;
     if (!recovery) return;
+    if (resourceId === "secondWind") {
+      resource.used = Math.max(0, resource.used - 1);
+      return;
+    }
     if (recovery === "all") {
       resource.used = 0;
       return;
@@ -3449,11 +3596,65 @@ function recoverLongRestResources() {
   });
 }
 
-function applyRest(type) { state.restModalType = type; const isLong = type === "long"; const description = isLong ? "Restaura HP ao máximo e recupera todos os slots de magia." : "Recupera recursos de descanso curto, como Pact Magic."; state.restModalContent = { label: isLong ? "Long Rest" : "Short Rest", description }; state.restModalOpen = true; renderSheet(); }
+function applyRest(type) {
+  state.restModalType = type;
+  state.restModalHitDice = {};
+  const isLong = type === "long";
+  const description = isLong
+    ? "Restaura HP ao maximo, recursos, slots e todos os Hit Dice."
+    : "Pode gastar Hit Dice e recupera recursos de Short Rest.";
+  state.restModalContent = { label: isLong ? "Long Rest" : "Short Rest", description };
+  state.restModalOpen = true;
+  renderSheet();
+}
 
-function confirmRest() { const type = state.restModalType; const isLong = type === "long"; if (isLong) { state.character.hp = maxHitPoints(); state.character.tempHp = 0; resetSpellSlots(); recoverLongRestResources(); } else { resetSpellSlots({ pactOnly: true }); recoverShortRestResources(); } state.validationMessage = `${isLong ? "Long Rest" : "Short Rest"} aplicado.`; state.restModalOpen = false; state.restModalContent = null; persist(); render(); }
+function confirmRest() {
+  const type = state.restModalType;
+  const isLong = type === "long";
+  if (isLong) {
+    state.character.hp = maxHitPoints();
+    state.character.tempHp = 0;
+    state.character.hitDiceUsed = 0;
+    resetSpellSlots();
+    recoverLongRestResources();
+  } else {
+    applySelectedHitDice();
+    resetSpellSlots({ pactOnly: true });
+    recoverShortRestResources();
+  }
+  state.validationMessage = `${isLong ? "Long Rest" : "Short Rest"} aplicado.`;
+  state.restModalOpen = false;
+  state.restModalContent = null;
+  state.restModalHitDice = {};
+  persist();
+  render();
+}
 
-function cancelRest() { state.restModalOpen = false; state.restModalContent = null; state.restModalType = null; renderSheet(); }
+function applySelectedHitDice() {
+  const selected = Object.values(state.restModalHitDice ?? {}).filter((entry) => entry?.value).length;
+  if (!selected) return;
+  const usable = Math.min(selected, availableHitDice());
+  const healing = usable * hitDieHealingAmount();
+  state.character.hp = Math.min(maxHitPoints(), (Number(state.character.hp) || 0) + healing);
+  state.character.hitDiceUsed = Math.min(Number(state.character.level) || 1, (Number(state.character.hitDiceUsed) || 0) + usable);
+}
+
+function availableHitDice() {
+  return Math.max(0, (Number(state.character.level) || 1) - (Number(state.character.hitDiceUsed) || 0));
+}
+
+function hitDieHealingAmount() {
+  return Math.max(1, Math.floor(hitDie() / 2) + 1 + mod("con"));
+}
+
+function cancelRest() {
+  state.restModalOpen = false;
+  state.restModalContent = null;
+  state.restModalType = null;
+  state.restModalHitDice = {};
+  renderRestModal();
+  renderSheet();
+}
 
 function maxHitPoints() {
   const level = Number(state.character.level) || 1;
@@ -3646,6 +3847,13 @@ function optionNames(choice) {
 }
 
 function normalizeCharacterState() {
+  state.derived = null;
+  delete state.character.events;
+  state.characters = (state.characters ?? []).map((character) => {
+    const next = { ...character };
+    delete next.events;
+    return next;
+  });
   normalizeSourceSelections();
   state.character.abilityMethod ??= "standard";
   normalizeAbilityMethodState();
@@ -3658,6 +3866,7 @@ function normalizeCharacterState() {
   state.character.equipmentChoices ??= {};
   state.character.inventory ??= [];
   state.character.equippedItems ??= [];
+  state.character.hitDiceUsed = clamp(Number(state.character.hitDiceUsed) || 0, 0, Number(state.character.level) || 1);
   state.character.spellSlots ??= {};
   state.character.resources ??= {};
   state.character.savingThrows = classSavingThrows();
@@ -3671,6 +3880,15 @@ function normalizeCharacterState() {
   syncSpellSlots();
   syncResources();
   syncInventoryEffects();
+  const activeModifiers = deriveActiveModifiers(state.character);
+  state.derived = deriveCharacterSheet(state.character, {
+    rules: ruleRepository,
+    skills: SKILLS,
+    abilityKeys: ABILITIES.map(([key]) => key),
+    spellAbility: spellAbility(),
+    modifiers: activeModifiers,
+    baseArmorClass: state.character.armorClass - modifierTotal(activeModifiers, "armor_class"),
+  });
 }
 
 function hasLoadedRules() {
@@ -3817,13 +4035,8 @@ function renderBgSpellChoice(rule) {
   const storageKey = `bg-${rule.id}`;
   const selected = state.character.bgSpellChoices?.[storageKey] || [];
   const locked = creationChoicesLocked();
-  const allSpells = state.api.source?.spellDetails || {};
   const spellList = rule.spellList?.toLowerCase() || '';
-  const listSpells = Object.values(allSpells).filter((spell) => {
-    if (!spell?.name) return false;
-    const className = (spell.className || '').toLowerCase();
-    return className.includes(spellList);
-  });
+  const listSpells = backgroundSpellOptions(spellList);
   const cantrips = listSpells.filter(s => s.level === 0).map(s => s.name);
   const level1 = listSpells.filter(s => s.level === 1).map(s => s.name);
   const selectedCantrips = selected.filter(s => cantrips.includes(s));
@@ -3836,18 +4049,40 @@ function renderBgSpellChoice(rule) {
       <div class="choice-list">
         ${cantrips.map(name => {
           const isSelected = selected.includes(name);
-          return `<label><input type="checkbox" data-bg-spell="${storageKey}" value="${name}" ${isSelected ? 'checked' : ''} ${locked ? 'disabled' : ''}/> ${escapeHtml(name)}</label>`;
+          const disabled = locked || (!isSelected && selectedCantrips.length >= rule.cantrips);
+          return `<label><input type="checkbox" data-bg-spell="${storageKey}" value="${name}" ${isSelected ? 'checked' : ''} ${disabled ? 'disabled' : ''}/> ${escapeHtml(name)}</label>`;
         }).join('')}
       </div>
       <h4>Magias de 1° nivel (escolha ${rule.level1Spells})</h4>
       <div class="choice-list">
         ${level1.map(name => {
           const isSelected = selected.includes(name);
-          return `<label><input type="checkbox" data-bg-spell="${storageKey}" value="${name}" ${isSelected ? 'checked' : ''} ${locked ? 'disabled' : ''}/> ${escapeHtml(name)}</label>`;
+          const disabled = locked || (!isSelected && selectedLevel1.length >= rule.level1Spells);
+          return `<label><input type="checkbox" data-bg-spell="${storageKey}" value="${name}" ${isSelected ? 'checked' : ''} ${disabled ? 'disabled' : ''}/> ${escapeHtml(name)}</label>`;
         }).join('')}
       </div>
     </fieldset>
   `;
+}
+
+function backgroundSpellOptions(spellList) {
+  const listKey = slugifyName(spellList);
+  return (state.api.classSpells?.[listKey] ?? [])
+    .map((spell) => spellFromKnownData(spell.name) ?? spell)
+    .filter((spell) => spell?.name && Number.isFinite(Number(spell.level)) && Number(spell.level) <= 1)
+    .sort((a, b) => Number(a.level) - Number(b.level) || a.name.localeCompare(b.name));
+}
+
+function backgroundSelectedSpellNames() {
+  const names = [];
+  backgroundSpellChoiceRules().forEach((rule) => {
+    const storageKey = `bg-${rule.id}`;
+    const legal = new Set(backgroundSpellOptions(rule.spellList).map((spell) => spell.name));
+    (state.character.bgSpellChoices?.[storageKey] ?? [])
+      .filter((name) => legal.has(name))
+      .forEach((name) => names.push(name));
+  });
+  return [...new Set(names)];
 }
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
@@ -3880,10 +4115,10 @@ function syncInventoryEffects() {
   state.character.equippedItems ??= [];
   const equipped = inventory.filter((item) => state.character.equippedItems.includes(item.id));
   const armor = equipped.find((item) => isArmorItem(item));
-  const shieldBonus = equipped.filter((item) => isShieldItem(item)).reduce((total, item) => total + (Number(item.ac) || 0), 0);
+  const activeModifiers = deriveActiveModifiers(state.character);
   const dex = mod("dex");
   const armorBase = armor?.ac ? Number(armor.ac) + armorDexBonus(armor, dex) : 10 + dex;
-  state.character.armorClass = armorBase + shieldBonus;
+  state.character.armorClass = armorBase + modifierTotal(activeModifiers, "armor_class");
   const manualAttacks = (state.character.attacks ?? []).filter((attack) => !attack.fromInventory);
   const itemAttacks = equipped.filter(isWeaponItem).map(attackFromInventoryItem);
   state.character.attacks = [...manualAttacks, ...itemAttacks];
@@ -3908,7 +4143,11 @@ function toggleEquipItem(id) {
 }
 
 function isEquipableItem(item) {
-  return isShieldItem(item) || isArmorItem(item) || isWeaponItem(item);
+  return isShieldItem(item) || isArmorItem(item) || isWeaponItem(item) || itemHasModifiers(item);
+}
+
+function itemHasModifiers(item) {
+  return Boolean(item?.modifier || item?.modifiers?.length || /ring of protection/i.test(String(item?.name ?? "")));
 }
 
 function isShieldItem(item) {
@@ -4052,10 +4291,11 @@ function setByPath(target, path, value) {
 }
 
 function mod(key) {
-  return Math.floor((abilityScore(key) - 10) / 2);
+  return state.derived?.abilityModifiers?.[key] ?? Math.floor((abilityScore(key) - 10) / 2);
 }
 
 function abilityScore(key) {
+  if (state.derived?.abilityScores?.[key] != null) return state.derived.abilityScores[key];
   return clamp((Number(state.character.abilities[key]) || 10) + abilityBonusFromChoices(key), 1, 30);
 }
 
@@ -4081,6 +4321,7 @@ function abilityScoreBeforeAsiRule(key, ruleId) {
 }
 
 function skillBonus(name) {
+  if (state.derived?.skillBonuses?.[name] != null) return state.derived.skillBonuses[name];
   const ability = SKILLS.find(([skill]) => skill === name)?.[1] ?? "dex";
   return mod(ability) + (state.character.skillProficiencies.includes(name) ? proficiency() : 0) + skillChoiceBonus(name);
 }
@@ -4095,7 +4336,7 @@ function skillChoiceBonus(name) {
 }
 
 function proficiency() {
-  return proficiencyForLevel(state.character.level);
+  return state.derived?.proficiencyBonus ?? proficiencyForLevel(state.character.level);
 }
 
 function proficiencyForLevel(level) {
