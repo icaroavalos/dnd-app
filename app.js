@@ -181,7 +181,8 @@ const defaultState = {
   hpModalOpen: false,
   hpModalMode: "damage",
   hpModalAmount: 0,
-  hpModalTempAmount: 0,
+  hpModalTempAmount: "",
+  bgSpellChoices: {},
  restModalOpen: false,
  restModalType: null,
  restModalContent: null,
@@ -350,6 +351,7 @@ function createStartingCharacter() {
   character.abilities = Object.fromEntries(ABILITIES.map(([key], index) => [key, STANDARD_ARRAY[index]]));
   character.classFeatureChoices = {};
   character.asiChoices = {};
+  character.bgSpellChoices = {};
   character.equipmentChoices = {};
   character.inventory = [];
   character.equippedItems = [];
@@ -382,6 +384,7 @@ function createNewCharacter() {
   state.levelUpMode = false;
   state.creationComplete = false;
   state.builderVisible = true;
+  state.character.bgSpellChoices = {};
   persist();
   render();
 }
@@ -942,6 +945,7 @@ function renderChoicesForm() {
   const selectedCount = selected.length;
   const skillOptions = [...new Set([...backgroundSkills, ...classSkill.options])];
   const classChoices = classCreationChoiceRules();
+const bgSpellChoices = backgroundSpellChoiceRules();
   const locked = creationChoicesLocked();
   return `
     <fieldset class="choice-group">
@@ -965,7 +969,7 @@ function renderChoicesForm() {
         }).join("")}
       </div>
     </fieldset>
-    ${classChoices.map(renderClassCreationChoice).join("")}
+    ${classChoices.map(renderClassCreationChoice).join("")} ${bgSpellChoices.map(renderBgSpellChoice).join("")}
     ${equipmentChoiceRules().map(renderEquipmentChoice).join("")}
     <fieldset class="choice-group">
       <legend>Ataques</legend>
@@ -1222,7 +1226,18 @@ function missingCreationChoices() {
     }
     if (!state.character.classFeatureChoices?.[rule.id]) missing.push(rule.name);
   });
-  if (!state.levelUpMode && !state.creationComplete) equipmentChoiceRules().forEach((rule) => {
+  // Check background spell choices (Magic Initiate)
+const bgSpellRules = backgroundSpellChoiceRules();
+bgSpellRules.forEach((rule) => {
+  const storageKey = `bg-${rule.id}`;
+  const selected = state.character.bgSpellChoices?.[storageKey] || [];
+  const selectedCantrips = selected.filter(s => s && state.api.source?.spellDetails?.[s.toLowerCase()]?.level === 0);
+  const selectedLevel1 = selected.filter(s => s && state.api.source?.spellDetails?.[s.toLowerCase()]?.level === 1);
+  if (selectedCantrips.length < (rule.cantrips || 2)) missing.push(`${rule.name}: ${rule.cantrips} cantrips`);
+  if (selectedLevel1.length < (rule.level1Spells || 1)) missing.push(`${rule.name}: ${rule.level1Spells} level 1 spell`);
+});
+
+if (!state.levelUpMode && !state.creationComplete) equipmentChoiceRules().forEach((rule) => {
     if (!state.character.equipmentChoices?.[rule.id]) missing.push(rule.name);
   });
   return missing;
@@ -1266,6 +1281,7 @@ function bindFormEvents() {
         state.character.classSkillChoices = [];
         state.character.classFeatureChoices = {};
         state.character.asiChoices = {};
+  character.bgSpellChoices = {};
         state.character.equipmentChoices = {};
         state.character.inventory = [];
         state.character.equippedItems = [];
@@ -1341,7 +1357,28 @@ function bindFormEvents() {
     });
   });
 
-  els.form.querySelectorAll("[data-level-hp-gain]").forEach((input) => {
+  // Background spell choices (Magic Initiate)
+els.form.querySelectorAll("[data-bg-spell]").forEach((input) => {
+  input.addEventListener("change", (e) => {
+    state.character.bgSpellChoices = state.character.bgSpellChoices || {};
+    const key = e.target.dataset.bgSpell;
+    const value = e.target.value;
+    const checked = e.target.checked;
+    if (!state.character.bgSpellChoices[key]) {
+      state.character.bgSpellChoices[key] = [];
+    }
+    if (checked) {
+      if (!state.character.bgSpellChoices[key].includes(value)) {
+        state.character.bgSpellChoices[key].push(value);
+      }
+    } else {
+      state.character.bgSpellChoices[key] = state.character.bgSpellChoices[key].filter(v => v !== value);
+    }
+    render();
+  });
+});
+
+els.form.querySelectorAll("[data-level-hp-gain]").forEach((input) => {
     input.addEventListener("input", () => {
       setLevelUpHpGain(Number(input.value));
       persist();
@@ -2698,8 +2735,37 @@ function resourceRecoveryFromBody(body) {
     recovery.long = "all";
   }
   else if (/finish a short rest/i.test(text) && /can't use (?:it|this trait|this feature|this ability)/i.test(text) && /again/i.test(text)) recovery.short = "all";
+// Action Surge pattern: "can't do so again until you finish a Short Rest or Long Rest"
+else if (/can't use this feature again until you finish a (?:Short Rest|Long Rest)/i.test(text)) {
+    recovery.short = "all";
+    recovery.long = "all";
+}
+else if (/finish a (?:Short Rest|Long Rest)/i.test(text) && /can't.*again/i.test(text)) {
+    recovery.short = "all";
+    recovery.long = "all";
+}
 
-  if (/regain all expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
+  // Pattern: "finish a Short Rest or Long Rest" (e.g., Action Surge, Second Wind)
+if (/finish a .{0,100}Short Rest.{0,100}Long Rest/i.test(text) || /finish a .{0,100}Long Rest.{0,100}Short Rest/i.test(text)) {
+  recovery.short = "all";
+  recovery.long = "all";
+}
+// Pattern: "can't do so again until you finish" (Action Surge)
+else if (/can't do so again until you finish/i.test(text)) {
+  if (/short/i.test(text)) recovery.short = "all";
+  if (/long/i.test(text)) recovery.long = "all";
+}
+// Pattern: "before a Short Rest or Long Rest" (Indomitable variant)
+else if (/before a .{0,50}Short Rest/i.test(text) || /before a .{0,50}Long Rest/i.test(text)) {
+  if (/short/i.test(text)) recovery.short = "all";
+  if (/long/i.test(text)) recovery.long = "all";
+}
+// Pattern: "regain one expended use when you finish a Short Rest" (Second Wind)
+else if (/regain one expended use when you finish a short rest/i.test(text)) {
+  recovery.short = "1";
+}
+
+if (/regain all expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/regain all your expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/regain all of (?:its|their|your) expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/finish a long rest/i.test(text) && /regain all expended uses/i.test(text)) recovery.long = "all";
@@ -3456,6 +3522,7 @@ function startLevelUpAssistant() {
   state.levelUpSnapshot = structuredClone(state.character);
   state.levelUpClassMode = "same";
   state.builderVisible = true;
+  state.character.bgSpellChoices = {};
   state.creationComplete = true;
   state.character.creationComplete = true;
   const gain = levelUpCharacter();
@@ -3714,6 +3781,74 @@ function backgroundSkillProficiencies(backgroundName = state.character.backgroun
   }))];
 }
 
+
+// Magic Initiate Background Spell Choices
+function getBackgroundGrantedSpells() {
+  const background = state.character.background?.toLowerCase();
+  if (!background) return [];
+  const bgDetails = state.api.source?.backgroundDetails?.[background];
+  if (!bgDetails?.entries) return [];
+  const granted = [];
+  for (const entry of bgDetails.entries) {
+    const entryStr = JSON.stringify(entry);
+    if (entryStr.includes('Magic Initiate')) {
+      let spellList = 'cleric';
+      if (entryStr.includes('Wizard')) spellList = 'wizard';
+      else if (entryStr.includes('Druid')) spellList = 'druid';
+      granted.push({ type: 'magic_initiate', spellList, cantrips: 2, level1Spells: 1 });
+    }
+  }
+  return granted;
+}
+
+function backgroundSpellChoiceRules() {
+  const granted = getBackgroundGrantedSpells();
+  return granted.map((grant, idx) => ({
+    id: `bg-magic-initiate-${grant.spellList}-${idx}`,
+    name: `Magic Initiate (${grant.spellList})`,
+    type: 'bg_spell_choice',
+    spellList: grant.spellList,
+    cantrips: grant.cantrips,
+    level1Spells: grant.level1Spells,
+  }));
+}
+
+function renderBgSpellChoice(rule) {
+  const storageKey = `bg-${rule.id}`;
+  const selected = state.character.bgSpellChoices?.[storageKey] || [];
+  const locked = creationChoicesLocked();
+  const allSpells = state.api.source?.spellDetails || {};
+  const spellList = rule.spellList?.toLowerCase() || '';
+  const listSpells = Object.values(allSpells).filter((spell) => {
+    if (!spell?.name) return false;
+    const className = (spell.className || '').toLowerCase();
+    return className.includes(spellList);
+  });
+  const cantrips = listSpells.filter(s => s.level === 0).map(s => s.name);
+  const level1 = listSpells.filter(s => s.level === 1).map(s => s.name);
+  const selectedCantrips = selected.filter(s => cantrips.includes(s));
+  const selectedLevel1 = selected.filter(s => level1.includes(s));
+  return `
+    <fieldset class="choice-group bg-spell-choice">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="choice-counter">${selectedCantrips.length}/${rule.cantrips} cantrips e ${selectedLevel1.length}/${rule.level1Spells} magias de nivel 1</p>
+      <h4>Cantrips (escolha ${rule.cantrips})</h4>
+      <div class="choice-list">
+        ${cantrips.map(name => {
+          const isSelected = selected.includes(name);
+          return `<label><input type="checkbox" data-bg-spell="${storageKey}" value="${name}" ${isSelected ? 'checked' : ''} ${locked ? 'disabled' : ''}/> ${escapeHtml(name)}</label>`;
+        }).join('')}
+      </div>
+      <h4>Magias de 1° nivel (escolha ${rule.level1Spells})</h4>
+      <div class="choice-list">
+        ${level1.map(name => {
+          const isSelected = selected.includes(name);
+          return `<label><input type="checkbox" data-bg-spell="${storageKey}" value="${name}" ${isSelected ? 'checked' : ''} ${locked ? 'disabled' : ''}/> ${escapeHtml(name)}</label>`;
+        }).join('')}
+      </div>
+    </fieldset>
+  `;
+}
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
   const legalNames = legalSpellNames();
