@@ -1085,7 +1085,7 @@ async function renderBackgroundForm() {
   // Load background data
   let bgOptions = [];
   try {
-    const { getBackgroundsBySource } = await import('./src/core/character/background-loader.js');
+    const { getBackgroundsBySource } = await import('./dist/src/core/character/background-loader.js');
     const backgrounds = getBackgroundsBySource('XPHB');
     bgOptions = backgrounds.map(bg => ({
       value: bg.name,
@@ -1101,8 +1101,8 @@ async function renderBackgroundForm() {
   let bgContent = '<p class="hint">Selecione um background para ver as opcoes.</p>';
   if (currentBg) {
     try {
-      const { backgroundChoiceRules, hasMagicInitiate } = await import('./src/core/character/background-rules.js');
-      const { createEmptyBgChoices } = await import('./src/core/character/background-choices.js');
+      const { backgroundChoiceRules, hasMagicInitiate } = await import('./dist/src/core/character/background-rules.js');
+      const { createEmptyBgChoices } = await import('./dist/src/core/character/background-choices.js');
 
       const rules = backgroundChoiceRules(currentBg, 'XPHB');
       const hasMagic = hasMagicInitiate(currentBg, 'XPHB');
