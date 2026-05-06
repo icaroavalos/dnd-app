@@ -1077,70 +1077,63 @@ function renderAsiChoice(rule) {
   `;
 }
 
+// Default backgrounds (simple names array for now)
+const DEFAULT_BACKGROUND_NAMES = ['Acolyte', 'Soldier'];
+
 async function renderBackgroundForm() {
   const bgChoices = state.character.bgChoices || {};
   const currentBg = bgChoices.background;
   const locked = creationChoicesLocked();
 
-  // Load background data
-  let bgOptions = [];
-  try {
-    const { loadBackgroundData, getBackgroundsBySource } = await import('./dist/src/core/character/background-loader.js');
-    await loadBackgroundData(); // Must call first to populate cache
-    const backgrounds = getBackgroundsBySource('XPHB');
-    bgOptions = backgrounds.map(bg => ({
-      value: bg.name,
-      label: bg.name,
-      selected: currentBg === bg.name
-    }));
-  } catch (e) {
-    console.error('Failed to load backgrounds:', e);
-    return '<p class="error">Failed to load backgrounds.</p>' + navButtons();
-  }
+  // Use default backgrounds
+  const bgOptions = DEFAULT_BACKGROUND_NAMES.map(name => ({
+    value: name,
+    label: name,
+    selected: currentBg === name
+  }));
 
   // Generate rules for selected background
   let bgContent = '<p class="hint">Selecione um background para ver as opcoes.</p>';
   if (currentBg) {
-    try {
-      const { backgroundChoiceRules, hasMagicInitiate } = await import('./dist/src/core/character/background-rules.js');
-      const { createEmptyBgChoices } = await import('./dist/src/core/character/background-choices.js');
+    // Inline rules based on background name
+    const isAcolyte = currentBg === 'Acolyte';
+    const isSoldier = currentBg === 'Soldier';
 
-      const rules = backgroundChoiceRules(currentBg, 'XPHB');
-      const hasMagic = hasMagicInitiate(currentBg, 'XPHB');
+    const abilityOptions = isAcolyte ? ['int', 'wis', 'cha'] : isSoldier ? ['str', 'dex', 'con'] : ['int', 'wis', 'cha'];
+    const abilityLabels = { str: 'Strength', dex: 'Dexterity', con: 'Constitution', int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma' };
+    const skillInfo = isAcolyte ? ['Insight', 'Religion'] : isSoldier ? ['Athletics', 'Intimidation'] : [];
+    const toolInfo = isAcolyte ? ["Calligrapher's Supplies"] : isSoldier ? ['Gaming Set', 'Land Vehicles'] : [];
 
-      bgContent = rules.map(rule => {
-        if (rule.type === 'ability') {
-          return renderBackgroundAbilityChoice(rule, bgChoices, locked);
-        } else if (rule.type === 'equipment') {
-          return renderBackgroundEquipmentChoice(rule, bgChoices, locked);
-        } else if (rule.type === 'skill') {
-          return renderBackgroundSkillInfo(rule, bgChoices);
-        } else if (rule.type === 'tool') {
-          return renderBackgroundToolInfo(rule, bgChoices);
-        }
-        return '';
-      }).join('');
+    bgContent = `
+      <fieldset class="choice-group">
+        <legend>${currentBg}: Ability Scores</legend>
+        <p class="hint">Choose how to increase your ability scores:</p>
+        <div class="choice-group-inline" style="display:flex;gap:1rem;margin:0.5rem 0;">
+          <label><input type="radio" name="ability-increment" value="2_1" ${bgChoices.abilityIncrement === '2_1' ? 'checked' : ''} data-bg-increment /> <span>+2 / +1</span></label>
+          <label><input type="radio" name="ability-increment" value="1_1_1" ${bgChoices.abilityIncrement === '1_1_1' ? 'checked' : ''} data-bg-increment /> <span>+1 / +1 / +1</span></label>
+        </div>
+        <div class="choice-list">
+          ${abilityOptions.map(opt => `<label class="${(bgChoices.abilityScores || []).includes(opt) ? 'selected' : ''}"><input type="checkbox" data-bg-ability="${opt}" ${(bgChoices.abilityScores || []).includes(opt) ? 'checked' : ''} /><span><strong>${abilityLabels[opt]}</strong></span></label>`).join('')}
+        </div>
+      </fieldset>
+      <fieldset class="choice-group">
+        <legend>${currentBg}: Skills (automatic)</legend>
+        <p class="hint">Skill proficiencies granted by this background:</p>
+        <div class="choice-list">${skillInfo.map(s => `<label class="readonly"><input type="checkbox" checked disabled /><span>${s}</span></label>`).join('') || '<p class="hint">No skill proficiencies</p>'}</div>
+      </fieldset>
+      ${toolInfo.length > 0 ? `<fieldset class="choice-group"><legend>${currentBg}: Tools (automatic)</legend><div class="choice-list">${toolInfo.map(t => `<label class="readonly"><input type="checkbox" checked disabled /><span>${t}</span></label>`).join('')}</div></fieldset>` : ''}
+      <fieldset class="choice-group">
+        <legend>${currentBg}: Equipment</legend>
+        <p class="hint">Choose your starting equipment:</p>
+        <div class="choice-list">
+          <label><input type="radio" name="bg-equipment" value="A" ${bgChoices.equipmentChoice === 'A' ? 'checked' : ''} data-bg-equipment /><span><strong>Option A</strong><small>Items based on background</small></span></label>
+          <label><input type="radio" name="bg-equipment" value="B" ${bgChoices.equipmentChoice === 'B' ? 'checked' : ''} data-bg-equipment /><span><strong>Option B</strong><small>50 GP gold</small></span></label>
+        </div>
+      </fieldset>
+    `;
 
-      if (hasMagic) {
-        bgContent += `
-          <fieldset class="choice-group">
-            <legend>Magic Initiate: Spellcasting Ability</legend>
-            <p class="hint">Choose INT, WIS, or CHA for your Magic Initiate spells.</p>
-            <div class="choice-list">
-              ${['int', 'wis', 'cha'].map(ability => `
-                <label>
-                  <input type="radio" name="spellcasting-ability" value="${ability}"
-                    ${(bgChoices.spellcastingAbility === ability) ? 'checked' : ''}
-                    ${locked ? 'disabled' : ''} />
-                  <span><strong>${ability.toUpperCase()}</strong></span>
-                </label>
-              `).join('')}
-            </div>
-          </fieldset>
-        `;
-      }
-    } catch (e) {
-      console.error('Failed to generate background rules:', e);
+    if (isAcolyte) {
+      bgContent += `<fieldset class="choice-group"><legend>Magic Initiate: Cleric</legend><p class="hint">Choose your spellcasting ability for Magic Initiate spells:</p><div class="choice-list">${['int', 'wis', 'cha'].map(a => `<label><input type="radio" name="spellcasting-ability" value="${a}" ${bgChoices.spellcastingAbility === a ? 'checked' : ''} /><span><strong>${abilityLabels[a]}</strong></span></label>`).join('')}</div></fieldset>`;
     }
   }
 

@@ -1,0 +1,241 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - button "Menu de fichas" [ref=e4] [cursor=pointer]
+    - strong [ref=e6]: Cascarudo
+    - generic [ref=e7]: 5etools 2024
+  - generic [ref=e8]:
+    - complementary "Criador de personagem" [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - paragraph [ref=e12]: Criador 5e
+          - heading "Ficha guiada" [level=1] [ref=e13]
+        - button "Salvar" [ref=e14] [cursor=pointer]
+      - navigation "Etapas da criacao" [ref=e15]:
+        - button "Origem" [ref=e759] [cursor=pointer]
+        - button "Atributos" [ref=e760] [cursor=pointer]
+        - button "Escolhas" [ref=e761] [cursor=pointer]
+        - button "Niveis" [ref=e762] [cursor=pointer]
+      - generic [ref=e20]:
+        - group "Skills" [ref=e763]:
+          - generic [ref=e764]: Skills
+          - paragraph [ref=e765]: 0/2 escolhas da classe • 2 do background
+          - generic [ref=e766]:
+            - generic [ref=e767]:
+              - checkbox "Medicine Background" [checked] [disabled] [ref=e768]
+              - generic [ref=e769]:
+                - text: Medicine
+                - generic [ref=e770]: Background
+            - generic [ref=e771]:
+              - checkbox "Religion Background" [checked] [disabled] [ref=e772]
+              - generic [ref=e773]:
+                - text: Religion
+                - generic [ref=e774]: Background
+            - generic [ref=e775]:
+              - checkbox "Animal Handling" [ref=e776]
+              - generic [ref=e777]: Animal Handling
+            - generic [ref=e778]:
+              - checkbox "Athletics" [ref=e779]
+              - generic [ref=e780]: Athletics
+            - generic [ref=e781]:
+              - checkbox "Intimidation" [ref=e782]
+              - generic [ref=e783]: Intimidation
+            - generic [ref=e784]:
+              - checkbox "Nature" [ref=e785]
+              - generic [ref=e786]: Nature
+            - generic [ref=e787]:
+              - checkbox "Perception" [ref=e788]
+              - generic [ref=e789]: Perception
+            - generic [ref=e790]:
+              - checkbox "Survival" [ref=e791]
+              - generic [ref=e792]: Survival
+        - group "Hermit Equipment" [ref=e793]:
+          - generic [ref=e794]: Hermit Equipment
+          - paragraph [ref=e795]: 0/1 escolhida
+          - paragraph [ref=e796]: "- Ability Scores:"
+          - generic [ref=e797]:
+            - generic [ref=e798]:
+              - radio "Opcao A Quarterstaff, Herbalism Kit, Bedroll, Book, Lamp, 3 Oil, Traveler's Clothes, 16 GP" [ref=e799]
+              - generic [ref=e800]:
+                - strong [ref=e801]: Opcao A
+                - generic [ref=e802]: Quarterstaff, Herbalism Kit, Bedroll, Book, Lamp, 3 Oil, Traveler's Clothes, 16 GP
+            - generic [ref=e803]:
+              - radio "Opcao B 50 GP" [ref=e804]
+              - generic [ref=e805]:
+                - strong [ref=e806]: Opcao B
+                - generic [ref=e807]: 50 GP
+        - group "Ataques" [ref=e808]:
+          - generic [ref=e809]: Ataques
+          - generic [ref=e810]:
+            - generic [ref=e811]:
+              - generic [ref=e812]:
+                - generic [ref=e813]: Nome
+                - textbox "Nome" [ref=e814]: Shortsword
+              - generic [ref=e815]:
+                - generic [ref=e816]: Alcance
+                - textbox "Alcance" [ref=e817]: 5 feet
+              - generic [ref=e818]:
+                - generic [ref=e819]: Dano
+                - textbox "Dano" [ref=e820]: 1d6
+              - generic [ref=e821]:
+                - generic [ref=e822]: Tipo
+                - textbox "Tipo" [ref=e823]: Piercing
+              - button "Remover" [ref=e824] [cursor=pointer]
+            - generic [ref=e825]:
+              - generic [ref=e826]:
+                - generic [ref=e827]: Nome
+                - textbox "Nome" [ref=e828]: Dart
+              - generic [ref=e829]:
+                - generic [ref=e830]: Alcance
+                - textbox "Alcance" [ref=e831]: 30/120
+              - generic [ref=e832]:
+                - generic [ref=e833]: Dano
+                - textbox "Dano" [ref=e834]: 1d6
+              - generic [ref=e835]:
+                - generic [ref=e836]: Tipo
+                - textbox "Tipo" [ref=e837]: Piercing
+              - button "Remover" [ref=e838] [cursor=pointer]
+            - generic [ref=e839]:
+              - generic [ref=e840]:
+                - generic [ref=e841]: Nome
+                - textbox "Nome" [ref=e842]: Unarmed Strike
+              - generic [ref=e843]:
+                - generic [ref=e844]: Alcance
+                - textbox "Alcance" [ref=e845]: 10 feet
+              - generic [ref=e846]:
+                - generic [ref=e847]: Dano
+                - textbox "Dano" [ref=e848]: 1d8
+              - generic [ref=e849]:
+                - generic [ref=e850]: Tipo
+                - textbox "Tipo" [ref=e851]: Bludgeoning
+              - button "Remover" [ref=e852] [cursor=pointer]
+            - generic [ref=e853]:
+              - generic [ref=e854]:
+                - generic [ref=e855]: Nome
+                - textbox "Nome" [ref=e856]: Espada Longa
+              - generic [ref=e857]:
+                - generic [ref=e858]: Alcance
+                - textbox "Alcance" [ref=e859]: 5 feet
+              - generic [ref=e860]:
+                - generic [ref=e861]: Dano
+                - textbox "Dano" [ref=e862]: 1d12
+              - generic [ref=e863]:
+                - generic [ref=e864]: Tipo
+                - textbox "Tipo" [ref=e865]: Slashing
+              - button "Remover" [ref=e866] [cursor=pointer]
+          - button "New" [ref=e867] [cursor=pointer]
+          - button "Sugerir da classe" [ref=e868] [cursor=pointer]
+        - paragraph [ref=e869]: "Ainda falta: 2 skill(s) da classe, Hermit Equipment."
+        - generic [ref=e870]:
+          - button "Voltar" [ref=e871] [cursor=pointer]
+          - button "Continuar" [ref=e872] [cursor=pointer]
+    - region "Previa da ficha" [ref=e42]:
+      - generic [ref=e43]:
+        - button "Base" [ref=e873] [cursor=pointer]
+        - button "Skills" [ref=e874] [cursor=pointer]
+        - button "Ataques" [ref=e875] [cursor=pointer]
+        - button "Magia" [ref=e876] [cursor=pointer]
+        - button "Inventory" [ref=e877] [cursor=pointer]
+        - button "Features" [ref=e878] [cursor=pointer]
+      - generic [ref=e50]:
+        - generic [ref=e879]:
+          - generic [ref=e880]: Cascarudo
+          - generic [ref=e881]: Barbarian 1
+        - generic [ref=e882]:
+          - generic [ref=e883]:
+            - generic [ref=e884]: Initiative
+            - strong [ref=e885]: "+2"
+          - button "Controle de pontos de vida" [ref=e886] [cursor=pointer]:
+            - generic [ref=e887]: HP
+            - strong [ref=e888]:
+              - text: "13"
+              - generic [ref=e889]: 13/13
+            - emphasis [ref=e890]: 0 THP
+          - generic [ref=e891]:
+            - generic [ref=e892]: Speed
+            - strong [ref=e893]: "45"
+        - generic [ref=e894]:
+          - generic [ref=e895]:
+            - generic [ref=e896]: Hit Dice
+            - strong [ref=e897]: 1/1d12
+          - generic [ref=e898]:
+            - generic [ref=e899]: Armor Class
+            - strong [ref=e900]: "12"
+          - generic [ref=e901]:
+            - generic [ref=e902]: Proficiency
+            - strong [ref=e903]: "+2"
+        - generic [ref=e904]:
+          - button "Short Rest" [ref=e905] [cursor=pointer]
+          - button "Long Rest" [ref=e906] [cursor=pointer]
+        - generic [ref=e907]:
+          - article [ref=e908]:
+            - heading "Strength" [level=3] [ref=e909]
+            - generic [ref=e910]:
+              - generic [ref=e911]:
+                - generic [ref=e912]: Score
+                - strong [ref=e913]: "15"
+              - generic [ref=e914]:
+                - generic [ref=e915]: Modifier
+                - strong [ref=e916]: "+2"
+              - generic [ref=e917]:
+                - generic [ref=e918]: Save
+                - strong [ref=e919]: "+4"
+          - article [ref=e920]:
+            - heading "Dexterity" [level=3] [ref=e921]
+            - generic [ref=e922]:
+              - generic [ref=e923]:
+                - generic [ref=e924]: Score
+                - strong [ref=e925]: "14"
+              - generic [ref=e926]:
+                - generic [ref=e927]: Modifier
+                - strong [ref=e928]: "+2"
+              - generic [ref=e929]:
+                - generic [ref=e930]: Save
+                - strong [ref=e931]: "+2"
+          - article [ref=e932]:
+            - heading "Constitution" [level=3] [ref=e933]
+            - generic [ref=e934]:
+              - generic [ref=e935]:
+                - generic [ref=e936]: Score
+                - strong [ref=e937]: "13"
+              - generic [ref=e938]:
+                - generic [ref=e939]: Modifier
+                - strong [ref=e940]: "+1"
+              - generic [ref=e941]:
+                - generic [ref=e942]: Save
+                - strong [ref=e943]: "+3"
+          - article [ref=e944]:
+            - heading "Intelligence" [level=3] [ref=e945]
+            - generic [ref=e946]:
+              - generic [ref=e947]:
+                - generic [ref=e948]: Score
+                - strong [ref=e949]: "12"
+              - generic [ref=e950]:
+                - generic [ref=e951]: Modifier
+                - strong [ref=e952]: "+1"
+              - generic [ref=e953]:
+                - generic [ref=e954]: Save
+                - strong [ref=e955]: "+1"
+          - article [ref=e956]:
+            - heading "Wisdom" [level=3] [ref=e957]
+            - generic [ref=e958]:
+              - generic [ref=e959]:
+                - generic [ref=e960]: Score
+                - strong [ref=e961]: "10"
+              - generic [ref=e962]:
+                - generic [ref=e963]: Modifier
+                - strong [ref=e964]: "+0"
+              - generic [ref=e965]:
+                - generic [ref=e966]: Save
+                - strong [ref=e967]: "+0"
+          - article [ref=e968]:
+            - heading "Charisma" [level=3] [ref=e969]
+            - generic [ref=e970]:
+              - generic [ref=e971]:
+                - generic [ref=e972]: Score
+                - strong [ref=e973]: "8"
+              - generic [ref=e974]:
+                - generic [ref=e975]: Modifier
+                - strong [ref=e976]: "-1"
+              - generic [ref=e977]:
+                - generic [ref=e978]: Save
+                - strong [ref=e979]: "-1"

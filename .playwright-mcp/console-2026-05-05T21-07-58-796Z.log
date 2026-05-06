@@ -1,0 +1,6 @@
+[    1069ms] [LOG] === Verifying Berserker Features === @ http://localhost:5173/app.js:4633
+[    1069ms] [ERROR] ❌ Berserker subclass not found or has no features @ http://localhost:5173/app.js:4607
+[   83544ms] ReferenceError: character is not defined
+    at HTMLSelectElement.updatePathValue (http://localhost:5173/app.js:1299:3)
+[   83544ms] ReferenceError: character is not defined
+    at HTMLSelectElement.updatePathValue (http://localhost:5173/app.js:1299:3)

@@ -1,0 +1,276 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - button "Menu de fichas" [ref=e4] [cursor=pointer]
+    - strong [ref=e6]: Cascarudo
+    - generic [ref=e7]: 5etools 2024
+  - generic [ref=e8]:
+    - complementary "Criador de personagem" [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - paragraph [ref=e12]: Criador 5e
+          - heading "Ficha guiada" [level=1] [ref=e13]
+        - button "Salvar" [ref=e14] [cursor=pointer]
+      - navigation "Etapas da criacao" [ref=e15]:
+        - button "Origem" [ref=e284] [cursor=pointer]
+        - button "Atributos" [ref=e285] [cursor=pointer]
+        - button "Escolhas" [ref=e286] [cursor=pointer]
+        - button "Niveis" [ref=e287] [cursor=pointer]
+      - generic [ref=e20]:
+        - group "Ability Scores" [ref=e288]:
+          - generic [ref=e289]: Ability Scores
+          - generic [ref=e290]:
+            - generic [ref=e291]: Metodo de geracao
+            - combobox "Metodo de geracao" [ref=e292]:
+              - option "Standard Array" [selected]
+              - option "Manual/Rolled"
+              - option "Point Buy"
+          - generic [ref=e293]:
+            - button "Strength 15 +2" [ref=e294]:
+              - generic [ref=e295]: Strength
+              - strong [ref=e296]: "15"
+              - emphasis [ref=e297]: "+2"
+            - button "Dexterity 14 +2" [ref=e298]:
+              - generic [ref=e299]: Dexterity
+              - strong [ref=e300]: "14"
+              - emphasis [ref=e301]: "+2"
+            - button "Constitution 13 +1" [ref=e302]:
+              - generic [ref=e303]: Constitution
+              - strong [ref=e304]: "13"
+              - emphasis [ref=e305]: "+1"
+            - button "Intelligence 12 +1" [ref=e306]:
+              - generic [ref=e307]: Intelligence
+              - strong [ref=e308]: "12"
+              - emphasis [ref=e309]: "+1"
+            - button "Wisdom 10 +0" [ref=e310]:
+              - generic [ref=e311]: Wisdom
+              - strong [ref=e312]: "10"
+              - emphasis [ref=e313]: "+0"
+            - button "Charisma 8 -1" [ref=e314]:
+              - generic [ref=e315]: Charisma
+              - strong [ref=e316]: "8"
+              - emphasis [ref=e317]: "-1"
+          - paragraph [ref=e318]: Arraste um atributo sobre outro para trocar os valores entre eles.
+        - generic [ref=e319]:
+          - heading "Score Calculations" [level=3] [ref=e320]
+          - generic [ref=e321]:
+            - article [ref=e322]:
+              - heading "Strength" [level=4] [ref=e323]
+              - generic [ref=e324]:
+                - generic [ref=e325]: Total Score
+                - strong [ref=e326]: "15"
+              - generic [ref=e327]:
+                - generic [ref=e328]: Modifier
+                - strong [ref=e329]: "+2"
+              - generic [ref=e330]:
+                - generic [ref=e331]: Base Score
+                - strong [ref=e332]: "15"
+              - generic [ref=e333]:
+                - generic [ref=e334]: Bonus
+                - strong [ref=e335]: "+0"
+            - article [ref=e336]:
+              - heading "Dexterity" [level=4] [ref=e337]
+              - generic [ref=e338]:
+                - generic [ref=e339]: Total Score
+                - strong [ref=e340]: "14"
+              - generic [ref=e341]:
+                - generic [ref=e342]: Modifier
+                - strong [ref=e343]: "+2"
+              - generic [ref=e344]:
+                - generic [ref=e345]: Base Score
+                - strong [ref=e346]: "14"
+              - generic [ref=e347]:
+                - generic [ref=e348]: Bonus
+                - strong [ref=e349]: "+0"
+            - article [ref=e350]:
+              - heading "Constitution" [level=4] [ref=e351]
+              - generic [ref=e352]:
+                - generic [ref=e353]: Total Score
+                - strong [ref=e354]: "13"
+              - generic [ref=e355]:
+                - generic [ref=e356]: Modifier
+                - strong [ref=e357]: "+1"
+              - generic [ref=e358]:
+                - generic [ref=e359]: Base Score
+                - strong [ref=e360]: "13"
+              - generic [ref=e361]:
+                - generic [ref=e362]: Bonus
+                - strong [ref=e363]: "+0"
+            - article [ref=e364]:
+              - heading "Intelligence" [level=4] [ref=e365]
+              - generic [ref=e366]:
+                - generic [ref=e367]: Total Score
+                - strong [ref=e368]: "12"
+              - generic [ref=e369]:
+                - generic [ref=e370]: Modifier
+                - strong [ref=e371]: "+1"
+              - generic [ref=e372]:
+                - generic [ref=e373]: Base Score
+                - strong [ref=e374]: "12"
+              - generic [ref=e375]:
+                - generic [ref=e376]: Bonus
+                - strong [ref=e377]: "+0"
+            - article [ref=e378]:
+              - heading "Wisdom" [level=4] [ref=e379]
+              - generic [ref=e380]:
+                - generic [ref=e381]: Total Score
+                - strong [ref=e382]: "10"
+              - generic [ref=e383]:
+                - generic [ref=e384]: Modifier
+                - strong [ref=e385]: "+0"
+              - generic [ref=e386]:
+                - generic [ref=e387]: Base Score
+                - strong [ref=e388]: "10"
+              - generic [ref=e389]:
+                - generic [ref=e390]: Bonus
+                - strong [ref=e391]: "+0"
+            - article [ref=e392]:
+              - heading "Charisma" [level=4] [ref=e393]
+              - generic [ref=e394]:
+                - generic [ref=e395]: Total Score
+                - strong [ref=e396]: "8"
+              - generic [ref=e397]:
+                - generic [ref=e398]: Modifier
+                - strong [ref=e399]: "-1"
+              - generic [ref=e400]:
+                - generic [ref=e401]: Base Score
+                - strong [ref=e402]: "8"
+              - generic [ref=e403]:
+                - generic [ref=e404]: Bonus
+                - strong [ref=e405]: "+0"
+        - group "Saving throws da classe" [ref=e406]:
+          - generic [ref=e407]: Saving throws da classe
+          - paragraph [ref=e408]: 2/2 fixos por Barbarian
+          - paragraph [ref=e409]: Saving throw proficiency vem da classe inicial. Trocar a classe atualiza estes dois saves automaticamente.
+          - generic [ref=e410]:
+            - generic [ref=e411]:
+              - checkbox "Strength" [checked] [disabled] [ref=e412]
+              - generic [ref=e413]: Strength
+            - generic [ref=e414]:
+              - checkbox "Dexterity" [disabled] [ref=e415]
+              - generic [ref=e416]: Dexterity
+            - generic [ref=e417]:
+              - checkbox "Constitution" [checked] [disabled] [ref=e418]
+              - generic [ref=e419]: Constitution
+            - generic [ref=e420]:
+              - checkbox "Intelligence" [disabled] [ref=e421]
+              - generic [ref=e422]: Intelligence
+            - generic [ref=e423]:
+              - checkbox "Wisdom" [disabled] [ref=e424]
+              - generic [ref=e425]: Wisdom
+            - generic [ref=e426]:
+              - checkbox "Charisma" [disabled] [ref=e427]
+              - generic [ref=e428]: Charisma
+        - generic [ref=e429]:
+          - button "Voltar" [ref=e430] [cursor=pointer]
+          - button "Continuar" [ref=e431] [cursor=pointer]
+    - region "Previa da ficha" [ref=e42]:
+      - generic [ref=e43]:
+        - button "Base" [ref=e432] [cursor=pointer]
+        - button "Skills" [ref=e433] [cursor=pointer]
+        - button "Ataques" [ref=e434] [cursor=pointer]
+        - button "Magia" [ref=e435] [cursor=pointer]
+        - button "Inventory" [ref=e436] [cursor=pointer]
+        - button "Features" [ref=e437] [cursor=pointer]
+      - generic [ref=e50]:
+        - generic [ref=e438]:
+          - generic [ref=e439]: Cascarudo
+          - generic [ref=e440]: Barbarian 1
+        - generic [ref=e441]:
+          - generic [ref=e442]:
+            - generic [ref=e443]: Initiative
+            - strong [ref=e444]: "+2"
+          - button "Controle de pontos de vida" [ref=e445] [cursor=pointer]:
+            - generic [ref=e446]: HP
+            - strong [ref=e447]:
+              - text: "13"
+              - generic [ref=e448]: 13/13
+            - emphasis [ref=e449]: 0 THP
+          - generic [ref=e450]:
+            - generic [ref=e451]: Speed
+            - strong [ref=e452]: "45"
+        - generic [ref=e453]:
+          - generic [ref=e454]:
+            - generic [ref=e455]: Hit Dice
+            - strong [ref=e456]: 1/1d12
+          - generic [ref=e457]:
+            - generic [ref=e458]: Armor Class
+            - strong [ref=e459]: "12"
+          - generic [ref=e460]:
+            - generic [ref=e461]: Proficiency
+            - strong [ref=e462]: "+2"
+        - generic [ref=e463]:
+          - button "Short Rest" [ref=e464] [cursor=pointer]
+          - button "Long Rest" [ref=e465] [cursor=pointer]
+        - generic [ref=e466]:
+          - article [ref=e467]:
+            - heading "Strength" [level=3] [ref=e468]
+            - generic [ref=e469]:
+              - generic [ref=e470]:
+                - generic [ref=e471]: Score
+                - strong [ref=e472]: "15"
+              - generic [ref=e473]:
+                - generic [ref=e474]: Modifier
+                - strong [ref=e475]: "+2"
+              - generic [ref=e476]:
+                - generic [ref=e477]: Save
+                - strong [ref=e478]: "+4"
+          - article [ref=e479]:
+            - heading "Dexterity" [level=3] [ref=e480]
+            - generic [ref=e481]:
+              - generic [ref=e482]:
+                - generic [ref=e483]: Score
+                - strong [ref=e484]: "14"
+              - generic [ref=e485]:
+                - generic [ref=e486]: Modifier
+                - strong [ref=e487]: "+2"
+              - generic [ref=e488]:
+                - generic [ref=e489]: Save
+                - strong [ref=e490]: "+2"
+          - article [ref=e491]:
+            - heading "Constitution" [level=3] [ref=e492]
+            - generic [ref=e493]:
+              - generic [ref=e494]:
+                - generic [ref=e495]: Score
+                - strong [ref=e496]: "13"
+              - generic [ref=e497]:
+                - generic [ref=e498]: Modifier
+                - strong [ref=e499]: "+1"
+              - generic [ref=e500]:
+                - generic [ref=e501]: Save
+                - strong [ref=e502]: "+3"
+          - article [ref=e503]:
+            - heading "Intelligence" [level=3] [ref=e504]
+            - generic [ref=e505]:
+              - generic [ref=e506]:
+                - generic [ref=e507]: Score
+                - strong [ref=e508]: "12"
+              - generic [ref=e509]:
+                - generic [ref=e510]: Modifier
+                - strong [ref=e511]: "+1"
+              - generic [ref=e512]:
+                - generic [ref=e513]: Save
+                - strong [ref=e514]: "+1"
+          - article [ref=e515]:
+            - heading "Wisdom" [level=3] [ref=e516]
+            - generic [ref=e517]:
+              - generic [ref=e518]:
+                - generic [ref=e519]: Score
+                - strong [ref=e520]: "10"
+              - generic [ref=e521]:
+                - generic [ref=e522]: Modifier
+                - strong [ref=e523]: "+0"
+              - generic [ref=e524]:
+                - generic [ref=e525]: Save
+                - strong [ref=e526]: "+0"
+          - article [ref=e527]:
+            - heading "Charisma" [level=3] [ref=e528]
+            - generic [ref=e529]:
+              - generic [ref=e530]:
+                - generic [ref=e531]: Score
+                - strong [ref=e532]: "8"
+              - generic [ref=e533]:
+                - generic [ref=e534]: Modifier
+                - strong [ref=e535]: "-1"
+              - generic [ref=e536]:
+                - generic [ref=e537]: Save
+                - strong [ref=e538]: "-1"

@@ -1,0 +1,15 @@
+{
+  "name": "dnd-5e-sheet",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node tests/test-recovery.js",
+    "test:watch": "node --watch tests/test-recovery.js",
+    "typecheck": "tsc --noEmit",
+    "dev": "npx serve ."
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
