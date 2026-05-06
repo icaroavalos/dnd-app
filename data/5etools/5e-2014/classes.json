@@ -1,0 +1,5296 @@
+{
+  "ruleset": "5e-2014",
+  "results": [
+    {
+      "name": "Artificer",
+      "source": "TCE",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "con",
+        "int"
+      ],
+      "spellcastingAbility": "int",
+      "casterProgression": "artificer",
+      "preparedSpells": "<$level$> / 2 + <$int_mod$>",
+      "cantripProgression": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          "shield"
+        ],
+        "weapons": [
+          "simple",
+          {
+            "proficiency": "firearms",
+            "optional": true
+          }
+        ],
+        "tools": [
+          "{@item thieves' tools|PHB}",
+          "{@item tinker's tools|PHB}",
+          "one type of {@item artisan's tools|PHB} of your choice"
+        ],
+        "toolProficiencies": [
+          {
+            "thieves' tools": true,
+            "tinker's tools": true,
+            "anyArtisansTool": 1
+          }
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "arcana",
+                "history",
+                "investigation",
+                "medicine",
+                "nature",
+                "perception",
+                "sleight of hand"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "any two {@filter simple weapons|items|source=phb|category=basic|type=simple weapon} of your choice",
+          "a {@item light crossbow|phb} and {@item crossbow bolts (20)|phb|20 bolts}",
+          "(a) {@item studded leather armor|phb} or (b) {@item scale mail|phb}",
+          "{@item thieves' tools|phb} and a {@item dungeoneer's pack|phb}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "_": [
+              {
+                "equipmentType": "weaponSimple",
+                "quantity": 2
+              }
+            ]
+          },
+          {
+            "_": [
+              "light crossbow|phb",
+              "crossbow bolts (20)|phb"
+            ]
+          },
+          {
+            "a": [
+              "studded leather armor|phb"
+            ],
+            "b": [
+              "scale mail|phb"
+            ]
+          },
+          {
+            "_": [
+              "thieves' tools|phb",
+              "dungeoneer's pack|phb"
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "int": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light",
+            "medium",
+            "shield"
+          ],
+          "tools": [
+            "{@item thieves' tools|PHB}",
+            "{@item tinker's tools|PHB}"
+          ],
+          "toolProficiencies": [
+            {
+              "thieves' tools": true,
+              "tinker's tools": true
+            }
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Infusions Known|optionalfeatures|feature type=ai|source=TCE}",
+            "Infused Items",
+            "{@filter Cantrips Known|spells|level=0|class=artificer}"
+          ],
+          "rows": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              4,
+              2,
+              2
+            ],
+            [
+              4,
+              2,
+              2
+            ],
+            [
+              4,
+              2,
+              2
+            ],
+            [
+              4,
+              2,
+              2
+            ],
+            [
+              6,
+              3,
+              2
+            ],
+            [
+              6,
+              3,
+              2
+            ],
+            [
+              6,
+              3,
+              2
+            ],
+            [
+              6,
+              3,
+              2
+            ],
+            [
+              8,
+              4,
+              3
+            ],
+            [
+              8,
+              4,
+              3
+            ],
+            [
+              8,
+              4,
+              3
+            ],
+            [
+              8,
+              4,
+              3
+            ],
+            [
+              10,
+              5,
+              4
+            ],
+            [
+              10,
+              5,
+              4
+            ],
+            [
+              10,
+              5,
+              4
+            ],
+            [
+              10,
+              5,
+              4
+            ],
+            [
+              12,
+              6,
+              4
+            ],
+            [
+              12,
+              6,
+              4
+            ],
+            [
+              12,
+              6,
+              4
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=Artificer}",
+            "{@filter 2nd|spells|level=2|class=Artificer}",
+            "{@filter 3rd|spells|level=3|class=Artificer}",
+            "{@filter 4th|spells|level=4|class=Artificer}",
+            "{@filter 5th|spells|level=5|class=Artificer}"
+          ],
+          "rowsSpellProgression": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Barbarian",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d12",
+      "proficiency": [
+        "str",
+        "con"
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          "shield"
+        ],
+        "weapons": [
+          "simple",
+          "martial"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "animal handling",
+                "athletics",
+                "intimidation",
+                "nature",
+                "perception",
+                "survival"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item greataxe|phb} or (b) any {@filter martial melee weapon|items|source=phb|category=basic|type=martial weapon;melee weapon=sand}",
+          "(a) two {@item handaxe|phb|handaxes} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "An {@item explorer's pack|phb}, and four {@item javelin|phb|javelins}"
+        ],
+        "goldAlternative": "{@dice 2d4 × 10|2d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "greataxe|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponMartialMelee"
+              }
+            ]
+          },
+          {
+            "a": [
+              {
+                "item": "handaxe|phb",
+                "quantity": 2
+              }
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "_": [
+              "explorer's pack|phb",
+              {
+                "item": "javelin|phb",
+                "quantity": 4
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "str": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "shield"
+          ],
+          "weapons": [
+            "simple",
+            "martial"
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "Rages",
+            "Rage Damage"
+          ],
+          "rows": [
+            [
+              "2",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "2",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "3",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "3",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "3",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "4",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "4",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "4",
+              {
+                "type": "bonus",
+                "value": 2
+              }
+            ],
+            [
+              "4",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "4",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "4",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "5",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "5",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "5",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "5",
+              {
+                "type": "bonus",
+                "value": 3
+              }
+            ],
+            [
+              "5",
+              {
+                "type": "bonus",
+                "value": 4
+              }
+            ],
+            [
+              "6",
+              {
+                "type": "bonus",
+                "value": 4
+              }
+            ],
+            [
+              "6",
+              {
+                "type": "bonus",
+                "value": 4
+              }
+            ],
+            [
+              "6",
+              {
+                "type": "bonus",
+                "value": 4
+              }
+            ],
+            [
+              "Unlimited",
+              {
+                "type": "bonus",
+                "value": 4
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bard",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "dex",
+        "cha"
+      ],
+      "spellcastingAbility": "cha",
+      "casterProgression": "full",
+      "cantripProgression": [
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light"
+        ],
+        "weapons": [
+          "simple",
+          "{@item hand crossbow|phb|hand crossbows}",
+          "{@item longsword|phb|longswords}",
+          "{@item rapier|phb|rapiers}",
+          "{@item shortsword|phb|shortswords}"
+        ],
+        "tools": [
+          "three {@item musical instrument|PHB|musical instruments} of your choice"
+        ],
+        "toolProficiencies": [
+          {
+            "anyMusicalInstrument": 3
+          }
+        ],
+        "skills": [
+          {
+            "any": 3
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item rapier|phb}, (b) a {@item longsword|phb}, or (c) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item diplomat's pack|phb} or (b) an {@item entertainer's pack|phb}",
+          "(a) a {@item lute|phb} or (b) any other {@filter musical instrument|items|miscellaneous=mundane|type=instrument}",
+          "{@item Leather armor|phb}, and a {@item dagger|phb}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "rapier|phb"
+            ],
+            "b": [
+              "longsword|phb"
+            ],
+            "c": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "diplomat's pack|phb"
+            ],
+            "b": [
+              "entertainer's pack|phb"
+            ]
+          },
+          {
+            "a": [
+              "lute|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "instrumentMusical"
+              }
+            ]
+          },
+          {
+            "_": [
+              "leather armor|phb",
+              "dagger|phb"
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "cha": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light"
+          ],
+          "skills": [
+            {
+              "choose": {
+                "from": [
+                  "athletics",
+                  "acrobatics",
+                  "sleight of hand",
+                  "stealth",
+                  "arcana",
+                  "history",
+                  "investigation",
+                  "nature",
+                  "religion",
+                  "animal handling",
+                  "insight",
+                  "medicine",
+                  "perception",
+                  "survival",
+                  "deception",
+                  "intimidation",
+                  "performance",
+                  "persuasion"
+                ],
+                "count": 1
+              }
+            }
+          ],
+          "tools": [
+            "one {@item musical instrument|PHB} of your choice"
+          ],
+          "toolProficiencies": [
+            {
+              "anyMusicalInstrument": 1
+            }
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0|class=bard}",
+            "{@filter Spells Known|spells|class=bard}"
+          ],
+          "rows": [
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ],
+            [
+              3,
+              10
+            ],
+            [
+              3,
+              11
+            ],
+            [
+              3,
+              12
+            ],
+            [
+              4,
+              14
+            ],
+            [
+              4,
+              15
+            ],
+            [
+              4,
+              15
+            ],
+            [
+              4,
+              16
+            ],
+            [
+              4,
+              18
+            ],
+            [
+              4,
+              19
+            ],
+            [
+              4,
+              19
+            ],
+            [
+              4,
+              20
+            ],
+            [
+              4,
+              22
+            ],
+            [
+              4,
+              22
+            ],
+            [
+              4,
+              22
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=bard}",
+            "{@filter 2nd|spells|level=2|class=bard}",
+            "{@filter 3rd|spells|level=3|class=bard}",
+            "{@filter 4th|spells|level=4|class=bard}",
+            "{@filter 5th|spells|level=5|class=bard}",
+            "{@filter 6th|spells|level=6|class=bard}",
+            "{@filter 7th|spells|level=7|class=bard}",
+            "{@filter 8th|spells|level=8|class=bard}",
+            "{@filter 9th|spells|level=9|class=bard}"
+          ],
+          "rowsSpellProgression": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              1,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cleric",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "wis",
+        "cha"
+      ],
+      "spellcastingAbility": "wis",
+      "casterProgression": "full",
+      "preparedSpells": "<$level$> + <$wis_mod$>",
+      "cantripProgression": [
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          "shield"
+        ],
+        "weapons": [
+          "simple"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "history",
+                "insight",
+                "medicine",
+                "persuasion",
+                "religion"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item mace|phb} or (b) a {@item warhammer|phb} (if proficient)",
+          "(a) {@item scale mail|phb}, (b) {@item leather armor|phb}, or (c) {@item chain mail|phb} (if proficient)",
+          "(a) a {@item light crossbow|phb} and {@item Crossbow Bolts (20)|phb|20 bolts} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item priest's pack|phb} or (b) an {@item explorer's pack|phb}",
+          "A {@item shield|phb} and a {@item holy symbol|phb}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "mace|phb"
+            ],
+            "b": [
+              "warhammer|phb"
+            ]
+          },
+          {
+            "a": [
+              "scale mail|phb"
+            ],
+            "b": [
+              "leather armor|phb"
+            ],
+            "c": [
+              "chain mail|phb"
+            ]
+          },
+          {
+            "a": [
+              "light crossbow|phb",
+              "crossbow bolts (20)|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "priest's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              "shield|phb",
+              {
+                "equipmentType": "focusSpellcastingHoly"
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "wis": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light",
+            "medium",
+            "shield"
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0|class=Cleric}"
+          ],
+          "rows": [
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=Cleric}",
+            "{@filter 2nd|spells|level=2|class=Cleric}",
+            "{@filter 3rd|spells|level=3|class=Cleric}",
+            "{@filter 4th|spells|level=4|class=Cleric}",
+            "{@filter 5th|spells|level=5|class=Cleric}",
+            "{@filter 6th|spells|level=6|class=Cleric}",
+            "{@filter 7th|spells|level=7|class=Cleric}",
+            "{@filter 8th|spells|level=8|class=Cleric}",
+            "{@filter 9th|spells|level=9|class=Cleric}"
+          ],
+          "rowsSpellProgression": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              1,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Druid",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "int",
+        "wis"
+      ],
+      "spellcastingAbility": "wis",
+      "casterProgression": "full",
+      "preparedSpells": "<$level$> + <$wis_mod$>",
+      "cantripProgression": [
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          {
+            "proficiency": "shield",
+            "full": "shields (druids will not wear armor or use shields made of metal)"
+          }
+        ],
+        "weapons": [
+          "{@item club|phb|clubs}",
+          "{@item dagger|phb|daggers}",
+          "{@item dart|phb|darts}",
+          "{@item javelin|phb|javelins}",
+          "{@item mace|phb|maces}",
+          "{@item quarterstaff|phb|quarterstaffs}",
+          "{@item scimitar|phb|scimitars}",
+          "{@item sickle|phb|sickles}",
+          "{@item sling|phb|slings}",
+          "{@item spear|phb|spears}"
+        ],
+        "tools": [
+          "{@item Herbalism kit|PHB}"
+        ],
+        "toolProficiencies": [
+          {
+            "herbalism kit": true
+          }
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "arcana",
+                "animal handling",
+                "insight",
+                "medicine",
+                "nature",
+                "perception",
+                "religion",
+                "survival"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a wooden {@item shield|phb} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item scimitar|phb} or (b) any {@filter simple melee weapon|items|source=phb|category=basic|type=simple weapon;melee weapon=sand}",
+          "{@item Leather armor|phb}, an {@item explorer's pack|phb}, and a {@item druidic focus|phb}"
+        ],
+        "goldAlternative": "{@dice 2d4 × 10|2d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "shield|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "scimitar|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimpleMelee"
+              }
+            ]
+          },
+          {
+            "_": [
+              "Leather armor|phb",
+              "explorer's pack|phb",
+              {
+                "equipmentType": "focusSpellcastingDruidic"
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "wis": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light",
+            "medium",
+            {
+              "proficiency": "shield",
+              "full": "shields (druids will not wear armor or use shields made of metal)"
+            }
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0|class=Druid}"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              2
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=Druid}",
+            "{@filter 2nd|spells|level=2|class=Druid}",
+            "{@filter 3rd|spells|level=3|class=Druid}",
+            "{@filter 4th|spells|level=4|class=Druid}",
+            "{@filter 5th|spells|level=5|class=Druid}",
+            "{@filter 6th|spells|level=6|class=Druid}",
+            "{@filter 7th|spells|level=7|class=Druid}",
+            "{@filter 8th|spells|level=8|class=Druid}",
+            "{@filter 9th|spells|level=9|class=Druid}"
+          ],
+          "rowsSpellProgression": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              1,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fighter",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d10",
+      "proficiency": [
+        "str",
+        "con"
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          "heavy",
+          "shield"
+        ],
+        "weapons": [
+          "simple",
+          "martial"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "acrobatics",
+                "animal handling",
+                "athletics",
+                "history",
+                "insight",
+                "intimidation",
+                "perception",
+                "survival"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) {@item chain mail|phb} or (b) {@item leather armor|phb}, {@item longbow|phb}, and {@item arrows (20)|phb|20 arrows}",
+          "(a) a {@filter martial weapon|items|source=phb|category=basic|type=martial weapon} and a {@item shield|phb} or (b) two {@filter martial weapons|items|source=phb|category=basic|type=martial weapon}",
+          "(a) a {@item light crossbow|phb} and {@item crossbow bolts (20)|phb|20 bolts} or (b) two {@item handaxe|phb|handaxes}",
+          "(a) a {@item dungeoneer's pack|phb} or (b) an {@item explorer's pack|phb}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "chain mail|phb"
+            ],
+            "b": [
+              "leather armor|phb",
+              "longbow|phb",
+              "arrows (20)|phb"
+            ]
+          },
+          {
+            "a": [
+              {
+                "equipmentType": "weaponMartial"
+              },
+              "shield|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponMartial",
+                "quantity": 2
+              }
+            ]
+          },
+          {
+            "a": [
+              "light crossbow|phb",
+              "crossbow bolts (20)|phb"
+            ],
+            "b": [
+              {
+                "item": "handaxe|phb",
+                "quantity": 2
+              }
+            ]
+          },
+          {
+            "a": [
+              "dungeoneer's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "or": [
+            {
+              "str": 13,
+              "dex": 13
+            }
+          ]
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light",
+            "medium",
+            "shield"
+          ],
+          "weapons": [
+            "simple",
+            "martial"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Monk",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "str",
+        "dex"
+      ],
+      "startingProficiencies": {
+        "weapons": [
+          "simple",
+          "{@item shortsword|phb|shortswords}"
+        ],
+        "tools": [
+          "any one type of {@item artisan's tools|PHB} or any one {@item musical instrument|PHB} of your choice"
+        ],
+        "toolProficiencies": [
+          {
+            "anyArtisansTool": 1
+          },
+          {
+            "anyMusicalInstrument": 1
+          }
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "acrobatics",
+                "athletics",
+                "history",
+                "insight",
+                "religion",
+                "stealth"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item shortsword|phb} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item dungeoneer's pack|phb} or (b) an {@item explorer's pack|phb}",
+          "10 {@item dart|phb|darts}"
+        ],
+        "goldAlternative": "{@dice 5d4|5d4|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "shortsword|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "dungeoneer's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              {
+                "item": "dart|phb",
+                "quantity": 10
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "dex": 13,
+          "wis": 13
+        },
+        "proficienciesGained": {
+          "weapons": [
+            "simple",
+            "{@item shortsword|phb|shortswords}"
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "Martial Arts",
+            "Ki Points",
+            "Unarmored Movement"
+          ],
+          "rows": [
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 4
+                  }
+                ],
+                "rollable": true
+              },
+              0,
+              {
+                "type": "bonusSpeed",
+                "value": 0
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 4
+                  }
+                ],
+                "rollable": true
+              },
+              2,
+              {
+                "type": "bonusSpeed",
+                "value": 10
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 4
+                  }
+                ],
+                "rollable": true
+              },
+              3,
+              {
+                "type": "bonusSpeed",
+                "value": 10
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 4
+                  }
+                ],
+                "rollable": true
+              },
+              4,
+              {
+                "type": "bonusSpeed",
+                "value": 10
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              },
+              5,
+              {
+                "type": "bonusSpeed",
+                "value": 10
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              },
+              6,
+              {
+                "type": "bonusSpeed",
+                "value": 15
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              },
+              7,
+              {
+                "type": "bonusSpeed",
+                "value": 15
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              },
+              8,
+              {
+                "type": "bonusSpeed",
+                "value": 15
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              },
+              9,
+              {
+                "type": "bonusSpeed",
+                "value": 15
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              },
+              10,
+              {
+                "type": "bonusSpeed",
+                "value": 20
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 8
+                  }
+                ],
+                "rollable": true
+              },
+              11,
+              {
+                "type": "bonusSpeed",
+                "value": 20
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 8
+                  }
+                ],
+                "rollable": true
+              },
+              12,
+              {
+                "type": "bonusSpeed",
+                "value": 20
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 8
+                  }
+                ],
+                "rollable": true
+              },
+              13,
+              {
+                "type": "bonusSpeed",
+                "value": 20
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 8
+                  }
+                ],
+                "rollable": true
+              },
+              14,
+              {
+                "type": "bonusSpeed",
+                "value": 25
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 8
+                  }
+                ],
+                "rollable": true
+              },
+              15,
+              {
+                "type": "bonusSpeed",
+                "value": 25
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 8
+                  }
+                ],
+                "rollable": true
+              },
+              16,
+              {
+                "type": "bonusSpeed",
+                "value": 25
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 10
+                  }
+                ],
+                "rollable": true
+              },
+              17,
+              {
+                "type": "bonusSpeed",
+                "value": 25
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 10
+                  }
+                ],
+                "rollable": true
+              },
+              18,
+              {
+                "type": "bonusSpeed",
+                "value": 30
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 10
+                  }
+                ],
+                "rollable": true
+              },
+              19,
+              {
+                "type": "bonusSpeed",
+                "value": 30
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 10
+                  }
+                ],
+                "rollable": true
+              },
+              20,
+              {
+                "type": "bonusSpeed",
+                "value": 30
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mystic",
+      "source": "UATheMysticClass",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "int",
+        "wis"
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light"
+        ],
+        "weapons": [
+          "simple"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "arcana",
+                "history",
+                "insight",
+                "medicine",
+                "nature",
+                "perception",
+                "religion"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item spear|phb} or (b) a {@item mace|phb}",
+          "(a) {@item leather armor|phb} or (b) {@item studded leather armor|phb}",
+          "(a) a {@item light crossbow|phb} and {@item crossbow bolts (20)|phb|20 bolts} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item scholar's pack|phb} or (b) an {@item explorer's pack|phb}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "spear|phb"
+            ],
+            "b": [
+              "mace|phb"
+            ]
+          },
+          {
+            "a": [
+              "leather armor|phb"
+            ],
+            "b": [
+              "studded leather armor|phb"
+            ]
+          },
+          {
+            "a": [
+              "light crossbow|phb",
+              "crossbow bolts (20)|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "scholar's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          }
+        ]
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Talents Known|psionics|type=T}",
+            "{@filter Disciplines Known|psionics|type=D}",
+            "Psi Points",
+            "Psi Limit"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              4,
+              2
+            ],
+            [
+              1,
+              1,
+              6,
+              2
+            ],
+            [
+              2,
+              2,
+              14,
+              3
+            ],
+            [
+              2,
+              2,
+              17,
+              3
+            ],
+            [
+              2,
+              3,
+              27,
+              5
+            ],
+            [
+              2,
+              3,
+              32,
+              5
+            ],
+            [
+              2,
+              4,
+              38,
+              6
+            ],
+            [
+              2,
+              4,
+              44,
+              6
+            ],
+            [
+              2,
+              5,
+              57,
+              7
+            ],
+            [
+              3,
+              5,
+              64,
+              7
+            ],
+            [
+              3,
+              5,
+              64,
+              7
+            ],
+            [
+              3,
+              6,
+              64,
+              7
+            ],
+            [
+              3,
+              6,
+              64,
+              7
+            ],
+            [
+              3,
+              6,
+              64,
+              7
+            ],
+            [
+              3,
+              7,
+              64,
+              7
+            ],
+            [
+              3,
+              7,
+              64,
+              7
+            ],
+            [
+              4,
+              7,
+              64,
+              7
+            ],
+            [
+              4,
+              8,
+              71,
+              7
+            ],
+            [
+              4,
+              8,
+              71,
+              7
+            ],
+            [
+              4,
+              8,
+              71,
+              7
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Paladin",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d10",
+      "proficiency": [
+        "wis",
+        "cha"
+      ],
+      "spellcastingAbility": "cha",
+      "casterProgression": "1/2",
+      "preparedSpells": "<$level$> / 2 + <$cha_mod$>",
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          "heavy",
+          "shield"
+        ],
+        "weapons": [
+          "simple",
+          "martial"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "athletics",
+                "insight",
+                "intimidation",
+                "medicine",
+                "persuasion",
+                "religion"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@filter martial weapon|items|source=phb|category=basic|type=martial weapon} and a {@item shield|phb} or (b) two {@filter martial weapons|items|source=phb|category=basic|type=martial weapon}",
+          "(a) five {@item javelin|phb|javelins} or (b) any {@filter simple melee weapon|items|source=phb|category=basic|type=simple weapon;melee weapon=sand}",
+          "(a) a {@item priest's pack|phb} or (b) an {@item explorer's pack|phb}",
+          "{@item Chain mail|phb} and a {@item holy symbol|phb}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              {
+                "equipmentType": "weaponMartial"
+              },
+              "shield|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponMartial",
+                "quantity": 2
+              }
+            ]
+          },
+          {
+            "a": [
+              {
+                "item": "javelin|phb",
+                "quantity": 5
+              }
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimpleMelee"
+              }
+            ]
+          },
+          {
+            "a": [
+              "priest's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              "chain mail|phb",
+              {
+                "equipmentType": "focusSpellcastingHoly"
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "str": 13,
+          "cha": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light",
+            "medium",
+            "shield"
+          ],
+          "weapons": [
+            "simple",
+            "martial"
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=Paladin}",
+            "{@filter 2nd|spells|level=2|class=Paladin}",
+            "{@filter 3rd|spells|level=3|class=Paladin}",
+            "{@filter 4th|spells|level=4|class=Paladin}",
+            "{@filter 5th|spells|level=5|class=Paladin}"
+          ],
+          "rowsSpellProgression": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ranger",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d10",
+      "proficiency": [
+        "str",
+        "dex"
+      ],
+      "spellcastingAbility": "wis",
+      "casterProgression": "1/2",
+      "startingProficiencies": {
+        "armor": [
+          "light",
+          "medium",
+          "shield"
+        ],
+        "weapons": [
+          "simple",
+          "martial"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "animal handling",
+                "athletics",
+                "insight",
+                "investigation",
+                "nature",
+                "perception",
+                "stealth",
+                "survival"
+              ],
+              "count": 3
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) {@item scale mail|phb} or (b) {@item leather armor|phb}",
+          "(a) two {@item shortsword|phb|shortswords} or (b) two {@filter simple melee weapons|items|source=phb|category=basic|type=simple weapon;melee weapon=sand}",
+          "(a) a {@item dungeoneer's pack|phb} or (b) an {@item explorer's pack|phb}",
+          "A {@item longbow|phb} and a {@item quiver|phb} of {@item arrows (20)|phb|20 arrows}"
+        ],
+        "goldAlternative": "{@dice 5d4 × 10|5d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "scale mail|phb"
+            ],
+            "b": [
+              "leather armor|phb"
+            ]
+          },
+          {
+            "a": [
+              {
+                "item": "shortsword|phb",
+                "quantity": 2
+              }
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimpleMelee",
+                "quantity": 2
+              }
+            ]
+          },
+          {
+            "a": [
+              "dungeoneer's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              "longbow|phb",
+              "arrows (20)|phb"
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "dex": 13,
+          "wis": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light",
+            "medium",
+            "shield"
+          ],
+          "skills": [
+            {
+              "choose": {
+                "from": [
+                  "animal handling",
+                  "athletics",
+                  "insight",
+                  "investigation",
+                  "nature",
+                  "perception",
+                  "stealth",
+                  "survival"
+                ],
+                "count": 1
+              }
+            }
+          ],
+          "weapons": [
+            "simple",
+            "martial"
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Spells Known|spells|class=ranger}"
+          ],
+          "rows": [
+            [
+              0
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ],
+            [
+              6
+            ],
+            [
+              7
+            ],
+            [
+              7
+            ],
+            [
+              8
+            ],
+            [
+              8
+            ],
+            [
+              9
+            ],
+            [
+              9
+            ],
+            [
+              10
+            ],
+            [
+              10
+            ],
+            [
+              11
+            ],
+            [
+              11
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=Ranger}",
+            "{@filter 2nd|spells|level=2|class=Ranger}",
+            "{@filter 3rd|spells|level=3|class=Ranger}",
+            "{@filter 4th|spells|level=4|class=Ranger}",
+            "{@filter 5th|spells|level=5|class=Ranger}"
+          ],
+          "rowsSpellProgression": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rogue",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "dex",
+        "int"
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light"
+        ],
+        "weapons": [
+          "simple",
+          "{@item hand crossbow|phb|hand crossbows}",
+          "{@item longsword|phb|longswords}",
+          "{@item rapier|phb|rapiers}",
+          "{@item shortsword|phb|shortswords}"
+        ],
+        "tools": [
+          "{@item thieves' tools|PHB}"
+        ],
+        "toolProficiencies": [
+          {
+            "thieves' tools": true
+          }
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "acrobatics",
+                "athletics",
+                "deception",
+                "insight",
+                "intimidation",
+                "investigation",
+                "perception",
+                "performance",
+                "persuasion",
+                "sleight of hand",
+                "stealth"
+              ],
+              "count": 4
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item rapier|phb} or (b) a {@item shortsword|phb}",
+          "(a) a {@item shortbow|phb} and {@item quiver|phb} of {@item arrows (20)|phb|20 arrows} or (b) a {@item shortsword|phb}",
+          "(a) a {@item burglar's pack|phb}, (b) a {@item dungeoneer's pack|phb}, or (c) an {@item explorer's pack|phb}",
+          "{@item Leather armor|phb}, two {@item dagger|phb|daggers}, and {@item thieves' tools|phb}"
+        ],
+        "goldAlternative": "{@dice 4d4 × 10|4d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "rapier|phb"
+            ],
+            "b": [
+              "shortsword|phb"
+            ]
+          },
+          {
+            "a": [
+              "shortbow|phb",
+              "arrows (20)|phb"
+            ],
+            "b": [
+              "shortsword|phb"
+            ]
+          },
+          {
+            "a": [
+              "burglar's pack|phb"
+            ],
+            "b": [
+              "dungeoneer's pack|phb"
+            ],
+            "c": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              "leather armor|phb",
+              {
+                "item": "dagger|phb",
+                "quantity": 2
+              },
+              "thieves' tools|phb"
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "dex": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light"
+          ],
+          "skills": [
+            {
+              "choose": {
+                "from": [
+                  "acrobatics",
+                  "athletics",
+                  "deception",
+                  "insight",
+                  "intimidation",
+                  "investigation",
+                  "perception",
+                  "performance",
+                  "persuasion",
+                  "sleight of hand",
+                  "stealth"
+                ],
+                "count": 1
+              }
+            }
+          ],
+          "tools": [
+            "{@item thieves' tools|PHB}"
+          ],
+          "toolProficiencies": [
+            {
+              "thieves' tools": true
+            }
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "Sneak Attack"
+          ],
+          "rows": [
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 1,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 2,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 2,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 3,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 3,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 4,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 4,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 5,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 5,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 6,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 6,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 7,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 7,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 8,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 8,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 9,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 9,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 10,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ],
+            [
+              {
+                "type": "dice",
+                "toRoll": [
+                  {
+                    "number": 10,
+                    "faces": 6
+                  }
+                ],
+                "rollable": true
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Expert Sidekick",
+      "source": "TCE",
+      "edition": "classic",
+      "proficiency": []
+    },
+    {
+      "name": "Spellcaster Sidekick",
+      "source": "TCE",
+      "edition": "classic",
+      "proficiency": [],
+      "casterProgression": "artificer",
+      "cantripProgression": [
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0}"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              2
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ]
+          ]
+        },
+        {
+          "colLabels": [
+            "{@filter Spells Known|spells|level=!0}"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ],
+            [
+              6
+            ],
+            [
+              7
+            ],
+            [
+              7
+            ],
+            [
+              8
+            ],
+            [
+              8
+            ],
+            [
+              9
+            ],
+            [
+              9
+            ],
+            [
+              10
+            ],
+            [
+              10
+            ],
+            [
+              11
+            ],
+            [
+              11
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1}",
+            "{@filter 2nd|spells|level=2}",
+            "{@filter 3rd|spells|level=3}",
+            "{@filter 4th|spells|level=4}",
+            "{@filter 5th|spells|level=5}"
+          ],
+          "rows": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Warrior Sidekick",
+      "source": "TCE",
+      "edition": "classic",
+      "proficiency": []
+    },
+    {
+      "name": "Sorcerer",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d6",
+      "proficiency": [
+        "con",
+        "cha"
+      ],
+      "spellcastingAbility": "cha",
+      "casterProgression": "full",
+      "cantripProgression": [
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "startingProficiencies": {
+        "weapons": [
+          "{@item dagger|phb|daggers}",
+          "{@item dart|phb|darts}",
+          "{@item sling|phb|slings}",
+          "{@item quarterstaff|phb|quarterstaffs}",
+          "{@item light crossbow|phb|light crossbows}"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "arcana",
+                "deception",
+                "insight",
+                "intimidation",
+                "persuasion",
+                "religion"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item light crossbow|phb} and {@item crossbow bolts (20)|phb|20 bolts} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item component pouch|phb} or (b) an {@item arcane focus|phb}",
+          "(a) a {@item dungeoneer's pack|phb} or (b) an {@item explorer's pack|phb}",
+          "Two {@item dagger|phb|daggers}"
+        ],
+        "goldAlternative": "{@dice 3d4 × 10|3d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "light crossbow|phb",
+              "crossbow bolts (20)|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "component pouch|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "focusSpellcastingArcane"
+              }
+            ]
+          },
+          {
+            "a": [
+              "dungeoneer's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              {
+                "item": "dagger|phb",
+                "quantity": 2
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "cha": 13
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "Sorcery Points"
+          ],
+          "rows": [
+            [
+              0
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ],
+            [
+              7
+            ],
+            [
+              8
+            ],
+            [
+              9
+            ],
+            [
+              10
+            ],
+            [
+              11
+            ],
+            [
+              12
+            ],
+            [
+              13
+            ],
+            [
+              14
+            ],
+            [
+              15
+            ],
+            [
+              16
+            ],
+            [
+              17
+            ],
+            [
+              18
+            ],
+            [
+              19
+            ],
+            [
+              20
+            ]
+          ]
+        },
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0|class=sorcerer}",
+            "{@filter Spells Known|spells|class=sorcerer}"
+          ],
+          "rows": [
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              5,
+              8
+            ],
+            [
+              5,
+              9
+            ],
+            [
+              5,
+              10
+            ],
+            [
+              6,
+              11
+            ],
+            [
+              6,
+              12
+            ],
+            [
+              6,
+              12
+            ],
+            [
+              6,
+              13
+            ],
+            [
+              6,
+              13
+            ],
+            [
+              6,
+              14
+            ],
+            [
+              6,
+              14
+            ],
+            [
+              6,
+              15
+            ],
+            [
+              6,
+              15
+            ],
+            [
+              6,
+              15
+            ],
+            [
+              6,
+              15
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=sorcerer}",
+            "{@filter 2nd|spells|level=2|class=sorcerer}",
+            "{@filter 3rd|spells|level=3|class=sorcerer}",
+            "{@filter 4th|spells|level=4|class=sorcerer}",
+            "{@filter 5th|spells|level=5|class=sorcerer}",
+            "{@filter 6th|spells|level=6|class=sorcerer}",
+            "{@filter 7th|spells|level=7|class=sorcerer}",
+            "{@filter 8th|spells|level=8|class=sorcerer}",
+            "{@filter 9th|spells|level=9|class=sorcerer}"
+          ],
+          "rowsSpellProgression": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              1,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Warlock",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d8",
+      "proficiency": [
+        "wis",
+        "cha"
+      ],
+      "spellcastingAbility": "cha",
+      "casterProgression": "pact",
+      "cantripProgression": [
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "startingProficiencies": {
+        "armor": [
+          "light"
+        ],
+        "weapons": [
+          "simple"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "arcana",
+                "deception",
+                "history",
+                "intimidation",
+                "investigation",
+                "nature",
+                "religion"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item light crossbow|phb} and {@item crossbow bolts (20)|phb|20 bolts} or (b) any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}",
+          "(a) a {@item component pouch|phb} or (b) an {@item arcane focus|phb}",
+          "(a) a {@item scholar's pack|phb} or (b) a {@item dungeoneer's pack|phb}",
+          "{@item Leather armor|phb}, any {@filter simple weapon|items|source=phb|category=basic|type=simple weapon}, and two {@item dagger|phb|daggers}"
+        ],
+        "goldAlternative": "{@dice 4d4 × 10|4d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "light crossbow|phb",
+              "crossbow bolts (20)|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "weaponSimple"
+              }
+            ]
+          },
+          {
+            "a": [
+              "component pouch|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "focusSpellcastingArcane"
+              }
+            ]
+          },
+          {
+            "a": [
+              "scholar's pack|phb"
+            ],
+            "b": [
+              "dungeoneer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              "leather armor|phb",
+              {
+                "equipmentType": "weaponSimple"
+              },
+              {
+                "item": "dagger|phb",
+                "quantity": 2
+              }
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "cha": 13
+        },
+        "proficienciesGained": {
+          "armor": [
+            "light"
+          ],
+          "weapons": [
+            "simple"
+          ]
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0|class=Warlock}",
+            "{@filter Spells Known|spells|class=Warlock}",
+            "Spell Slots",
+            "Slot Level",
+            "{@filter Invocations Known|optionalfeatures|feature type=ei}"
+          ],
+          "rows": [
+            [
+              2,
+              2,
+              1,
+              "{@filter 1st|spells|level=1|class=Warlock}",
+              0
+            ],
+            [
+              2,
+              3,
+              2,
+              "{@filter 1st|spells|level=1|class=Warlock}",
+              2
+            ],
+            [
+              2,
+              4,
+              2,
+              "{@filter 2nd|spells|level=2|class=Warlock}",
+              2
+            ],
+            [
+              3,
+              5,
+              2,
+              "{@filter 2nd|spells|level=2|class=Warlock}",
+              2
+            ],
+            [
+              3,
+              6,
+              2,
+              "{@filter 3rd|spells|level=3|class=Warlock}",
+              3
+            ],
+            [
+              3,
+              7,
+              2,
+              "{@filter 3rd|spells|level=3|class=Warlock}",
+              3
+            ],
+            [
+              3,
+              8,
+              2,
+              "{@filter 4th|spells|level=4|class=Warlock}",
+              4
+            ],
+            [
+              3,
+              9,
+              2,
+              "{@filter 4th|spells|level=4|class=Warlock}",
+              4
+            ],
+            [
+              3,
+              10,
+              2,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              5
+            ],
+            [
+              4,
+              10,
+              2,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              5
+            ],
+            [
+              4,
+              11,
+              3,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              5
+            ],
+            [
+              4,
+              11,
+              3,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              6
+            ],
+            [
+              4,
+              12,
+              3,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              6
+            ],
+            [
+              4,
+              12,
+              3,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              6
+            ],
+            [
+              4,
+              13,
+              3,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              7
+            ],
+            [
+              4,
+              13,
+              3,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              7
+            ],
+            [
+              4,
+              14,
+              4,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              7
+            ],
+            [
+              4,
+              14,
+              4,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              8
+            ],
+            [
+              4,
+              15,
+              4,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              8
+            ],
+            [
+              4,
+              15,
+              4,
+              "{@filter 5th|spells|level=5|class=Warlock}",
+              8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wizard",
+      "source": "PHB",
+      "edition": "classic",
+      "hitDie": "d6",
+      "proficiency": [
+        "int",
+        "wis"
+      ],
+      "spellcastingAbility": "int",
+      "casterProgression": "full",
+      "preparedSpells": "<$level$> + <$int_mod$>",
+      "cantripProgression": [
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "startingProficiencies": {
+        "weapons": [
+          "{@item dagger|phb|daggers}",
+          "{@item dart|phb|darts}",
+          "{@item sling|phb|slings}",
+          "{@item quarterstaff|phb|quarterstaffs}",
+          "{@item light crossbow|phb|light crossbows}"
+        ],
+        "skills": [
+          {
+            "choose": {
+              "from": [
+                "arcana",
+                "history",
+                "insight",
+                "investigation",
+                "medicine",
+                "religion"
+              ],
+              "count": 2
+            }
+          }
+        ]
+      },
+      "startingEquipment": {
+        "additionalFromBackground": true,
+        "default": [
+          "(a) a {@item quarterstaff|phb} or (b) a {@item dagger|phb}",
+          "(a) a {@item component pouch|phb} or (b) an {@item arcane focus|phb}",
+          "(a) a {@item scholar's pack|phb} or (b) an {@item explorer's pack|phb}",
+          "A {@item spellbook|phb}"
+        ],
+        "goldAlternative": "{@dice 4d4 × 10|4d4 × 10|Starting Gold}",
+        "defaultData": [
+          {
+            "a": [
+              "quarterstaff|phb"
+            ],
+            "b": [
+              "dagger|phb"
+            ]
+          },
+          {
+            "a": [
+              "component pouch|phb"
+            ],
+            "b": [
+              {
+                "equipmentType": "focusSpellcastingArcane"
+              }
+            ]
+          },
+          {
+            "a": [
+              "scholar's pack|phb"
+            ],
+            "b": [
+              "explorer's pack|phb"
+            ]
+          },
+          {
+            "_": [
+              "spellbook|phb"
+            ]
+          }
+        ]
+      },
+      "multiclassing": {
+        "requirements": {
+          "int": 13
+        }
+      },
+      "classTableGroups": [
+        {
+          "colLabels": [
+            "{@filter Cantrips Known|spells|level=0|class=Wizard}"
+          ],
+          "rows": [
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ],
+            [
+              5
+            ]
+          ]
+        },
+        {
+          "title": "Spell Slots per Spell Level",
+          "colLabels": [
+            "{@filter 1st|spells|level=1|class=Wizard}",
+            "{@filter 2nd|spells|level=2|class=Wizard}",
+            "{@filter 3rd|spells|level=3|class=Wizard}",
+            "{@filter 4th|spells|level=4|class=Wizard}",
+            "{@filter 5th|spells|level=5|class=Wizard}",
+            "{@filter 6th|spells|level=6|class=Wizard}",
+            "{@filter 7th|spells|level=7|class=Wizard}",
+            "{@filter 8th|spells|level=8|class=Wizard}",
+            "{@filter 9th|spells|level=9|class=Wizard}"
+          ],
+          "rowsSpellProgression": [
+            [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              1,
+              1,
+              1
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              1,
+              1
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha D&D 5e</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app" class="app-shell">
+      <header class="topbar">
+        <button class="icon-button" id="characterMenuButton" title="Menu de fichas" aria-label="Menu de fichas" aria-expanded="false">
+          <span class="hamburger-icon"></span>
+        </button>
+        <strong id="topbarName">Nova Ficha</strong>
+        <span id="syncState" class="sync-state">local</span>
+      </header>
+      <div class="menu-backdrop" id="menuBackdrop" hidden></div>
+      <aside class="character-menu" id="characterMenu" hidden aria-label="Menu de fichas"></aside>
+      <div class="menu-backdrop" id="hpModalBackdrop" hidden></div>
+      <section class="hp-modal" id="hpModal" hidden aria-label="Controle de pontos de vida"></section>
+  <div class="menu-backdrop" id="restModalBackdrop" hidden></div>
+  <section class="hp-modal" id="restModal" hidden aria-label="Confirmar descanso"></section>
+
+      <section class="workspace">
+        <aside class="builder-panel" aria-label="Criador de personagem">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Criador 5e</p>
+              <h1>Ficha guiada</h1>
+            </div>
+            <button id="saveButton" class="primary-button">Salvar</button>
+          </div>
+
+          <nav class="steps" id="stepNav" aria-label="Etapas da criacao"></nav>
+          <form id="builderForm" class="builder-form"></form>
+        </aside>
+
+        <section class="sheet-phone" aria-label="Previa da ficha">
+          <div class="sheet-tabs" id="sheetTabs"></div>
+          <div id="sheetView" class="sheet-view"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

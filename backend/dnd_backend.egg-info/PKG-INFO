@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: dnd-backend
+Version: 0.1.0
+Summary: Backend API for the D&D app
+Requires-Python: >=3.11
+Requires-Dist: fastapi<1.0,>=0.115
+Provides-Extra: dev
+Requires-Dist: httpx<1.0,>=0.28; extra == "dev"
+Requires-Dist: pytest<9.0,>=8.0; extra == "dev"

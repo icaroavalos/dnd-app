@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-05-03T01:21:02.129Z",
+  "source": {
+    "name": "5etools local data",
+    "path": "/Users/icaro/codes/dnd-app/5etools-v2.28.0"
+  },
+  "note": "Compact character-builder data extracted from the user's local 5etools folder. Source filtering is preserved so the app can distinguish 2014 and 2024 rules.",
+  "rulesets": {
+    "5e-2014": {
+      "label": "5e / 2014 rules from local 5etools",
+      "counts": {
+        "classes": 17,
+        "subclasses": 130,
+        "classFeatures": 375,
+        "subclassFeatures": 286,
+        "races": 142,
+        "subraces": 98,
+        "backgrounds": 101,
+        "equipment": 127,
+        "feats": 188,
+        "spells": 545,
+        "classSpellLists": 11
+      }
+    },
+    "5e-2024": {
+      "label": "5.5e / 2024 rules from local 5etools",
+      "counts": {
+        "classes": 13,
+        "subclasses": 185,
+        "classFeatures": 302,
+        "subclassFeatures": 182,
+        "races": 15,
+        "subraces": 0,
+        "backgrounds": 56,
+        "equipment": 103,
+        "feats": 77,
+        "spells": 391,
+        "classSpellLists": 8
+      }
+    }
+  }
+}

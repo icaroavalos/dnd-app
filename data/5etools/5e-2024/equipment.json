@@ -1,0 +1,1893 @@
+{
+  "ruleset": "5e-2024",
+  "results": [
+    {
+      "name": "Alchemist's Supplies",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 5000,
+      "weight": 8,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Intelligence"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Identify a substance ({@dc 15}), or start a fire ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Acid|XPHB}, {@item Alchemist's Fire|XPHB}, {@item Component Pouch|XPHB}, {@item Oil|XPHB}, {@item Paper|XPHB}, {@item Perfume|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Antimatter Rifle",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 10,
+      "dmg1": "6d8",
+      "dmgType": "N",
+      "range": "120/360",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Arrow",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 5,
+      "weight": 0.05,
+      "entries": [
+        "Arrows are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Arrows are typically stored in a {@item Quiver|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Arrows (20)",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 100,
+      "weight": 1,
+      "entries": [
+        "Arrows are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Arrows are typically stored in a {@item Quiver|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Automatic Rifle",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 8,
+      "dmg1": "2d8",
+      "dmgType": "P",
+      "range": "80/240",
+      "property": [
+        "AF|XDMG",
+        "BF|XDMG",
+        "RLD|XDMG",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Bagpipes",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 3000,
+      "weight": 6,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Battleaxe",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1000,
+      "weight": 4,
+      "dmg1": "1d8",
+      "dmgType": "S",
+      "property": [
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Blowgun",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 1000,
+      "weight": 1,
+      "dmg1": "1",
+      "dmgType": "P",
+      "range": "25/100",
+      "property": [
+        "A|XPHB",
+        "LD|XPHB"
+      ]
+    },
+    {
+      "name": "Bolt",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 5,
+      "weight": 0.075,
+      "entries": [
+        "Crossbow bolts are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Bolts are typically stored in a {@item Crossbow Bolt Case|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Bolts (20)",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 100,
+      "weight": 1.5,
+      "entries": [
+        "Crossbow bolts are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Bolts are typically stored in a {@item Crossbow Bolt Case|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Breastplate",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "MA|XPHB",
+      "value": 40000,
+      "weight": 20,
+      "ac": 14
+    },
+    {
+      "name": "Brewer's Supplies",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 2000,
+      "weight": 9,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Intelligence"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Detect poisoned drink ({@dc 15}), or identify alcohol ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Antitoxin|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Calligrapher's Supplies",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 1000,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Dexterity"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Write text with impressive flourishes that guard against forgery ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Ink|XPHB}, {@item Spell Scroll|XDMG}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Carpenter's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 800,
+      "weight": 6,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Strength"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Seal or pry open a door or container ({@dc 20})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Club|XPHB}, {@item Greatclub|XPHB}, {@item Quarterstaff|XPHB}, {@item Barrel|XPHB}, {@item Chest|XPHB}, {@item Ladder|XPHB}, {@item Pole|XPHB}, {@item Portable Ram|XPHB}, {@item Torch|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cartographer's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 1500,
+      "weight": 6,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Wisdom"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Draft a map of a small area ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Map|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chain Mail",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "HA|XPHB",
+      "value": 7500,
+      "weight": 55,
+      "ac": 16
+    },
+    {
+      "name": "Chain Shirt",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "MA|XPHB",
+      "value": 5000,
+      "weight": 20,
+      "ac": 13
+    },
+    {
+      "name": "Club",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 10,
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "B",
+      "property": [
+        "L|XPHB"
+      ]
+    },
+    {
+      "name": "Cobbler's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 500,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Dexterity"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Modify footwear to give {@variantrule Advantage|XPHB} on the wearer's next Dexterity ({@skill Acrobatics|XPHB}) check ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Climber's Kit|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cook's Utensils",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 100,
+      "weight": 8,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Wisdom"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Improve food's flavor ({@dc 10}), or detect spoiled or poisoned food ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Rations|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Crystal",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "SCF|XPHB",
+      "value": 1000,
+      "weight": 1
+    },
+    {
+      "name": "Dagger",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 200,
+      "weight": 1,
+      "dmg1": "1d4",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "F|XPHB",
+        "L|XPHB",
+        "T|XPHB"
+      ]
+    },
+    {
+      "name": "Dart",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 5,
+      "weight": 0.25,
+      "dmg1": "1d4",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "F|XPHB",
+        "T|XPHB"
+      ]
+    },
+    {
+      "name": "Drum",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 600,
+      "weight": 3,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dulcimer",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 2500,
+      "weight": 10,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Energy Cell",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "AF|XDMG",
+      "weight": 0.5
+    },
+    {
+      "name": "Firearm Bullet",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 30,
+      "weight": 0.2,
+      "entries": [
+        "Firearm Bullets are destroyed upon use in a modern firearm."
+      ]
+    },
+    {
+      "name": "Firearm Bullets (10)",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 300,
+      "weight": 2,
+      "entries": [
+        "Firearm Bullets are destroyed upon use in a modern firearm."
+      ]
+    },
+    {
+      "name": "Flail",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1000,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "B"
+    },
+    {
+      "name": "Flute",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 200,
+      "weight": 1,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glaive",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 2000,
+      "weight": 6,
+      "dmg1": "1d10",
+      "dmgType": "S",
+      "property": [
+        "H|XPHB",
+        "R|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Glassblower's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 3000,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Intelligence"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Discern what a glass object held in the past 24 hours ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Glass Bottle|XPHB}, {@item Magnifying Glass|XPHB}, {@item Spyglass|XPHB}, {@item Vial|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Greataxe",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 3000,
+      "weight": 7,
+      "dmg1": "1d12",
+      "dmgType": "S",
+      "property": [
+        "H|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Greatclub",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 20,
+      "weight": 10,
+      "dmg1": "1d8",
+      "dmgType": "B",
+      "property": [
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Greatsword",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 5000,
+      "weight": 6,
+      "dmg1": "2d6",
+      "dmgType": "S",
+      "property": [
+        "H|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Halberd",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 2000,
+      "weight": 6,
+      "dmg1": "1d10",
+      "dmgType": "S",
+      "property": [
+        "H|XPHB",
+        "R|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Half Plate Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "MA|XPHB",
+      "value": 75000,
+      "weight": 40,
+      "ac": 15
+    },
+    {
+      "name": "Hand Crossbow",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 7500,
+      "weight": 3,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "30/120",
+      "property": [
+        "A|XPHB",
+        "L|XPHB",
+        "LD|XPHB"
+      ]
+    },
+    {
+      "name": "Handaxe",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 500,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "S",
+      "range": "20/60",
+      "property": [
+        "L|XPHB",
+        "T|XPHB"
+      ]
+    },
+    {
+      "name": "Heavy Crossbow",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 5000,
+      "weight": 18,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "range": "100/400",
+      "property": [
+        "A|XPHB",
+        "H|XPHB",
+        "LD|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Hide Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "MA|XPHB",
+      "value": 1000,
+      "weight": 12,
+      "ac": 12
+    },
+    {
+      "name": "Horn",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 300,
+      "weight": 2,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hunting Rifle",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 8,
+      "dmg1": "2d10",
+      "dmgType": "P",
+      "range": "80/240",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Javelin",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 50,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "30/120",
+      "property": [
+        "T|XPHB"
+      ]
+    },
+    {
+      "name": "Jeweler's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 2500,
+      "weight": 2,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Intelligence"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Discern a gem's value ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Arcane Focus|XPHB}, {@item Holy Symbol|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lance",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1000,
+      "weight": 6,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "property": [
+        "H|XPHB",
+        "R|XPHB",
+        {
+          "uid": "2H|XPHB",
+          "note": "unless mounted"
+        }
+      ],
+      "entries": [
+        "A Lance requires two hands to wield when you aren't mounted."
+      ]
+    },
+    {
+      "name": "Laser Pistol",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 2,
+      "dmg1": "3d6",
+      "dmgType": "R",
+      "range": "40/120",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG"
+      ]
+    },
+    {
+      "name": "Laser Rifle",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 7,
+      "dmg1": "3d8",
+      "dmgType": "R",
+      "range": "100/300",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Leather Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "LA|XPHB",
+      "value": 1000,
+      "weight": 10,
+      "ac": 11
+    },
+    {
+      "name": "Leatherworker's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 500,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Dexterity"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Add a design to a leather item ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Sling|XPHB}, {@item Whip|XPHB}, {@item Hide Armor|XPHB}, {@item Leather Armor|XPHB}, {@item Studded Leather Armor|XPHB}, {@item Backpack|XPHB}, {@item Crossbow Bolt Case|XPHB}, {@item Map or Scroll Case|XPHB}, {@item Parchment|XPHB}, {@item Pouch|XPHB}, {@item Quiver|XPHB}, {@item Waterskin|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Light Crossbow",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 2500,
+      "weight": 5,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "80/320",
+      "property": [
+        "A|XPHB",
+        "LD|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Light Hammer",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 200,
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "B",
+      "range": "20/60",
+      "property": [
+        "L|XPHB",
+        "T|XPHB"
+      ]
+    },
+    {
+      "name": "Longbow",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 5000,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "150/600",
+      "property": [
+        "A|XPHB",
+        "H|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Longsword",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1500,
+      "weight": 3,
+      "dmg1": "1d8",
+      "dmgType": "S",
+      "property": [
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Lute",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 3500,
+      "weight": 2,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lyre",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 3000,
+      "weight": 2,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mace",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B"
+    },
+    {
+      "name": "Mason's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 1000,
+      "weight": 8,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Strength"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Chisel a symbol or hole in stone ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Block and Tackle|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Maul",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1000,
+      "weight": 10,
+      "dmg1": "2d6",
+      "dmgType": "B",
+      "property": [
+        "H|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Morningstar",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1500,
+      "weight": 4,
+      "dmg1": "1d8",
+      "dmgType": "P"
+    },
+    {
+      "name": "Musket",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 50000,
+      "weight": 10,
+      "dmg1": "1d12",
+      "dmgType": "P",
+      "range": "40/120",
+      "property": [
+        "A|XPHB",
+        "LD|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Needle",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 2,
+      "weight": 0.02,
+      "entries": [
+        "Blowgun needles are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Needles are typically stored in a {@item Pouch|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Needles (50)",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 100,
+      "weight": 1,
+      "entries": [
+        "Blowgun needles are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Needles are typically stored in a {@item Pouch|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Orb",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "SCF|XPHB",
+      "value": 2000,
+      "weight": 3
+    },
+    {
+      "name": "Padded Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "LA|XPHB",
+      "value": 500,
+      "weight": 8,
+      "ac": 11
+    },
+    {
+      "name": "Painter's Supplies",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 1000,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Wisdom"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Paint a recognizable image of something you've seen ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Druidic Focus|XPHB}, {@item Holy Symbol|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pan Flute",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 1200,
+      "weight": 2,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pike",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 500,
+      "weight": 18,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "property": [
+        "H|XPHB",
+        "R|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Pistol",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 25000,
+      "weight": 3,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "range": "30/90",
+      "property": [
+        "A|XPHB",
+        "LD|XPHB"
+      ]
+    },
+    {
+      "name": "Plate Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "HA|XPHB",
+      "value": 150000,
+      "weight": 65,
+      "ac": 18
+    },
+    {
+      "name": "Potter's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 1000,
+      "weight": 3,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Intelligence"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Discern what a ceramic object held in the past 24 hours ({@dc 15})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Jug|XPHB}, {@item Lamp|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Quarterstaff",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 20,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B",
+      "property": [
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Rapier",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 2500,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "property": [
+        "F|XPHB"
+      ]
+    },
+    {
+      "name": "Revolver",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 3,
+      "dmg1": "2d8",
+      "dmgType": "P",
+      "range": "40/120",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG"
+      ]
+    },
+    {
+      "name": "Ring Mail",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "HA|XPHB",
+      "value": 3000,
+      "weight": 40,
+      "ac": 14
+    },
+    {
+      "name": "Rod",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "SCF|XPHB",
+      "value": 1000,
+      "weight": 2
+    },
+    {
+      "name": "Scale Mail",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "MA|XPHB",
+      "value": 5000,
+      "weight": 45,
+      "ac": 14
+    },
+    {
+      "name": "Scimitar",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 2500,
+      "weight": 3,
+      "dmg1": "1d6",
+      "dmgType": "S",
+      "property": [
+        "F|XPHB",
+        "L|XPHB"
+      ]
+    },
+    {
+      "name": "Semiautomatic Pistol",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 3,
+      "dmg1": "2d6",
+      "dmgType": "P",
+      "range": "50/150",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG"
+      ]
+    },
+    {
+      "name": "Shawm",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 200,
+      "weight": 1,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shield",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "S|XPHB",
+      "value": 1000,
+      "weight": 6,
+      "ac": 2
+    },
+    {
+      "name": "Shortbow",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 2500,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "80/320",
+      "property": [
+        "A|XPHB",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Shortsword",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1000,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "property": [
+        "F|XPHB",
+        "L|XPHB"
+      ]
+    },
+    {
+      "name": "Shotgun",
+      "source": "XDMG",
+      "edition": "one",
+      "type": "R|XPHB",
+      "weight": 7,
+      "dmg1": "2d8",
+      "dmgType": "P",
+      "range": "30/90",
+      "property": [
+        "AF|XDMG",
+        "RLD|XDMG",
+        "2H|XPHB"
+      ]
+    },
+    {
+      "name": "Sickle",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 100,
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "S",
+      "property": [
+        "L|XPHB"
+      ]
+    },
+    {
+      "name": "Sling",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "R|XPHB",
+      "value": 10,
+      "dmg1": "1d4",
+      "dmgType": "B",
+      "range": "30/120",
+      "property": [
+        "A|XPHB"
+      ]
+    },
+    {
+      "name": "Sling Bullet",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 0.2,
+      "weight": 0.075,
+      "entries": [
+        "Sling bullets are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Sling Bullets are typically stored in a {@item Pouch|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Sling Bullets (20)",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "A|XPHB",
+      "value": 4,
+      "weight": 1.5,
+      "entries": [
+        "Sling bullets are used with a weapon that has the ammunition property to make a ranged attack. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield.",
+        "Sling Bullets are typically stored in a {@item Pouch|XPHB} (bought separately)."
+      ]
+    },
+    {
+      "name": "Smith's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 2000,
+      "weight": 8,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Strength"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Pry open a door or container ({@dc 20})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "Any Melee weapon (except {@item Club|XPHB}, {@item Greatclub|XPHB}, {@item Quarterstaff|XPHB}, and {@item Whip|XPHB}), Medium armor (except {@item Hide Armor|XPHB|Hide}), Heavy armor, {@item Ball Bearings|XPHB}, {@item Bucket|XPHB}, {@item Caltrops|XPHB}, {@item Chain|XPHB}, {@item Crowbar|XPHB}, {@item Firearm Bullets (10)|XPHB|Firearm Bullets}, {@item Grappling Hook|XPHB}, {@item Iron Pot|XPHB}, {@item Iron Spikes|XPHB}, {@item Sling Bullets (20)|XPHB|Sling Bullets}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spear",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 100,
+      "weight": 3,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "T|XPHB",
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Splint Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "HA|XPHB",
+      "value": 20000,
+      "weight": 60,
+      "ac": 17
+    },
+    {
+      "name": "Staff",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "SCF|XPHB",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Studded Leather Armor",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "LA|XPHB",
+      "value": 4500,
+      "weight": 13,
+      "ac": 12
+    },
+    {
+      "name": "Tinker's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 5000,
+      "weight": 10,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Dexterity"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Assemble a Tiny item composed of scrap, which falls apart in 1 minute ({@dc 20})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Musket|XPHB}, {@item Pistol|XPHB}, {@item Bell|XPHB}, {@item Bullseye Lantern|XPHB}, {@item Flask|XPHB}, {@item Hooded Lantern|XPHB}, {@item Hunting Trap|XPHB}, {@item Lock|XPHB}, {@item Manacles|XPHB}, {@item Mirror|XPHB}, {@item Shovel|XPHB}, {@item Signal Whistle|XPHB}, {@item Tinderbox|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trident",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "T|XPHB",
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Viol",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "INS|XPHB",
+      "value": 3000,
+      "weight": 1,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Charisma"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Play a known tune ({@dc 10}), or improvise a song ({@dc 15})"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wand",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "SCF|XPHB",
+      "value": 1000,
+      "weight": 1
+    },
+    {
+      "name": "War Pick",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 500,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "property": [
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Warhammer",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 1500,
+      "weight": 5,
+      "dmg1": "1d8",
+      "dmgType": "B",
+      "property": [
+        "V|XPHB"
+      ]
+    },
+    {
+      "name": "Weaver's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 100,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Dexterity"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Mend a tear in clothing ({@dc 10}), or sew a Tiny design ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Padded Armor|XPHB}, {@item Basket|XPHB}, {@item Bedroll|XPHB}, {@item Blanket|XPHB}, {@item Fine Clothes|XPHB}, {@item Net|XPHB}, {@item Robe|XPHB}, {@item Rope|XPHB}, {@item Sack|XPHB}, {@item String|XPHB}, {@item Tent|XPHB}, {@item Traveler's Clothes|XPHB}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Whip",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "M|XPHB",
+      "value": 200,
+      "weight": 3,
+      "dmg1": "1d4",
+      "dmgType": "S",
+      "property": [
+        "F|XPHB",
+        "R|XPHB"
+      ]
+    },
+    {
+      "name": "Woodcarver's Tools",
+      "source": "XPHB",
+      "edition": "classic",
+      "type": "AT|XPHB",
+      "value": 100,
+      "weight": 5,
+      "entries": [
+        {
+          "type": "list",
+          "style": "list-hang-notitle",
+          "items": [
+            {
+              "name": "Ability:",
+              "type": "item",
+              "entries": [
+                "Dexterity"
+              ]
+            },
+            {
+              "name": "Utilize:",
+              "type": "item",
+              "entries": [
+                "Carve a pattern in wood ({@dc 10})"
+              ]
+            },
+            {
+              "name": "Craft:",
+              "type": "item",
+              "entries": [
+                "{@item Club|XPHB}, {@item Greatclub|XPHB}, {@item Quarterstaff|XPHB}, Ranged weapons (except {@item Pistol|XPHB}, {@item Musket|XPHB}, and  {@item Sling|XPHB}), {@item Arcane Focus|XPHB}, {@item Arrows (20)|XPHB|Arrows}, {@item Bolts (20)|XPHB|Bolts}, {@item Druidic Focus|XPHB}, {@item Ink Pen|XPHB}, {@item Needles (50)|XPHB|Needles}"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wooden Staff",
+      "source": "XPHB",
+      "edition": "one",
+      "type": "SCF|XPHB",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B",
+      "property": [
+        "V"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1459 @@
+{
+  "ruleset": "5e-2014",
+  "results": [
+    {
+      "name": "Alchemist's Supplies",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 5000,
+      "weight": 8
+    },
+    {
+      "name": "Antimatter Rifle",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 10,
+      "dmg1": "6d8",
+      "dmgType": "N",
+      "range": "120/360",
+      "property": [
+        "AF|DMG",
+        "RLD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Arrow",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 5,
+      "weight": 0.05
+    },
+    {
+      "name": "Arrows (20)",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 100,
+      "weight": 1
+    },
+    {
+      "name": "Automatic Pistol",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 3,
+      "dmg1": "2d6",
+      "dmgType": "P",
+      "range": "50/150",
+      "property": [
+        "AF|DMG",
+        "RLD"
+      ]
+    },
+    {
+      "name": "Automatic Rifle",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 8,
+      "dmg1": "2d8",
+      "dmgType": "P",
+      "range": "80/240",
+      "property": [
+        "AF|DMG",
+        "BF|DMG",
+        "RLD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Bagpipes",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 3000,
+      "weight": 6
+    },
+    {
+      "name": "Bandore",
+      "source": "FRHoF",
+      "edition": "classic",
+      "type": "INS|XPHB",
+      "value": 6500,
+      "weight": 3
+    },
+    {
+      "name": "Battleaxe",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1000,
+      "weight": 4,
+      "dmg1": "1d8",
+      "dmgType": "S",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Birdpipes",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "Pan pipes or satyr pipes, also known as the shalm, these are sacred to {@deity Lliira|Faerûnian|scag} and popular with wood elf and wild elf bards."
+      ]
+    },
+    {
+      "name": "Blowgun",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 1000,
+      "weight": 1,
+      "dmg1": "1",
+      "dmgType": "P",
+      "range": "25/100",
+      "property": [
+        "A",
+        "LD"
+      ]
+    },
+    {
+      "name": "Blowgun Needle",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 2,
+      "weight": 0.02
+    },
+    {
+      "name": "Blowgun Needles (50)",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 100,
+      "weight": 1
+    },
+    {
+      "name": "Breastplate",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "MA",
+      "value": 40000,
+      "weight": 20,
+      "ac": 14,
+      "entries": [
+        "This armor consists of a fitted metal chest piece worn with supple leather. Although it leaves the legs and arms relatively unprotected, this armor provides good protection for the wearer's vital organs while leaving the wearer relatively unencumbered."
+      ]
+    },
+    {
+      "name": "Brewer's Supplies",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 2000,
+      "weight": 9
+    },
+    {
+      "name": "Calligrapher's Supplies",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 1000,
+      "weight": 5
+    },
+    {
+      "name": "Carpenter's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 800,
+      "weight": 6
+    },
+    {
+      "name": "Cartographer's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 1500,
+      "weight": 6
+    },
+    {
+      "name": "Chain Mail",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "HA",
+      "value": 7500,
+      "weight": 55,
+      "ac": 16,
+      "entries": [
+        "Made of interlocking metal rings, chain mail includes a layer of quilted fabric worn underneath the mail to prevent chafing and to cushion the impact of blows. The suit includes gauntlets."
+      ]
+    },
+    {
+      "name": "Chain Shirt",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "MA",
+      "value": 5000,
+      "weight": 20,
+      "ac": 13,
+      "entries": [
+        "Made of interlocking metal rings, a chain shirt is worn between layers of clothing or leather. This armor offers modest protection to the wearer's upper body and allows the sound of the rings rubbing against one another to be muffled by outer layers."
+      ]
+    },
+    {
+      "name": "Cittern",
+      "source": "FRHoF",
+      "edition": "classic",
+      "type": "INS|XPHB",
+      "value": 6500,
+      "weight": 2
+    },
+    {
+      "name": "Club",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 10,
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "B",
+      "property": [
+        "L"
+      ]
+    },
+    {
+      "name": "Cobbler's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 500,
+      "weight": 5
+    },
+    {
+      "name": "Cook's Utensils",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 100,
+      "weight": 8
+    },
+    {
+      "name": "Crossbow Bolt",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 5,
+      "weight": 0.075
+    },
+    {
+      "name": "Crossbow Bolts (20)",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 100,
+      "weight": 1.5
+    },
+    {
+      "name": "Crystal",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "SCF",
+      "value": 1000,
+      "weight": 1
+    },
+    {
+      "name": "Dagger",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 200,
+      "weight": 1,
+      "dmg1": "1d4",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "F",
+        "L",
+        "T"
+      ]
+    },
+    {
+      "name": "Dart",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 5,
+      "weight": 0.25,
+      "dmg1": "1d4",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "F",
+        "T"
+      ]
+    },
+    {
+      "name": "Double-Bladed Scimitar",
+      "source": "ERLW",
+      "edition": "classic",
+      "type": "M",
+      "value": 10000,
+      "weight": 6,
+      "dmg1": "2d4",
+      "dmgType": "S",
+      "property": [
+        "S",
+        "2H"
+      ],
+      "entries": [
+        {
+          "type": "entries",
+          "name": "Special",
+          "entries": [
+            "If you attack with a double-bladed scimitar as part of the {@action Attack} action on your turn, you can use a bonus action immediately after to make a melee attack with it. This attack deals {@damage 1d4} slashing damage on a hit, instead of {@damage 2d4}."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drum",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 600,
+      "weight": 3
+    },
+    {
+      "name": "Dulcimer",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 2500,
+      "weight": 10
+    },
+    {
+      "name": "Energy Cell",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "AF|DMG",
+      "weight": 0.3125
+    },
+    {
+      "name": "Flail",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1000,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "B"
+    },
+    {
+      "name": "Flute",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 200,
+      "weight": 1
+    },
+    {
+      "name": "Glaive",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 2000,
+      "weight": 6,
+      "dmg1": "1d10",
+      "dmgType": "S",
+      "property": [
+        "H",
+        "R",
+        "2H"
+      ]
+    },
+    {
+      "name": "Glassblower's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 3000,
+      "weight": 5
+    },
+    {
+      "name": "Glaur",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "Short, curved horns like a cornucopia. Played with valves, glaur sound like trumpets, while those without valves, known as gloon, have a more mournful sound."
+      ]
+    },
+    {
+      "name": "Greataxe",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 3000,
+      "weight": 7,
+      "dmg1": "1d12",
+      "dmgType": "S",
+      "property": [
+        "H",
+        "2H"
+      ]
+    },
+    {
+      "name": "Greatclub",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 20,
+      "weight": 10,
+      "dmg1": "1d8",
+      "dmgType": "B",
+      "property": [
+        "2H"
+      ]
+    },
+    {
+      "name": "Greatsword",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 5000,
+      "weight": 6,
+      "dmg1": "2d6",
+      "dmgType": "S",
+      "property": [
+        "H",
+        "2H"
+      ]
+    },
+    {
+      "name": "Halberd",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 2000,
+      "weight": 6,
+      "dmg1": "1d10",
+      "dmgType": "S",
+      "property": [
+        "H",
+        "R",
+        "2H"
+      ]
+    },
+    {
+      "name": "Half Plate Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "MA",
+      "value": 75000,
+      "weight": 40,
+      "ac": 15,
+      "entries": [
+        "Half plate consists of shaped metal plates that cover most of the wearer's body. It does not include leg protection beyond simple greaves that are attached with leather straps."
+      ]
+    },
+    {
+      "name": "Hand Crossbow",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 7500,
+      "weight": 3,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "30/120",
+      "property": [
+        "A",
+        "L",
+        "LD"
+      ]
+    },
+    {
+      "name": "Hand Drum",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A double-headed skin drum fitted with handles along its side."
+      ]
+    },
+    {
+      "name": "Handaxe",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 500,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "S",
+      "range": "20/60",
+      "property": [
+        "L",
+        "T"
+      ]
+    },
+    {
+      "name": "Heavy Crossbow",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 5000,
+      "weight": 18,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "range": "100/400",
+      "property": [
+        "A",
+        "H",
+        "LD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Hide Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "MA",
+      "value": 1000,
+      "weight": 12,
+      "ac": 12,
+      "entries": [
+        "This crude armor consists of thick furs and pelts. It is commonly worn by barbarian tribes, evil humanoids, and other folk who lack access to the tools and materials needed to create better armor."
+      ]
+    },
+    {
+      "name": "Hooked Shortspear",
+      "source": "OotA",
+      "edition": "classic",
+      "type": "M",
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "P",
+      "property": [
+        "L"
+      ],
+      "entries": [
+        "On a hit with this weapon, the wielder can forgo dealing damage and attempt to trip the target, in which case the target must succeed on a Strength saving throw or fall {@condition prone}. The DC is 8 + the wielder's Strength modifier + the wielder's proficiency bonus."
+      ]
+    },
+    {
+      "name": "Hoopak",
+      "source": "DSotDQ",
+      "edition": "classic",
+      "type": "M",
+      "value": 10,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "40/160",
+      "property": [
+        "A",
+        "F",
+        "S",
+        "2H"
+      ],
+      "entries": [
+        "A hoopak is a sturdy stick with a sling at one end and a pointed tip at the other.",
+        {
+          "type": "entries",
+          "name": "Special",
+          "entries": [
+            "When you make a melee attack with this weapon, you ignore its ammunition property. You can use the hoopak as a martial ranged weapon. If you do, it uses the ammunition property, uses sling bullets, and deals {@damage 1d4} bludgeoning damage on a hit."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Horn",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 300,
+      "weight": 2
+    },
+    {
+      "name": "Hunting Rifle",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 8,
+      "dmg1": "2d10",
+      "dmgType": "P",
+      "range": "80/240",
+      "property": [
+        "AF|DMG",
+        "RLD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Javelin",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 50,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "30/120",
+      "property": [
+        "T"
+      ]
+    },
+    {
+      "name": "Jeweler's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 2500,
+      "weight": 2
+    },
+    {
+      "name": "Lance",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1000,
+      "weight": 6,
+      "dmg1": "1d12",
+      "dmgType": "P",
+      "property": [
+        "R",
+        "S"
+      ],
+      "entries": [
+        {
+          "type": "entries",
+          "name": "Special",
+          "entries": [
+            "You have disadvantage when you use a lance to attack a target within 5 feet of you. Also, a lance requires two hands to wield when you aren't mounted."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Laser Pistol",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 2,
+      "dmg1": "3d6",
+      "dmgType": "R",
+      "range": "40/120",
+      "property": [
+        "AF|DMG",
+        "RLD"
+      ]
+    },
+    {
+      "name": "Laser Rifle",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 7,
+      "dmg1": "3d8",
+      "dmgType": "R",
+      "range": "100/300",
+      "property": [
+        "AF|DMG",
+        "RLD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Leather Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "LA",
+      "value": 1000,
+      "weight": 10,
+      "ac": 11,
+      "entries": [
+        "The breastplate and shoulder protectors of this armor are made of leather that has been stiffened by being boiled in oil. The rest of the armor is made of softer and more flexible materials."
+      ]
+    },
+    {
+      "name": "Leatherworker's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 500,
+      "weight": 5
+    },
+    {
+      "name": "Light Crossbow",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 2500,
+      "weight": 5,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "80/320",
+      "property": [
+        "A",
+        "LD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Light Hammer",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 200,
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "B",
+      "range": "20/60",
+      "property": [
+        "L",
+        "T"
+      ]
+    },
+    {
+      "name": "Light Repeating Crossbow",
+      "source": "OotA",
+      "edition": "classic",
+      "type": "R",
+      "weight": 5,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "40/160",
+      "property": [
+        "A",
+        "2H"
+      ],
+      "entries": [
+        "This crossbow is fitted with a cartridge that can hold up to six crossbow bolts. It automatically reloads after firing until the cartridge runs out of ammunition. Reloading the cartridge takes an action."
+      ]
+    },
+    {
+      "name": "Longbow",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 5000,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "150/600",
+      "property": [
+        "A",
+        "H",
+        "2H"
+      ]
+    },
+    {
+      "name": "Longhorn",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A Faerûnian flute of sophisticated make, found only in areas with skilled artisans, as in great cities or elven enclaves."
+      ]
+    },
+    {
+      "name": "Longsword",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1500,
+      "weight": 3,
+      "dmg1": "1d8",
+      "dmgType": "S",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Lute",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 3500,
+      "weight": 2
+    },
+    {
+      "name": "Lyre",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 3000,
+      "weight": 2
+    },
+    {
+      "name": "Mace",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B"
+    },
+    {
+      "name": "Mason's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 1000,
+      "weight": 8
+    },
+    {
+      "name": "Maul",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1000,
+      "weight": 10,
+      "dmg1": "2d6",
+      "dmgType": "B",
+      "property": [
+        "H",
+        "2H"
+      ]
+    },
+    {
+      "name": "Modern Bullet",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "AF|DMG",
+      "weight": 0.1
+    },
+    {
+      "name": "Modern Bullets (10)",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "AF|DMG",
+      "weight": 1
+    },
+    {
+      "name": "Morningstar",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1500,
+      "weight": 4,
+      "dmg1": "1d8",
+      "dmgType": "P"
+    },
+    {
+      "name": "Musket",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "value": 50000,
+      "weight": 10,
+      "dmg1": "1d12",
+      "dmgType": "P",
+      "range": "40/120",
+      "property": [
+        "AF|DMG",
+        "LD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Net",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 100,
+      "weight": 3,
+      "range": "5/15",
+      "property": [
+        "S",
+        "T"
+      ],
+      "entries": [
+        {
+          "type": "entries",
+          "name": "Special",
+          "entries": [
+            "A Large or smaller creature hit by a net is {@condition restrained} until it is freed. A net has no effect on creatures that are formless, or creatures that are Huge or larger. A creature can use its action to make a {@dc 10} Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the net (AC 10) also frees the creature without harming it, ending the effect and destroying the net. When you use an action, bonus action, or reaction to attack with a net, you can make only one attack regardless of the number of attacks you can normally make."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orb",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "SCF",
+      "value": 2000,
+      "weight": 3
+    },
+    {
+      "name": "Padded Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "LA",
+      "value": 500,
+      "weight": 8,
+      "ac": 11,
+      "entries": [
+        "Padded armor consists of quilted layers of cloth and batting."
+      ]
+    },
+    {
+      "name": "Painter's Supplies",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 1000,
+      "weight": 5
+    },
+    {
+      "name": "Pan Flute",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 1200,
+      "weight": 2
+    },
+    {
+      "name": "Pike",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 500,
+      "weight": 18,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "property": [
+        "H",
+        "R",
+        "2H"
+      ]
+    },
+    {
+      "name": "Pistol",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "value": 25000,
+      "weight": 3,
+      "dmg1": "1d10",
+      "dmgType": "P",
+      "range": "30/90",
+      "property": [
+        "AF|DMG",
+        "LD"
+      ]
+    },
+    {
+      "name": "Plate Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "HA",
+      "value": 150000,
+      "weight": 65,
+      "ac": 18,
+      "entries": [
+        "Plate consists of shaped, interlocking metal plates to cover the entire body. A suit of plate includes gauntlets, heavy leather boots, a visored helmet, and thick layers of padding underneath the armor. Buckles and straps distribute the weight over the body."
+      ]
+    },
+    {
+      "name": "Potter's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 1000,
+      "weight": 3
+    },
+    {
+      "name": "Quarterstaff",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 20,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Rapier",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 2500,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "property": [
+        "F"
+      ]
+    },
+    {
+      "name": "Renaissance Bullet",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "AF|DMG",
+      "value": 30,
+      "weight": 0.2
+    },
+    {
+      "name": "Renaissance Bullets (10)",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "AF|DMG",
+      "value": 300,
+      "weight": 2
+    },
+    {
+      "name": "Revolver",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 3,
+      "dmg1": "2d8",
+      "dmgType": "P",
+      "range": "40/120",
+      "property": [
+        "AF|DMG",
+        "RLD"
+      ]
+    },
+    {
+      "name": "Ring Mail",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "HA",
+      "value": 3000,
+      "weight": 40,
+      "ac": 14,
+      "entries": [
+        "This armor is leather armor with heavy rings sewn into it. The rings help reinforce the armor against blows from swords and axes. Ring mail is inferior to chain mail, and it's usually worn only by those who can't afford better armor."
+      ]
+    },
+    {
+      "name": "Rod",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "SCF",
+      "value": 1000,
+      "weight": 2
+    },
+    {
+      "name": "Scale Mail",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "MA",
+      "value": 5000,
+      "weight": 45,
+      "ac": 14,
+      "entries": [
+        "This armor consists of a coat and leggings (and perhaps a separate skirt) of leather covered with overlapping pieces of metal, much like the scales of a fish. The suit includes gauntlets."
+      ]
+    },
+    {
+      "name": "Scimitar",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 2500,
+      "weight": 3,
+      "dmg1": "1d6",
+      "dmgType": "S",
+      "property": [
+        "F",
+        "L"
+      ]
+    },
+    {
+      "name": "Shawm",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 200,
+      "weight": 1
+    },
+    {
+      "name": "Shawm",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A double-reed instrument similar to an oboe or a bassoon, popular with gnomes, who have developed some bellows-powered versions."
+      ]
+    },
+    {
+      "name": "Shield",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "S",
+      "value": 1000,
+      "weight": 6,
+      "ac": 2,
+      "entries": [
+        "A shield is made from wood or metal and is carried in one hand. Wielding a shield increases your Armor Class by 2. You can benefit from only one shield at a time."
+      ]
+    },
+    {
+      "name": "Shortbow",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 2500,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "80/320",
+      "property": [
+        "A",
+        "2H"
+      ]
+    },
+    {
+      "name": "Shortsword",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1000,
+      "weight": 2,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "property": [
+        "F",
+        "L"
+      ]
+    },
+    {
+      "name": "Shotgun",
+      "source": "DMG",
+      "edition": "classic",
+      "type": "R",
+      "weight": 7,
+      "dmg1": "2d8",
+      "dmgType": "P",
+      "range": "30/90",
+      "property": [
+        "AF|DMG",
+        "RLD",
+        "2H"
+      ]
+    },
+    {
+      "name": "Sickle",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 100,
+      "weight": 2,
+      "dmg1": "1d4",
+      "dmgType": "S",
+      "property": [
+        "L"
+      ]
+    },
+    {
+      "name": "Sling",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "R",
+      "value": 10,
+      "dmg1": "1d4",
+      "dmgType": "B",
+      "range": "30/120",
+      "property": [
+        "A"
+      ]
+    },
+    {
+      "name": "Sling Bullet",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 0.2,
+      "weight": 0.075
+    },
+    {
+      "name": "Sling Bullets (20)",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "A",
+      "value": 4,
+      "weight": 1.5
+    },
+    {
+      "name": "Smith's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 2000,
+      "weight": 8
+    },
+    {
+      "name": "Songhorn",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A recorder, a simple type of flute, usually carved from wood."
+      ]
+    },
+    {
+      "name": "Spear",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 100,
+      "weight": 3,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "T",
+        "V"
+      ]
+    },
+    {
+      "name": "Spiked Armor",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "MA",
+      "value": 7500,
+      "weight": 45,
+      "ac": 14,
+      "entries": [
+        "Spiked armor is a rare type of medium armor made by dwarves. It consists of a leather coat and leggings covered with spikes that are usually made of metal."
+      ]
+    },
+    {
+      "name": "Splint Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "HA",
+      "value": 20000,
+      "weight": 60,
+      "ac": 17,
+      "entries": [
+        "This armor is made of narrow vertical strips of metal riveted to a backing of leather that is worn over cloth padding. Flexible chain mail protects the joints."
+      ]
+    },
+    {
+      "name": "Staff",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "SCF",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Studded Leather Armor",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "LA",
+      "value": 4500,
+      "weight": 13,
+      "ac": 12,
+      "entries": [
+        "Made from tough but flexible leather, studded leather is reinforced with close-set rivets or spikes."
+      ]
+    },
+    {
+      "name": "Tantan",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A tambourine, a popular instrument with halflings and humans south of the Dalelands."
+      ]
+    },
+    {
+      "name": "Thelarr",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "Also known as a whistlecane, a simple and easy-to-make wind instrument cut from a reed. They are so simple, in fact, that skilled bards frequently make and give them away to children—to the parents' delight or regret."
+      ]
+    },
+    {
+      "name": "Tinker's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 5000,
+      "weight": 10
+    },
+    {
+      "name": "Tocken",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A hanging set of carved oval bells, usually played with a pair of light wooden hammers (or open handed). They are most common in underground cultures, where the resonant tones can carry."
+      ]
+    },
+    {
+      "name": "Trident",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "P",
+      "range": "20/60",
+      "property": [
+        "T",
+        "V"
+      ]
+    },
+    {
+      "name": "Viol",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "INS",
+      "value": 3000,
+      "weight": 1
+    },
+    {
+      "name": "Wand",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "SCF",
+      "value": 1000,
+      "weight": 1
+    },
+    {
+      "name": "War Pick",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 500,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "P"
+    },
+    {
+      "name": "Wargong",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A metal gong, traditionally made from a shield, particularly the shield of an enemy. Both goblins and dwarves make and play wargongs, their sound echoing through tunnels in the Underdark."
+      ]
+    },
+    {
+      "name": "Warhammer",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 1500,
+      "weight": 2,
+      "dmg1": "1d8",
+      "dmgType": "B",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Weaver's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 100,
+      "weight": 5
+    },
+    {
+      "name": "Whip",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "M",
+      "value": 200,
+      "weight": 3,
+      "dmg1": "1d4",
+      "dmgType": "S",
+      "property": [
+        "F",
+        "R"
+      ]
+    },
+    {
+      "name": "Woodcarver's Tools",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "AT",
+      "value": 100,
+      "weight": 5
+    },
+    {
+      "name": "Wooden Staff",
+      "source": "PHB",
+      "edition": "classic",
+      "type": "SCF",
+      "value": 500,
+      "weight": 4,
+      "dmg1": "1d6",
+      "dmgType": "B",
+      "property": [
+        "V"
+      ]
+    },
+    {
+      "name": "Yarting",
+      "source": "FRHoF",
+      "edition": "classic",
+      "type": "INS|XPHB",
+      "value": 4000,
+      "weight": 2
+    },
+    {
+      "name": "Yarting",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A southern instrument from Amn and Calimshan that is a Faerûnian analog to the guitar. Numerous variations have spread across the continent."
+      ]
+    },
+    {
+      "name": "Yklwa",
+      "source": "ToA",
+      "edition": "classic",
+      "type": "M",
+      "value": 100,
+      "weight": 3,
+      "dmg1": "1d8",
+      "dmgType": "P",
+      "range": "10/30",
+      "property": [
+        "T"
+      ],
+      "entries": [
+        "A yklwa (pronounced YICK-ul-wah) is a simple melee weapon that is the traditional weapon of Chultan warriors. A yklwa consists of a 3-foot wooden shaft with a steel or stone blade up to 18 inches long. Although it has the thrown weapon property, the yklwa is not well balanced for throwing."
+      ]
+    },
+    {
+      "name": "Zulkoon",
+      "source": "SCAG",
+      "edition": "classic",
+      "type": "INS",
+      "entries": [
+        "A complex pump organ that originated with the zulkirs of Thay, who use it in the casting of their spells. It is considered to have a dramatic, but sinister, sound."
+      ]
+    }
+  ]
+}
