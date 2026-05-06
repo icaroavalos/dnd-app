@@ -802,8 +802,21 @@ function renderForm() {
     background: renderBackgroundForm,
     leveling: renderLevelingForm,
   };
-  els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${renderers[state.step]()}`;
-  bindFormEvents();
+  const renderer = renderers[state.step];
+  const html = renderer();
+
+  if (html instanceof Promise) {
+    html.then((content) => {
+      els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${content}`;
+      bindFormEvents();
+    }).catch((err) => {
+      console.error('Error rendering background form:', err);
+      els.form.innerHTML = '<p class="error">Erro ao carregar background. Tente novamente.</p>';
+    });
+  } else {
+    els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${html}`;
+    bindFormEvents();
+  }
 }
 
 function renderNameField() {
