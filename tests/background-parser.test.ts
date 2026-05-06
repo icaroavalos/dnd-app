@@ -39,6 +39,7 @@ describe('Background Parser', () => {
 
   it('should extract ability options with weights', async () => {
     const rawAcolyte = getBackground('Acolyte', 'XPHB');
+    assert.ok(rawAcolyte, 'Acolyte should exist');
     const parsed = parseBackground(rawAcolyte);
 
     const firstAbility = parsed.abilityScores[0];
@@ -52,6 +53,7 @@ describe('Background Parser', () => {
 
   it('should parse equipment with gold fallback', async () => {
     const rawAcolyte = getBackground('Acolyte', 'XPHB');
+    assert.ok(rawAcolyte, 'Acolyte should exist');
     const parsed = parseBackground(rawAcolyte);
 
     const optionA = parsed.equipment.optionA;

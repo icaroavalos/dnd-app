@@ -72,13 +72,13 @@ describe('Background Choices', () => {
     it('should reject +2/+1 pattern with only 1 score', () => {
       const result = validateAbilitySelection(['int'], '2_1');
       assert.strictEqual(result.valid, false);
-      assert.ok(result.message.includes('2 ability scores'));
+      assert.ok(result.message && result.message.includes('2 ability scores'));
     });
 
     it('should reject duplicate selections', () => {
       const result = validateAbilitySelection(['int', 'int', 'wis'], '2_1');
       assert.strictEqual(result.valid, false);
-      assert.ok(result.message.includes('once'));
+      assert.ok(result.message && result.message.includes('once'));
     });
 
     it('should validate +1/+1/+1 pattern with 3 scores', () => {

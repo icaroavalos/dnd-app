@@ -162,6 +162,7 @@ const STEPS = [
   ["lineage", "Origem"],
   ["abilities", "Atributos"],
   ["choices", "Escolhas"],
+  ["background", "Background"],
   ["leveling", "Niveis"],
 ];
 
@@ -209,13 +210,13 @@ const defaultState = {
     level: 1,
     race: "Turtle",
     subrace: "Turtle",
-    background: "Hermit",
     alignment: "Neutral",
     experience: 0,
     abilityMethod: "standard",
     classFeatureChoices: {},
     asiChoices: {},
     equipmentChoices: {},
+    bgChoices: null,
     inventory: [],
     equippedItems: [],
     hitDiceUsed: 0,
@@ -370,7 +371,7 @@ function createStartingCharacter() {
   character.race = "human";
   character.subrace = "Human";
   character.class = "fighter";
-  character.background = "Acolyte";
+  
   character.hp = maxLevelOneHp(character.class, character.abilities);
   character.armorClass = 10 + Math.floor(((character.abilities.dex ?? 10) - 10) / 2);
   character.speed = 30;
@@ -435,19 +436,18 @@ async function hydrateApiData() {
   state.dataStatus = "carregando 5etools 2024";
   renderChrome();
   try {
-    const [classes, races, subraces, backgrounds, equipment, spells, classSpells, classFeatures, subclasses, feats] = await Promise.all([
+    const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats] = await Promise.all([
       fetchJson(`${DATA_SOURCE}/classes.json`),
       fetchJson(`${DATA_SOURCE}/races.json`),
       fetchJson(`${DATA_SOURCE}/subraces.json`),
-      fetchJson(`${DATA_SOURCE}/backgrounds.json`),
-      fetchJson(`${DATA_SOURCE}/equipment.json`),
+          fetchJson(`${DATA_SOURCE}/equipment.json`),
       fetchJson(`${DATA_SOURCE}/spells.json`),
       fetchJson(`${DATA_SOURCE}/class-spells.json`),
       fetchJson(`${DATA_SOURCE}/class-features.json`),
       fetchJson(`${DATA_SOURCE}/subclasses.json`),
       fetchJson(`${DATA_SOURCE}/feats.json`),
     ]);
-    hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment, spells, classSpells, classFeatures, subclasses, feats });
+    hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats });
     state.dataStatus = DATA_SOURCE_LABEL;
     normalizeCharacterState();
     persist();
@@ -478,11 +478,11 @@ async function loadSpellDetails(spellName) {
   }
 }
 
-function hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment, spells, classSpells, classFeatures, subclasses, feats }) {
+function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats }) {
   const classResults = classes.results ?? [];
   const raceResults = races.results ?? [];
   const subraceResults = subraces.results ?? [];
-  const backgroundResults = backgrounds.results ?? [];
+
   const equipmentResults = equipment.results ?? [];
   const spellResults = spells.results ?? [];
   const classSpellResults = classSpells.results ?? {};
@@ -509,9 +509,7 @@ function hydrate5etoolsSource({ classes, races, subraces, backgrounds, equipment
     source: {
       classOptions: classResults.map((klass) => [slugifyName(klass.name), klass.name]).sort((a, b) => a[1].localeCompare(b[1])),
       raceOptions: raceResults.map((race) => [slugifyName(race.name), race.name]).sort((a, b) => a[1].localeCompare(b[1])),
-      backgroundOptions: backgroundResults.map((background) => [background.name, background.name]).sort((a, b) => a[1].localeCompare(b[1])),
-      backgroundDetails: Object.fromEntries(backgroundResults.map((background) => [background.name.toLowerCase(), background])),
-      subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
+              subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
       itemDetails: Object.fromEntries(equipmentResults.map((item) => [itemKey(item.name, item.source), item])),
       classFeatures: classFeatureResults.map(normalize5etoolsFeature),
       subclasses: subclassResults,
@@ -801,6 +799,7 @@ function renderForm() {
     lineage: renderLineageForm,
     abilities: renderAbilitiesForm,
     choices: renderChoicesForm,
+    background: renderBackgroundForm,
     leveling: renderLevelingForm,
   };
   els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${renderers[state.step]()}`;
@@ -822,17 +821,16 @@ function renderLineageForm() {
   const subraceOptions = subracesFor(c.race);
   const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
   const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
-  const backgroundOptions = state.api.source?.backgroundOptions?.length ? state.api.source.backgroundOptions : BACKGROUNDS.map((item) => [item, item]);
+  const backgroundOptions = []; // background disabled
   const hasSubrace = subraceOptions.length > 0; const subraceFieldOptions = hasSubrace ? subraceOptions.map((item) => [item, item]) : [["", ""]];
   return `
     <div class="form-grid">
       ${selectField("class", "Classe", c.class, classOptions, locked)}
       ${selectField("race", "Raca / especie", c.race, raceOptions, locked)}
       ${hasSubrace ? selectField("subrace", "Subraca", c.subrace ?? "", subraceFieldOptions, locked) : ""}
-      ${selectField("background", "Background", c.background, backgroundOptions, locked)}
-      ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]), locked)}
+          ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]), locked)}
     </div>
-    <p class="hint">${locked ? "Origem, classe e background foram definidos na criacao e ficam travados depois que a ficha e finalizada." : "Classe, especie, background, magias e progresso por nivel vem exclusivamente dos dados 5etools 2024."}</p>
+    <p class="hint">${locked ? "Origem e classe foram definidos na criacao e ficam travados depois que a ficha e finalizada." : "Classe, especie, magias e progresso por nivel vem exclusivamente dos dados 5etools 2024."}</p>
     ${navButtons()}
   `;
 }
@@ -901,7 +899,7 @@ function renderPointBuyControls() {
     <div class="point-buy-grid">
       ${ABILITIES.map(([key, label]) => pointBuyRow(key, label, remaining)).join("")}
     </div>
-    <p class="hint">Point Buy usa valores de 8 a 15 antes dos bonus de especie/background. Aumentar de 13 para 14 ou 15 custa mais.</p>
+    <p class="hint">Point Buy usa valores de 8 a 15 antes dos bonus de especie. Aumentar de 13 para 14 ou 15 custa mais.</p>
   `;
 }
 
@@ -1062,6 +1060,190 @@ function renderAsiChoice(rule) {
           ${choice.pattern === "plus1plus1" ? selectField(`asiChoices.${rule.id}.ability2`, "Atributo 2", choice.ability2, asiAbilityOptions(choice.ability1), choiceLocked(rule)) : ""}
         </div>
       ` : ""}
+    </fieldset>
+  `;
+}
+
+async function renderBackgroundForm() {
+  const bgChoices = state.character.bgChoices || {};
+  const currentBg = bgChoices.background;
+  const locked = creationChoicesLocked();
+
+  // Load background data
+  let bgOptions = [];
+  try {
+    const { getBackgroundsBySource } = await import('./src/core/character/background-loader.js');
+    const backgrounds = getBackgroundsBySource('XPHB');
+    bgOptions = backgrounds.map(bg => ({
+      value: bg.name,
+      label: bg.name,
+      selected: currentBg === bg.name
+    }));
+  } catch (e) {
+    console.error('Failed to load backgrounds:', e);
+    return '<p class="error">Failed to load backgrounds.</p>' + navButtons();
+  }
+
+  // Generate rules for selected background
+  let bgContent = '<p class="hint">Selecione um background para ver as opcoes.</p>';
+  if (currentBg) {
+    try {
+      const { backgroundChoiceRules, hasMagicInitiate } = await import('./src/core/character/background-rules.js');
+      const { createEmptyBgChoices } = await import('./src/core/character/background-choices.js');
+
+      const rules = backgroundChoiceRules(currentBg, 'XPHB');
+      const hasMagic = hasMagicInitiate(currentBg, 'XPHB');
+
+      bgContent = rules.map(rule => {
+        if (rule.type === 'ability') {
+          return renderBackgroundAbilityChoice(rule, bgChoices, locked);
+        } else if (rule.type === 'equipment') {
+          return renderBackgroundEquipmentChoice(rule, bgChoices, locked);
+        } else if (rule.type === 'skill') {
+          return renderBackgroundSkillInfo(rule, bgChoices);
+        } else if (rule.type === 'tool') {
+          return renderBackgroundToolInfo(rule, bgChoices);
+        }
+        return '';
+      }).join('');
+
+      if (hasMagic) {
+        bgContent += `
+          <fieldset class="choice-group">
+            <legend>Magic Initiate: Spellcasting Ability</legend>
+            <p class="hint">Choose INT, WIS, or CHA for your Magic Initiate spells.</p>
+            <div class="choice-list">
+              ${['int', 'wis', 'cha'].map(ability => `
+                <label>
+                  <input type="radio" name="spellcasting-ability" value="${ability}"
+                    ${(bgChoices.spellcastingAbility === ability) ? 'checked' : ''}
+                    ${locked ? 'disabled' : ''} />
+                  <span><strong>${ability.toUpperCase()}</strong></span>
+                </label>
+              `).join('')}
+            </div>
+          </fieldset>
+        `;
+      }
+    } catch (e) {
+      console.error('Failed to generate background rules:', e);
+    }
+  }
+
+  return `
+    <section class="background-panel">
+      <h2>Background</h2>
+
+      <div class="form-group">
+        <label for="bg-select">Escolha seu Background:</label>
+        <select id="bg-select" class="select-field" data-bg-select ${locked ? 'disabled' : ''}>
+          <option value="">-- Selecione --</option>
+          ${bgOptions.map(opt =>
+            `<option value="${escapeHtml(opt.value)}" ${opt.selected ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`
+          ).join('')}
+        </select>
+      </div>
+
+      ${bgContent}
+      ${navButtons()}
+    </section>
+  `;
+}
+
+function renderBackgroundAbilityChoice(rule, bgChoices, locked) {
+  const increment = bgChoices.abilityIncrement;
+  const selectedScores = bgChoices.abilityScores || [];
+
+  return `
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="hint">Cada background sugere uma distribuicao de atributos. Escolha seu padrao:</p>
+
+      <div class="choice-group-inline">
+        <label>
+          <input type="radio" name="ability-increment" value="2_1"
+            ${increment === '2_1' ? 'checked' : ''}
+            ${locked ? 'disabled' : ''}
+            data-bg-increment />
+          <span>+2 em um atributo, +1 em outro</span>
+        </label>
+        <label>
+          <input type="radio" name="ability-increment" value="1_1_1"
+            ${increment === '1_1_1' ? 'checked' : ''}
+            ${locked ? 'disabled' : ''}
+            data-bg-increment />
+          <span>+1 em tres atributos</span>
+        </label>
+      </div>
+
+      <div class="choice-list">
+        ${rule.options.map(opt => `
+          <label class="${selectedScores.includes(opt.value) ? 'selected' : ''}">
+            <input type="checkbox"
+              data-bg-ability="${opt.value}"
+              ${selectedScores.includes(opt.value) ? 'checked' : ''}
+              ${locked ? 'disabled' : ''} />
+            <span><strong>${escapeHtml(opt.label)}</strong>${opt.hint ? `<small> ${escapeHtml(opt.hint)}</small>` : ''}</span>
+          </label>
+        `).join('')}
+      </div>
+    </fieldset>
+  `;
+}
+
+function renderBackgroundEquipmentChoice(rule, bgChoices, locked) {
+  const selected = bgChoices.equipmentChoice;
+
+  return `
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="hint">Escolha seu equipamento inicial:</p>
+      <div class="choice-list">
+        ${rule.options.map(opt => `
+          <label>
+            <input type="radio" name="bg-equipment" value="${opt.value}"
+              ${selected === opt.value ? 'checked' : ''}
+              ${locked ? 'disabled' : ''}
+              data-bg-equipment />
+            <span><strong>${escapeHtml(opt.label)}</strong><small>${escapeHtml(opt.hint || '')}</small></span>
+          </label>
+        `).join('')}
+      </div>
+    </fieldset>
+  `;
+}
+
+function renderBackgroundSkillInfo(rule, bgChoices) {
+  // Skills are automatically granted, just display them
+  return `
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="hint">Proficiencias concedidas automaticamente:</p>
+      <div class="choice-list">
+        ${rule.options.map(opt => `
+          <label class="readonly">
+            <input type="checkbox" checked disabled />
+            <span>${escapeHtml(opt.label)}</span>
+          </label>
+        `).join('')}
+      </div>
+    </fieldset>
+  `;
+}
+
+function renderBackgroundToolInfo(rule, bgChoices) {
+  return `
+    <fieldset class="choice-group">
+      <legend>${escapeHtml(rule.name)}</legend>
+      <p class="hint">Proficiencia concedida:</p>
+      <div class="choice-list">
+        ${rule.options.map(opt => `
+          <label class="readonly">
+            <input type="checkbox" checked disabled />
+            <span>${escapeHtml(opt.label)}</span>
+          </label>
+        `).join('')}
+      </div>
     </fieldset>
   `;
 }
@@ -1285,7 +1467,7 @@ function bindFormEvents() {
   els.form.querySelectorAll("[data-path]").forEach((input) => {
     const updatePathValue = async () => {
       setByPath(state.character, input.dataset.path, input.type === "number" ? Number(input.value) : input.value);
-      const needsFullRender = input.dataset.path === "class" || input.dataset.path === "race" || input.dataset.path === "subrace" || input.dataset.path === "background" || input.dataset.path === "abilityMethod" || input.dataset.path.startsWith("abilities.") || input.dataset.path.startsWith("asiChoices.");
+      const needsFullRender = input.dataset.path === "class" || input.dataset.path === "race" || input.dataset.path === "subrace" || input.dataset.path === "abilityMethod" || input.dataset.path.startsWith("abilities.") || input.dataset.path.startsWith("asiChoices.");
       if (input.dataset.path === "class") {
         await loadClassData(input.value);
         state.character.savingThrows = defaultSaves(input.value);
@@ -1385,6 +1567,74 @@ els.form.querySelectorAll("[data-bg-spell]").forEach((input) => {
     } else {
       state.character.bgSpellChoices[key] = state.character.bgSpellChoices[key].filter(v => v !== value);
     }
+    render();
+  });
+});
+
+  // Background step event handlers
+els.form.querySelectorAll("[data-bg-select]").forEach((select) => {
+  select.addEventListener("change", (e) => {
+    state.character.bgChoices = state.character.bgChoices || {
+      background: null,
+      source: 'XPHB',
+      abilityIncrement: null,
+      abilityScores: [],
+      skillChoices: [],
+      toolChoices: [],
+      equipmentChoice: null,
+      spellcastingAbility: null,
+    };
+    state.character.bgChoices.background = e.target.value;
+    state.character.bgChoices.abilityIncrement = null;
+    state.character.bgChoices.abilityScores = [];
+    state.character.bgChoices.equipmentChoice = null;
+    state.character.bgChoices.spellcastingAbility = null;
+    persist();
+    render();
+  });
+});
+
+els.form.querySelectorAll("[data-bg-increment]").forEach((input) => {
+  input.addEventListener("change", () => {
+    state.character.bgChoices ??= {};
+    state.character.bgChoices.abilityIncrement = input.value;
+    if (input.value === '2_1' && state.character.bgChoices.abilityScores.length > 2) {
+      state.character.bgChoices.abilityScores = state.character.bgChoices.abilityScores.slice(0, 2);
+    }
+    persist();
+    render();
+  });
+});
+
+els.form.querySelectorAll("[data-bg-ability]").forEach((input) => {
+  input.addEventListener("change", () => {
+    state.character.bgChoices ??= {};
+    state.character.bgChoices.abilityScores ??= [];
+    const ability = input.dataset.bgAbility;
+    if (input.checked) {
+      state.character.bgChoices.abilityScores.push(ability);
+    } else {
+      state.character.bgChoices.abilityScores = state.character.bgChoices.abilityScores.filter(a => a !== ability);
+    }
+    persist();
+    render();
+  });
+});
+
+els.form.querySelectorAll("[data-bg-equipment]").forEach((input) => {
+  input.addEventListener("change", () => {
+    state.character.bgChoices ??= {};
+    state.character.bgChoices.equipmentChoice = input.value;
+    persist();
+    render();
+  });
+});
+
+els.form.querySelectorAll("[name='spellcasting-ability']").forEach((input) => {
+  input.addEventListener("change", () => {
+    state.character.bgChoices ??= {};
+    state.character.bgChoices.spellcastingAbility = input.value;
+    persist();
     render();
   });
 });
@@ -3989,47 +4239,13 @@ function syncSkillProficiencies() {
   state.character.skillProficiencies = [...new Set([...backgroundSkills, ...existingOtherSkills, ...state.character.classSkillChoices])];
 }
 
-function backgroundSkillProficiencies(backgroundName = state.character.background) {
-  const background = state.api.source?.backgroundDetails?.[String(backgroundName).toLowerCase()];
-  return [...new Set((background?.skillProficiencies ?? []).flatMap((group) => {
-    if (!group || typeof group !== "object") return [];
-    return Object.entries(group)
-      .filter(([, enabled]) => enabled === true)
-      .map(([slug]) => skillNameFromSlug(slug));
-  }))];
-}
+function backgroundSkillProficiencies() { return []; }
 
 
 // Magic Initiate Background Spell Choices
-function getBackgroundGrantedSpells() {
-  const background = state.character.background?.toLowerCase();
-  if (!background) return [];
-  const bgDetails = state.api.source?.backgroundDetails?.[background];
-  if (!bgDetails?.entries) return [];
-  const granted = [];
-  for (const entry of bgDetails.entries) {
-    const entryStr = JSON.stringify(entry);
-    if (entryStr.includes('Magic Initiate')) {
-      let spellList = 'cleric';
-      if (entryStr.includes('Wizard')) spellList = 'wizard';
-      else if (entryStr.includes('Druid')) spellList = 'druid';
-      granted.push({ type: 'magic_initiate', spellList, cantrips: 2, level1Spells: 1 });
-    }
-  }
-  return granted;
-}
+function getBackgroundGrantedSpells() { return []; }
 
-function backgroundSpellChoiceRules() {
-  const granted = getBackgroundGrantedSpells();
-  return granted.map((grant, idx) => ({
-    id: `bg-magic-initiate-${grant.spellList}-${idx}`,
-    name: `Magic Initiate (${grant.spellList})`,
-    type: 'bg_spell_choice',
-    spellList: grant.spellList,
-    cantrips: grant.cantrips,
-    level1Spells: grant.level1Spells,
-  }));
-}
+function backgroundSpellChoiceRules() { return []; }
 
 function renderBgSpellChoice(rule) {
   const storageKey = `bg-${rule.id}`;
@@ -4065,25 +4281,9 @@ function renderBgSpellChoice(rule) {
   `;
 }
 
-function backgroundSpellOptions(spellList) {
-  const listKey = slugifyName(spellList);
-  return (state.api.classSpells?.[listKey] ?? [])
-    .map((spell) => spellFromKnownData(spell.name) ?? spell)
-    .filter((spell) => spell?.name && Number.isFinite(Number(spell.level)) && Number(spell.level) <= 1)
-    .sort((a, b) => Number(a.level) - Number(b.level) || a.name.localeCompare(b.name));
-}
+function backgroundSpellOptions() { return []; }
 
-function backgroundSelectedSpellNames() {
-  const names = [];
-  backgroundSpellChoiceRules().forEach((rule) => {
-    const storageKey = `bg-${rule.id}`;
-    const legal = new Set(backgroundSpellOptions(rule.spellList).map((spell) => spell.name));
-    (state.character.bgSpellChoices?.[storageKey] ?? [])
-      .filter((name) => legal.has(name))
-      .forEach((name) => names.push(name));
-  });
-  return [...new Set(names)];
-}
+function backgroundSelectedSpellNames() { return []; }
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
   const legalNames = legalSpellNames();
