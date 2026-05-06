@@ -4,28 +4,38 @@
  */
 
 import type { RawBackground } from '../../types/background';
+import { DEFAULT_BACKGROUNDS } from './backgrounds';
 
 // Browser-only path: relative to index.html
 const BACKGROUND_DATA_PATH = './5etools-v2.28.0/data/backgrounds.json';
 
 let cachedData: RawBackground[] | null = null;
 let loadPromise: Promise<RawBackground[]> | null = null;
+let useLocalBackgrounds = false;
 
 /**
  * Load backgrounds from 5etools data file.
- * Uses browser fetch API.
+ * Falls back to hardcoded backgrounds if fetch fails.
  */
 export async function loadBackgroundData(): Promise<RawBackground[]> {
   if (cachedData) return cachedData;
   if (loadPromise) return loadPromise;
 
+  // First try to load from JSON
   loadPromise = fetch(BACKGROUND_DATA_PATH)
     .then((res: Response) => {
-      if (!res.ok) throw new Error(`Failed to load backgrounds: ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
     .then((data: { background?: RawBackground[] }) => {
       cachedData = data.background || [];
+      return cachedData;
+    })
+    .catch(() => {
+      // Fallback to hardcoded backgrounds
+      console.warn('Using hardcoded backgrounds');
+      useLocalBackgrounds = true;
+      cachedData = DEFAULT_BACKGROUNDS as unknown as RawBackground[];
       return cachedData;
     });
 
