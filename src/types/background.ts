@@ -26,7 +26,7 @@ export interface BackgroundData {
 export interface BackgroundOption {
   value: string;
   label: string;
-  description?: string;
+  description?: string | undefined;
   source: string;
 }
 
