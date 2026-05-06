@@ -20,8 +20,8 @@ let loadPromise: Promise<RawBackground[]> | null = null;
  */
 function isNodeEnvironment(): boolean {
   return typeof process !== 'undefined' &&
-         process.versions &&
-         process.versions.node;
+         typeof process.versions !== 'undefined' &&
+         typeof process.versions.node !== 'undefined';
 }
 
 /**
