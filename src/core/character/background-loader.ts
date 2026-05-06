@@ -1,56 +1,33 @@
 /**
  * Background Loader - Load and cache 5etools backgrounds.json
- * Works in both browser (via fetch) and Node.js environments
+ * Browser-only version using fetch
  */
 
 import type { RawBackground } from '../../types/background';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 
-interface BackgroundsData {
-  _meta?: { internalCopies?: string[] };
-  background: RawBackground[];
-}
+// Browser-only path: relative to index.html
+const BACKGROUND_DATA_PATH = './5etools-v2.28.0/data/backgrounds.json';
 
 let cachedData: RawBackground[] | null = null;
 let loadPromise: Promise<RawBackground[]> | null = null;
 
 /**
- * Determine if we're running in Node.js or browser
- */
-function isNodeEnvironment(): boolean {
-  return typeof process !== 'undefined' &&
-         typeof process.versions !== 'undefined' &&
-         typeof process.versions.node !== 'undefined';
-}
-
-/**
  * Load backgrounds from 5etools data file.
- * Caches result after first load.
+ * Uses browser fetch API.
  */
-export async function loadBackgroundData(customPath?: string): Promise<RawBackground[]> {
+export async function loadBackgroundData(): Promise<RawBackground[]> {
   if (cachedData) return cachedData;
   if (loadPromise) return loadPromise;
 
-  loadPromise = (async () => {
-    let data: BackgroundsData;
-
-    if (isNodeEnvironment()) {
-      // Node.js: use fs
-      const filePath = customPath || resolve(process.cwd(), '5etools-v2.28.0/data/backgrounds.json');
-      const content = readFileSync(filePath, 'utf-8');
-      data = JSON.parse(content);
-    } else {
-      // Browser: use fetch
-      const url = customPath || './5etools-v2.28.0/data/backgrounds.json';
-      const res = await fetch(url);
+  loadPromise = fetch(BACKGROUND_DATA_PATH)
+    .then((res: Response) => {
       if (!res.ok) throw new Error(`Failed to load backgrounds: ${res.status}`);
-      data = await res.json();
-    }
-
-    cachedData = data.background || [];
-    return cachedData;
-  })();
+      return res.json();
+    })
+    .then((data: { background?: RawBackground[] }) => {
+      cachedData = data.background || [];
+      return cachedData;
+    });
 
   return loadPromise;
 }
@@ -72,7 +49,7 @@ export function getAllBackgrounds(): RawBackground[] {
 export function getBackground(name: string, source: string): RawBackground | undefined {
   const backgrounds = getAllBackgrounds();
   return backgrounds.find(
-    (bg) => bg.name.toLowerCase() === name.toLowerCase() && bg.source === source
+    (bg: RawBackground) => bg.name.toLowerCase() === name.toLowerCase() && bg.source === source
   );
 }
 
@@ -80,7 +57,7 @@ export function getBackground(name: string, source: string): RawBackground | und
  * Get backgrounds filtered by source (defaults to XPHB).
  */
 export function getBackgroundsBySource(source: string = 'XPHB'): RawBackground[] {
-  return getAllBackgrounds().filter((bg) => bg.source === source);
+  return getAllBackgrounds().filter((bg: RawBackground) => bg.source === source);
 }
 
 /**
