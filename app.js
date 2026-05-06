@@ -1085,7 +1085,8 @@ async function renderBackgroundForm() {
   // Load background data
   let bgOptions = [];
   try {
-    const { getBackgroundsBySource } = await import('./dist/src/core/character/background-loader.js');
+    const { loadBackgroundData, getBackgroundsBySource } = await import('./dist/src/core/character/background-loader.js');
+    await loadBackgroundData(); // Must call first to populate cache
     const backgrounds = getBackgroundsBySource('XPHB');
     bgOptions = backgrounds.map(bg => ({
       value: bg.name,
