@@ -88,7 +88,7 @@ export interface EquipmentItem {
 }
 
 export interface EquipmentOption {
-  type: 'items' | 'gold';
+  type: 'items' | 'gold' | 'mixed';
   items?: EquipmentItem[];
   goldValue?: number;
 }
