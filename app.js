@@ -1390,7 +1390,7 @@ function missingChoicesForStep(step) {
     if (!state.character.class) missing.push("classe");
     if (!state.character.race) missing.push("raca/especie");
     if (subracesFor(state.character.race).length && !state.character.subrace) missing.push("subraca/linhagem");
-    if (!state.character.background) missing.push("background");
+    // Background has its own step now, no longer required here
     return missing;
   }
 
@@ -1585,6 +1585,7 @@ els.form.querySelectorAll("[data-bg-select]").forEach((select) => {
       spellcastingAbility: null,
     };
     state.character.bgChoices.background = e.target.value;
+    state.character.background = e.target.value; // Keep for compatibility
     state.character.bgChoices.abilityIncrement = null;
     state.character.bgChoices.abilityScores = [];
     state.character.bgChoices.equipmentChoice = null;
