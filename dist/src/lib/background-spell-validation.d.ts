@@ -10,7 +10,7 @@
  * FIX: TypeScript adiciona type safety e a lógica corrigida verifica
  * se o storage key está correto e se as escolhas foram persistidas.
  */
-import type { BgSpellGrant, BackgroundSpellRule } from '../types/character';
+import type { BgSpellGrant, BackgroundSpellRule } from '../types/character.js';
 /**
  * Extrai granted spells do background (Magic Initiate)
  */

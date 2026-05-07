@@ -1,5 +1,5 @@
-import type { AbilityName } from '../../types/background';
-import type { Character } from '../../types/state';
+import type { AbilityName } from '../../types/background.js';
+import type { Character } from '../../types/state.js';
 
 export type AbilityBonusMap = Record<AbilityName, number>;
 

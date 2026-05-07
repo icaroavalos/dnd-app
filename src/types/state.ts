@@ -3,8 +3,8 @@
  * Baseado na estrutura atual do app.js
  */
 
-import type { SpellDetail, ClassData, RaceData, BackgroundData, ItemData, FeatureData, SubclassData } from './character';
-import type { BackgroundChoiceState } from './background';
+import type { SpellDetail, ClassData, RaceData, BackgroundData, ItemData, FeatureData, SubclassData } from './character.js';
+import type { BackgroundChoiceState } from './background.js';
 
 export type BuilderStepId = 'lineage' | 'background' | 'abilities' | 'choices' | 'leveling';
 
@@ -26,6 +26,7 @@ export interface ApiState {
     subraceDetails: Record<string, RaceData>;
     itemDetails: Record<string, ItemData>;
     classFeatures: FeatureData[];
+    subclassFeatures: FeatureData[];
     subclasses: SubclassData[];
     featDetails: Record<string, FeatureData>;
     spellDetails: Record<string, SpellDetail>;
@@ -78,6 +79,7 @@ export interface Character {
   tempHp: number;
   creationComplete: boolean;
   hp: number;
+  maxHp?: number;
   armorClass: number;
   speed: number;
   abilities: AbilityScores;
@@ -163,6 +165,8 @@ export interface DerivedCharacterSheet {
   armorClass: number;
   initiative: number;
   maxHp: number;
+  currentHp: number;
+  tempHp: number;
   hitDie: number;
   hitDiceTotal: number;
   spellAttack: number;

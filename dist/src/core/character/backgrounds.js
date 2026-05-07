@@ -4,7 +4,7 @@
  * Este arquivo registra os backgrounds iniciais no sistema.
  * Para adicionar novos backgrounds, importe BackgroundRegistry e registre no init.
  */
-import { BackgroundRegistry } from './background-selector';
+import { BackgroundRegistry } from './background-selector.js';
 /**
  * Lista de backgrounds padroes disponiveis
  */

@@ -1,23 +1,39 @@
-import { deriveCharacterSheet } from "./dist/src/core/character/character-projection.js";
-import { deriveAvailableActions } from "./src/core/engine/action-engine.js";
-import { deriveActiveModifiers, modifierTotal } from "./src/core/engine/modifier-engine.js";
-import { RuleRepository } from "./src/core/rules/rule-repository.js";
-import { ALIGNMENT_OPTIONS, applyBackgroundStepSelection, updateCreationField } from "./dist/src/core/state/creation-form-controller.js";
-import { calculateBackgroundAbilityBonuses, calculateCharacterAbilityBonuses } from "./dist/src/core/character/ability-bonuses.js";
 import {
-  deriveAbilityModifier,
+  deriveCharacterSheet,
+  deriveProjectedAbilityModifier,
+  deriveProjectedAbilityScore,
+  deriveProjectedAbilityScores,
+  deriveProjectedProficiencyBonus,
+  deriveProjectedSaveBonus,
+  deriveProjectedSkillBonus,
+} from "./dist/src/core/character/character-projection.js";
+import { deriveAvailableActions } from "./dist/src/core/engine/action-engine.js";
+import { deriveActiveModifiers, modifierTotal } from "./dist/src/core/engine/modifier-engine.js";
+import { RuleRepository } from "./dist/src/core/rules/rule-repository.js";
+import { applyBackgroundStepSelection, updateCreationField } from "./dist/src/core/state/creation-form-controller.js";
+import { calculateCharacterAbilityBonuses } from "./dist/src/core/character/ability-bonuses.js";
+import {
+  calculateFixedHpGain,
+  calculateMaxHpGain,
   deriveAbilityScores,
   deriveLevelOneMaxHp,
   deriveProficiencyBonus,
-  deriveSavingThrowBonus,
   deriveSpellcastingMetrics,
   signed,
 } from "./dist/src/core/character/character-engine.js";
 import {
   autoGrantedSpellEntries as typedAutoGrantedSpellEntries,
+  backgroundSpellAbility as typedBackgroundSpellAbility,
+  casterLevel as typedCasterLevel,
+  classSpellAbility as typedClassSpellAbility,
+  currentKnownSpellNames as typedCurrentKnownSpellNames,
   spellAbility as typedSpellAbility,
+  spellAbilityForSpell as typedSpellAbilityForSpell,
+  resolveSelectedSpellName as typedResolveSelectedSpellName,
+  spellcastingMetricsForAbility as typedSpellcastingMetricsForAbility,
   spellFromKnownData as typedSpellFromKnownData,
   spellSlotsMaxByLevel as typedSpellSlotsMaxByLevel,
+  classHasSpellList as typedClassHasSpellList,
 } from "./dist/src/core/character/spell-engine.js";
 import {
   itemDetail as typedItemDetail,
@@ -31,6 +47,23 @@ import {
   resourceRecoveryLabel,
 } from "./dist/src/core/character/resource-engine.js";
 import { deriveActiveFeatures } from "./dist/src/core/character/feature-engine.js";
+import { loadState as typedLoadState, saveState as typedSaveState, fetchJson } from "./dist/src/core/state/persistence.js";
+import { renderSummarySheet } from "./dist/src/core/state/summary-view.js";
+import { renderSkillsSheet } from "./dist/src/core/state/skills-view.js";
+import { renderAttacksSheet } from "./dist/src/core/state/attacks-view.js";
+import { renderInventorySheet } from "./dist/src/core/state/inventory-view.js";
+import { renderFeaturesSheet } from "./dist/src/core/state/features-view.js";
+import { renderSpellsSheet } from "./dist/src/core/state/spells-view.js";
+import {
+  renderNameField as renderTypedNameField,
+  renderLineageForm as renderTypedLineageForm,
+  renderAbilitiesForm as renderTypedAbilitiesForm,
+  renderChoicesForm as renderTypedChoicesForm,
+  renderBackgroundForm as renderTypedBackgroundForm,
+  renderLevelingForm as renderTypedLevelingForm,
+} from "./dist/src/core/state/builder-views.js";
+import { titleCase, ordinalSuffix, slugifyName, escapeRegExp, escapeHtml, setByPath, clamp, clean5etoolsText, paragraphs } from "./dist/src/lib/utils.js";
+import { format5etoolsTime, format5etoolsRange, format5etoolsComponents, format5etoolsDuration, entriesToText, entryToText, spellSchoolName } from "./dist/src/lib/formatter.js";
 import { CREATION_STEPS, getMissingChoicesForStep as getTypedMissingChoicesForStep, validateCreationStep } from "./dist/src/core/state/creation-flow.js";
 import {
   applyGuidedBackgroundEquipmentChoice,
@@ -52,173 +85,37 @@ import {
   buildScoreCards,
   buildPointBuyViewModel,
   buildStandardArrayCards,
-  adjustPointBuyScore,
-  applyAbilityMethod as applyAbilityMethodPure,
   swapAbilities,
+  adjustPointBuyScore as typedAdjustPointBuyScore,
+  applyAbilityMethod as typedApplyAbilityMethod,
+  trimPointBuyToBudget as typedTrimPointBuyToBudget,
   pointBuySpent as typedPointBuySpent,
   pointBuyCost as typedPointBuyCost,
-  trimPointBuyToBudget as typedTrimPointBuyToBudget,
-  getClassSavingThrows,
+  getClassSavingThrows as typedGetClassSavingThrows,
+  getAbilityScore as typedGetAbilityScore,
+  getAbilityModifier as typedGetAbilityModifier,
+  getAbilityScoreBeforeAsiRule as typedGetAbilityScoreBeforeAsiRule,
   ABILITY_METHODS,
   STANDARD_ARRAY,
   POINT_BUY_BUDGET,
 } from "./dist/src/core/state/abilities-step.js";
-
-const DATA_SOURCE = "data/5etools/5e-2024";
-const DATA_SOURCE_LABEL = "5etools 2024";
-
-const ABILITIES = [
-  ["str", "Strength"],
-  ["dex", "Dexterity"],
-  ["con", "Constitution"],
-  ["int", "Intelligence"],
-  ["wis", "Wisdom"],
-  ["cha", "Charisma"],
-];
-
-const SKILLS = [
-  ["Athletics", "str"],
-  ["Acrobatics", "dex"],
-  ["Sleight of Hand", "dex"],
-  ["Stealth", "dex"],
-  ["Arcana", "int"],
-  ["History", "int"],
-  ["Investigation", "int"],
-  ["Nature", "int"],
-  ["Religion", "int"],
-  ["Animal Handling", "wis"],
-  ["Insight", "wis"],
-  ["Medicine", "wis"],
-  ["Perception", "wis"],
-  ["Survival", "wis"],
-  ["Deception", "cha"],
-  ["Intimidation", "cha"],
-  ["Performance", "cha"],
-  ["Persuasion", "cha"],
-];
-
-const CLASSES = [
-  "barbarian",
-  "bard",
-  "cleric",
-  "druid",
-  "fighter",
-  "monk",
-  "paladin",
-  "ranger",
-  "rogue",
-  "sorcerer",
-  "warlock",
-  "wizard",
-];
-
-const RACES = [
-  "dragonborn",
-  "dwarf",
-  "elf",
-  "gnome",
-  "half-elf",
-  "half-orc",
-  "halfling",
-  "human",
-  "tiefling",
-];
-
-const SUBRACES = {
-  dragonborn: ["Dragonborn"],
-  dwarf: ["Hill Dwarf", "Mountain Dwarf"],
-  elf: ["High Elf", "Wood Elf", "Dark Elf"],
-  gnome: ["Forest Gnome", "Rock Gnome"],
-  "half-elf": ["Half Elf"],
-  "half-orc": ["Half Orc"],
-  halfling: ["Lightfoot Halfling", "Stout Halfling"],
-  human: ["Human"],
-  tiefling: ["Tiefling"],
-  Turtle: ["Turtle"],
-};
-
-const BACKGROUNDS = ["Acolyte", "Criminal", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier"];
-
-const CLASS_HIT_DIE = {
-  barbarian: 12,
-  bard: 8,
-  cleric: 8,
-  druid: 8,
-  fighter: 10,
-  monk: 8,
-  paladin: 10,
-  ranger: 10,
-  rogue: 8,
-  sorcerer: 6,
-  warlock: 8,
-  wizard: 6,
-};
-
-const CLASS_SKILLS = {
-  barbarian: { choose: 2, options: ["Animal Handling", "Athletics", "Intimidation", "Nature", "Perception", "Survival"] },
-  bard: { choose: 3, options: SKILLS.map(([name]) => name) },
-  cleric: { choose: 2, options: ["History", "Insight", "Medicine", "Persuasion", "Religion"] },
-  druid: { choose: 2, options: ["Arcana", "Animal Handling", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"] },
-  fighter: { choose: 2, options: ["Acrobatics", "Animal Handling", "Athletics", "History", "Insight", "Intimidation", "Perception", "Survival"] },
-  monk: { choose: 2, options: ["Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"] },
-  paladin: { choose: 2, options: ["Athletics", "Insight", "Intimidation", "Medicine", "Persuasion", "Religion"] },
-  ranger: { choose: 3, options: ["Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"] },
-  rogue: { choose: 4, options: ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "Sleight of Hand", "Stealth"] },
-  sorcerer: { choose: 2, options: ["Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"] },
-  warlock: { choose: 2, options: ["Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"] },
-  wizard: { choose: 2, options: ["Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"] },
-};
-
-const RACE_TRAITS = {
-  dragonborn: ["Draconic Ancestry", "Breath Weapon", "Damage Resistance"],
-  dwarf: ["Darkvision", "Dwarven Resilience", "Stonecunning", "Tool Proficiency"],
-  elf: ["Darkvision", "Keen Senses", "Fey Ancestry", "Trance"],
-  gnome: ["Darkvision", "Gnome Cunning"],
-  "half-elf": ["Darkvision", "Fey Ancestry", "Skill Versatility"],
-  "half-orc": ["Darkvision", "Relentless Endurance", "Savage Attacks"],
-  halfling: ["Lucky", "Brave", "Halfling Nimbleness"],
-  human: ["Extra Language", "Versatile Ability Scores"],
-  tiefling: ["Darkvision", "Hellish Resistance", "Infernal Legacy"],
-};
-
-const STARTER_ATTACKS = {
-  monk: [
-    { name: "Shortsword", range: "5 feet", type: "Piercing", damage: "1d6" },
-    { name: "Dart", range: "20/60", type: "Piercing", damage: "1d4" },
-    { name: "Unarmed Strike", range: "5 feet", type: "Bludgeoning", damage: "1d4" },
-  ],
-  fighter: [
-    { name: "Longsword", range: "5 feet", type: "Slashing", damage: "1d8" },
-    { name: "Light Crossbow", range: "80/320", type: "Piercing", damage: "1d8" },
-  ],
-  rogue: [
-    { name: "Rapier", range: "5 feet", type: "Piercing", damage: "1d8" },
-    { name: "Shortbow", range: "80/320", type: "Piercing", damage: "1d6" },
-  ],
-};
-
-const HALF_CASTER = new Set(["paladin", "ranger"]);
-const CLASS_DECKS = {
-  bard: "bard",
-  cleric: "cleric",
-  druid: "druid",
-  paladin: "paladin",
-  ranger: "ranger",
-  warlock: "warlock",
-  sorcerer: "arcane",
-  wizard: "arcane",
-};
+import {
+  ABILITIES,
+  ALIGNMENT_OPTIONS,
+  CLASS_DECKS,
+  CLASSES,
+  CLASS_HIT_DIE,
+  DATA_SOURCE,
+  DATA_SOURCE_LABEL,
+  HALF_CASTER,
+  RACES,
+  SKILLS,
+  STARTER_ATTACKS,
+  TABS,
+  DECK_LABELS,
+} from "./dist/src/core/rules/constants.js";
 
 const STEPS = CREATION_STEPS;
-
-const TABS = [
-  ["summary", "Base"],
-  ["skills", "Skills"],
-  ["attacks", "Ataques"],
-  ["spells", "Magia"],
-  ["inventory", "Inventory"],
-  ["features", "Features"],
-];
 
 const defaultState = {
   step: "lineage",
@@ -320,7 +217,7 @@ async function init() {
   if (state.step === "identity") state.step = "lineage";
   ensureRosterState();
   normalizeCharacterState();
-  state.selectedSpell ||= state.character.spells[0] ?? "";
+  state.selectedSpell = typedResolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
   bindGlobalEvents();
   render();
   await hydrateApiData();
@@ -328,21 +225,12 @@ async function init() {
 }
 
 function loadState() {
-  const saved = localStorage.getItem("dnd-sheet-builder");
-  if (!saved) return structuredClone(defaultState);
-  try {
-    return { ...structuredClone(defaultState), ...JSON.parse(saved) };
-  } catch {
-    return structuredClone(defaultState);
-  }
+  return typedLoadState(defaultState);
 }
 
 function persist() {
   syncActiveCharacter();
-  const savedState = structuredClone(state);
-  savedState.api = structuredClone(defaultState.api);
-  savedState.derived = null;
-  localStorage.setItem("dnd-sheet-builder", JSON.stringify(savedState));
+  typedSaveState(state);
 }
 
 function ensureRosterState() {
@@ -451,11 +339,11 @@ function switchCharacter(characterId) {
   if (!character) return;
   state.activeCharacterId = character.id;
   state.character = structuredClone(character);
-  state.selectedSpell = state.character.spells[0] ?? "";
   state.levelUpMode = false;
   state.creationComplete = Boolean(state.character.creationComplete);
   if (state.creationComplete) state.builderVisible = false;
   normalizeCharacterState();
+  state.selectedSpell = typedResolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
   persist();
   render();
 }
@@ -481,19 +369,20 @@ async function hydrateApiData() {
   state.dataStatus = "carregando 5etools 2024";
   renderChrome();
   try {
-    const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats, backgrounds] = await Promise.all([
+    const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds] = await Promise.all([
       fetchJson(`${DATA_SOURCE}/classes.json`),
       fetchJson(`${DATA_SOURCE}/races.json`),
       fetchJson(`${DATA_SOURCE}/subraces.json`),
-          fetchJson(`${DATA_SOURCE}/equipment.json`),
+      fetchJson(`${DATA_SOURCE}/equipment.json`),
       fetchJson(`${DATA_SOURCE}/spells.json`),
       fetchJson(`${DATA_SOURCE}/class-spells.json`),
       fetchJson(`${DATA_SOURCE}/class-features.json`),
+      fetchJson(`${DATA_SOURCE}/subclass-features.json`),
       fetchJson(`${DATA_SOURCE}/subclasses.json`),
       fetchJson(`${DATA_SOURCE}/feats.json`),
       fetchJson(`${DATA_SOURCE}/backgrounds.json`),
     ]);
-    hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats, backgrounds });
+    hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds });
     state.dataStatus = DATA_SOURCE_LABEL;
     normalizeCharacterState();
     persist();
@@ -524,7 +413,7 @@ async function loadSpellDetails(spellName) {
   }
 }
 
-function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats, backgrounds }) {
+function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds }) {
   const classResults = classes.results ?? [];
   const raceResults = races.results ?? [];
   const subraceResults = subraces.results ?? [];
@@ -533,6 +422,7 @@ function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, cla
   const spellResults = spells.results ?? [];
   const classSpellResults = classSpells.results ?? {};
   const classFeatureResults = classFeatures.results ?? [];
+  const subclassFeatureResults = subclassFeatures.results ?? [];
   const subclassResults = subclasses.results ?? [];
   const featResults = feats.results ?? [];
   const spellByKey = new Map(spellResults.map((spell) => [`${spell.name.toLowerCase()}|${spell.source.toLowerCase()}`, spell]));
@@ -560,9 +450,10 @@ function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, cla
         .map((background) => [background.name, background.name])
         .sort((a, b) => a[1].localeCompare(b[1])),
       backgroundDetails: Object.fromEntries(backgroundResults.map((background) => [background.name.toLowerCase(), background])),
-              subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
+      subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
       itemDetails: Object.fromEntries(equipmentResults.map((item) => [itemKey(item.name, item.source), item])),
       classFeatures: classFeatureResults.map(normalize5etoolsFeature),
+      subclassFeatures: subclassFeatureResults.map(normalize5etoolsFeature),
       subclasses: subclassResults,
       featDetails: Object.fromEntries(featResults.map((feat) => [slugifyName(feat.name), normalize5etoolsFeature({ ...feat, type: "feat" })])),
       spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), normalize5etoolsSpell(spell)])),
@@ -577,6 +468,8 @@ function normalize5etoolsFeature(feature) {
     source: feature.source,
     className: feature.className,
     classSource: feature.classSource,
+    subclassShortName: feature.subclassShortName,
+    subclassSource: feature.subclassSource,
     level: feature.level,
     category: feature.category,
     ability: feature.ability,
@@ -619,7 +512,7 @@ function build5etoolsLevels(klass) {
     });
     return {
       level: index + 1,
-      prof_bonus: proficiencyForLevel(index + 1),
+      prof_bonus: deriveProficiencyBonus(index + 1),
       features: [],
       spellcasting,
     };
@@ -686,17 +579,6 @@ function walkEntries(value, visitor) {
   Object.values(value).forEach((item) => walkEntries(item, visitor));
 }
 
-async function fetchJson(url) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4500);
-  try {
-    const response = await fetch(url, { headers: { Accept: "application/json" }, signal: controller.signal });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 function render() {
   renderChrome();
@@ -856,27 +738,15 @@ function renderForm() {
   const renderer = renderers[state.step];
   const html = renderer();
 
-  if (html instanceof Promise) {
-    html.then((content) => {
-      els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${content}`;
-      bindFormEvents();
-    }).catch((err) => {
-      console.error('Error rendering background form:', err);
-      els.form.innerHTML = '<p class="error">Erro ao carregar background. Tente novamente.</p>';
-    });
-  } else {
-    els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${html}`;
-    bindFormEvents();
-  }
+  els.form.innerHTML = `${state.step === "lineage" ? renderNameField() : ""}${html}`;
+  bindFormEvents();
 }
 
 function renderNameField() {
-  const c = state.character;
-  return `
-    <section class="character-name-panel">
-      ${field("name", "Nome da ficha", c.name)}
-    </section>
-  `;
+  return renderTypedNameField({
+    character: state.character,
+    field,
+  });
 }
 
 function renderLineageForm() {
@@ -885,40 +755,38 @@ function renderLineageForm() {
   const subraceOptions = subracesFor(c.race);
   const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
   const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
-  const backgroundOptions = []; // background disabled
-  const hasSubrace = subraceOptions.length > 0; const subraceFieldOptions = hasSubrace ? subraceOptions.map((item) => [item, item]) : [["", ""]];
-  return `
-    <div class="form-grid">
-      ${selectField("class", "Classe", c.class, classOptions, locked)}
-      ${selectField("race", "Raca / especie", c.race, raceOptions, locked)}
-      ${hasSubrace ? selectField("subrace", "Subraca", c.subrace ?? "", subraceFieldOptions, locked) : ""}
-          ${selectField("alignment", "Alinhamento", c.alignment, ALIGNMENT_OPTIONS, locked)}
-    </div>
-    <p class="hint">${locked ? "Origem e classe foram definidos na criacao e ficam travados depois que a ficha e finalizada." : "Classe, especie, magias e progresso por nivel vem exclusivamente dos dados 5etools 2024."}</p>
-    ${navButtons()}
-  `;
+  return renderTypedLineageForm({
+    character: c,
+    locked,
+    subraceOptions,
+    classOptions,
+    raceOptions,
+    alignmentOptions: ALIGNMENT_OPTIONS,
+    selectField,
+    navButtons,
+    titleCase,
+    escapeHtml,
+  });
 }
 
 function renderAbilitiesForm() {
   const locked = creationChoicesLocked();
-  const classSaves = classSavingThrows();
-  return `
-    <fieldset class="choice-group ability-method-panel">
-      <legend>Ability Scores</legend>
-      ${locked ? `<p class="hint">Atributos de criacao ficam travados depois que a ficha e finalizada.</p>` : selectField("abilityMethod", "Metodo de geracao", state.character.abilityMethod ?? "standard", ABILITY_METHODS)}
-      ${locked ? "" : renderAbilityMethodControls()}
-    </fieldset>
-    ${renderAbilityScoreCalculations()}
-    <fieldset class="choice-group">
-      <legend>Saving throws da classe</legend>
-      <p class="choice-counter complete">${classSaves.length}/${classSaves.length} fixos por ${titleCase(state.character.class)}</p>
-      <p class="hint">Saving throw proficiency vem da classe inicial. Trocar a classe atualiza estes dois saves automaticamente.</p>
-      <div class="choice-list">
-        ${ABILITIES.map(([key, label]) => checkbox("savingThrows", key, label, classSaves.includes(key), !classSaves.includes(key), true)).join("")}
-      </div>
-    </fieldset>
-    ${navButtons()}
-  `;
+  const classSaves = typedGetClassSavingThrows(state.character.class, state.api.classes);
+  return renderTypedAbilitiesForm({
+    locked,
+    abilityMethod: state.character.abilityMethod ?? "standard",
+    abilityMethods: ABILITY_METHODS,
+    className: state.character.class,
+    classSaves,
+    abilityDefinitions: ABILITIES,
+    selectField,
+    checkbox,
+    navButtons,
+    titleCase,
+    escapeHtml,
+    renderAbilityMethodControls,
+    renderAbilityScoreCalculations,
+  });
 }
 
 function renderAbilityMethodControls() {
@@ -1000,45 +868,22 @@ function renderChoicesForm() {
   const classSkill = classSkillRule();
   const backgroundSkills = backgroundSkillProficiencies();
   const selected = state.character.classSkillChoices ?? [];
-  const selectedCount = selected.length;
-  const skillOptions = [...new Set([...backgroundSkills, ...classSkill.options])];
   const classChoices = classCreationChoiceRules();
   const creationEquipmentRules = equipmentChoiceRules().filter((rule) => rule.id !== "background-starting-equipment");
   const locked = creationChoicesLocked();
-  return `
-    <fieldset class="choice-group">
-      <legend>Skills</legend>
-      <p class="choice-counter ${selectedCount === classSkill.choose ? "complete" : selectedCount > classSkill.choose ? "invalid" : ""}">
-        ${selectedCount}/${classSkill.choose} escolhas da classe${backgroundSkills.length ? ` • ${backgroundSkills.length} do background` : ""}
-      </p>
-      <div class="choice-list">
-        ${skillOptions.map((name) => {
-          const fromBackground = backgroundSkills.includes(name);
-          const isClassOption = classSkill.options.includes(name);
-          const isSelected = selected.includes(name);
-          return checkbox(
-            "classSkillChoices",
-            name,
-            `${escapeHtml(name)}${fromBackground ? " <small class=\"choice-source\">Background</small>" : ""}`,
-            isSelected || fromBackground,
-            !isClassOption || (selectedCount >= classSkill.choose && !isSelected),
-            locked || fromBackground
-          );
-        }).join("")}
-      </div>
-    </fieldset>
-    ${classChoices.map(renderClassCreationChoice).join("")}
-    ${creationEquipmentRules.map(renderEquipmentChoice).join("")}
-    <fieldset class="choice-group">
-      <legend>Ataques</legend>
-      <div id="attackEditor">
-        ${state.character.attacks.map((attack, index) => attackEditorRow(attack, index)).join("") || `<p class="hint">Nenhum ataque cadastrado.</p>`}
-      </div>
-      <button type="button" class="mini-button" id="addAttackButton">New</button>
-      <button type="button" class="mini-button" id="suggestAttacksButton">Sugerir da classe</button>
-    </fieldset>
-    ${navButtons()}
-  `;
+  return renderTypedChoicesForm({
+    classSkill,
+    backgroundSkills,
+    selectedClassSkills: selected,
+    classChoicesHtml: classChoices.map(renderClassCreationChoice).join(""),
+    equipmentChoicesHtml: creationEquipmentRules.map(renderEquipmentChoice).join(""),
+    attacksHtml: state.character.attacks.map((attack, index) => attackEditorRow(attack, index)).join(""),
+    locked,
+    checkbox,
+    navButtons,
+    escapeHtml,
+    titleCase,
+  });
 }
 
 function renderEquipmentChoice(rule) {
@@ -1121,91 +966,41 @@ function renderBackgroundForm() {
     ...bgChoices,
     background: currentBg || bgChoices.background || null,
   });
-  let bgContent = '<p class="hint">Selecione um background para ver as opcoes.</p>';
-  if (viewModel.currentBackground) {
-    bgContent = `
-      <fieldset class="choice-group">
-        <legend>${viewModel.currentBackground}: Ability Scores</legend>
-        <p class="hint">Choose how to increase your ability scores. In +2 / +1, the first selected ability receives +2 and the second receives +1.</p>
-        <div class="choice-group-inline" style="display:flex;gap:1rem;margin:0.5rem 0;">
-          <label><input type="radio" name="ability-increment" value="2_1" ${bgChoices.abilityIncrement === '2_1' ? 'checked' : ''} data-bg-increment /> <span>+2 / +1</span></label>
-          <label><input type="radio" name="ability-increment" value="1_1_1" ${bgChoices.abilityIncrement === '1_1_1' ? 'checked' : ''} data-bg-increment /> <span>+1 / +1 / +1</span></label>
-        </div>
-        <p class="choice-counter ${(viewModel.maxAbilityChoices > 0 && viewModel.selectedAbilityCount === viewModel.maxAbilityChoices) ? 'complete' : ''}">${viewModel.selectedAbilityCount}/${viewModel.maxAbilityChoices || 0} escolhidas</p>
-        <div class="choice-list">
-          ${viewModel.abilityOptions.map((option) => {
-            const bonus = option.bonus ? ` <small class="choice-source">+${option.bonus}</small>` : '';
-            return `<label class="${option.selected ? 'selected' : ''} ${option.disabled ? 'disabled' : ''}"><input type="checkbox" data-bg-ability="${option.value}" ${option.selected ? 'checked' : ''} ${option.disabled ? 'disabled' : ''} /><span><strong>${option.label}</strong>${bonus}</span></label>`;
-          }).join('')}
-        </div>
-      </fieldset>
-      <fieldset class="choice-group">
-        <legend>${viewModel.currentBackground}: Skills (automatic)</legend>
-        <p class="hint">Skill proficiencies granted by this background:</p>
-        <div class="choice-list">${viewModel.skills.map((skill) => `<label class="readonly"><input type="checkbox" checked disabled /><span>${skill}</span></label>`).join('') || '<p class="hint">No skill proficiencies</p>'}</div>
-      </fieldset>
-      ${viewModel.tools.length > 0 ? `<fieldset class="choice-group"><legend>${viewModel.currentBackground}: Tools (automatic)</legend><div class="choice-list">${viewModel.tools.map((tool) => `<label class="readonly"><input type="checkbox" checked disabled /><span>${tool}</span></label>`).join('')}</div></fieldset>` : ''}
-      <fieldset class="choice-group">
-        <legend>${viewModel.currentBackground}: Equipment</legend>
-        <p class="hint">Choose your starting equipment:</p>
-        <div class="choice-list">
-          ${viewModel.equipmentOptions.map((option) => `<label><input type="radio" name="bg-equipment" value="${option.value}" ${option.selected ? 'checked' : ''} data-bg-equipment /><span><strong>${option.label}</strong><small>${option.hint}</small></span></label>`).join('')}
-        </div>
-      </fieldset>
-    `;
-
-    if (viewModel.showsMagicInitiate) {
-      bgContent += `<fieldset class="choice-group"><legend>Magic Initiate: Cleric</legend><p class="hint">Choose your spellcasting ability for Magic Initiate spells:</p><div class="choice-list">${['int', 'wis', 'cha'].map((ability) => `<label><input type="radio" name="spellcasting-ability" value="${ability}" ${viewModel.spellcastingAbility === ability ? 'checked' : ''} /><span><strong>${titleCase(ability === 'int' ? 'intelligence' : ability === 'wis' ? 'wisdom' : 'charisma')}</strong></span></label>`).join('')}</div></fieldset>`;
-      bgContent += backgroundSpellChoiceRules().map(renderBgSpellChoice).join("");
-    }
-  }
-
-  return `
-    <section class="background-panel">
-      <h2>Background</h2>
-
-      <div class="form-group">
-        <label for="bg-select">Escolha seu Background:</label>
-        <select id="bg-select" class="select-field" data-bg-select ${locked ? 'disabled' : ''}>
-          <option value="">-- Selecione --</option>
-          ${viewModel.options.map(opt =>
-            `<option value="${escapeHtml(opt.value)}" ${opt.selected ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`
-          ).join('')}
-        </select>
-      </div>
-
-      ${bgContent}
-      ${navButtons()}
-    </section>
-  `;
+  return renderTypedBackgroundForm({
+    locked,
+    bgChoices,
+    viewModel,
+    navButtons,
+    titleCase,
+    escapeHtml,
+    renderBgSpellChoices: () => backgroundSpellChoiceRules().map(renderBgSpellChoice).join(""),
+  });
 }
 
 function renderLevelingForm() {
   const spellRule = spellChoiceRule();
   const spellCounts = selectedSpellCounts();
-  const spellComplete = spellCounts.cantrips === spellRule.cantrips && spellCounts.leveled === spellRule.spellsMax;
-  const spellInvalid = spellCounts.cantrips > spellRule.cantrips || spellCounts.leveled > spellRule.spellsMax;
   const classChoices = levelScopedChoiceRules();
-  return `
-    ${state.levelUpMode ? `
-      <section class="level-up-banner">
-        <strong>Level up: ${state.levelUpFrom} → ${state.character.level}</strong>
-        <span>Este fluxo mostra apenas o que pode mudar neste nivel.</span>
-      </section>
-      ${renderLevelUpClassChoice()}
-      ${renderLevelUpHpControl()}
-    ` : ""}
-    ${classChoices.length ? classChoices.map(renderClassCreationChoice).join("") : ""}
-    <fieldset class="choice-group">
-      <legend>Magias conhecidas / preparadas</legend>
-      <p class="choice-counter ${spellComplete ? "complete" : spellInvalid ? "invalid" : ""}">
-        Cantrips ${spellCounts.cantrips}/${spellRule.cantrips} | Magias ${spellCounts.leveled}/${spellRule.spellsMax}
-      </p>
-      <p class="hint">${spellRule.hint}</p>
-      ${renderSpellChoiceGroups(spellRule, spellCounts)}
-    </fieldset>
-    ${state.levelUpMode ? levelUpNavButtons() : navButtons()}
-  `;
+  const levelUpBannerHtml = state.levelUpMode ? `
+    <section class="level-up-banner">
+      <strong>Level up: ${state.levelUpFrom} → ${state.character.level}</strong>
+      <span>Este fluxo mostra apenas o que pode mudar neste nivel.</span>
+    </section>
+    ${renderLevelUpClassChoice()}
+    ${renderLevelUpHpControl()}
+  ` : "";
+  return renderTypedLevelingForm({
+    isLevelUpMode: state.levelUpMode,
+    levelUpBannerHtml,
+    classChoicesHtml: classChoices.length ? classChoices.map(renderClassCreationChoice).join("") : "",
+    spellChoiceRule: spellRule,
+    spellCounts,
+    renderSpellChoiceGroups: () => renderSpellChoiceGroups(spellRule, spellCounts),
+    navButtonsHtml: state.levelUpMode ? levelUpNavButtons() : navButtons(),
+    navButtons,
+    titleCase,
+    escapeHtml,
+  });
 }
 
 function renderLevelUpClassChoice() {
@@ -1228,8 +1023,8 @@ function renderLevelUpClassChoice() {
 }
 
 function renderLevelUpHpControl() {
-  const con = mod("con");
-  const die = hitDie();
+  const con = deriveProjectedAbilityModifier(state.character, "con");
+  const die = (state.api.classes[state.character.class]?.hit_die ?? 8);
   const fixed = fixedHpGain();
   const min = Math.max(1, 1 + con);
   const max = Math.max(1, die + con);
@@ -1361,29 +1156,30 @@ function buildCreationFlowState() {
       : 0;
 
   if (currentBackground) {
-    const isGuidedBackground = ["Acolyte", "Soldier"].includes(currentBackground);
-    if (isGuidedBackground) {
-      if (!state.character.bgChoices || !state.character.bgChoices.abilityIncrement) {
-        backgroundStepMissing.push("distribuicao de atributos do background");
-      } else if (backgroundAbilityRequired > 0 && backgroundAbilityCount < backgroundAbilityRequired) {
-        backgroundStepMissing.push(`${backgroundAbilityRequired} atributos do background`);
-      }
+    if (!state.character.bgChoices || !state.character.bgChoices.abilityIncrement) {
+      backgroundStepMissing.push("distribuicao de atributos do background");
+    } else if (backgroundAbilityRequired > 0 && backgroundAbilityCount < backgroundAbilityRequired) {
+      backgroundStepMissing.push(`${backgroundAbilityRequired} atributos do background`);
+    }
 
-      if (!state.character.bgChoices?.equipmentChoice) {
-        backgroundStepMissing.push(`${currentBackground} Equipment`);
-      }
+    if (!state.character.bgChoices?.equipmentChoice) {
+      backgroundStepMissing.push(`${currentBackground} Equipment`);
+    }
 
-      const showsMagicInitiate = ["Acolyte"].includes(currentBackground) || state.api.source?.backgroundDetails?.[currentBackground]?.feature?.name?.toLowerCase().includes("magic initiate");
-      if (showsMagicInitiate && !state.character.bgChoices?.spellcastingAbility) {
-        backgroundStepMissing.push("Magic Initiate: habilidade de conjuracao");
-      }
+    const guidedBackgrounds = ["Acolyte", "Soldier"];
+    const isGuided = guidedBackgrounds.includes(currentBackground);
+    const showsMagicInitiate = isGuided && (["Acolyte"].includes(currentBackground) || state.api.source?.backgroundDetails?.[currentBackground.toLowerCase()]?.feature?.name?.toLowerCase().includes("magic initiate"));
+    if (showsMagicInitiate && !state.character.bgChoices?.spellcastingAbility) {
+      backgroundStepMissing.push("Magic Initiate: habilidade de conjuracao");
+    }
 
+    if (isGuided) {
       backgroundSpellSelections.forEach((selection) => {
         if (selection.selectedCantrips < selection.requiredCantrips) {
-          backgroundStepMissing.push(`${selection.name}: ${selection.requiredCantrips} cantrips`);
+          backgroundStepMissing.push(`Magic Initiate: ${selection.requiredCantrips - selection.selectedCantrips} cantrips`);
         }
         if (selection.selectedLevel1 < selection.requiredLevel1Spells) {
-          backgroundStepMissing.push(`${selection.name}: ${selection.requiredLevel1Spells} level 1 spell`);
+          backgroundStepMissing.push(`Magic Initiate: ${selection.requiredLevel1Spells - selection.selectedLevel1} magias de nivel 1`);
         }
       });
     }
@@ -1639,6 +1435,7 @@ els.form.querySelectorAll("[data-level-hp-gain]").forEach((input) => {
     state.builderVisible = false;
     state.levelUpMode = false;
     state.levelUpSnapshot = null;
+    normalizeCharacterState(); // Recalcular derived.maxHp agora com o novo level
     persist();
     render();
   });
@@ -1761,14 +1558,100 @@ function swapStandardArrayAbilities(from, to) {
   render();
 }
 
+function renderSummarySheetWrapper() {
+  return renderSummarySheet(state.character, state.derived);
+}
+
+function renderSkillsSheetWrapper() {
+  return renderSkillsSheet(state.character, state.derived);
+}
+
+function renderAttacksSheetWrapper() {
+  return renderAttacksSheet(
+    currentActionItems(),
+    state.actionFilter ?? "all",
+    availableSpellSlotsAtLevel,
+    state.selectedAction ?? "",
+    state.character.resources ?? {},
+    resourceRecoveryLabel
+  );
+}
+
+function renderInventorySheetWrapper() {
+  return renderInventorySheet(
+    state.character.inventory ?? [],
+    state.derived?.activeModifiers ?? deriveActiveModifiers(state.character),
+    state.derived?.encumbrance,
+    state.character.equippedItems ?? [],
+    isEquipableItem,
+    itemTags
+  );
+}
+
+function renderFeaturesSheetWrapper() {
+  const featureItems = currentFeatureItems().map((feature) => {
+    const resourceState = feature.resource ? state.character.resources?.[feature.resource.id] : null;
+    const max = Number(resourceState?.max ?? feature.resource?.max ?? 0);
+    const used = Number(resourceState?.used ?? 0);
+    const remaining = Math.max(0, max - used);
+
+    return {
+      id: feature.id,
+      kind: feature.kind,
+      name: feature.name,
+      meta: feature.meta,
+      description: feature.body,
+      resource: feature.resource ? {
+        id: feature.resource.id,
+        remaining,
+        max,
+        recoveryLabel: resourceRecoveryLabel(feature.resource.recovery),
+      } : undefined,
+    };
+  });
+
+  return renderFeaturesSheet(
+    featureItems,
+    state.featureFilter ?? "all",
+    state.selectedFeature ?? ""
+  );
+}
+
+function renderSpellsSheetWrapper() {
+  const globalSpellcasting = typedSpellcastingMetricsForAbility(typedSpellAbility(state.character, state.api), state.character, state.derived);
+  const backgroundAbility = typedBackgroundSpellAbility(state.character, state.api);
+  const backgroundAbilityMetrics = backgroundAbility ? typedSpellcastingMetricsForAbility(backgroundAbility, state.character, state.derived) : null;
+  const spells = knownSheetSpellNames();
+
+  return renderSpellsSheet(
+    [],
+    spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level)),
+    typedCasterLevel(state.character, state.api),
+    globalSpellcasting.attackBonus,
+    globalSpellcasting.saveDc,
+    state.selectedSpell ?? "",
+    [],
+    backgroundAbilityMetrics,
+    spellSlotsMaxByLevel(),
+    state.character.spellSlots ?? {},
+    availableSpellSlotsAtLevel,
+    spellFromKnownData,
+    spellLevelLabel,
+    ordinalLabel,
+    DECK_LABELS,
+    CLASS_DECKS,
+    state.character.class
+  );
+}
+
 function renderSheet() {
   const renderers = {
-    summary: renderSummarySheet,
-    skills: renderSkillsSheet,
-    attacks: renderAttacksSheet,
-    spells: renderSpellsSheet,
-    inventory: renderInventorySheet,
-    features: renderFeaturesSheet,
+    summary: renderSummarySheetWrapper,
+    skills: renderSkillsSheetWrapper,
+    attacks: renderAttacksSheetWrapper,
+    spells: renderSpellsSheetWrapper,
+    inventory: renderInventorySheetWrapper,
+    features: renderFeaturesSheetWrapper,
   };
   els.sheetView.innerHTML = renderers[state.tab]();
   bindSheetEvents();
@@ -1904,9 +1787,9 @@ function renderHpModal() {
     els.hpModal.innerHTML = "";
     return;
   }
-  const maxHp = maxHitPoints();
-  const currentHp = Number(state.character.hp) || 0;
-  const tempHp = Math.max(0, Number(state.character.tempHp) || 0);
+  const maxHp = state.derived?.maxHp ?? 0;
+  const currentHp = state.derived?.currentHp ?? 0;
+  const tempHp = state.derived?.tempHp ?? 0;
   const totalHp = currentHp + tempHp;
   els.hpModal.innerHTML = `
     <div class="hp-modal-panel">
@@ -1990,7 +1873,7 @@ function renderRestModal() {
   const className = state.character.class || "fighter";
   const hitDie = state.api.classes?.[className]?.hit_die || 8;
   const level = state.character.level || 1;
-  const conMod = mod("con");
+  const conMod = deriveProjectedAbilityModifier(state.character, "con");
   const hpPerDie = Math.max(1, Math.floor(hitDie / 2) + 1 + conMod);
   state.restModalHitDice ??= {};
 
@@ -2080,168 +1963,13 @@ function applyDamage(amount) {
   }
 }
 
-function renderSummarySheet() {
-  const c = state.character;
-  const maxHp = maxHitPoints();
-  const currentHp = Number(c.hp) || 0;
-  const tempHp = Math.max(0, Number(c.tempHp) || 0);
-  const totalHp = currentHp + tempHp;
-  const hitDiceAvailable = availableHitDice();
-  return `
-    <div class="pill-row">
-      <div class="cream-pill">${escapeHtml(c.name)}</div>
-      <div class="cream-pill">${titleCase(c.class)} ${c.level}</div>
-    </div>
-    <div class="hero-stats">
-      ${bigStat("Initiative", signed(mod("dex")))}
-      <button type="button" class="hp-orb" data-open-hp-modal aria-label="Controle de pontos de vida">
-        <span>HP</span>
-        <strong>${totalHp}<small>${currentHp}/${maxHp}</small></strong>
-        <em>${tempHp > 0 ? `+${tempHp} THP` : "0 THP"}</em>
-      </button>
-      ${bigStat("Speed", c.speed)}
-    </div>
-    <div class="small-grid">
-      ${smallStat("Hit Dice", `${hitDiceAvailable}/${c.level}d${hitDie()}`)}
-      ${smallStat("Armor Class", c.armorClass)}
-      ${smallStat("Proficiency", signed(proficiency()))}
-    </div>
-    <div class="rest-actions">
-      <button type="button" class="secondary-button" data-rest-type="short">Short Rest</button>
-      <button type="button" class="primary-button" data-rest-type="long">Long Rest</button>
-    </div>
-    <div class="abilities">
-      ${ABILITIES.map(([key, label]) => abilityCard(key, label)).join("")}
-    </div>
-  `;
-}
-
-function renderSkillsSheet() {
-  const grouped = ABILITIES.map(([key, label]) => [key, label, SKILLS.filter(([, ability]) => ability === key)]);
-  return `<div class="skill-columns">${grouped.map(([key, label, skills]) => `
-    <article class="skill-card">
-      <h3><span>${label}</span><span>${signed(mod(key))}</span></h3>
-      ${skills.map(([name]) => `<div class="skill-row"><span>${name}</span><strong>${signed(skillBonus(name))}</strong></div>`).join("")}
-    </article>
-  `).join("")}</div>`;
-}
-
-function renderAttacksSheet() {
-  const filter = state.actionFilter ?? "all";
-  const actions = currentActionItems();
-  const filtered = filter === "all" ? actions : actions.filter((action) => action.kind === filter);
-  const filters = [
-    ["all", "All"],
-    ["attack", "Attack"],
-    ["action", "Action"],
-    ["bonus", "Bonus Action"],
-    ["reaction", "Reaction"],
-    ["other", "Other"],
-    ["limited", "Limited Use"],
-  ];
-  return `
-    <div class="action-filter-row">
-      ${filters.map(([id, label]) => `<button type="button" class="action-filter ${filter === id ? "active" : ""}" data-action-filter="${id}">${label}</button>`).join("")}
-    </div>
-    ${filter === "all" ? renderActionSections(actions) : renderActionSection(actionFilterTitle(filter), filtered, filter)}
-  `;
-}
-
-function renderActionSections(actions) {
-  return ["attack", "action", "bonus", "reaction", "other", "limited"]
-    .map((kind) => renderActionSection(actionFilterTitle(kind), actions.filter((action) => action.kind === kind), kind))
-    .join("");
-}
-
-function renderActionSection(title, actions, kind) {
-  if (!actions.length) return "";
-  return `
-    <div class="actions-heading"><strong>${escapeHtml(title)}</strong>${kind === "attack" ? `<span>Attacks per Action: 1</span>` : ""}</div>
-    <div class="actions-table">
-      <div class="actions-table-head">
-        <span>Attack</span><span>Range</span><span>Hit / DC</span><span>Damage</span><span>Notes</span>
-      </div>
-      ${actions.map(renderActionRow).join("")}
-    </div>
-  `;
-}
-
-function renderActionRow(action) {
-  const open = state.selectedAction === action.id;
-  return `
-    <article class="action-entry">
-      <button type="button" class="action-row ${open ? "active" : ""} ${action.disabled ? "disabled" : ""}" data-action-id="${escapeHtml(action.id)}" aria-disabled="${action.disabled ? "true" : "false"}">
-        <span class="action-icon" aria-hidden="true">${escapeHtml(action.icon)}</span>
-        <span class="action-name">
-          <strong>${escapeHtml(action.name)}</strong>
-          <span>${escapeHtml(action.subtitle)}</span>
-        </span>
-        <span class="action-range"><strong>${escapeHtml(action.range)}</strong><span>${escapeHtml(action.rangeLabel)}</span></span>
-        <span class="action-hit">${escapeHtml(action.hit)}</span>
-        <span class="action-damage">${action.damage.map((damage) => `<span>${escapeHtml(damage)}</span>`).join("") || "--"}</span>
-        <span class="action-notes">${escapeHtml(action.notes)}</span>
-      </button>
-      ${open ? renderActionDetail(action) : ""}
-    </article>
-  `;
-}
-
-function renderActionDetail(action) {
-  return `
-    <div class="action-detail">
-      ${action.detail ? paragraphs(action.detail) : `<p>${escapeHtml(action.notes || "Sem detalhes adicionais.")}</p>`}
-      ${renderActionUse(action)}
-    </div>
-  `;
-}
-
-function renderActionUse(action) {
-  if (action.resource) return renderResourceUse(action.resource);
-  if (action.slotLevel) {
-    const remaining = availableSpellSlotsAtLevel(action.slotLevel);
-    return `
-      <div class="resource-use">
-        <button type="button" class="cast-button" data-use-action="${escapeHtml(action.id)}" ${remaining ? "" : "disabled"}>Cast</button>
-        <span>${remaining} slot(s) de nivel ${action.slotLevel} disponivel</span>
-      </div>
-    `;
-  }
-  return "";
-}
-
-function renderResourceUse(resourceId) {
-  const resource = state.character.resources?.[resourceId];
-  if (!resource) return "";
-  const remaining = Math.max(0, resource.max - resource.used);
-  const recovery = resourceRecoveryLabel(resource.recovery);
-  return `
-    <div class="resource-use">
-      <button type="button" class="cast-button" data-use-resource="${escapeHtml(resourceId)}" ${remaining ? "" : "disabled"}>Use</button>
-      <span>${remaining}/${resource.max} disponivel - recupera em ${recovery.replace(" Resource", "")}</span>
-    </div>
-  `;
-}
-
-function actionFilterTitle(filter) {
-  const labels = {
-    all: "Actions",
-    attack: "Actions",
-    action: "Actions",
-    bonus: "Bonus Actions",
-    reaction: "Reactions",
-    other: "Other",
-    limited: "Limited Use",
-  };
-  return labels[filter] ?? "Actions";
-}
-
 function currentActionItems() {
   return deriveAvailableActions(actionEngineContext());
 }
 
 function actionEngineContext() {
   return {
-    character: { ...state.character, spells: currentKnownSpellNames() },
+    character: { ...state.character, spells: knownSheetSpellNames() },
     projection: state.derived,
     resourceDefinitions: currentResourceDefinitions(),
     spellDetails: state.api.source?.spellDetails ?? {},
@@ -2257,209 +1985,8 @@ function actionEngineContext() {
   };
 }
 
-function currentAttackActions() {
-  const attackAbility = state.character.class === "monk" || state.character.class === "rogue" ? "dex" : "str";
-  return (state.character.attacks ?? []).map((attack, index) => {
-    const item = (state.character.inventory ?? []).find((entry) => entry.id === attack.itemId);
-    return {
-      id: `attack:${index}:${slugifyName(attack.name)}`,
-      kind: "attack",
-      icon: "⚔",
-      name: attack.name,
-      subtitle: item ? itemTypeLabel(item) : "Weapon / Attack",
-      range: compactRange(attack.range),
-      rangeLabel: rangeLabel(attack.range),
-      hit: signed(proficiency() + mod(attackAbility)),
-      damage: [`${attack.damage}${signed(mod(attackAbility))}`],
-      notes: item ? itemTags(item).join(", ") : attack.type,
-      detail: item ? entriesToText(item.entries) : "",
-    };
-  });
-}
-
-function currentSpellActions() {
-  return currentKnownSpellNames()
-    .map((name) => state.api.source?.spellDetails?.[name.toLowerCase()] ?? state.api.spellDetails?.[name] ?? null)
-    .filter(Boolean)
-    .filter((spell) => spellActionVisible(spell))
-    .map((spell) => {
-      const kind = actionKindForSpell(spell);
-      return {
-        id: `spell-action:${slugifyName(spell.name)}`,
-        kind,
-        icon: "✦",
-        name: spell.name,
-        subtitle: spell.level === 0 ? "Cantrip" : `Magia nivel ${spell.level}`,
-        range: compactRange(spell.range),
-        rangeLabel: spell.range === "Self" ? "Self" : "Range",
-        hit: spellHitOrDc(spell),
-      damage: spellDamageChips(spell.description),
-      notes: spell.components || spell.levelLine || "Magic",
-      detail: spell.description,
-      };
-    });
-}
-
-function rulesActionItems() {
-  return [
-    {
-      id: "rule:attack",
-      kind: "action",
-      icon: "A",
-      name: "Attack",
-      subtitle: "Combat Action",
-      range: "--",
-      rangeLabel: "Varies",
-      hit: "--",
-      damage: [],
-      notes: "Make one attack with a weapon or an Unarmed Strike.",
-      detail: "When you take the Attack action, you can make one attack roll with a weapon or an Unarmed Strike.",
-    },
-    {
-      id: "rule:dash",
-      kind: "action",
-      icon: "A",
-      name: "Dash",
-      subtitle: "Combat Action",
-      range: "Self",
-      rangeLabel: "Move",
-      hit: "--",
-      damage: [],
-      notes: "Gain extra movement for the current turn.",
-      detail: "When you take the Dash action, you gain extra movement for the current turn. The increase equals your Speed after applying any modifiers.",
-    },
-    {
-      id: "rule:dodge",
-      kind: "action",
-      icon: "A",
-      name: "Dodge",
-      subtitle: "Combat Action",
-      range: "Self",
-      rangeLabel: "Defense",
-      hit: "--",
-      damage: [],
-      notes: "Attacks against you have Disadvantage.",
-      detail: "Until the start of your next turn, any attack roll made against you has Disadvantage if you can see the attacker, and you make Dexterity saving throws with Advantage.",
-    },
-    {
-      id: "rule:two-weapon",
-      kind: "bonus",
-      icon: "BA",
-      name: "Two-Weapon Fighting",
-      subtitle: "Bonus Action",
-      range: "Melee",
-      rangeLabel: "Weapon",
-      hit: "--",
-      damage: [],
-      notes: "Extra attack with eligible Light weapons.",
-      detail: "When you make the extra attack of the Light property, you don't add your ability modifier to the extra attack's damage unless that modifier is negative.",
-    },
-    {
-      id: "rule:opportunity",
-      kind: "reaction",
-      icon: "R",
-      name: "Opportunity Attack",
-      subtitle: "Reaction",
-      range: "Reach",
-      rangeLabel: "Melee",
-      hit: "--",
-      damage: [],
-      notes: "A creature leaves your reach.",
-      detail: "You can make an Opportunity Attack when a creature that you can see leaves your reach using its action, Bonus Action, Reaction, or movement.",
-    },
-    {
-      id: "rule:interact",
-      kind: "other",
-      icon: "O",
-      name: "Interact with an Object",
-      subtitle: "Other",
-      range: "Touch",
-      rangeLabel: "Object",
-      hit: "--",
-      damage: [],
-      notes: "Interact with one object or feature.",
-      detail: "You normally interact with one object or feature of the environment for free, during either your move or your action.",
-    },
-  ];
-}
-
-function featureActionItems() {
-  const items = [];
-  currentResourceDefinitions().forEach((resourceDef) => {
-    const resource = state.character.resources?.[resourceDef.id];
-    const remaining = resource ? Math.max(0, resource.max - resource.used) : 0;
-    const subtitle = resourceDef.kind === "species" ? resourceDef.sourceLabel : `${resourceDef.className} Feature`;
-    if (resourceDef.actionKind) {
-      items.push({
-        id: `feature:${resourceDef.id}`,
-        kind: resourceDef.actionKind,
-        icon: actionIconForKind(resourceDef.actionKind),
-        name: resourceDef.name,
-        subtitle,
-        range: "Self",
-        rangeLabel: "Resource",
-        hit: "--",
-        damage: [],
-        notes: `${remaining}/${resource?.max ?? 0} uses`,
-        detail: resourceDef.body,
-        resource: resourceDef.id,
-      });
-    }
-    items.push({
-      id: `limited:${resourceDef.id}`,
-      kind: "limited",
-      icon: "LU",
-      name: `${resourceDef.name} Uses`,
-      subtitle: resourceRecoveryLabel(resourceDef.recovery),
-      range: "Self",
-      rangeLabel: "Resource",
-      hit: "--",
-      damage: [],
-      notes: `${remaining}/${resource?.max ?? 0} disponivel`,
-      detail: resourceDef.body,
-      resource: resourceDef.id,
-    });
-  });
-  return items;
-}
-
-function spellActionVisible(spell) {
-  const kind = actionKindForSpell(spell);
-  if (kind === "bonus" || kind === "reaction") return true;
-  const damage = spellDamageChips(spell.description);
-  const hit = spellHitOrDc(spell);
-  if (kind === "attack") return damage.length || hit !== "--";
-  return spell.level > 0 || (spell.level === 0 && kind === "action");
-}
-
-function actionKindForSpell(spell) {
-  const text = String(spell.castingTime).toLowerCase();
-  if (text.includes("bonus")) return "bonus";
-  if (text.includes("reaction")) return "reaction";
-  if (spellDamageChips(spell.description).length || spellHitOrDc(spell) !== "--") return "attack";
-  if (/ritual/i.test(`${spell.name} ${spell.description}`)) return "other";
-  return actionKindFromCastingTime(spell.castingTime);
-}
-
-function actionKindFromCastingTime(castingTime = "") {
-  const text = String(castingTime).toLowerCase();
-  if (text.includes("bonus")) return "bonus";
-  if (text.includes("reaction")) return "reaction";
-  if (text.includes("action")) return "action";
-  return "other";
-}
-
-function spellHitOrDc(spell) {
-  const description = String(spell.description ?? "").toLowerCase();
-  const metrics = spellcastingMetricsForAbility(spellAbilityForSpell(spell));
-  if (description.includes("saving throw")) return String(metrics.saveDc);
-  if (description.includes("spell attack")) return signed(metrics.attackBonus);
-  return "--";
-}
-
-function spellDamageChips(description = "") {
-  const matches = [...String(description).matchAll(/\b\d+d\d+(?:\s*[+-]\s*\d+)?\b/gi)].map((match) => match[0].replace(/\s+/g, ""));
-  return [...new Set(matches)].slice(0, 2);
+function knownSheetSpellNames() {
+  return typedCurrentKnownSpellNames(state.character, state.api, currentFeatureItems());
 }
 
 function compactRange(range = "") {
@@ -2496,303 +2023,12 @@ function autoGrantedSpellNameSet() {
   return new Set(autoGrantedSpellEntries().map((spell) => spell.name));
 }
 
-function renderSpellsSheet() {
-  const autoSpells = autoGrantedSpellEntries();
-  const autoLeveledSpells = autoSpells.filter((spell) => spell.level > 0);
-  const autoCantrips = autoGrantedCantripNames();
-  const backgroundSpells = backgroundSelectedSpellNames();
-  const globalSpellcasting = spellcastingMetricsForAbility(spellAbility());
-  const spells = currentKnownSpellNames();
-  const selected = state.selectedSpell && spells.includes(state.selectedSpell) ? state.selectedSpell : "";
-  const knownSpells = spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level));
-  return `
-    <div class="metric-row">
-      ${smallStat("C Level", casterLevel())}
-      ${smallStat("Spell Attack", signed(globalSpellcasting.attackBonus))}
-      ${smallStat("Spell DC", globalSpellcasting.saveDc)}
-    </div>
-    ${autoLeveledSpells.length ? renderAutoGrantedSpells(autoLeveledSpells) : ""}
-    ${renderSpellSheetGroups(knownSpells, selected)}
-    ${backgroundSpells.length ? renderBackgroundSpellSource(backgroundSpells) : ""}
-    ${spells.length || autoLeveledSpells.length ? "" : `<div class="empty-state">Nenhuma magia selecionada para esta ficha.</div>`}
-  `;
-}
-
-function currentKnownSpellNames() {
-  return [...new Set([
-    ...(state.character.spells ?? []),
-    ...backgroundSelectedSpellNames(),
-    ...autoGrantedCantripNames(),
-  ])];
-}
-
-function renderBackgroundSpellSource(spells) {
-  const backgroundAbility = backgroundSpellAbility();
-  const metrics = backgroundAbility ? spellcastingMetricsForAbility(backgroundAbility) : null;
-  return `
-    <section class="feature-section">
-      <h3>Magias de background</h3>
-      <div class="auto-spell-list">
-        ${spells.map((name) => {
-          const detail = spellFromKnownData(name);
-          return `
-            <article class="auto-spell-card">
-              <strong>${escapeHtml(name)}</strong>
-              <span>${escapeHtml(detail?.level === 0 ? "Cantrip" : `${ordinalLabel(detail?.level ?? 1)}-level spell`)}</span>
-              ${metrics ? `<span>Spell Attack ${signed(metrics.attackBonus)} • Spell DC ${metrics.saveDc}</span>` : ""}
-              <em>Magic Initiate</em>
-            </article>
-          `;
-        }).join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderAutoGrantedSpells(spells) {
-  return `
-    <section class="feature-section">
-      <h3>Magias automáticas</h3>
-      <div class="auto-spell-list">
-        ${spells.map((spell) => {
-          const detail = spellFromKnownData(spell.name) ?? spell;
-          return `
-            <article class="auto-spell-card">
-              <strong>${escapeHtml(detail.name)}</strong>
-              <span>${escapeHtml(detail.level === 0 ? "Cantrip" : `${ordinalLabel(detail.level)}-level spell`)}</span>
-              <em>${escapeHtml(spell.origin)}</em>
-            </article>
-          `;
-        }).join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderSpellSheetGroups(spells, selected) {
-  const cantrips = spells.filter((spell) => spell.level === 0).sort((a, b) => a.name.localeCompare(b.name));
-  const leveled = spells.filter((spell) => spell.level > 0).sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
-  const slotLevels = Object.keys(spellSlotsMaxByLevel()).map(Number).sort((a, b) => a - b);
-  const fallbackLevels = [...new Set(leveled.map((spell) => spell.level))].sort((a, b) => a - b);
-  return [
-    cantrips.length ? renderSpellSheetGroup(0, cantrips, selected) : "",
-    ...(slotLevels.length ? slotLevels : fallbackLevels).map((slotLevel) =>
-      renderSpellSheetGroup(slotLevel, leveled.filter((spell) => spell.level <= slotLevel), selected)
-    ),
-  ].join("");
-}
-
-function renderSpellSheetGroup(level, spells, selected) {
-  if (!spells.length) return "";
-  return `
-    <section class="spell-sheet-group">
-      <div class="spell-strip">
-        <span>${spellLevelLabel(level)}</span>
-        ${level > 0 ? renderSpellSlotTrack(level) : ""}
-      </div>
-      ${spells.map((spell) => renderSpellSheetRow(spell, selected, level)).join("")}
-    </section>
-  `;
-}
-
-function renderSpellSheetRow(spell, selected, slotLevel = spell.level) {
-  const isSelected = spell.name === selected;
-  const canCast = spell.level > 0 && availableSpellSlotsAtLevel(slotLevel) > 0;
-  const badge = spell.level > 0 && spell.level !== slotLevel ? `<span class="spell-level-badge">${ordinalLabel(spell.level)}</span>` : "";
-  return `
-    <div class="spell-row">
-      ${spell.level > 0 ? `<button type="button" class="cast-button" data-cast-spell-level="${slotLevel}" ${canCast ? "" : "disabled"}>${badge}Cast</button>` : `<span class="spell-at-will">At Will</span>`}
-      <button type="button" class="purple-strip spell-button ${isSelected ? "active" : ""}" data-spell-name="${escapeHtml(spell.name)}">${escapeHtml(spell.name)}</button>
-    </div>
-    ${isSelected ? renderSpellCard(spell.name) : ""}
-  `;
-}
-
-function renderSpellSlotTrack(level) {
-  const slot = state.character.spellSlots?.[level] ?? { max: spellSlotsMaxByLevel()[level] ?? 0, used: 0 };
-  if (!slot.max) return "";
-  return `
-    <span class="spell-slots" aria-label="Slots nivel ${level}">
-      ${Array.from({ length: slot.max }, (_, index) => `<span class="slot-box ${index < slot.used ? "used" : ""}"></span>`).join("")}
-      <strong>Slots</strong>
-    </span>
-  `;
-}
-
-function renderInventorySheet() {
-  const inventory = state.character.inventory ?? [];
-  const activeModifiers = state.derived?.activeModifiers ?? deriveActiveModifiers(state.character);
-  const encumbrance = state.derived?.encumbrance;
-  const weight = inventory.reduce((total, item) => total + (Number(item.weight) || 0) * (Number(item.quantity) || 1), 0);
-  const gold = inventory.filter((item) => item.kind === "currency").reduce((total, item) => total + (Number(item.gp) || 0), 0);
-  return `
-    <div class="inventory-head">
-      <div>
-        <strong>Weight Carried: ${weight.toFixed(1)} lb.${encumbrance ? ` / ${encumbrance.carryingCapacity} lb.` : ""}</strong>
-        <span>${encumbrance?.encumbered ? "Encumbered" : "Inventory pessoal"}</span>
-      </div>
-      <strong>${gold} GP</strong>
-    </div>
-    ${renderActiveModifierSummary(activeModifiers)}
-    <div class="inventory-list">
-      ${inventory.length ? inventory.map(renderInventoryRow).join("") : `<div class="empty-state">Escolha o equipamento inicial na etapa Escolhas.</div>`}
-    </div>
-  `;
-}
-
-function renderActiveModifierSummary(modifiers) {
-  if (!modifiers.length) return "";
-  return `
-    <div class="inventory-modifiers">
-      <strong>Modificadores ativos</strong>
-      ${modifiers.map((modifier) => `
-        <span>${escapeHtml(modifier.sourceName ?? modifier.sourceId ?? "Fonte")}: ${escapeHtml(modifier.target)} ${signed(Number(modifier.value) || 0)}</span>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderInventoryRow(item) {
-  const equipped = state.character.equippedItems?.includes(item.id);
-  const equipable = isEquipableItem(item);
-  return `
-    <div class="inventory-row">
-      <button type="button" class="equip-box ${equipped ? "equipped" : ""}" data-toggle-equip="${item.id}" ${equipable ? "" : "disabled"} aria-label="Equipar ${escapeHtml(item.name)}"></button>
-      <div>
-        <strong>${escapeHtml(item.name)}${item.quantity > 1 ? ` x${item.quantity}` : ""}</strong>
-        <span>${escapeHtml(item.typeLabel ?? item.kind ?? "Item")}</span>
-      </div>
-      <span>${item.weight ? `${item.weight} lb.` : "--"}</span>
-      <span>${item.valueGp ? `${item.valueGp} GP` : "--"}</span>
-      <em>${escapeHtml(itemTags(item).join(", "))}</em>
-    </div>
-  `;
-}
-
-function renderSpellCard(spellName) {
-  const detail = state.api.spellDetails[spellName];
-  const deck = spellDeck();
-  if (!detail) {
-    return `<article class="spell-card deck-${deck}"><div class="spell-card-title">${escapeHtml(spellName)}</div><div class="spell-card-body">Carregando descricao...</div></article>`;
-  }
-
-  return `
-    <article class="spell-card deck-${deck}">
-      <button type="button" class="spell-close" data-close-spell aria-label="Fechar descricao">x</button>
-      <div class="spell-card-title">${escapeHtml(detail.name)}</div>
-      <div class="spell-card-subtitle">${escapeHtml(detail.levelLine)}</div>
-      <div class="spell-facts">
-        ${spellFact("Casting Time", detail.castingTime)}
-        ${spellFact("Range", detail.range)}
-        ${spellFact("Components", detail.components)}
-        ${spellFact("Duration", detail.duration)}
-      </div>
-      ${detail.material ? `<div class="spell-material"><strong>Material:</strong> ${escapeHtml(detail.material)}</div>` : ""}
-      <div class="spell-card-body">${paragraphs(detail.description)}</div>
-      ${detail.higherLevel ? `
-        <div class="spell-higher-label">At Higher Levels</div>
-        <div class="spell-card-body higher">${paragraphs(detail.higherLevel)}</div>
-      ` : ""}
-      <div class="spell-footer"><strong>${escapeHtml(deckLabel(deck))}</strong><span>D&D</span></div>
-    </article>
-  `;
-}
-
-function spellFact(label, value) {
-  return `<div><strong>${label}</strong><span>${escapeHtml(value || "-")}</span></div>`;
-}
-
-function renderFeaturesSheet() {
-  const items = currentFeatureItems();
-  const filter = state.featureFilter ?? "all";
-  const filtered = filter === "all" ? items : items.filter((item) => item.kind === filter);
-  const filters = [
-    ["all", "All"],
-    ["class", "Class Features"],
-    ["species", "Species Traits"],
-    ["feat", "Feats"],
-  ];
-  return `
-    <div class="feature-filter-row">
-      ${filters.map(([id, label]) => `<button type="button" class="feature-filter ${filter === id ? "active" : ""}" data-feature-filter="${id}">${label}</button>`).join("")}
-    </div>
-    <div class="feature-section-list">
-      ${renderFeatureSection("Class Features", filtered.filter((item) => item.kind === "class"))}
-      ${renderFeatureSection("Species Traits", filtered.filter((item) => item.kind === "species"))}
-      ${renderFeatureSection("Feats", filtered.filter((item) => item.kind === "feat"))}
-    </div>
-    ${filtered.length ? "" : `<div class="empty-state">Nenhuma feature nesta categoria.</div>`}
-  `;
-}
-
-function renderFeatureSection(title, items) {
-  if (!items.length) return "";
-  return `
-    <section class="feature-section">
-      <h3>${title}</h3>
-      <div class="feature-button-list">
-        ${items.map((item) => `
-          <button type="button" class="feature-button ${state.selectedFeature === item.id ? "active" : ""}" data-feature-id="${item.id}">
-            <strong>${escapeHtml(item.name)}</strong>
-            <span>${escapeHtml(item.meta)}</span>
-          </button>
-          ${state.selectedFeature === item.id ? renderFeatureDetail(item) : ""}
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderFeatureDetail(item) {
-  const choiceLines = featureChoiceSummary(item);
-  const resource = resourceDefinitionForFeatureName(item.name);
-  return `
-    <article class="feature-detail-card">
-      <button type="button" class="spell-close" data-close-feature aria-label="Fechar detalhe">x</button>
-      <h3>${escapeHtml(item.name)}</h3>
-      <p>${escapeHtml(item.meta)}</p>
-      ${choiceLines.length ? `<div class="feature-choice-summary">${choiceLines.map((line) => `<strong>${escapeHtml(line)}</strong>`).join("")}</div>` : ""}
-      ${resource ? renderResourceUse(resource.id) : ""}
-      <div>${paragraphs(item.body || "Detalhe indisponivel nos dados 5etools 2024.")}</div>
-    </article>
-  `;
-}
-
-function featureChoiceSummary(item) {
-  const summaries = [];
-  const featureSlug = item.id.split(":")[1];
-  const matchingRule = classCreationChoiceRules().find((rule) => slugifyName(rule.name) === featureSlug || rule.id === featureSlug);
-  const selected = matchingRule ? state.character.classFeatureChoices?.[matchingRule.id] : "";
-  if (matchingRule && selected) {
-    const option = matchingRule.options?.find((entry) => entry.value === selected);
-    if (option) summaries.push(`Escolha: ${option.label}`);
-  }
-  if (item.kind === "species" && /lineage|ancestry|legacy/i.test(item.name) && state.character.subrace) {
-    summaries.push(`Escolha: ${state.character.subrace}`);
-  }
-  return summaries;
-}
-
 function bigStat(label, value) {
   return `<div class="stat-card"><span>${label}</span><strong>${value}</strong></div>`;
 }
 
 function smallStat(label, value) {
   return `<div class="small-card"><span>${label}</span><strong>${value}</strong></div>`;
-}
-
-function abilityCard(key, label) {
-  const save = saveBonus(key);
-  return `
-    <article class="ability-card">
-      <h3>${label}</h3>
-      <div class="ability-values">
-        <div><span>Score</span><strong>${abilityScore(key)}</strong></div>
-        <div><span>Modifier</span><strong>${signed(mod(key))}</strong></div>
-        <div><span>Save</span><strong>${signed(save)}</strong></div>
-      </div>
-    </article>
-  `;
 }
 
 function getLevelPlan() {
@@ -2824,209 +2060,28 @@ function currentFeatureItems() {
   return deriveActiveFeatures(state.character, state.api, classCreationChoiceRules());
 }
 
-function currentClassFeatureData() {
-  const unselectedOptionNames = new Set(classCreationChoiceRules().filter((rule) => Array.isArray(rule.options)).flatMap((rule) =>
-    rule.options
-      .filter((option) => state.character.classFeatureChoices?.[rule.id] !== option.value)
-      .map((option) => option.label)
-  ));
-  return (state.api.source?.classFeatures ?? [])
-    .filter((feature) => slugifyName(feature.className) === state.character.class && Number(feature.level) <= state.character.level)
-    .filter((feature) => !unselectedOptionNames.has(feature.name));
-}
-
-const RESOURCE_META = [
-  { id: "rage", name: "Rage", tableLabels: ["Rages"], match: /^rage(?:$|[:(])/i },
-  { id: "wildShape", name: "Wild Shape", tableLabels: ["Wild Shape"], match: /^wild shape(?:$|[:(])/i },
-  { id: "channelDivinity", name: "Channel Divinity", tableLabels: ["Channel Divinity"], match: /^channel divinity(?:$|[:(])/i },
-  { id: "secondWind", name: "Second Wind", tableLabels: ["Second Wind"], match: /^second wind(?:$|[:(])/i },
-  { id: "actionSurge", name: "Action Surge", tableLabels: ["Action Surge"], match: /^action surge(?:$|[:(])/i },
-  { id: "bardicInspiration", name: "Bardic Inspiration", tableLabels: [], match: /^bardic inspiration(?:$|[:(])/i },
-  { id: "flashOfGenius", name: "Flash of Genius", tableLabels: [], match: /^flash of genius(?:$|[:(])/i },
-  { id: "healingHands", name: "Healing Hands", tableLabels: [], match: /^healing hands(?:$|[:(])/i },
-  { id: "radiantSoul", name: "Radiant Soul", tableLabels: [], match: /^radiant soul(?:$|[:(])/i },
-  { id: "necroticShroud", name: "Necrotic Shroud", tableLabels: [], match: /^necrotic shroud(?:$|[:(])/i },
-  { id: "furyOfTheSmall", name: "Fury of the Small", tableLabels: [], match: /^fury of the small(?:$|[:(])/i },
-  { id: "relentlessEndurance", name: "Relentless Endurance", tableLabels: [], match: /^relentless endurance(?:$|[:(])/i },
-  { id: "stonesEndurance", name: "Stone's Endurance", tableLabels: [], match: /^stone'?s endurance(?:$|[:(])/i },
-  { id: "feyStep", name: "Fey Step", tableLabels: [], match: /^fey step(?:$|[:(])/i },
-  { id: "infernalLegacy", name: "Infernal Legacy", tableLabels: [], match: /^infernal legacy(?:$|[:(])/i },
-];
-
-function currentClassResourceDefinitions() {
-  const byId = new Map();
-  currentClassFeatureData().forEach((feature) => {
-    const resource = resourceDefinitionFromFeature(feature);
-    if (!resource) return;
-    const existing = byId.get(resource.id);
-    byId.set(resource.id, existing ? mergeResourceDefinitions(existing, resource) : resource);
-  });
-  return [...byId.values()].sort((a, b) => (Number(a.level) - Number(b.level)) || a.name.localeCompare(b.name));
-}
-
-function currentSpeciesResourceDefinitions() {
-  const byId = new Map();
-  currentSpeciesTraitItems().forEach((trait) => {
-    const resource = resourceDefinitionFromTraitItem(trait);
-    if (!resource) return;
-    const existing = byId.get(resource.id);
-    byId.set(resource.id, existing ? mergeResourceDefinitions(existing, resource) : resource);
-  });
-  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
-}
-
 function currentResourceDefinitions() {
-  return [...currentClassResourceDefinitions(), ...currentSpeciesResourceDefinitions()];
-}
-
-function resourceDefinitionForFeatureName(name) {
-  const normalizedName = clean5etoolsText(name).toLowerCase();
-  return currentResourceDefinitions().find((definition) => definition.name.toLowerCase() === normalizedName) ?? null;
-}
-
-function resourceDefinitionFromFeature(feature) {
-  const meta = resourceMetaFromFeatureName(feature.name);
-  if (!meta) return null;
-  const body = String(feature.body ?? "");
-  const recovery = resourceRecoveryFromBody(body);
-  const actionKind = resourceActionKindFromBody(body);
-  const max = resourceMaxFromBody(body, feature.name, meta, Number(feature.level) || 1);
-  if ((!max || !Number.isFinite(max) || max <= 0) && !Object.keys(recovery).length && !actionKind) return null;
-  return {
-    id: meta.id,
-    name: meta.name,
-    className: state.api.classes[state.character.class]?.name ?? titleCase(state.character.class),
-    feature,
-    body,
-    level: Number(feature.level) || 1,
-    max: max || 0,
-    recovery,
-    actionKind,
-    isCanonical: meta.isCanonical,
-  };
-}
-
-function resourceDefinitionFromTraitItem(trait) {
-  const meta = resourceMetaFromFeatureName(trait.name);
-  const body = String(trait.body ?? "");
-  const recovery = resourceRecoveryFromBody(body);
-  const actionKind = resourceActionKindFromBody(body);
-  const max = resourceMaxFromBody(body, trait.name, meta, 1);
-  if ((!max || !Number.isFinite(max) || max <= 0) && !Object.keys(recovery).length && !actionKind) return null;
-  return {
-    id: trait.id,
-    name: meta?.name ?? trait.name,
-    kind: "species",
-    sourceLabel: trait.meta,
-    body,
-    level: 1,
-    max: max || 0,
-    recovery,
-    actionKind,
-    isCanonical: Boolean(meta?.isCanonical),
-  };
-}
-
-function mergeResourceDefinitions(existing, incoming) {
-  const next = { ...existing, recovery: { ...(existing.recovery ?? {}) } };
-  if (!next.feature && incoming.feature) next.feature = incoming.feature;
-  if (!next.body && incoming.body) next.body = incoming.body;
-  if (!next.sourceLabel && incoming.sourceLabel) next.sourceLabel = incoming.sourceLabel;
-  if (incoming.max && (!next.max || incoming.max > next.max)) next.max = incoming.max;
-  if (!next.actionKind && incoming.actionKind) next.actionKind = incoming.actionKind;
-  if (incoming.recovery?.short && !next.recovery.short) next.recovery.short = incoming.recovery.short;
-  if (incoming.recovery?.long && !next.recovery.long) next.recovery.long = incoming.recovery.long;
-  if (incoming.isCanonical) next.isCanonical = true;
-  return next;
-}
-
-function resourceMetaFromFeatureName(name) {
-  const cleanName = clean5etoolsText(name);
-  const meta = RESOURCE_META.find((entry) => entry.match.test(cleanName));
-  if (!meta) return null;
-  return {
-    ...meta,
-    isCanonical: cleanName.toLowerCase() === meta.name.toLowerCase(),
-  };
-}
-
-function resourceMaxFromBody(body, name = "", meta = null, level = 1) {
-  const text = String(body ?? "");
-  const tableValue = meta ? classTableResourceValue(meta.tableLabels, Number(level) || 1) : 0;
-  if (Number.isFinite(tableValue) && tableValue > 0) return tableValue;
-  if (/\bonce (?:you )?use this (?:trait|feature|ability)\b/i.test(text)) return 1;
-  if (/can't use (?:it|this (?:trait|feature|ability|spell(?: again)?|trait again|ability again)|that spell) again until you finish a short or long rest/i.test(text)) return 1;
-  if (/can't use (?:it|this (?:trait|feature|ability|spell(?: again)?|trait again|ability again)|that spell) again until you finish a (?:short|long) rest/i.test(text)) return 1;
-  if (/once per (?:short|long) rest/i.test(text)) return 1;
-  if (/regain the ability to do so when you finish a (?:short|long) rest/i.test(text)) return 1;
-  if (/regain the ability to cast it when you finish a long rest/i.test(text)) return 1;
-  const modifierMatch = text.match(/number of times equal to your ([A-Za-z]+) modifier/i);
-  if (modifierMatch) return Math.max(1, abilityModifierFromLabel(modifierMatch[1]));
-  const proficiencyMatch = text.match(/(?:number of times|a number of times|uses) equal to your proficiency bonus/i);
-  if (proficiencyMatch) return Math.max(1, proficiency());
-  const fixedMatch = text.match(/\b(once|twice|thrice)\b/i);
-  if (fixedMatch) {
-    const fixed = { once: 1, twice: 2, thrice: 3 }[fixedMatch[1].toLowerCase()];
-    if (fixed) return fixed;
-  }
-  const numericMatch = text.match(/(?:you can use this feature|you can use this class's [^]+?|you can enter your rage|you can confer a bardic inspiration die)[^.\n]*?(\d+)\b/i);
-  if (numericMatch) return Number(numericMatch[1]) || 0;
-  return 0;
-}
-
-function resourceMaxFromFeature(feature, meta) {
-  return resourceMaxFromBody(String(feature.body ?? ""), feature.name, meta, Number(feature.level) || 1);
-}
-
-function classTableResourceValue(labels, level) {
-  const classData = state.api.classes[state.character.class];
-  if (!classData) return 0;
-  const rowIndex = Math.max(0, Number(level) - 1);
-  for (const group of classData.classTableGroups ?? []) {
-    const colIndex = (group.colLabels ?? []).findIndex((label) => labels.some((needle) => clean5etoolsText(label).toLowerCase() === clean5etoolsText(needle).toLowerCase()));
-    if (colIndex === -1) continue;
-    const cell = group.rows?.[rowIndex]?.[colIndex];
-    const numeric = parseTableCellValue(cell);
-    if (numeric) return numeric;
-  }
-  return 0;
-}
-
-function parseTableCellValue(cell) {
-  if (cell == null) return 0;
-  if (typeof cell === "number") return cell;
-  if (typeof cell === "string") {
-    const cleaned = clean5etoolsText(cell);
-    if (!cleaned || cleaned === "—" || /^unlimited$/i.test(cleaned)) return 0;
-    const numeric = Number(cleaned.replace(/[^\d.-]/g, ""));
-    return Number.isFinite(numeric) ? numeric : 0;
-  }
-  if (typeof cell === "object") {
-    if (typeof cell.value === "number") return cell.value;
-    if (typeof cell.value === "string") return parseTableCellValue(cell.value);
-    if (typeof cell.max === "number") return cell.max;
-  }
-  return 0;
-}
-
-function abilityModifierFromLabel(label) {
-  const normalized = String(label ?? "").toLowerCase();
-  const abilityMap = {
-    charisma: "cha",
-    constitution: "con",
-    dexterity: "dex",
-    intelligence: "int",
-    strength: "str",
-    wisdom: "wis",
-    cha: "cha",
-    con: "con",
-    dex: "dex",
-    int: "int",
-    str: "str",
-    wis: "wis",
-  };
-  const key = abilityMap[normalized];
-  return key ? Math.max(1, mod(key)) : proficiency();
+  const byId = new Map();
+  currentFeatureItems()
+    .map((feature) => feature.resource)
+    .filter(Boolean)
+    .forEach((resource) => {
+      const existing = byId.get(resource.id);
+      if (!existing) {
+        byId.set(resource.id, resource);
+        return;
+      }
+      byId.set(resource.id, {
+        ...existing,
+        recovery: { ...(existing.recovery ?? {}), ...(resource.recovery ?? {}) },
+        max: Math.max(Number(existing.max) || 0, Number(resource.max) || 0),
+        actionKind: existing.actionKind || resource.actionKind,
+        body: existing.body || resource.body,
+        sourceLabel: existing.sourceLabel || resource.sourceLabel,
+        isCanonical: Boolean(existing.isCanonical || resource.isCanonical),
+      });
+    });
+  return [...byId.values()].sort((a, b) => (Number(a.level) - Number(b.level)) || a.name.localeCompare(b.name));
 }
 
 function resourceRecoveryFromBody(body) {
@@ -3159,8 +2214,8 @@ function dependentClassChoiceRules() {
       level: 1,
       summary: "Escolha Arcana ou Nature para receber bonus igual ao modificador de Wisdom, minimo +1.",
       options: [
-        { value: "arcana", label: "Arcana", hint: `Bonus atual: ${signed(Math.max(1, mod("wis")))}` },
-        { value: "nature", label: "Nature", hint: `Bonus atual: ${signed(Math.max(1, mod("wis")))}` },
+        { value: "arcana", label: "Arcana", hint: `Bonus atual: ${signed(Math.max(1, deriveProjectedAbilityModifier(state.character, "wis")))}` },
+        { value: "nature", label: "Nature", hint: `Bonus atual: ${signed(Math.max(1, deriveProjectedAbilityModifier(state.character, "wis")))}` },
       ],
     }];
   }
@@ -3235,7 +2290,7 @@ function isAsiChoiceComplete(rule) {
   if (!state.character.asiChoices?.[rule.id]) return false;
   const choice = normalizedAsiChoice(rule);
   if (choice.mode === "feat") return Boolean(choice.feat);
-  if (choice.pattern === "plus2") return abilityScoreBeforeAsiRule(choice.ability1, rule.id) <= 18;
+  if (choice.pattern === "plus2") return deriveProjectedAbilityScore(state.character, choice.ability1, { omitAsiRuleId: rule.id }) <= 18;
   return Boolean(choice.ability1 && choice.ability2 && choice.ability1 !== choice.ability2);
 }
 
@@ -3255,10 +2310,10 @@ function qualifiesForFeat(feat) {
     if (prereq.level && state.character.level < prereq.level) return false;
     if (prereq.ability) {
       return prereq.ability.some((abilityReq) =>
-        Object.entries(abilityReq).every(([key, value]) => abilityScore(key) >= value)
+        Object.entries(abilityReq).every(([key, value]) => deriveProjectedAbilityScore(state.character, key) >= value)
       );
     }
-    if (prereq.spellcasting2020 && !classHasSpellList(state.character.class)) return false;
+    if (prereq.spellcasting2020 && !typedClassHasSpellList(state.character.class, state.api)) return false;
     return true;
   });
 }
@@ -3266,11 +2321,11 @@ function qualifiesForFeat(feat) {
 function asiAbilityOptions(exclude = "") {
   return ABILITIES
     .filter(([key]) => key !== exclude)
-    .map(([key, label]) => [key, `${label} (${abilityScore(key)})`]);
+    .map(([key, label]) => [key, `${label} (${deriveProjectedAbilityScore(state.character, key)})`]);
 }
 
 function defaultAsiAbility() {
-  const preferred = spellAbility();
+  const preferred = typedSpellAbility(state.character, state.api);
   return ABILITIES.some(([key]) => key === preferred) ? preferred : "con";
 }
 
@@ -3441,7 +2496,7 @@ function parseFeatRef(ref) {
 }
 
 function spellOptions() {
-  if (!classHasSpellList(state.character.class)) return state.character.spells;
+  if (!typedClassHasSpellList(state.character.class, state.api)) return state.character.spells;
   const legalOptions = legalSpellOptions();
   return [...new Set([...state.character.spells.filter((name) => legalSpellNames().has(name)), ...legalOptions.map((spell) => spell.name)])].slice(0, 60);
 }
@@ -3680,8 +2735,13 @@ function availableHitDice() {
   return Math.max(0, (Number(state.character.level) || 1) - (Number(state.character.hitDiceUsed) || 0));
 }
 
+function skillNameFromSlug(value) {
+  const normalized = String(value).toLowerCase();
+  return SKILLS.find(([name]) => slugifyName(name) === slugifyName(normalized))?.[0] ?? titleCase(normalized);
+}
+
 function hitDieHealingAmount() {
-  return Math.max(1, Math.floor(hitDie() / 2) + 1 + mod("con"));
+  return Math.max(1, Math.floor((state.api.classes[state.character.class]?.hit_die ?? 8) / 2) + 1 + deriveProjectedAbilityModifier(state.character, "con"));
 }
 
 function cancelRest() {
@@ -3694,11 +2754,7 @@ function cancelRest() {
 }
 
 function maxHitPoints() {
-  const level = Number(state.character.level) || 1;
-  const die = hitDie();
-  const first = Math.max(1, die + mod("con"));
-  const later = Math.max(1, fixedHpGain());
-  return first + Math.max(0, level - 1) * later;
+  return state.derived?.maxHp ?? 0;
 }
 
 function spellFromKnownData(name) {
@@ -3742,7 +2798,8 @@ function levelUpCharacter() {
   if (state.character.level >= 20) return;
   state.character.level += 1;
   const gain = fixedHpGain();
-  state.character.hp += gain;
+  state.character.hp = (Number(state.character.hp) || 0) + gain;
+  state.character.maxHp = state.character.hp;
   normalizeCharacterState();
   return gain;
 }
@@ -3781,22 +2838,26 @@ function cancelLevelUpAssistant() {
 
 function setLevelUpHpGain(value) {
   if (!state.levelUpMode) return;
-  const con = mod("con");
+  const con = deriveProjectedAbilityModifier(state.character, "con");
   const min = Math.max(1, 1 + con);
-  const max = Math.max(1, hitDie() + con);
+  const max = calculateMaxHpGain((state.api.classes[state.character.class]?.hit_die ?? 8), con);
   state.levelUpHpGain = clamp(Number(value) || min, min, max);
-  state.character.hp = (state.levelUpHpBase || state.character.hp - state.levelUpHpGain) + state.levelUpHpGain;
+  const newHp = (state.levelUpHpBase || 0) + state.levelUpHpGain;
+  state.character.hp = newHp;
+  state.character.maxHp = newHp;
 }
 
 function fixedHpGain() {
-  return Math.max(1, Math.floor(hitDie() / 2) + 1 + mod("con"));
+  return calculateFixedHpGain((state.api.classes[state.character.class]?.hit_die ?? 8), deriveProjectedAbilityModifier(state.character, "con"));
 }
 
 function maxLevelOneHp(className, abilities = state.character.abilities) {
   const die = state.api.classes?.[className]?.hit_die ?? CLASS_HIT_DIE[className] ?? 8;
   const bonuses = calculateCharacterAbilityBonuses(state.character);
   const scores = deriveAbilityScores(abilities ?? {}, bonuses);
-  return deriveLevelOneMaxHp(die, scores.con);
+  const hp = deriveLevelOneMaxHp(die, scores.con);
+  state.character.maxHp = hp;
+  return hp;
 }
 
 function normalizeSubrace() {
@@ -3814,7 +2875,7 @@ function spellChoiceRule() {
   const spellcasting = levelRow?.spellcasting;
   const cantrips = (spellcasting?.cantrips_known ?? 0) + classFeatureCantripBonus() + autoGrantedCantripNames().length;
 
-  if (!spellcasting || !classHasSpellList(className) || casterLevel() === 0) {
+  if (!spellcasting || !typedClassHasSpellList(className, state.api) || typedCasterLevel(state.character, state.api) === 0) {
     return {
       cantrips: 0,
       spellsMax: 0,
@@ -3855,7 +2916,7 @@ function classFeatureCantripBonus() {
 
 function maxSpellLevelAvailable() {
   const className = state.character.class;
-  if (!classHasSpellList(className) || casterLevel() === 0) return 0;
+  if (!typedClassHasSpellList(className, state.api) || typedCasterLevel(state.character, state.api) === 0) return 0;
   const spellcasting = currentLevelRow()?.spellcasting;
   if (spellcasting) {
     for (let level = 9; level >= 1; level -= 1) {
@@ -3893,7 +2954,7 @@ function normalizeCharacterState() {
   state.character.abilityMethod ??= "standard";
   normalizeAbilityMethodState();
   state.character.tempHp = Math.max(0, Number(state.character.tempHp) || 0);
-  if (state.character.level === 1) state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
+  if (state.character.level === 1 && !state.character.maxHp) state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
   normalizeSubrace();
   state.character.classSkillChoices ??= deriveClassSkillChoices();
   state.character.classFeatureChoices ??= {};
@@ -3904,7 +2965,7 @@ function normalizeCharacterState() {
   state.character.hitDiceUsed = clamp(Number(state.character.hitDiceUsed) || 0, 0, Number(state.character.level) || 1);
   state.character.spellSlots ??= {};
   state.character.resources ??= {};
-  state.character.savingThrows = classSavingThrows();
+  state.character.savingThrows = typedGetClassSavingThrows(state.character.class, state.api.classes);
   if (hasLoadedRules()) {
     enforceClassFeatureChoices();
     enforceEquipmentChoices();
@@ -3920,8 +2981,10 @@ function normalizeCharacterState() {
     rules: ruleRepository,
     skills: SKILLS,
     abilityKeys: ABILITIES.map(([key]) => key),
-    spellAbility: spellAbility(),
+    spellAbility: typedSpellAbility(state.character, state.api),
     modifiers: activeModifiers,
+    apiClasses: state.api.classes,
+    apiLevels: state.api.levels,
     baseArmorClass: state.character.armorClass - modifierTotal(activeModifiers, "armor_class"),
   });
 }
@@ -4024,7 +3087,18 @@ function syncSkillProficiencies() {
   state.character.skillProficiencies = [...new Set([...backgroundSkills, ...existingOtherSkills, ...state.character.classSkillChoices])];
 }
 
-function backgroundSkillProficiencies() { return []; }
+function backgroundSkillProficiencies(backgroundName = state.character.background) {
+  const name = String(backgroundName || "").toLowerCase();
+  const background = state.api.source?.backgroundDetails?.[name];
+  if (!background) return [];
+
+  return [...new Set((background.skillProficiencies ?? []).flatMap((group) => {
+    if (!group || typeof group !== "object") return [];
+    return Object.entries(group)
+      .filter(([, enabled]) => enabled === true)
+      .map(([slug]) => skillNameFromSlug(slug));
+  }))];
+}
 
 
 // Magic Initiate Background Spell Choices
@@ -4098,9 +3172,9 @@ function enforceSpellLimit() {
         leveled += 1;
       }
       next.push(name);
-    });
+  });
   state.character.spells = next;
-  if (state.selectedSpell && !state.character.spells.includes(state.selectedSpell)) state.selectedSpell = state.character.spells[0] ?? "";
+  state.selectedSpell = typedResolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
 }
 
 function syncInventoryEffects() {
@@ -4109,7 +3183,7 @@ function syncInventoryEffects() {
   const equipped = inventory.filter((item) => state.character.equippedItems.includes(item.id));
   const armor = equipped.find((item) => isArmorItem(item));
   const activeModifiers = deriveActiveModifiers(state.character);
-  const dex = mod("dex");
+  const dex = deriveProjectedAbilityModifier(state.character, "dex");
   const armorBase = armor?.ac ? Number(armor.ac) + armorDexBonus(armor, dex) : 10 + dex;
   state.character.armorClass = armorBase + modifierTotal(activeModifiers, "armor_class");
   const manualAttacks = (state.character.attacks ?? []).filter((attack) => !attack.fromInventory);
@@ -4185,12 +3259,12 @@ function propertyLabel(prop) {
 }
 
 function applyAbilityMethod(method) {
-  state.character.abilities = applyAbilityMethodPure(state.character.abilities, method);
+  state.character.abilities = typedApplyAbilityMethod(state.character.abilities, method);
   state.character.abilityMethod = method;
 }
 
 function adjustPointBuyAbility(key, delta) {
-  const result = adjustPointBuyScore(state.character.abilities, key, delta);
+  const result = typedAdjustPointBuyScore(state.character.abilities, key, delta);
   state.character.abilities = result;
 }
 
@@ -4239,302 +3313,4 @@ function defaultSaves(className) {
     wizard: ["int", "wis"],
   };
   return saves[className] ?? ["str", "dex"];
-}
-
-function classSavingThrows() {
-  return getClassSavingThrows(state.character.class, state.api.classes);
-}
-
-function classFeatureSummary() {
-  const className = state.character.class;
-  if (className === "monk") return "- Martial Arts\n- Ki\n- Unarmored Movement";
-  if (classHasSpellList(className)) return "- Spellcasting\n- Class features by level";
-  return "- Class features by level";
-}
-
-function setByPath(target, path, value) {
-  const parts = path.split(".");
-  let cursor = target;
-  while (parts.length > 1) {
-    const part = parts.shift();
-    cursor[part] ??= {};
-    cursor = cursor[part];
-  }
-  cursor[parts[0]] = value;
-}
-
-function mod(key) {
-  return deriveAbilityModifier(abilityScore(key));
-}
-
-function abilityScore(key) {
-  const bonuses = calculateCharacterAbilityBonuses(state.character);
-  return deriveAbilityScores(state.character.abilities ?? {}, bonuses)[key];
-}
-
-function abilityScoreBeforeAsiRule(key, ruleId) {
-  const bonuses = calculateCharacterAbilityBonuses(state.character, { omitAsiRuleId: ruleId });
-  return deriveAbilityScores(state.character.abilities ?? {}, bonuses)[key];
-}
-
-function saveBonus(key) {
-  const base = deriveSavingThrowBonus(
-    abilityScore(key),
-    state.character.savingThrows.includes(key),
-    proficiency()
-  );
-  const derivedSave = state.derived?.savingThrows?.[key];
-  if (derivedSave == null) return base;
-
-  const derivedBase = deriveSavingThrowBonus(
-    (state.derived?.abilityScores?.[key] ?? abilityScore(key)) || 10,
-    state.character.savingThrows.includes(key),
-    proficiency()
-  );
-  return base + (derivedSave - derivedBase);
-}
-
-function skillBonus(name) {
-  if (state.derived?.skillBonuses?.[name] != null) return state.derived.skillBonuses[name];
-  const ability = SKILLS.find(([skill]) => skill === name)?.[1] ?? "dex";
-  return mod(ability) + (state.character.skillProficiencies.includes(name) ? proficiency() : 0) + skillChoiceBonus(name);
-}
-
-function skillChoiceBonus(name) {
-  const choices = state.character.classFeatureChoices ?? {};
-  if (state.character.class === "druid" && choices["primal-order"] === "magician") {
-    const target = choices["magician-skill"];
-    if (target && slugifyName(name) === target) return Math.max(1, mod("wis"));
-  }
-  return 0;
-}
-
-function proficiency() {
-  return state.derived?.proficiencyBonus ?? proficiencyForLevel(state.character.level);
-}
-
-function proficiencyForLevel(level) {
-  return deriveProficiencyBonus(level);
-}
-
-function currentAbilityScores() {
-  const bonuses = calculateCharacterAbilityBonuses(state.character);
-  return deriveAbilityScores(state.character.abilities ?? {}, bonuses);
-}
-
-function hitDie() {
-  return state.api.classes[state.character.class]?.hit_die ?? 8;
-}
-
-function casterLevel() {
-  const className = state.character.class;
-  const progression = state.api.classes[className]?.casterProgression;
-  if (!classHasSpellList(className)) return 0;
-  if (progression === "artificer") return Math.max(0, Math.ceil(state.character.level / 2));
-  if (progression === "pact") return state.character.level;
-  if (HALF_CASTER.has(className)) return Math.max(0, Math.floor(state.character.level / 2));
-  if (className === "warlock") return state.character.level;
-  return state.character.level;
-}
-
-function classSpellAbility() {
-  const apiAbility = state.api.classes[state.character.class]?.spellcastingAbility;
-  if (apiAbility) return apiAbility;
-  const ability = {
-    bard: "cha",
-    cleric: "wis",
-    druid: "wis",
-    paladin: "cha",
-    ranger: "wis",
-    sorcerer: "cha",
-    warlock: "cha",
-    wizard: "int",
-    monk: "wis",
-  };
-  return ability[state.character.class] ?? "int";
-}
-
-function backgroundSpellAbility() {
-  return resolveBackgroundSpellcastingAbility(state.character.bgChoices, backgroundSpellChoiceRules());
-}
-
-function spellAbility() {
-  return typedSpellAbility(state.character, state.api);
-}
-
-function spellAbilityForSpell(spell) {
-  const backgroundAbility = backgroundSpellAbility();
-  if (backgroundAbility && backgroundSelectedSpellNames().includes(spell?.name)) return backgroundAbility;
-  return classHasSpellList(state.character.class) ? classSpellAbility() : backgroundAbility ?? classSpellAbility();
-}
-
-function spellcastingMetricsForAbility(ability) {
-  return deriveSpellcastingMetrics(ability, currentAbilityScores(), proficiency());
-}
-
-function spellDeck() {
-  return CLASS_DECKS[state.character.class] ?? "arcane";
-}
-
-function deckLabel(deck) {
-  const labels = {
-    arcane: "Arcane",
-    bard: "Bard",
-    cleric: "Cleric",
-    druid: "Druid",
-    paladin: "Paladin",
-    ranger: "Ranger",
-    warlock: "Warlock",
-  };
-  return labels[deck] ?? "Arcane";
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function titleCase(value) {
-  return String(value)
-    .split(/[-\s]/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function ordinalSuffix(value) {
-  if (!Number.isFinite(value)) return "";
-  const mod100 = value % 100;
-  if (mod100 >= 11 && mod100 <= 13) return "th";
-  const mod10 = value % 10;
-  if (mod10 === 1) return "st";
-  if (mod10 === 2) return "nd";
-  if (mod10 === 3) return "rd";
-  return "th";
-}
-
-function classHasSpellList(className) {
-  return (state.api.classSpells?.[className] ?? []).length > 0;
-}
-
-function slugifyName(value) {
-  return String(value)
-    .trim()
-    .toLowerCase()
-    .replaceAll("'", "")
-    .replaceAll("/", " ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function escapeRegExp(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function skillNameFromSlug(value) {
-  const normalized = String(value).toLowerCase();
-  return SKILLS.find(([name]) => slugifyName(name) === slugifyName(normalized))?.[0] ?? titleCase(normalized);
-}
-
-function spellSchoolName(school) {
-  const schools = {
-    A: "Abjuration",
-    C: "Conjuration",
-    D: "Divination",
-    E: "Enchantment",
-    I: "Illusion",
-    N: "Necromancy",
-    T: "Transmutation",
-    V: "Evocation",
-  };
-  return schools[school] ?? school ?? "";
-}
-
-function format5etoolsTime(time) {
-  const first = Array.isArray(time) ? time[0] : time;
-  if (!first) return "-";
-  return `${first.number ?? 1} ${first.unit ?? ""}`.trim();
-}
-
-function format5etoolsRange(range) {
-  const distance = range?.distance;
-  if (!distance) return "-";
-  if (distance.type === "self") return "Self";
-  if (distance.type === "touch") return "Touch";
-  if (distance.type === "sight") return "Sight";
-  if (distance.type === "unlimited") return "Unlimited";
-  if (Number.isFinite(distance.amount)) return `${distance.amount} ${distance.type}`;
-  return titleCase(distance.type ?? range.type ?? "-");
-}
-
-function format5etoolsComponents(components) {
-  if (!components) return "-";
-  const parts = [];
-  if (components.v) parts.push("V");
-  if (components.s) parts.push("S");
-  if (components.m) parts.push("M");
-  return parts.join(", ");
-}
-
-function format5etoolsDuration(duration) {
-  const first = Array.isArray(duration) ? duration[0] : duration;
-  if (!first) return "-";
-  if (first.type === "instant") return "Instantaneous";
-  if (first.type === "permanent") return "Permanent";
-  if (first.type === "special") return "Special";
-  if (first.type === "timed") {
-    const amount = first.duration?.amount ?? 1;
-    const type = first.duration?.type ?? "";
-    return `${first.concentration ? "Concentration, up to " : ""}${amount} ${type}`.trim();
-  }
-  return titleCase(first.type);
-}
-
-function entriesToText(entries) {
-  return (entries ?? [])
-    .map(entryToText)
-    .filter(Boolean)
-    .join("\n\n");
-}
-
-function entryToText(entry) {
-  if (typeof entry === "string") return clean5etoolsText(entry);
-  if (Array.isArray(entry)) return entry.map(entryToText).filter(Boolean).join("\n");
-  if (!entry || typeof entry !== "object") return "";
-  if (entry.type === "entries") {
-    const title = entry.name ? `${clean5etoolsText(entry.name)}\n` : "";
-    return `${title}${entriesToText(entry.entries)}`.trim();
-  }
-  if (entry.type === "list") return (entry.items ?? []).map((item) => `- ${entryToText(item)}`).join("\n");
-  if (entry.type === "item") return clean5etoolsText(entry.name ?? entry.entry ?? "");
-  if (entry.type === "table") {
-    const rows = (entry.rows ?? []).map((row) => Array.isArray(row) ? row.map(entryToText).join(" | ") : entryToText(row));
-    return [entry.caption, ...rows].filter(Boolean).map(clean5etoolsText).join("\n");
-  }
-  return clean5etoolsText(entry.name ?? "");
-}
-
-function clean5etoolsText(value) {
-  return String(value ?? "")
-    .replace(/\{@(?:spell|item|condition|skill|sense|variantrule|filter|hazard|scaledamage|damage|feat|action|book)\s+([^|}]+)(?:\|[^}]*)?}/g, "$1")
-    .replace(/\{@(?:dice|hit|d20|chance)\s+([^|}]+)(?:\|[^}]*)?}/g, "$1")
-    .replace(/\{@i\s+([^}]+)}/g, "$1")
-    .replace(/\{@b\s+([^}]+)}/g, "$1")
-    .replace(/\{@[^}]+\}/g, "")
-    .trim();
-}
-
-function paragraphs(value) {
-  return String(value || "")
-    .split(/\n{2,}/)
-    .filter(Boolean)
-    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
-    .join("");
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
 }

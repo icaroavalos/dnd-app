@@ -1,6 +1,5 @@
-import type { Character } from '../../types/state';
-export declare const ALIGNMENT_OPTIONS: readonly [readonly ["Lawful Good", "Lawful Good"], readonly ["Neutral Good", "Neutral Good"], readonly ["Chaotic Good", "Chaotic Good"], readonly ["Lawful Neutral", "Lawful Neutral"], readonly ["Neutral", "Neutral"], readonly ["Chaotic Neutral", "Chaotic Neutral"], readonly ["Lawful Evil", "Lawful Evil"], readonly ["Neutral Evil", "Neutral Evil"], readonly ["Chaotic Evil", "Chaotic Evil"]];
-export declare const DEFAULT_CREATION_BACKGROUNDS: readonly ["Acolyte", "Soldier"];
+import type { Character } from '../../types/state.js';
+export { ALIGNMENT_OPTIONS, DEFAULT_CREATION_BACKGROUNDS } from '../rules/constants.js';
 export type CreationFieldPath = 'class' | 'race' | 'subrace' | 'alignment' | 'background';
 export interface CreationFieldHelpers {
     backgroundSkillProficiencies: (backgroundName: string) => string[];

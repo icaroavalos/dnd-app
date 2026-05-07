@@ -46,8 +46,8 @@ export function deriveCharacterSheet(character, options = {}) {
         });
     }
     // 5. HP & Hit Die
-    const hitDie = options.hitDie ?? 8;
-    const maxHp = deriveMaxHp(level, hitDie, abilityModifiers.con);
+    const hitDie = options.hitDie ?? (options.apiClasses?.[character.class]?.hit_die ?? 8);
+    const maxHp = Number(character.maxHp) || deriveMaxHp(level, hitDie, abilityModifiers.con);
     // 6. Spellcasting
     const spellAbility = options.spellAbility ?? (character.class === 'cleric' || character.class === 'druid' ? 'wis' : 'int');
     const spellAttack = proficiencyBonus + abilityModifiers[spellAbility];
@@ -75,6 +75,8 @@ export function deriveCharacterSheet(character, options = {}) {
         armorClass: character.armorClass ?? (10 + abilityModifiers.dex),
         initiative: abilityModifiers.dex,
         maxHp,
+        currentHp: Number(character.hp) || maxHp,
+        tempHp: Math.max(0, Number(character.tempHp) || 0),
         hitDie,
         hitDiceTotal: level,
         spellAttack,
@@ -86,6 +88,49 @@ export function deriveCharacterSheet(character, options = {}) {
             encumbered: false
         }
     };
+}
+export function deriveProjectedAbilityScores(character) {
+    const abilityBonuses = calculateCharacterAbilityBonuses(character);
+    return deriveAbilityScores(character.abilities ?? {}, abilityBonuses);
+}
+export function deriveProjectedAbilityScore(character, ability, options = {}) {
+    const abilityBonuses = calculateCharacterAbilityBonuses(character, options);
+    return deriveAbilityScores(character.abilities ?? {}, abilityBonuses)[ability];
+}
+export function deriveProjectedAbilityModifier(character, ability) {
+    return deriveAbilityModifier(deriveProjectedAbilityScore(character, ability));
+}
+export function deriveProjectedProficiencyBonus(character, derivedSheet) {
+    return Number(derivedSheet?.proficiencyBonus) || deriveProficiencyBonus(Number(character.level) || 1);
+}
+export function deriveProjectedSaveBonus(character, ability, options = {}) {
+    const proficiencyBonus = deriveProjectedProficiencyBonus(character, options.derivedSheet);
+    const base = deriveSavingThrowBonus(deriveProjectedAbilityScore(character, ability), (character.savingThrows ?? []).includes(ability), proficiencyBonus);
+    const derivedSave = options.derivedSheet?.savingThrows?.[ability];
+    if (derivedSave == null)
+        return base;
+    const derivedBase = deriveSavingThrowBonus((options.derivedSheet?.abilityScores?.[ability] ?? deriveProjectedAbilityScore(character, ability)) || 10, (character.savingThrows ?? []).includes(ability), proficiencyBonus);
+    return base + (derivedSave - derivedBase);
+}
+export function deriveProjectedSkillBonus(character, skillName, options = {}) {
+    const derivedBonus = options.derivedSheet?.skillBonuses?.[skillName];
+    if (derivedBonus != null)
+        return derivedBonus;
+    const ability = options.skills?.find(([name]) => name === skillName)?.[1] ?? 'dex';
+    const proficiencyBonus = deriveProjectedProficiencyBonus(character, options.derivedSheet);
+    return deriveProjectedAbilityModifier(character, ability) +
+        ((character.skillProficiencies ?? []).includes(skillName) ? proficiencyBonus : 0) +
+        deriveProjectedSkillChoiceBonus(character, skillName, options.slugify);
+}
+function deriveProjectedSkillChoiceBonus(character, skillName, slugifyFn) {
+    const choices = character.classFeatureChoices ?? {};
+    if (character.class === 'druid' && choices['primal-order'] === 'magician') {
+        const target = choices['magician-skill'];
+        const normalize = slugifyFn ?? slugify;
+        if (target && normalize(skillName) === target)
+            return Math.max(1, deriveProjectedAbilityModifier(character, 'wis'));
+    }
+    return 0;
 }
 function slugify(value) {
     return String(value ?? "")

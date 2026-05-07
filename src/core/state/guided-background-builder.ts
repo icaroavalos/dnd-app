@@ -1,4 +1,4 @@
-import type { AbilityName, AbilityIncrementPattern, BackgroundChoiceState } from '../../types/background';
+import type { AbilityName, AbilityIncrementPattern, BackgroundChoiceState } from '../../types/background.js';
 
 export const SUPPORTED_GUIDED_BACKGROUNDS = ['Acolyte', 'Soldier'] as const;
 

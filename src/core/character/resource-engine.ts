@@ -67,7 +67,7 @@ export function resourceRecoveryFromBody(body: string): ResourceRecovery {
     recovery.short = "all";
     recovery.long = "all";
   }
-  else if (/finish a short rest/i.test(text) && /can't use (?:it|this trait|this feature|this ability)/i.test(text) && /again/i.test(text)) recovery.short = "all";
+  else if (/finish a short rest/i.test(text) && /(can't|cannot) use (?:it|this trait|this feature|this ability)/i.test(text) && /again/i.test(text)) recovery.short = "all";
   else if (/can't use this feature again until you finish a (?:Short Rest|Long Rest)/i.test(text)) {
     recovery.short = "all";
     recovery.long = "all";
@@ -77,7 +77,7 @@ export function resourceRecoveryFromBody(body: string): ResourceRecovery {
     recovery.long = "all";
   }
 
-  if (/finish a .{0,100}Short Rest.{0,100}Long Rest/i.test(text) || /finish a .{0,100}Long Rest.{0,100}Short Rest/i.test(text)) {
+  if (/short or long rest/i.test(text) && /can't use|regain all/i.test(text)) {
     recovery.short = "all";
     recovery.long = "all";
   }
@@ -98,8 +98,8 @@ export function resourceRecoveryFromBody(body: string): ResourceRecovery {
   else if (/regain all of (?:its|their|your) expended uses when you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/finish a long rest/i.test(text) && /regain all expended uses/i.test(text)) recovery.long = "all";
   else if (/once you use this trait/i.test(text) && /finish a long rest/i.test(text)) recovery.long = "all";
-  else if (/can't use this trait again until you finish a long rest/i.test(text)) recovery.long = "all";
-  else if (/can't use (?:it|this trait|this feature|this ability) again until you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/(can't|cannot) use this trait again until you finish a long rest/i.test(text)) recovery.long = "all";
+  else if (/(can't|cannot) use (?:it|this trait|this feature|this ability) again until you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/regain the ability to cast it when you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/regain the ability to do so when you finish a long rest/i.test(text)) recovery.long = "all";
   else if (/you regain the ability to cast it this way when you finish a long rest/i.test(text)) recovery.long = "all";

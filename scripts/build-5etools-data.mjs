@@ -72,7 +72,10 @@ for (const [ruleset, config] of Object.entries(rulesets)) {
     .filter((feature) => classKeySet.has(keyFor(feature.className, feature.classSource)))
     .map(normalizeClassFeature);
 
-  const subclassKeySet = new Set(subclasses.map((subclass) => keyFor(subclass.name, subclass.source, subclass.className, subclass.classSource)));
+  const subclassKeySet = new Set(subclasses.flatMap((subclass) => {
+    const names = [subclass.name, subclass.shortName].filter(Boolean);
+    return names.map((name) => keyFor(name, subclass.source, subclass.className, subclass.classSource));
+  }));
   const subclassFeatures = allSubclassFeatures
     .filter((feature) => subclassKeySet.has(keyFor(feature.subclassShortName ?? feature.subclassName, feature.subclassSource, feature.className, feature.classSource)))
     .map(normalizeSubclassFeature);

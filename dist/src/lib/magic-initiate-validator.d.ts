@@ -32,7 +32,7 @@ export interface SpellcastingMetrics {
     attackBonus: number;
     saveDc: number;
 }
-import { BackgroundData } from '../types/character';
+import { BackgroundData } from '../types/character.js';
 type BackgroundDetails = Record<string, BackgroundData>;
 /**
  * Valida as escolhas de Magic Initiate para um background

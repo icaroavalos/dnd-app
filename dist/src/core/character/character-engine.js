@@ -35,6 +35,12 @@ export function deriveMaxHp(level, hitDie, constitutionModifier) {
     const later = Math.max(1, Math.floor(hitDie / 2) + 1 + constitutionModifier);
     return first + Math.max(0, level - 1) * later;
 }
+export function calculateFixedHpGain(hitDie, constitutionModifier) {
+    return Math.max(1, Math.floor(hitDie / 2) + 1 + constitutionModifier);
+}
+export function calculateMaxHpGain(hitDie, constitutionModifier) {
+    return Math.max(1, hitDie + constitutionModifier);
+}
 export function deriveSavingThrowBonus(abilityScore, proficient, proficiencyBonus) {
     return deriveAbilityModifier(abilityScore) + (proficient ? proficiencyBonus : 0);
 }

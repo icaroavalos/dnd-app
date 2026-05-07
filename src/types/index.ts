@@ -18,7 +18,7 @@ export type {
   ItemData,
   FeatureData,
   SubclassData,
-} from './character';
+} from './character.js';
 
 // Types de State
 export type {
@@ -28,4 +28,4 @@ export type {
   Character,
   UiState,
   AppState,
-} from './state';
+} from './state.js';

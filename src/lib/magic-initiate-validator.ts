@@ -38,7 +38,7 @@ export interface SpellcastingMetrics {
   saveDc: number;
 }
 
-import { BackgroundData } from '../types/character';
+import { BackgroundData } from '../types/character.js';
 
 type BackgroundDetails = Record<string, BackgroundData>;
 

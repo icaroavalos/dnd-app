@@ -10,14 +10,14 @@ export {
   createDefaultCharacter,
   isCharacterComplete,
   createEmptyState,
-} from './state-manager';
+} from './state-manager.js';
 
 export {
   ALIGNMENT_OPTIONS,
   DEFAULT_CREATION_BACKGROUNDS,
   updateCreationField,
   applyBackgroundStepSelection,
-} from './creation-form-controller';
+} from './creation-form-controller.js';
 
 export {
   CREATION_STEPS,
@@ -25,4 +25,4 @@ export {
   getMissingChoicesForStep,
   getMissingCreationChoices,
   getMissingSpellChoices,
-} from './creation-flow';
+} from './creation-flow.js';

@@ -1,15 +1,4 @@
-export const ALIGNMENT_OPTIONS = [
-    ['Lawful Good', 'Lawful Good'],
-    ['Neutral Good', 'Neutral Good'],
-    ['Chaotic Good', 'Chaotic Good'],
-    ['Lawful Neutral', 'Lawful Neutral'],
-    ['Neutral', 'Neutral'],
-    ['Chaotic Neutral', 'Chaotic Neutral'],
-    ['Lawful Evil', 'Lawful Evil'],
-    ['Neutral Evil', 'Neutral Evil'],
-    ['Chaotic Evil', 'Chaotic Evil'],
-];
-export const DEFAULT_CREATION_BACKGROUNDS = ['Acolyte', 'Soldier'];
+export { ALIGNMENT_OPTIONS, DEFAULT_CREATION_BACKGROUNDS } from '../rules/constants.js';
 function createDefaultBackgroundChoiceState() {
     return {
         background: null,

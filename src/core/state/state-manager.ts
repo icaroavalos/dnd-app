@@ -4,7 +4,7 @@
  * Funções puras para load/save do estado da aplicação
  */
 
-import type { AppState, Character } from '../../types/state';
+import type { AppState, Character } from '../../types/state.js';
 import { getDefaultBackgroundChoice } from '../../types/background.js';
 
 const STATE_KEY = 'dnd-character-state';
@@ -141,6 +141,7 @@ export function createEmptyState(): Partial<AppState> {
         subraceDetails: {},
         itemDetails: {},
         classFeatures: [],
+        subclassFeatures: [],
         subclasses: [],
         featDetails: {},
         spellDetails: {},

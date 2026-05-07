@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-03T01:21:02.129Z",
+  "generatedAt": "2026-05-07T23:40:56.219Z",
   "source": {
     "name": "5etools local data",
     "path": "/Users/icaro/codes/dnd-app/5etools-v2.28.0"
@@ -12,7 +12,7 @@
         "classes": 17,
         "subclasses": 130,
         "classFeatures": 375,
-        "subclassFeatures": 286,
+        "subclassFeatures": 916,
         "races": 142,
         "subraces": 98,
         "backgrounds": 101,
@@ -28,7 +28,7 @@
         "classes": 13,
         "subclasses": 185,
         "classFeatures": 302,
-        "subclassFeatures": 182,
+        "subclassFeatures": 481,
         "races": 15,
         "subraces": 0,
         "backgrounds": 56,

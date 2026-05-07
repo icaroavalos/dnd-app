@@ -1,0 +1,360 @@
+type ActionKind = 'action' | 'bonus' | 'reaction' | 'other' | 'limited' | 'attack';
+type EconomyKind = 'action' | 'bonus' | 'reaction' | 'other' | 'free' | 'attack';
+
+export interface ActionCost {
+  economy?: EconomyKind | ActionKind;
+  resource?: string;
+  slotLevel?: number | null;
+}
+
+export interface DerivedAction {
+  id: string;
+  kind: ActionKind;
+  icon: string;
+  name: string;
+  subtitle: string;
+  range: string;
+  rangeLabel: string;
+  hit: string;
+  damage: string[];
+  notes: string;
+  detail: string;
+  cost?: ActionCost;
+  resource?: string;
+  slotLevel?: number | null;
+  source?: Record<string, unknown>;
+  disabled?: boolean;
+}
+
+export interface ResourceDefinition {
+  id: string;
+  name: string;
+  kind?: string;
+  className?: string;
+  sourceLabel?: string;
+  body: string;
+  recovery?: Record<string, unknown>;
+  actionKind?: ActionKind | null;
+}
+
+export interface AttackLike {
+  name: string;
+  range?: string;
+  type?: string;
+  damage: string;
+  itemId?: string;
+}
+
+export interface InventoryItemLike {
+  id?: string;
+  name?: string;
+  entries?: string[];
+  type?: string;
+}
+
+export interface SpellLike {
+  name: string;
+  level: number;
+  castingTime?: string;
+  range?: string;
+  components?: string;
+  levelLine?: string;
+  description?: string;
+}
+
+export interface ActionEngineCharacter {
+  class?: string;
+  attacks?: AttackLike[];
+  inventory?: InventoryItemLike[];
+  spells?: string[];
+  resources?: Record<string, { used?: number; max?: number }>;
+  spellSlots?: Record<string | number, { used?: number; max?: number }>;
+}
+
+export interface ActionProjection {
+  abilityModifiers?: Record<string, number>;
+  proficiencyBonus?: number;
+  spellSaveDc?: number | string;
+  spellAttack?: number;
+}
+
+export interface ActionEngineContext {
+  character?: ActionEngineCharacter;
+  projection?: ActionProjection;
+  resourceDefinitions?: ResourceDefinition[];
+  spellDetails?: Record<string, SpellLike>;
+  loadedSpellDetails?: Record<string, SpellLike>;
+  compactRange: (range?: string) => string;
+  rangeLabel: (range?: string) => string;
+  signed: (value: number) => string;
+  slugify: (value: string) => string;
+  itemTypeLabel: (item: InventoryItemLike) => string;
+  itemTags: (item: InventoryItemLike) => string[];
+  entriesToText: (entries?: string[]) => string;
+  resourceRecoveryLabel: (recovery?: Record<string, unknown>) => string;
+}
+
+const BASIC_ACTIONS: readonly DerivedAction[] = [
+  {
+    id: 'rule:attack',
+    kind: 'action',
+    icon: 'A',
+    name: 'Attack',
+    subtitle: 'Combat Action',
+    range: '--',
+    rangeLabel: 'Varies',
+    hit: '--',
+    damage: [],
+    notes: 'Make one attack with a weapon or an Unarmed Strike.',
+    detail: 'When you take the Attack action, you can make one attack roll with a weapon or an Unarmed Strike.',
+    cost: { economy: 'action' },
+  },
+  {
+    id: 'rule:dash',
+    kind: 'action',
+    icon: 'A',
+    name: 'Dash',
+    subtitle: 'Combat Action',
+    range: 'Self',
+    rangeLabel: 'Move',
+    hit: '--',
+    damage: [],
+    notes: 'Gain extra movement for the current turn.',
+    detail: 'When you take the Dash action, you gain extra movement for the current turn. The increase equals your Speed after applying any modifiers.',
+    cost: { economy: 'action' },
+  },
+  {
+    id: 'rule:dodge',
+    kind: 'action',
+    icon: 'A',
+    name: 'Dodge',
+    subtitle: 'Combat Action',
+    range: 'Self',
+    rangeLabel: 'Defense',
+    hit: '--',
+    damage: [],
+    notes: 'Attacks against you have Disadvantage.',
+    detail: 'Until the start of your next turn, any attack roll made against you has Disadvantage if you can see the attacker, and you make Dexterity saving throws with Advantage.',
+    cost: { economy: 'action' },
+  },
+  {
+    id: 'rule:two-weapon',
+    kind: 'bonus',
+    icon: 'BA',
+    name: 'Two-Weapon Fighting',
+    subtitle: 'Bonus Action',
+    range: 'Melee',
+    rangeLabel: 'Weapon',
+    hit: '--',
+    damage: [],
+    notes: "Extra attack with eligible Light weapons.",
+    detail: "When you make the extra attack of the Light property, you don't add your ability modifier to the extra attack's damage unless that modifier is negative.",
+    cost: { economy: 'bonus' },
+  },
+  {
+    id: 'rule:opportunity',
+    kind: 'reaction',
+    icon: 'R',
+    name: 'Opportunity Attack',
+    subtitle: 'Reaction',
+    range: 'Reach',
+    rangeLabel: 'Melee',
+    hit: '--',
+    damage: [],
+    notes: 'A creature leaves your reach.',
+    detail: 'You can make an Opportunity Attack when a creature that you can see leaves your reach using its action, Bonus Action, Reaction, or movement.',
+    cost: { economy: 'reaction' },
+  },
+  {
+    id: 'rule:interact',
+    kind: 'other',
+    icon: 'O',
+    name: 'Interact with an Object',
+    subtitle: 'Other',
+    range: 'Touch',
+    rangeLabel: 'Object',
+    hit: '--',
+    damage: [],
+    notes: 'Interact with one object or feature.',
+    detail: 'You normally interact with one object or feature of the environment for free, during either your move or your action.',
+    cost: { economy: 'free' },
+  },
+] as const;
+
+export function deriveAvailableActions(context: ActionEngineContext): DerivedAction[] {
+  const actions = [
+    ...deriveAttackActions(context),
+    ...deriveSpellActions(context),
+    ...BASIC_ACTIONS,
+    ...deriveFeatureActions(context),
+  ];
+
+  return actions.map((action) => ({
+    ...action,
+    disabled: isActionDisabled(action, context),
+  }));
+}
+
+export function isActionDisabled(action: Pick<DerivedAction, 'resource' | 'slotLevel'>, context: ActionEngineContext): boolean {
+  if (action.resource && !hasResourceAvailable(context.character, action.resource)) return true;
+  if (action.slotLevel && !hasSpellSlotAvailable(context.character, action.slotLevel)) return true;
+  return false;
+}
+
+export function actionIconForKind(kind: ActionKind | string): string {
+  return {
+    action: 'A',
+    bonus: 'BA',
+    reaction: 'R',
+    other: 'O',
+    limited: 'LU',
+    attack: 'ATK',
+  }[kind] ?? 'LU';
+}
+
+function deriveAttackActions(context: ActionEngineContext): DerivedAction[] {
+  const character = context.character ?? {};
+  const projection = context.projection ?? {};
+  const attackAbility = character.class === 'monk' || character.class === 'rogue' ? 'dex' : 'str';
+  const abilityMod = projection.abilityModifiers?.[attackAbility] ?? 0;
+  const hitBonus = (projection.proficiencyBonus ?? 0) + abilityMod;
+
+  return (character.attacks ?? []).map((attack, index) => {
+    const item = (character.inventory ?? []).find((entry) => entry.id === attack.itemId);
+    return {
+      id: `attack:${index}:${context.slugify(attack.name)}`,
+      kind: 'attack',
+      icon: 'ATK',
+      name: attack.name,
+      subtitle: item ? context.itemTypeLabel(item) : 'Weapon / Attack',
+      range: context.compactRange(attack.range),
+      rangeLabel: context.rangeLabel(attack.range),
+      hit: context.signed(hitBonus),
+      damage: [`${attack.damage}${context.signed(abilityMod)}`],
+      notes: item ? context.itemTags(item).join(', ') : (attack.type ?? ''),
+      detail: item ? context.entriesToText(item.entries) : '',
+      source: { type: 'attack', itemId: attack.itemId },
+      cost: { economy: 'action' },
+    };
+  });
+}
+
+function deriveSpellActions(context: ActionEngineContext): DerivedAction[] {
+  const character = context.character ?? {};
+  return (character.spells ?? [])
+    .map((name) => context.spellDetails?.[name.toLowerCase()] ?? context.loadedSpellDetails?.[name] ?? null)
+    .filter((spell): spell is SpellLike => Boolean(spell))
+    .filter((spell) => spellActionVisible(spell, context))
+    .map((spell) => {
+      const kind = actionKindForSpell(spell, context);
+      const slotLevel = spell.level > 0 ? spell.level : null;
+      return {
+        id: `spell-action:${context.slugify(spell.name)}`,
+        kind,
+        icon: 'SPL',
+        name: spell.name,
+        subtitle: spell.level === 0 ? 'Cantrip' : `Magia nivel ${spell.level}`,
+        range: context.compactRange(spell.range),
+        rangeLabel: spell.range === 'Self' ? 'Self' : 'Range',
+        hit: spellHitOrDc(spell, context),
+        damage: spellDamageChips(spell.description),
+        notes: spell.components || spell.levelLine || 'Magic',
+        detail: spell.description ?? '',
+        slotLevel,
+        source: { type: 'spell', spellName: spell.name },
+        cost: slotLevel ? { resource: 'spell_slot', slotLevel, economy: kind } : { economy: kind },
+      };
+    });
+}
+
+function deriveFeatureActions(context: ActionEngineContext): DerivedAction[] {
+  const items: DerivedAction[] = [];
+  (context.resourceDefinitions ?? []).forEach((resourceDef) => {
+    const resource = context.character?.resources?.[resourceDef.id];
+    const remaining = resource ? Math.max(0, Number(resource.max) - Number(resource.used)) : 0;
+    const subtitle = resourceDef.kind === 'species' ? (resourceDef.sourceLabel ?? '') : `${resourceDef.className} Feature`;
+    if (resourceDef.actionKind) {
+      items.push({
+        id: `feature:${resourceDef.id}`,
+        kind: resourceDef.actionKind,
+        icon: actionIconForKind(resourceDef.actionKind),
+        name: resourceDef.name,
+        subtitle,
+        range: 'Self',
+        rangeLabel: 'Resource',
+        hit: '--',
+        damage: [],
+        notes: `${remaining}/${resource?.max ?? 0} uses`,
+        detail: resourceDef.body,
+        resource: resourceDef.id,
+        source: { type: 'feature', resourceId: resourceDef.id },
+        cost: { resource: resourceDef.id, economy: resourceDef.actionKind },
+      });
+    }
+    items.push({
+      id: `limited:${resourceDef.id}`,
+      kind: 'limited',
+      icon: 'LU',
+      name: `${resourceDef.name} Uses`,
+      subtitle: context.resourceRecoveryLabel(resourceDef.recovery),
+      range: 'Self',
+      rangeLabel: 'Resource',
+      hit: '--',
+      damage: [],
+      notes: `${remaining}/${resource?.max ?? 0} disponivel`,
+      detail: resourceDef.body,
+      resource: resourceDef.id,
+      source: { type: 'resource', resourceId: resourceDef.id },
+      cost: { resource: resourceDef.id },
+    });
+  });
+  return items;
+}
+
+function spellActionVisible(spell: SpellLike, context: ActionEngineContext): boolean {
+  const kind = actionKindForSpell(spell, context);
+  if (kind === 'bonus' || kind === 'reaction') return true;
+  const damage = spellDamageChips(spell.description);
+  const hit = spellHitOrDc(spell, context);
+  if (kind === 'attack') return damage.length > 0 || hit !== '--';
+  return spell.level > 0 || (spell.level === 0 && kind === 'action');
+}
+
+function actionKindForSpell(spell: SpellLike, context: ActionEngineContext): ActionKind {
+  const text = String(spell.castingTime).toLowerCase();
+  if (text.includes('bonus')) return 'bonus';
+  if (text.includes('reaction')) return 'reaction';
+  if (spellDamageChips(spell.description).length || spellHitOrDc(spell, context) !== '--') return 'attack';
+  if (/ritual/i.test(`${spell.name} ${spell.description ?? ''}`)) return 'other';
+  return actionKindFromCastingTime(spell.castingTime);
+}
+
+function actionKindFromCastingTime(castingTime = ''): ActionKind {
+  const text = String(castingTime).toLowerCase();
+  if (text.includes('bonus')) return 'bonus';
+  if (text.includes('reaction')) return 'reaction';
+  if (text.includes('action')) return 'action';
+  return 'other';
+}
+
+function spellHitOrDc(spell: SpellLike, context: ActionEngineContext): string {
+  const description = String(spell.description ?? '').toLowerCase();
+  if (description.includes('saving throw')) return String(context.projection?.spellSaveDc ?? '--');
+  if (description.includes('spell attack')) return context.signed(context.projection?.spellAttack ?? 0);
+  return '--';
+}
+
+function spellDamageChips(description = ''): string[] {
+  const matches = [...String(description).matchAll(/\b\d+d\d+(?:\s*[+-]\s*\d+)?\b/gi)].map((match) => match[0].replace(/\s+/g, ''));
+  return [...new Set(matches)].slice(0, 2);
+}
+
+function hasResourceAvailable(character: ActionEngineCharacter | undefined, resourceId: string): boolean {
+  const resource = character?.resources?.[resourceId];
+  return Boolean(resource && Number(resource.used) < Number(resource.max));
+}
+
+function hasSpellSlotAvailable(character: ActionEngineCharacter | undefined, level: number): boolean {
+  const slot = character?.spellSlots?.[level];
+  return Boolean(slot && Number(slot.used) < Number(slot.max));
+}

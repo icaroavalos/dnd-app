@@ -110,11 +110,17 @@ export interface FeatureData {
     prerequisite: unknown;
     type: string;
     entries: string[];
+    body?: string;
+    subclassShortName?: string;
+    subclassSource?: string;
 }
 export interface SubclassData {
     name: string;
     className: string;
     source: string;
-    features: FeatureData[];
+    features?: FeatureData[];
+    subclassFeatures?: string[];
+    shortName?: string;
+    classSource?: string;
 }
 //# sourceMappingURL=character.d.ts.map

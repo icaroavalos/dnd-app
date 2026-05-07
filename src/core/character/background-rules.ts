@@ -2,8 +2,8 @@
  * Background Rules - Generate choice rules for UI from parsed backgrounds
  */
 
-import { getBackground } from './background-loader';
-import { parseBackground } from './background-parser';
+import { getBackground } from './background-loader.js';
+import { parseBackground } from './background-parser.js';
 import type { ParsedBackground, BackgroundRule, BackgroundRuleOption, AbilityName } from '../../types/background';
 
 /**

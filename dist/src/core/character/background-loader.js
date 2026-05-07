@@ -1,10 +1,10 @@
 /**
- * Background Loader - Load and cache 5etools backgrounds.json
- * Browser-only version using fetch
+ * Background Loader - load and cache compacted 5etools background data.
+ * Browser-only version using fetch.
  */
-import { DEFAULT_BACKGROUNDS } from './backgrounds';
+import { DEFAULT_BACKGROUNDS } from './backgrounds.js';
 // Browser-only path: relative to index.html
-const BACKGROUND_DATA_PATH = './5etools-v2.28.0/data/backgrounds.json';
+const BACKGROUND_DATA_PATH = './data/5etools/5e-2024/backgrounds.json';
 let cachedData = null;
 let loadPromise = null;
 /**
@@ -27,8 +27,9 @@ export async function loadBackgroundData() {
         return res.json();
     })
         .then((data) => {
-        if (data.background && data.background.length > 0) {
-            cachedData = data.background;
+        const backgrounds = data.results ?? data.background ?? [];
+        if (backgrounds.length > 0) {
+            cachedData = backgrounds;
         }
     })
         .catch(() => {

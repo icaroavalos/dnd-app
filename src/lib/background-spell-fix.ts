@@ -18,7 +18,7 @@
  * - Usa a lista específica da classe (cleric, wizard, etc.)
  */
 
-import type { BgSpellGrant, BackgroundSpellRule } from '../types/character';
+import type { BgSpellGrant, BackgroundSpellRule } from '../types/character.js';
 
 /**
  * Slugify para nomes de listas de magia

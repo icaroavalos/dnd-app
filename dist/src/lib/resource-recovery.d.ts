@@ -7,7 +7,7 @@
  * Com TypeScript, o bug seria pego em tempo de compilação ao misturar
  * "1" (string) com 1 (number).
  */
-import type { RecoveryResult } from '../types/recovery';
+import type { RecoveryResult } from '../types/recovery.js';
 /**
  * Normaliza texto do 5etools removendo markup {@variantrule ...}
  */

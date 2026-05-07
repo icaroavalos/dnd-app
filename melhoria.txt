@@ -13,20 +13,37 @@ Maintainability roadmap:
    - [ok] feature grants (src/core/character/feature-engine.ts)
    - [ok] equipment effects (src/core/character/inventory-engine.ts)
    - [ok] validation (src/core/state/creation-flow.ts)
-3. [in progress] Keep app.js only as a render and wiring shell, then gradually replace it with TypeScript too.
+3. [ok] Keep app.js only as a render and wiring shell, then gradually replace it with TypeScript too.
+   - [ok] Move static rules constants out of app.js into src/core/rules/constants.ts
+   - [ok] Migrate action-engine and modifier-engine to TypeScript, with app.js consuming only compiled typed modules
+   - [ok] Remove legacy action-building wrappers from app.js after migrating the typed action engine
+   - [ok] Move projection helper wrappers (ability/saves/skills/proficiency) out of app.js into typed character-projection helpers
+   - [ok] Move builder step rendering (lineage/abilities/choices/background/leveling) into typed builder view modules
 4. [ok] Define stable TypeScript contracts for:
    - [ok] Character
    - [ok] BackgroundChoiceState
    - [ok] SpellChoiceState (as part of Character/Rules)
    - [ok] RuleDefinition
    - [ok] DerivedCharacterSheet
-5. [pending] Add tests around behavior modules first, not the whole UI first.
+5. [ok] Add tests around behavior modules first, not the whole UI first.
+   - [ok] action engine tests
+   - [ok] modifier engine tests
+   - [ok] rules constants shell-cleanup regression tests
+   - [ok] character projection helper tests
 
 Suggested execution order:
 - Phase A: [ok] migrate the rest of builder and state logic from JS to TS
 - Phase B: [ok] centralize all derived calculations in one typed engine
-- Phase C: [in progress] make the UI consume only typed outputs (app.js is now a shell for these)
-- Phase D: [pending] delete duplicated JS rule logic completely (clean up app.js wrappers)
+- Phase C: [ok] make the UI consume only typed outputs (app.js is now a shell for these)
+  - [ok] extract static constants into typed rules module
+  - [ok] migrate combat engines to typed modules
+  - [ok] remove legacy action wrappers from app.js
+  - [ok] remove legacy projection helper wrappers from app.js
+- Phase D: [ok] delete duplicated JS rule logic completely (clean up app.js wrappers)
+- Phase E: [ok] extract sheet rendering logic into pure typed view modules
+  - [ok] Summary, Skills, Attacks, Spells, Inventory, Features
+- Phase F: [ok] extract builder rendering logic into pure typed view modules
+  - [ok] Name, Lineage, Abilities, Choices, Background, Leveling
 
 Best next implementation target:
-Migrate combat actions and effect engine (action-engine.js and modifier-engine.js) to TypeScript to complete the logic migration.
+Refine character state persistence, specifically focusing on manual HP gains during level-up and background choice validation. With sheet and builder rendering now modularized, the next step is tightening state consistency and reducing the remaining event/wiring complexity in app.js.

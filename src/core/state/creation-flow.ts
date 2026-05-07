@@ -1,4 +1,4 @@
-import type { BuilderStepId } from '../../types/state';
+import type { BuilderStepId } from '../../types/state.js';
 
 export const CREATION_STEPS: [BuilderStepId, string][] = [
   ['lineage', 'Origem'],
@@ -100,15 +100,12 @@ export function getMissingChoicesForStep(step: BuilderStepId, state: CreationFlo
 
   if (step === 'background') {
     if (!state.character.background) return ['background'];
-    
-    // For non-guided backgrounds we don't have bgChoices UI fully built yet, 
-    // so we shouldn't block the UI to continue
+
+    // For guided backgrounds, we enforce completeness of choices.
+    // For non-guided (5etools) backgrounds, we allow them to proceed as long as they are selected,
+    // because we don't have the dynamic UI for all their complex rules yet.
     const isGuidedBackground = ["Acolyte", "Soldier"].includes(state.character.background);
-    if (!isGuidedBackground) {
-      // Temporarily allow 5etools backgrounds to continue even if incomplete
-      // because we haven't built the UI for all of their complex rules yet
-      return [];
-    }
+    if (!isGuidedBackground) return [];
 
     if (state.backgroundStepMissing && state.backgroundStepMissing.length > 0) return state.backgroundStepMissing;
     return [];

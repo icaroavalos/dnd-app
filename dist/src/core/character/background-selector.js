@@ -9,10 +9,10 @@
  * Permite adicao dinamica de novos backgrounds sem modificar o codigo base
  */
 class BackgroundRegistry {
-    constructor() {
-        this.backgrounds = new Map();
-        this.customBackgrounds = new Map();
-    }
+    static instance;
+    backgrounds = new Map();
+    customBackgrounds = new Map();
+    constructor() { }
     static getInstance() {
         if (!BackgroundRegistry.instance) {
             BackgroundRegistry.instance = new BackgroundRegistry();
@@ -88,8 +88,10 @@ export function getBackgroundOptions() {
  * Gerencia UI e logica de selecao de backgrounds
  */
 export class BackgroundSelector {
+    config;
+    container;
+    selectedValue = '';
     constructor(config) {
-        this.selectedValue = '';
         this.config = config;
     }
     /**

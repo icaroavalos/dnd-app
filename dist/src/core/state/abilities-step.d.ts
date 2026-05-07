@@ -4,8 +4,8 @@
  * Provides a pure-function view model so app.js only needs to call
  * `buildAbilitiesViewModel(...)` and render the result.
  */
-import type { AbilityName } from '../../types/background';
-import type { Character } from '../../types/state';
+import type { AbilityName } from '../../types/background.js';
+import type { Character } from '../../types/state.js';
 import { type AbilityBonusMap } from '../character/ability-bonuses.js';
 export type AbilityMethodId = 'standard' | 'pointBuy' | 'manual';
 export declare const ABILITY_KEYS: AbilityName[];

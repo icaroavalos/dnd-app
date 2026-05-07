@@ -42,7 +42,7 @@ export function resourceRecoveryFromBody(body) {
         recovery.short = "all";
         recovery.long = "all";
     }
-    else if (/finish a short rest/i.test(text) && /can't use (?:it|this trait|this feature|this ability)/i.test(text) && /again/i.test(text))
+    else if (/finish a short rest/i.test(text) && /(can't|cannot) use (?:it|this trait|this feature|this ability)/i.test(text) && /again/i.test(text))
         recovery.short = "all";
     else if (/can't use this feature again until you finish a (?:Short Rest|Long Rest)/i.test(text)) {
         recovery.short = "all";
@@ -52,7 +52,7 @@ export function resourceRecoveryFromBody(body) {
         recovery.short = "all";
         recovery.long = "all";
     }
-    if (/finish a .{0,100}Short Rest.{0,100}Long Rest/i.test(text) || /finish a .{0,100}Long Rest.{0,100}Short Rest/i.test(text)) {
+    if (/short or long rest/i.test(text) && /can't use|regain all/i.test(text)) {
         recovery.short = "all";
         recovery.long = "all";
     }
@@ -81,9 +81,9 @@ export function resourceRecoveryFromBody(body) {
         recovery.long = "all";
     else if (/once you use this trait/i.test(text) && /finish a long rest/i.test(text))
         recovery.long = "all";
-    else if (/can't use this trait again until you finish a long rest/i.test(text))
+    else if (/(can't|cannot) use this trait again until you finish a long rest/i.test(text))
         recovery.long = "all";
-    else if (/can't use (?:it|this trait|this feature|this ability) again until you finish a long rest/i.test(text))
+    else if (/(can't|cannot) use (?:it|this trait|this feature|this ability) again until you finish a long rest/i.test(text))
         recovery.long = "all";
     else if (/regain the ability to cast it when you finish a long rest/i.test(text))
         recovery.long = "all";

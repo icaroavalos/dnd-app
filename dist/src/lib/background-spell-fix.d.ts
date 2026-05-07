@@ -17,7 +17,7 @@
  * - Não depende de spellDetails (que pode estar inconsistente)
  * - Usa a lista específica da classe (cleric, wizard, etc.)
  */
-import type { BgSpellGrant, BackgroundSpellRule } from '../types/character';
+import type { BgSpellGrant, BackgroundSpellRule } from '../types/character.js';
 /**
  * Extrai granted spells do background (Magic Initiate)
  */

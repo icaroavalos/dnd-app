@@ -3,7 +3,7 @@
  *
  * Funções puras para load/save do estado da aplicação
  */
-import type { AppState, Character } from '../../types/state';
+import type { AppState, Character } from '../../types/state.js';
 /**
  * Carrega estado do localStorage ou retorna estado vazio
  */

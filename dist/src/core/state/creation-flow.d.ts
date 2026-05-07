@@ -1,4 +1,4 @@
-import type { BuilderStepId } from '../../types/state';
+import type { BuilderStepId } from '../../types/state.js';
 export declare const CREATION_STEPS: [BuilderStepId, string][];
 type AbilityKey = 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
 export interface CreationFlowCharacter {

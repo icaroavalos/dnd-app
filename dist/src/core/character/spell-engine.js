@@ -2,22 +2,19 @@
  * Spell Engine - Lógica para derivação de magias, slots e métricas de conjuração
  */
 import { deriveProficiencyBonus } from './character-engine.js';
-import { resolveBackgroundSpellcastingAbility, createBackgroundSpellRules, getBackgroundGrantedSpells } from '../../lib/magic-initiate-validator.js';
+import { getSelectedBackgroundSpellNames, resolveBackgroundSpellcastingAbility, createBackgroundSpellRules, getBackgroundGrantedSpells } from '../../lib/magic-initiate-validator.js';
 import { calculateCharacterAbilityBonuses } from './ability-bonuses.js';
 import { deriveAbilityScores, deriveAbilityModifier } from './character-engine.js';
-export function spellcastingMetricsForAbility(ability, character, api) {
-    const proficiencyBonus = deriveProficiencyBonus(character.level);
-    const bonuses = calculateCharacterAbilityBonuses(character);
-    const scores = deriveAbilityScores(character.abilities ?? {}, bonuses);
-    const normalizedAbility = (ability.toLowerCase() || 'int');
-    const score = scores[normalizedAbility] || 10;
-    const modifier = deriveAbilityModifier(score);
-    return {
-        ability: normalizedAbility,
-        modifier,
-        attackBonus: proficiencyBonus + modifier,
-        saveDc: 8 + proficiencyBonus + modifier,
-    };
+export function currentKnownSpellNames(character, api, activeFeatures = []) {
+    const explicit = [...new Set(character.spells ?? [])];
+    const autoGranted = autoGrantedSpellEntries(character, api, activeFeatures).map((spell) => spell.name);
+    const backgroundSelected = getSelectedBackgroundSpellNames(character.bgSpellChoices, backgroundSpellChoiceRules(character, api));
+    return [...new Set([...explicit, ...autoGranted, ...backgroundSelected])];
+}
+export function resolveSelectedSpellName(selectedSpell, spellNames) {
+    if (selectedSpell && spellNames.includes(selectedSpell))
+        return selectedSpell;
+    return spellNames[0] ?? '';
 }
 export function currentLevelRow(character, api) {
     const levels = api.levels[character.class];
@@ -26,11 +23,25 @@ export function currentLevelRow(character, api) {
 export function classHasSpellList(className, api) {
     return (api.classSpells?.[className] ?? []).length > 0;
 }
+export function casterLevel(character, api) {
+    const className = character.class;
+    const progression = api.classes[className]?.casterProgression;
+    if (!classHasSpellList(className, api))
+        return 0;
+    if (progression === "artificer")
+        return Math.max(0, Math.ceil(character.level / 2));
+    if (progression === "pact")
+        return character.level;
+    const halfCasters = ["paladin", "ranger"];
+    if (halfCasters.includes(className.toLowerCase()))
+        return Math.max(0, Math.floor(character.level / 2));
+    return character.level;
+}
 export function classSpellAbility(className, api) {
     const apiAbility = api.classes[className]?.spellcastingAbility;
     if (apiAbility)
         return apiAbility.toLowerCase();
-    const defaults = {
+    const ability = {
         bard: "cha",
         cleric: "wis",
         druid: "wis",
@@ -39,9 +50,9 @@ export function classSpellAbility(className, api) {
         sorcerer: "cha",
         warlock: "cha",
         wizard: "int",
-        artificer: "int"
+        monk: "wis",
     };
-    return defaults[className.toLowerCase()] ?? "int";
+    return ability[className.toLowerCase()] ?? "int";
 }
 export function backgroundSpellChoiceRules(character, api) {
     const background = character.background || character.bgChoices?.background;
@@ -54,9 +65,31 @@ export function backgroundSpellAbility(character, api) {
 }
 export function spellAbility(character, api) {
     if (classHasSpellList(character.class, api)) {
-        return classSpellAbility(character.class, api) ?? 'int';
+        return classSpellAbility(character.class, api);
     }
-    return backgroundSpellAbility(character, api) ?? classSpellAbility(character.class, api) ?? 'int';
+    return backgroundSpellAbility(character, api) ?? classSpellAbility(character.class, api);
+}
+export function spellAbilityForSpell(spellName, character, api, bgSpellNames) {
+    const bgAbility = backgroundSpellAbility(character, api);
+    if (bgAbility && bgSpellNames.includes(spellName))
+        return bgAbility;
+    return classHasSpellList(character.class, api)
+        ? classSpellAbility(character.class, api)
+        : bgAbility ?? classSpellAbility(character.class, api);
+}
+export function spellcastingMetricsForAbility(ability, character, derivedSheet) {
+    const proficiencyBonus = derivedSheet?.proficiencyBonus ?? deriveProficiencyBonus(character.level);
+    const bonuses = calculateCharacterAbilityBonuses(character);
+    const scores = deriveAbilityScores(character.abilities ?? {}, bonuses);
+    const normalizedAbility = (ability.toLowerCase() || 'int');
+    const score = scores[normalizedAbility] || 10;
+    const modifier = deriveAbilityModifier(score);
+    return {
+        ability: normalizedAbility,
+        modifier,
+        attackBonus: proficiencyBonus + modifier,
+        saveDc: 8 + proficiencyBonus + modifier,
+    };
 }
 export function spellSlotsMaxByLevel(character, api) {
     const levelRow = currentLevelRow(character, api);

@@ -1,6 +1,6 @@
 /**
- * Background Loader - Load and cache 5etools backgrounds.json
- * Browser-only version using fetch
+ * Background Loader - load and cache compacted 5etools background data.
+ * Browser-only version using fetch.
  */
 import type { RawBackground } from '../../types/background';
 /**

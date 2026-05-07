@@ -5,7 +5,7 @@
  * Para adicionar novos backgrounds, importe BackgroundRegistry e registre no init.
  */
 
-import { BackgroundRegistry } from './background-selector';
+import { BackgroundRegistry } from './background-selector.js';
 import type { BackgroundData } from '../../types/background';
 
 /**

@@ -130,6 +130,7 @@ export function createEmptyState() {
                 subraceDetails: {},
                 itemDetails: {},
                 classFeatures: [],
+                subclassFeatures: [],
                 subclasses: [],
                 featDetails: {},
                 spellDetails: {},

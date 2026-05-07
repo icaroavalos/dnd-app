@@ -8,7 +8,7 @@
  * "1" (string) com 1 (number).
  */
 
-import type { RecoveryResult, ResourceText } from '../types/recovery';
+import type { RecoveryResult, ResourceText } from '../types/recovery.js';
 
 /**
  * Normaliza texto do 5etools removendo markup {@variantrule ...}

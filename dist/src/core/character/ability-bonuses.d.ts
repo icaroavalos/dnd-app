@@ -1,5 +1,5 @@
-import type { AbilityName } from '../../types/background';
-import type { Character } from '../../types/state';
+import type { AbilityName } from '../../types/background.js';
+import type { Character } from '../../types/state.js';
 export type AbilityBonusMap = Record<AbilityName, number>;
 export declare function calculateBackgroundAbilityBonuses(bgChoices: Character['bgChoices']): AbilityBonusMap;
 export declare function calculateAsiAbilityBonuses(asiChoices: Character['asiChoices'], omitRuleId?: string): AbilityBonusMap;
