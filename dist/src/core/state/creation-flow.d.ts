@@ -12,6 +12,8 @@ export interface CreationFlowCharacter {
     classSkillChoices?: string[];
     classFeatureChoices?: Record<string, unknown>;
     equipmentChoices?: Record<string, string>;
+    bgChoices?: any;
+    bgSpellChoices?: any;
     creationComplete?: boolean;
 }
 export interface ActiveChoiceRuleStatus {

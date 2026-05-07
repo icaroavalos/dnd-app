@@ -1346,7 +1346,7 @@ function buildCreationFlowState() {
       : 0;
 
   if (currentBackground) {
-    if (!state.character.bgChoices?.abilityIncrement) {
+    if (!state.character.bgChoices || !state.character.bgChoices.abilityIncrement) {
       backgroundStepMissing.push("distribuicao de atributos do background");
     } else if (backgroundAbilityRequired > 0 && backgroundAbilityCount < backgroundAbilityRequired) {
       backgroundStepMissing.push(`${backgroundAbilityRequired} atributos do background`);
