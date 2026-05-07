@@ -71,6 +71,8 @@ export function updateCreationField(character, path, value, helpers) {
     };
 }
 function nextBackgroundChoices(backgroundName, currentChoices) {
+    if (currentChoices?.background === backgroundName)
+        return currentChoices;
     const base = currentChoices ? { ...currentChoices } : createDefaultBackgroundChoiceState();
     return {
         ...base,

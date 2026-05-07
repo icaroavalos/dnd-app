@@ -29,6 +29,7 @@ export interface ApiState {
         classFeatures: FeatureData[];
         subclasses: SubclassData[];
         featDetails: Record<string, FeatureData>;
+        spellDetails: Record<string, SpellDetail>;
     };
 }
 /**
@@ -64,8 +65,8 @@ export interface Character {
     alignment: string;
     experience: number;
     abilityMethod: 'standard' | 'pointBuy' | 'manual';
-    classFeatureChoices: Record<string, string[]>;
-    asiChoices: Record<string, string[]>;
+    classFeatureChoices: Record<string, string>;
+    asiChoices: Record<string, any>;
     equipmentChoices: Record<string, string>;
     inventory: string[];
     equippedItems: string[];
@@ -142,5 +143,30 @@ export interface AppState {
     characters: Character[];
     api: ApiState;
     character: Character;
+}
+/**
+ * Estado derivado da ficha para exibição e cálculos em combate
+ */
+export interface DerivedCharacterSheet {
+    level: number;
+    proficiencyBonus: number;
+    abilityScores: AbilityScores;
+    abilityModifiers: AbilityScores;
+    savingThrows: Record<string, number>;
+    skillBonuses: Record<string, number>;
+    passivePerception: number;
+    armorClass: number;
+    initiative: number;
+    maxHp: number;
+    hitDie: number;
+    hitDiceTotal: number;
+    spellAttack: number;
+    spellSaveDc: number;
+    spellSlotsMax: Record<string, number>;
+    encumbrance: {
+        carriedWeight: number;
+        carryingCapacity: number;
+        encumbered: boolean;
+    };
 }
 //# sourceMappingURL=state.d.ts.map

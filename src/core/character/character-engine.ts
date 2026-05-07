@@ -63,12 +63,26 @@ export function deriveLevelOneMaxHp(hitDie: number, constitutionScore: number): 
   return Math.max(1, (Number(hitDie) || 8) + deriveAbilityModifier(constitutionScore));
 }
 
+export function deriveMaxHp(
+  level: number,
+  hitDie: number,
+  constitutionModifier: number
+): number {
+  const first = Math.max(1, hitDie + constitutionModifier);
+  const later = Math.max(1, Math.floor(hitDie / 2) + 1 + constitutionModifier);
+  return first + Math.max(0, level - 1) * later;
+}
+
 export function deriveSavingThrowBonus(
   abilityScore: number,
   proficient: boolean,
   proficiencyBonus: number
 ): number {
   return deriveAbilityModifier(abilityScore) + (proficient ? proficiencyBonus : 0);
+}
+
+export function signed(value: number): string {
+  return value >= 0 ? `+${value}` : `${value}`;
 }
 
 function normalizeAbility(value: AbilityName | string): AbilityName {

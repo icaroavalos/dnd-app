@@ -102,6 +102,7 @@ export function updateCreationField(
 }
 
 function nextBackgroundChoices(backgroundName: string, currentChoices?: BackgroundChoiceState | null): BackgroundChoiceState {
+  if (currentChoices?.background === backgroundName) return currentChoices;
   const base = currentChoices ? { ...currentChoices } : createDefaultBackgroundChoiceState();
 
   return {

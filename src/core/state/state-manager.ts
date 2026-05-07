@@ -5,7 +5,7 @@
  */
 
 import type { AppState, Character } from '../../types/state';
-import { getDefaultBackgroundChoice } from '../../types/background';
+import { getDefaultBackgroundChoice } from '../../types/background.js';
 
 const STATE_KEY = 'dnd-character-state';
 
@@ -143,6 +143,7 @@ export function createEmptyState(): Partial<AppState> {
         classFeatures: [],
         subclasses: [],
         featDetails: {},
+        spellDetails: {},
       },
     },
     character: createDefaultCharacter(),

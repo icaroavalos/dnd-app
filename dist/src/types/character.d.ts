@@ -42,7 +42,7 @@ export interface ClassData {
     proficiency: string[];
     savingThrows: string[];
     spellcastingAbility?: string;
-    casterProgression?: number;
+    casterProgression?: string;
     cantripProgression: number[];
     preparedSpellsProgression: number[][];
     startingProficiencies: {
@@ -54,6 +54,14 @@ export interface ClassData {
         };
     };
     proficiency_choices?: ProficiencyChoice[];
+    classTableGroups?: ClassTableGroup[];
+}
+export interface ClassTableGroup {
+    colLabels: string[];
+    rows: (number | string | {
+        value?: number | string;
+        max?: number;
+    })[][];
 }
 export interface ProficiencyChoice {
     choose: number;
@@ -77,10 +85,12 @@ export interface BackgroundData {
     toolProficiencies?: string[];
     languages?: string[];
     equipment: string[];
-    feature: {
+    feature?: {
         name: string;
         entries: string[];
     };
+    entries?: any[];
+    feats?: Record<string, boolean>[];
 }
 export interface ItemData {
     name: string;

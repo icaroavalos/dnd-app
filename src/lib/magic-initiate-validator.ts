@@ -38,7 +38,9 @@ export interface SpellcastingMetrics {
   saveDc: number;
 }
 
-type BackgroundDetails = Record<string, { entries?: unknown[]; feats?: Record<string, boolean>[] }>;
+import { BackgroundData } from '../types/character';
+
+type BackgroundDetails = Record<string, BackgroundData>;
 
 /**
  * Valida as escolhas de Magic Initiate para um background

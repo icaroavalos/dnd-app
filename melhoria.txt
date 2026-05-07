@@ -7,26 +7,26 @@ Why:
 
 Maintainability roadmap:
 1. [ok] Move character-creation state logic fully out of app.js into TypeScript modules.
-2. [in progress] Create one typed CharacterService / CharacterEngine for derived calculations:
-   - ability totals
-   - spellcasting metrics
-   - feature grants
-   - equipment effects
-   - validation
-3. Keep app.js only as a render and wiring shell, then gradually replace it with TypeScript too.
-4. Define stable TypeScript contracts for:
-   - Character
-   - BackgroundChoiceState
-   - SpellChoiceState
-   - RuleDefinition
-   - DerivedCharacterSheet
-5. Add tests around behavior modules first, not the whole UI first.
+2. [ok] Create one typed CharacterService / CharacterEngine for derived calculations:
+   - [ok] ability totals (src/core/character/ability-bonuses.ts)
+   - [ok] spellcasting metrics (src/core/character/spell-engine.ts)
+   - [ok] feature grants (src/core/character/feature-engine.ts)
+   - [ok] equipment effects (src/core/character/inventory-engine.ts)
+   - [ok] validation (src/core/state/creation-flow.ts)
+3. [in progress] Keep app.js only as a render and wiring shell, then gradually replace it with TypeScript too.
+4. [ok] Define stable TypeScript contracts for:
+   - [ok] Character
+   - [ok] BackgroundChoiceState
+   - [ok] SpellChoiceState (as part of Character/Rules)
+   - [ok] RuleDefinition
+   - [ok] DerivedCharacterSheet
+5. [pending] Add tests around behavior modules first, not the whole UI first.
 
 Suggested execution order:
-- Phase A: migrate the rest of builder and state logic from JS to TS
-- Phase B: centralize all derived calculations in one typed engine
-- Phase C: make the UI consume only typed outputs
-- Phase D: delete duplicated JS rule logic completely
+- Phase A: [ok] migrate the rest of builder and state logic from JS to TS
+- Phase B: [ok] centralize all derived calculations in one typed engine
+- Phase C: [in progress] make the UI consume only typed outputs (app.js is now a shell for these)
+- Phase D: [pending] delete duplicated JS rule logic completely (clean up app.js wrappers)
 
 Best next implementation target:
-Extract all spell, feature, background, and equipment derivation from app.js into a TypeScript character-engine module and make the UI read only from that.
+Migrate combat actions and effect engine (action-engine.js and modifier-engine.js) to TypeScript to complete the logic migration.

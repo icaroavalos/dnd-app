@@ -3,7 +3,7 @@
  *
  * Funções puras para load/save do estado da aplicação
  */
-import { getDefaultBackgroundChoice } from '../../types/background';
+import { getDefaultBackgroundChoice } from '../../types/background.js';
 const STATE_KEY = 'dnd-character-state';
 /**
  * Carrega estado do localStorage ou retorna estado vazio
@@ -132,6 +132,7 @@ export function createEmptyState() {
                 classFeatures: [],
                 subclasses: [],
                 featDetails: {},
+                spellDetails: {},
             },
         },
         character: createDefaultCharacter(),

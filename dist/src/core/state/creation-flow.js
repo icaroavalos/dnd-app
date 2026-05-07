@@ -37,7 +37,17 @@ export function getMissingChoicesForStep(step, state) {
     if (step === 'background') {
         if (!state.character.background)
             return ['background'];
-        return state.backgroundStepMissing;
+        // For non-guided backgrounds we don't have bgChoices UI fully built yet, 
+        // so we shouldn't block the UI to continue
+        const isGuidedBackground = ["Acolyte", "Soldier"].includes(state.character.background);
+        if (!isGuidedBackground) {
+            // Temporarily allow 5etools backgrounds to continue even if incomplete
+            // because we haven't built the UI for all of their complex rules yet
+            return [];
+        }
+        if (state.backgroundStepMissing && state.backgroundStepMissing.length > 0)
+            return state.backgroundStepMissing;
+        return [];
     }
     if (step === 'abilities') {
         const missing = ABILITY_LABELS
