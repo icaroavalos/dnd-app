@@ -41,7 +41,8 @@ export function validateMagicInitiateChoices(bgSpellChoices, classSpells, rules)
 export function createBackgroundSpellRules(grantedSpells) {
     return grantedSpells.map((grant, idx) => ({
         id: `bg-magic-initiate-${grant.spellList.toLowerCase()}-${idx}`,
-        name: `Magic Initiate (${grant.spellList})`,
+        name: `Magic Initiate (${toTitleCase(grant.spellList)})`,
+        type: 'bg_spell_choice',
         spellList: grant.spellList,
         cantrips: grant.cantrips,
         level1Spells: grant.level1Spells,
@@ -59,35 +60,23 @@ export function getBackgroundGrantedSpells(background, backgroundDetails) {
         return [];
     const bgKey = background.toLowerCase();
     const bgDetails = backgroundDetails?.[bgKey];
-    if (!bgDetails?.entries)
+    if (!bgDetails)
         return [];
     const granted = [];
-    for (const entry of bgDetails.entries) {
-        const entryStr = JSON.stringify(entry);
-        if (entryStr.toLowerCase().includes('magic initiate')) {
-            // Determina a lista de magias baseada no texto
-            let spellList = 'cleric';
-            if (entryStr.toLowerCase().includes('wizard'))
-                spellList = 'wizard';
-            else if (entryStr.toLowerCase().includes('druid'))
-                spellList = 'druid';
-            else if (entryStr.toLowerCase().includes('bard'))
-                spellList = 'bard';
-            else if (entryStr.toLowerCase().includes('sorcerer'))
-                spellList = 'sorcerer';
-            else if (entryStr.toLowerCase().includes('warlock'))
-                spellList = 'warlock';
-            else if (entryStr.toLowerCase().includes('paladin'))
-                spellList = 'paladin';
-            else if (entryStr.toLowerCase().includes('ranger'))
-                spellList = 'ranger';
-            granted.push({
-                type: 'magic_initiate',
-                spellList,
-                cantrips: 2,
-                level1Spells: 1,
-            });
-        }
+    const featRefs = (bgDetails.feats ?? []).flatMap((group) => Object.keys(group));
+    for (const featRef of featRefs) {
+        const parsed = parseMagicInitiateRef(featRef);
+        if (!parsed)
+            continue;
+        granted.push(parsed);
+    }
+    if (granted.length > 0)
+        return granted;
+    for (const entry of bgDetails.entries ?? []) {
+        const parsed = parseMagicInitiateRef(JSON.stringify(entry));
+        if (!parsed)
+            continue;
+        granted.push(parsed);
     }
     return granted;
 }
@@ -97,5 +86,65 @@ export function getBackgroundGrantedSpells(background, backgroundDetails) {
 export function isMagicInitiateComplete(bgSpellChoices, classSpells, rules) {
     const errors = validateMagicInitiateChoices(bgSpellChoices, classSpells, rules);
     return errors.length === 0;
+}
+export function getBackgroundSpellOptions(spellList, classSpells) {
+    if (!spellList)
+        return [];
+    const key = spellList.toLowerCase();
+    const options = classSpells?.[key] ?? [];
+    return [...options].sort((left, right) => left.level - right.level || left.name.localeCompare(right.name));
+}
+export function getSelectedBackgroundSpellNames(bgSpellChoices, rules) {
+    const selectedNames = [];
+    for (const rule of rules) {
+        const storageKey = `bg-${rule.id}`;
+        const selected = bgSpellChoices?.[storageKey] ?? [];
+        selected.forEach((name) => {
+            if (name && !selectedNames.includes(name))
+                selectedNames.push(name);
+        });
+    }
+    return selectedNames;
+}
+export function resolveBackgroundSpellcastingAbility(bgChoices, rules) {
+    if (!rules.length)
+        return null;
+    const chosenAbility = bgChoices?.spellcastingAbility?.toLowerCase();
+    if (!chosenAbility)
+        return null;
+    if (!['int', 'wis', 'cha'].includes(chosenAbility))
+        return null;
+    return chosenAbility;
+}
+export function getSpellcastingMetrics(ability, abilities, proficiencyBonus) {
+    const normalizedAbility = ability.toLowerCase();
+    const score = Number(abilities[normalizedAbility] ?? 10);
+    const modifier = Math.floor((score - 10) / 2);
+    return {
+        ability: normalizedAbility,
+        modifier,
+        attackBonus: proficiencyBonus + modifier,
+        saveDc: 8 + proficiencyBonus + modifier,
+    };
+}
+function parseMagicInitiateRef(text) {
+    const normalized = text.toLowerCase();
+    if (!normalized.includes('magic initiate'))
+        return null;
+    const classMatch = normalized.match(/magic initiate;?\s*([a-z]+)/i);
+    const spellList = classMatch?.[1]?.toLowerCase() ?? inferSpellListFromText(normalized);
+    return {
+        type: 'magic_initiate',
+        spellList,
+        cantrips: 2,
+        level1Spells: 1,
+    };
+}
+function inferSpellListFromText(text) {
+    const spellLists = ['bard', 'cleric', 'druid', 'paladin', 'ranger', 'sorcerer', 'warlock', 'wizard'];
+    return spellLists.find((name) => text.includes(name)) ?? 'cleric';
+}
+function toTitleCase(value) {
+    return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 }
 //# sourceMappingURL=magic-initiate-validator.js.map

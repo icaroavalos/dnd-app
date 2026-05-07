@@ -4,6 +4,7 @@
  */
 
 import type { SpellDetail, ClassData, RaceData, BackgroundData, ItemData, FeatureData, SubclassData } from './character';
+import type { BackgroundChoiceState } from './background';
 
 export type BuilderStepId = 'lineage' | 'background' | 'abilities' | 'choices' | 'leveling';
 
@@ -86,6 +87,7 @@ export interface Character {
   spells: string[];
   notes: string;
   bgSpellChoices?: Record<string, string[]>;
+  bgChoices?: BackgroundChoiceState | null;
 }
 
 /**

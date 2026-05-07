@@ -2,6 +2,25 @@ import { deriveCharacterSheet } from "./src/core/character/character-projection.
 import { deriveAvailableActions } from "./src/core/engine/action-engine.js";
 import { deriveActiveModifiers, modifierTotal } from "./src/core/engine/modifier-engine.js";
 import { RuleRepository } from "./src/core/rules/rule-repository.js";
+import { ALIGNMENT_OPTIONS, applyBackgroundStepSelection, updateCreationField } from "./dist/src/core/state/creation-form-controller.js";
+import { calculateBackgroundAbilityBonuses, calculateCharacterAbilityBonuses } from "./dist/src/core/character/ability-bonuses.js";
+import { deriveAbilityModifier, deriveAbilityScores, deriveLevelOneMaxHp, deriveProficiencyBonus, deriveSavingThrowBonus, deriveSpellcastingMetrics } from "./dist/src/core/character/character-engine.js";
+import { CREATION_STEPS, getMissingChoicesForStep as getTypedMissingChoicesForStep, validateCreationStep } from "./dist/src/core/state/creation-flow.js";
+import {
+  applyGuidedBackgroundEquipmentChoice,
+  applyGuidedBackgroundIncrement,
+  applyGuidedBackgroundSpellcastingAbility,
+  buildGuidedBackgroundViewModel,
+  ensureGuidedBackgroundChoiceState,
+  toggleGuidedBackgroundAbility,
+} from "./dist/src/core/state/guided-background-builder.js";
+import {
+  createBackgroundSpellRules as createMagicInitiateSpellRules,
+  getBackgroundGrantedSpells as getMagicInitiateBackgroundGrants,
+  getBackgroundSpellOptions as getMagicInitiateSpellOptions,
+  getSelectedBackgroundSpellNames as getSelectedMagicInitiateSpellNames,
+  resolveBackgroundSpellcastingAbility,
+} from "./dist/src/lib/magic-initiate-validator.js";
 
 const DATA_SOURCE = "data/5etools/5e-2024";
 const DATA_SOURCE_LABEL = "5etools 2024";
@@ -158,13 +177,7 @@ const CLASS_DECKS = {
   wizard: "arcane",
 };
 
-const STEPS = [
-  ["lineage", "Origem"],
-  ["background", "Background"],
-  ["abilities", "Atributos"],
-  ["choices", "Escolhas"],
-  ["leveling", "Niveis"],
-];
+const STEPS = CREATION_STEPS;
 
 const TABS = [
   ["summary", "Base"],
@@ -436,7 +449,7 @@ async function hydrateApiData() {
   state.dataStatus = "carregando 5etools 2024";
   renderChrome();
   try {
-    const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats] = await Promise.all([
+    const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats, backgrounds] = await Promise.all([
       fetchJson(`${DATA_SOURCE}/classes.json`),
       fetchJson(`${DATA_SOURCE}/races.json`),
       fetchJson(`${DATA_SOURCE}/subraces.json`),
@@ -446,8 +459,9 @@ async function hydrateApiData() {
       fetchJson(`${DATA_SOURCE}/class-features.json`),
       fetchJson(`${DATA_SOURCE}/subclasses.json`),
       fetchJson(`${DATA_SOURCE}/feats.json`),
+      fetchJson(`${DATA_SOURCE}/backgrounds.json`),
     ]);
-    hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats });
+    hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats, backgrounds });
     state.dataStatus = DATA_SOURCE_LABEL;
     normalizeCharacterState();
     persist();
@@ -478,11 +492,11 @@ async function loadSpellDetails(spellName) {
   }
 }
 
-function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats }) {
+function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, classSpells, classFeatures, subclasses, feats, backgrounds }) {
   const classResults = classes.results ?? [];
   const raceResults = races.results ?? [];
   const subraceResults = subraces.results ?? [];
-
+  const backgroundResults = backgrounds.results ?? [];
   const equipmentResults = equipment.results ?? [];
   const spellResults = spells.results ?? [];
   const classSpellResults = classSpells.results ?? {};
@@ -509,6 +523,11 @@ function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, cla
     source: {
       classOptions: classResults.map((klass) => [slugifyName(klass.name), klass.name]).sort((a, b) => a[1].localeCompare(b[1])),
       raceOptions: raceResults.map((race) => [slugifyName(race.name), race.name]).sort((a, b) => a[1].localeCompare(b[1])),
+      backgroundOptions: backgroundResults
+        .filter((background) => background.source === "XPHB")
+        .map((background) => [background.name, background.name])
+        .sort((a, b) => a[1].localeCompare(b[1])),
+      backgroundDetails: Object.fromEntries(backgroundResults.map((background) => [background.name.toLowerCase(), background])),
               subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
       itemDetails: Object.fromEntries(equipmentResults.map((item) => [itemKey(item.name, item.source), item])),
       classFeatures: classFeatureResults.map(normalize5etoolsFeature),
@@ -841,7 +860,7 @@ function renderLineageForm() {
       ${selectField("class", "Classe", c.class, classOptions, locked)}
       ${selectField("race", "Raca / especie", c.race, raceOptions, locked)}
       ${hasSubrace ? selectField("subrace", "Subraca", c.subrace ?? "", subraceFieldOptions, locked) : ""}
-          ${selectField("alignment", "Alinhamento", c.alignment, ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"].map((item) => [item, item]), locked)}
+          ${selectField("alignment", "Alinhamento", c.alignment, ALIGNMENT_OPTIONS, locked)}
     </div>
     <p class="hint">${locked ? "Origem e classe foram definidos na criacao e ficam travados depois que a ficha e finalizada." : "Classe, especie, magias e progresso por nivel vem exclusivamente dos dados 5etools 2024."}</p>
     ${navButtons()}
@@ -967,7 +986,7 @@ function renderChoicesForm() {
   const selectedCount = selected.length;
   const skillOptions = [...new Set([...backgroundSkills, ...classSkill.options])];
   const classChoices = classCreationChoiceRules();
-const bgSpellChoices = backgroundSpellChoiceRules();
+  const creationEquipmentRules = equipmentChoiceRules().filter((rule) => rule.id !== "background-starting-equipment");
   const locked = creationChoicesLocked();
   return `
     <fieldset class="choice-group">
@@ -991,8 +1010,8 @@ const bgSpellChoices = backgroundSpellChoiceRules();
         }).join("")}
       </div>
     </fieldset>
-    ${classChoices.map(renderClassCreationChoice).join("")} ${bgSpellChoices.map(renderBgSpellChoice).join("")}
-    ${equipmentChoiceRules().map(renderEquipmentChoice).join("")}
+    ${classChoices.map(renderClassCreationChoice).join("")}
+    ${creationEquipmentRules.map(renderEquipmentChoice).join("")}
     <fieldset class="choice-group">
       <legend>Ataques</legend>
       <div id="attackEditor">
@@ -1077,63 +1096,50 @@ function renderAsiChoice(rule) {
   `;
 }
 
-// Default backgrounds (simple names array for now)
-const DEFAULT_BACKGROUND_NAMES = ['Acolyte', 'Soldier'];
-
-async function renderBackgroundForm() {
-  const bgChoices = state.character.bgChoices || {};
-  const currentBg = bgChoices.background;
+function renderBackgroundForm() {
+  const bgChoices = ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background);
+  const currentBg = bgChoices.background || state.character.background;
   const locked = creationChoicesLocked();
-
-  // Use default backgrounds
-  const bgOptions = DEFAULT_BACKGROUND_NAMES.map(name => ({
-    value: name,
-    label: name,
-    selected: currentBg === name
-  }));
-
-  // Generate rules for selected background
+  const viewModel = buildGuidedBackgroundViewModel({
+    ...bgChoices,
+    background: currentBg || bgChoices.background || null,
+  });
   let bgContent = '<p class="hint">Selecione um background para ver as opcoes.</p>';
-  if (currentBg) {
-    // Inline rules based on background name
-    const isAcolyte = currentBg === 'Acolyte';
-    const isSoldier = currentBg === 'Soldier';
-
-    const abilityOptions = isAcolyte ? ['int', 'wis', 'cha'] : isSoldier ? ['str', 'dex', 'con'] : ['int', 'wis', 'cha'];
-    const abilityLabels = { str: 'Strength', dex: 'Dexterity', con: 'Constitution', int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma' };
-    const skillInfo = isAcolyte ? ['Insight', 'Religion'] : isSoldier ? ['Athletics', 'Intimidation'] : [];
-    const toolInfo = isAcolyte ? ["Calligrapher's Supplies"] : isSoldier ? ['Gaming Set', 'Land Vehicles'] : [];
-
+  if (viewModel.currentBackground) {
     bgContent = `
       <fieldset class="choice-group">
-        <legend>${currentBg}: Ability Scores</legend>
-        <p class="hint">Choose how to increase your ability scores:</p>
+        <legend>${viewModel.currentBackground}: Ability Scores</legend>
+        <p class="hint">Choose how to increase your ability scores. In +2 / +1, the first selected ability receives +2 and the second receives +1.</p>
         <div class="choice-group-inline" style="display:flex;gap:1rem;margin:0.5rem 0;">
           <label><input type="radio" name="ability-increment" value="2_1" ${bgChoices.abilityIncrement === '2_1' ? 'checked' : ''} data-bg-increment /> <span>+2 / +1</span></label>
           <label><input type="radio" name="ability-increment" value="1_1_1" ${bgChoices.abilityIncrement === '1_1_1' ? 'checked' : ''} data-bg-increment /> <span>+1 / +1 / +1</span></label>
         </div>
+        <p class="choice-counter ${(viewModel.maxAbilityChoices > 0 && viewModel.selectedAbilityCount === viewModel.maxAbilityChoices) ? 'complete' : ''}">${viewModel.selectedAbilityCount}/${viewModel.maxAbilityChoices || 0} escolhidas</p>
         <div class="choice-list">
-          ${abilityOptions.map(opt => `<label class="${(bgChoices.abilityScores || []).includes(opt) ? 'selected' : ''}"><input type="checkbox" data-bg-ability="${opt}" ${(bgChoices.abilityScores || []).includes(opt) ? 'checked' : ''} /><span><strong>${abilityLabels[opt]}</strong></span></label>`).join('')}
+          ${viewModel.abilityOptions.map((option) => {
+            const bonus = option.bonus ? ` <small class="choice-source">+${option.bonus}</small>` : '';
+            return `<label class="${option.selected ? 'selected' : ''} ${option.disabled ? 'disabled' : ''}"><input type="checkbox" data-bg-ability="${option.value}" ${option.selected ? 'checked' : ''} ${option.disabled ? 'disabled' : ''} /><span><strong>${option.label}</strong>${bonus}</span></label>`;
+          }).join('')}
         </div>
       </fieldset>
       <fieldset class="choice-group">
-        <legend>${currentBg}: Skills (automatic)</legend>
+        <legend>${viewModel.currentBackground}: Skills (automatic)</legend>
         <p class="hint">Skill proficiencies granted by this background:</p>
-        <div class="choice-list">${skillInfo.map(s => `<label class="readonly"><input type="checkbox" checked disabled /><span>${s}</span></label>`).join('') || '<p class="hint">No skill proficiencies</p>'}</div>
+        <div class="choice-list">${viewModel.skills.map((skill) => `<label class="readonly"><input type="checkbox" checked disabled /><span>${skill}</span></label>`).join('') || '<p class="hint">No skill proficiencies</p>'}</div>
       </fieldset>
-      ${toolInfo.length > 0 ? `<fieldset class="choice-group"><legend>${currentBg}: Tools (automatic)</legend><div class="choice-list">${toolInfo.map(t => `<label class="readonly"><input type="checkbox" checked disabled /><span>${t}</span></label>`).join('')}</div></fieldset>` : ''}
+      ${viewModel.tools.length > 0 ? `<fieldset class="choice-group"><legend>${viewModel.currentBackground}: Tools (automatic)</legend><div class="choice-list">${viewModel.tools.map((tool) => `<label class="readonly"><input type="checkbox" checked disabled /><span>${tool}</span></label>`).join('')}</div></fieldset>` : ''}
       <fieldset class="choice-group">
-        <legend>${currentBg}: Equipment</legend>
+        <legend>${viewModel.currentBackground}: Equipment</legend>
         <p class="hint">Choose your starting equipment:</p>
         <div class="choice-list">
-          <label><input type="radio" name="bg-equipment" value="A" ${bgChoices.equipmentChoice === 'A' ? 'checked' : ''} data-bg-equipment /><span><strong>Option A</strong><small>Items based on background</small></span></label>
-          <label><input type="radio" name="bg-equipment" value="B" ${bgChoices.equipmentChoice === 'B' ? 'checked' : ''} data-bg-equipment /><span><strong>Option B</strong><small>50 GP gold</small></span></label>
+          ${viewModel.equipmentOptions.map((option) => `<label><input type="radio" name="bg-equipment" value="${option.value}" ${option.selected ? 'checked' : ''} data-bg-equipment /><span><strong>${option.label}</strong><small>${option.hint}</small></span></label>`).join('')}
         </div>
       </fieldset>
     `;
 
-    if (isAcolyte) {
-      bgContent += `<fieldset class="choice-group"><legend>Magic Initiate: Cleric</legend><p class="hint">Choose your spellcasting ability for Magic Initiate spells:</p><div class="choice-list">${['int', 'wis', 'cha'].map(a => `<label><input type="radio" name="spellcasting-ability" value="${a}" ${bgChoices.spellcastingAbility === a ? 'checked' : ''} /><span><strong>${abilityLabels[a]}</strong></span></label>`).join('')}</div></fieldset>`;
+    if (viewModel.showsMagicInitiate) {
+      bgContent += `<fieldset class="choice-group"><legend>Magic Initiate: Cleric</legend><p class="hint">Choose your spellcasting ability for Magic Initiate spells:</p><div class="choice-list">${['int', 'wis', 'cha'].map((ability) => `<label><input type="radio" name="spellcasting-ability" value="${ability}" ${viewModel.spellcastingAbility === ability ? 'checked' : ''} /><span><strong>${titleCase(ability === 'int' ? 'intelligence' : ability === 'wis' ? 'wisdom' : 'charisma')}</strong></span></label>`).join('')}</div></fieldset>`;
+      bgContent += backgroundSpellChoiceRules().map(renderBgSpellChoice).join("");
     }
   }
 
@@ -1145,7 +1151,7 @@ async function renderBackgroundForm() {
         <label for="bg-select">Escolha seu Background:</label>
         <select id="bg-select" class="select-field" data-bg-select ${locked ? 'disabled' : ''}>
           <option value="">-- Selecione --</option>
-          ${bgOptions.map(opt =>
+          ${viewModel.options.map(opt =>
             `<option value="${escapeHtml(opt.value)}" ${opt.selected ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`
           ).join('')}
         </select>
@@ -1154,104 +1160,6 @@ async function renderBackgroundForm() {
       ${bgContent}
       ${navButtons()}
     </section>
-  `;
-}
-
-function renderBackgroundAbilityChoice(rule, bgChoices, locked) {
-  const increment = bgChoices.abilityIncrement;
-  const selectedScores = bgChoices.abilityScores || [];
-
-  return `
-    <fieldset class="choice-group">
-      <legend>${escapeHtml(rule.name)}</legend>
-      <p class="hint">Cada background sugere uma distribuicao de atributos. Escolha seu padrao:</p>
-
-      <div class="choice-group-inline">
-        <label>
-          <input type="radio" name="ability-increment" value="2_1"
-            ${increment === '2_1' ? 'checked' : ''}
-            ${locked ? 'disabled' : ''}
-            data-bg-increment />
-          <span>+2 em um atributo, +1 em outro</span>
-        </label>
-        <label>
-          <input type="radio" name="ability-increment" value="1_1_1"
-            ${increment === '1_1_1' ? 'checked' : ''}
-            ${locked ? 'disabled' : ''}
-            data-bg-increment />
-          <span>+1 em tres atributos</span>
-        </label>
-      </div>
-
-      <div class="choice-list">
-        ${rule.options.map(opt => `
-          <label class="${selectedScores.includes(opt.value) ? 'selected' : ''}">
-            <input type="checkbox"
-              data-bg-ability="${opt.value}"
-              ${selectedScores.includes(opt.value) ? 'checked' : ''}
-              ${locked ? 'disabled' : ''} />
-            <span><strong>${escapeHtml(opt.label)}</strong>${opt.hint ? `<small> ${escapeHtml(opt.hint)}</small>` : ''}</span>
-          </label>
-        `).join('')}
-      </div>
-    </fieldset>
-  `;
-}
-
-function renderBackgroundEquipmentChoice(rule, bgChoices, locked) {
-  const selected = bgChoices.equipmentChoice;
-
-  return `
-    <fieldset class="choice-group">
-      <legend>${escapeHtml(rule.name)}</legend>
-      <p class="hint">Escolha seu equipamento inicial:</p>
-      <div class="choice-list">
-        ${rule.options.map(opt => `
-          <label>
-            <input type="radio" name="bg-equipment" value="${opt.value}"
-              ${selected === opt.value ? 'checked' : ''}
-              ${locked ? 'disabled' : ''}
-              data-bg-equipment />
-            <span><strong>${escapeHtml(opt.label)}</strong><small>${escapeHtml(opt.hint || '')}</small></span>
-          </label>
-        `).join('')}
-      </div>
-    </fieldset>
-  `;
-}
-
-function renderBackgroundSkillInfo(rule, bgChoices) {
-  // Skills are automatically granted, just display them
-  return `
-    <fieldset class="choice-group">
-      <legend>${escapeHtml(rule.name)}</legend>
-      <p class="hint">Proficiencias concedidas automaticamente:</p>
-      <div class="choice-list">
-        ${rule.options.map(opt => `
-          <label class="readonly">
-            <input type="checkbox" checked disabled />
-            <span>${escapeHtml(opt.label)}</span>
-          </label>
-        `).join('')}
-      </div>
-    </fieldset>
-  `;
-}
-
-function renderBackgroundToolInfo(rule, bgChoices) {
-  return `
-    <fieldset class="choice-group">
-      <legend>${escapeHtml(rule.name)}</legend>
-      <p class="hint">Proficiencia concedida:</p>
-      <div class="choice-list">
-        ${rule.options.map(opt => `
-          <label class="readonly">
-            <input type="checkbox" checked disabled />
-            <span>${escapeHtml(opt.label)}</span>
-          </label>
-        `).join('')}
-      </div>
-    </fieldset>
   `;
 }
 
@@ -1381,70 +1289,13 @@ function validateStepRange(fromIndex, toIndex) {
 }
 
 function validateStep(step) {
-  const missing = missingChoicesForStep(step);
-  if (missing.length) {
-    state.validationMessage = `Ainda falta: ${missing.join(", ")}.`;
-    return false;
-  }
-  state.validationMessage = "";
-  return true;
+  const result = validateCreationStep(step, buildCreationFlowState());
+  state.validationMessage = result.message;
+  return result.valid;
 }
 
 function missingChoicesForStep(step) {
-  if (step === "lineage") {
-    const missing = [];
-    if (!state.character.name?.trim()) missing.push("nome da ficha");
-    if (!state.character.class) missing.push("classe");
-    if (!state.character.race) missing.push("raca/especie");
-    if (subracesFor(state.character.race).length && !state.character.subrace) missing.push("subraca/linhagem");
-    // Background has its own step now, no longer required here
-    return missing;
-  }
-
-  if (step === "abilities") {
-    const missing = ABILITIES.filter(([key]) => !Number.isFinite(Number(state.character.abilities[key]))).map(([, label]) => label);
-    if ((state.character.abilityMethod ?? "standard") === "pointBuy" && pointBuySpent() !== POINT_BUY_BUDGET) {
-      missing.push(`${POINT_BUY_BUDGET - pointBuySpent()} pontos de Point Buy`);
-    }
-    return missing;
-  }
-
-  if (step === "background") {
-    return state.character.background ? [] : ["background"];
-  }
-
-  if (step === "choices") return missingCreationChoices();
-  if (step === "leveling") return [...missingLevelUpChoices(), ...missingCreationChoices(), ...missingSpellChoices()];
-  return [];
-}
-
-function missingCreationChoices() {
-  if (!state.levelUpMode && creationChoicesLocked()) return [];
-  const missing = [];
-  const skillRule = classSkillRule();
-  if (!state.levelUpMode && !state.creationComplete && (state.character.classSkillChoices ?? []).length !== skillRule.choose) missing.push(`${skillRule.choose} skill(s) da classe`);
-  activeChoiceRulesForValidation().forEach((rule) => {
-    if (rule.type === "asi") {
-      if (!isAsiChoiceComplete(rule)) missing.push(rule.name);
-      return;
-    }
-    if (!state.character.classFeatureChoices?.[rule.id]) missing.push(rule.name);
-  });
-  // Check background spell choices (Magic Initiate)
-const bgSpellRules = backgroundSpellChoiceRules();
-bgSpellRules.forEach((rule) => {
-  const storageKey = `bg-${rule.id}`;
-  const selected = state.character.bgSpellChoices?.[storageKey] || [];
-  const selectedCantrips = selected.filter(s => s && state.api.source?.spellDetails?.[s.toLowerCase()]?.level === 0);
-  const selectedLevel1 = selected.filter(s => s && state.api.source?.spellDetails?.[s.toLowerCase()]?.level === 1);
-  if (selectedCantrips.length < (rule.cantrips || 2)) missing.push(`${rule.name}: ${rule.cantrips} cantrips`);
-  if (selectedLevel1.length < (rule.level1Spells || 1)) missing.push(`${rule.name}: ${rule.level1Spells} level 1 spell`);
-});
-
-if (!state.levelUpMode && !state.creationComplete) equipmentChoiceRules().forEach((rule) => {
-    if (!state.character.equipmentChoices?.[rule.id]) missing.push(rule.name);
-  });
-  return missing;
+  return getTypedMissingChoicesForStep(step, buildCreationFlowState());
 }
 
 function missingSpellChoices() {
@@ -1462,6 +1313,97 @@ function missingLevelUpChoices() {
   return state.levelUpHpGain ? [] : ["ganho de HP do nivel"];
 }
 
+function buildCreationFlowState() {
+  const classSkill = classSkillRule();
+  const bgSpellRules = backgroundSpellChoiceRules();
+  const currentBackground = state.character.background || state.character.bgChoices?.background || "";
+  const activeRules = activeChoiceRulesForValidation().map((rule) => ({
+    name: rule.name,
+    type: rule.type,
+    complete: rule.type === "asi"
+      ? isAsiChoiceComplete(rule)
+      : Boolean(state.character.classFeatureChoices?.[rule.id]),
+  }));
+  const backgroundSpellSelections = bgSpellRules.map((rule) => {
+    const storageKey = `bg-${rule.id}`;
+    const selected = state.character.bgSpellChoices?.[storageKey] || [];
+    return {
+      name: rule.name,
+      selectedCantrips: selected.filter((spellName) => state.api.source?.spellDetails?.[spellName.toLowerCase()]?.level === 0).length,
+      requiredCantrips: rule.cantrips || 2,
+      selectedLevel1: selected.filter((spellName) => state.api.source?.spellDetails?.[spellName.toLowerCase()]?.level === 1).length,
+      requiredLevel1Spells: rule.level1Spells || 1,
+    };
+  });
+  const spellRule = spellChoiceRule();
+  const spellCounts = selectedSpellCounts();
+  const backgroundStepMissing = [];
+  const backgroundAbilityCount = state.character.bgChoices?.abilityScores?.length ?? 0;
+  const backgroundAbilityRequired = state.character.bgChoices?.abilityIncrement === "2_1"
+    ? 2
+    : state.character.bgChoices?.abilityIncrement === "1_1_1"
+      ? 3
+      : 0;
+
+  if (currentBackground) {
+    if (!state.character.bgChoices?.abilityIncrement) {
+      backgroundStepMissing.push("distribuicao de atributos do background");
+    } else if (backgroundAbilityRequired > 0 && backgroundAbilityCount < backgroundAbilityRequired) {
+      backgroundStepMissing.push(`${backgroundAbilityRequired} atributos do background`);
+    }
+
+    if (!state.character.bgChoices?.equipmentChoice) {
+      backgroundStepMissing.push(`${currentBackground} Equipment`);
+    }
+
+    if (currentBackground === "Acolyte" && !state.character.bgChoices?.spellcastingAbility) {
+      backgroundStepMissing.push("Magic Initiate: habilidade de conjuracao");
+    }
+
+    backgroundSpellSelections.forEach((selection) => {
+      if (selection.selectedCantrips < selection.requiredCantrips) {
+        backgroundStepMissing.push(`${selection.name}: ${selection.requiredCantrips} cantrips`);
+      }
+      if (selection.selectedLevel1 < selection.requiredLevel1Spells) {
+        backgroundStepMissing.push(`${selection.name}: ${selection.requiredLevel1Spells} level 1 spell`);
+      }
+    });
+  }
+
+  return {
+    character: {
+      ...state.character,
+      background: state.character.background || state.character.bgChoices?.background || "",
+      creationComplete: state.creationComplete,
+    },
+    levelUpMode: state.levelUpMode,
+    creationChoicesLocked: creationChoicesLocked(),
+    pointBuyBudget: POINT_BUY_BUDGET,
+    pointBuySpent: pointBuySpent(),
+    subraceRequired: subracesFor(state.character.race).length > 0,
+    backgroundStepMissing,
+    classSkillSelectedCount: (state.character.classSkillChoices ?? []).length,
+    classSkillRequiredCount: classSkill.choose,
+    activeChoiceRules: activeRules,
+    backgroundSpellSelections,
+    equipmentChoiceNames: !state.levelUpMode && !state.creationComplete
+      ? equipmentChoiceRules()
+          .filter((rule) => rule.id !== "background-starting-equipment")
+          .filter((rule) => !state.character.equipmentChoices?.[rule.id])
+          .map((rule) => rule.name)
+      : [],
+    missingLevelUpChoices: missingLevelUpChoices(),
+    spellChoiceStatus: spellRule.totalMax === 0
+      ? null
+      : {
+          selectedCantrips: spellCounts.cantrips,
+          requiredCantrips: spellRule.cantrips,
+          selectedLeveled: spellCounts.leveled,
+          requiredLeveled: spellRule.spellsMax,
+        },
+  };
+}
+
 function attackEditorRow(attack, index) {
   return `
     <div class="form-grid" data-attack="${index}">
@@ -1477,36 +1419,33 @@ function attackEditorRow(attack, index) {
 function bindFormEvents() {
   els.form.querySelectorAll("[data-path]").forEach((input) => {
     const updatePathValue = async () => {
-      setByPath(state.character, input.dataset.path, input.type === "number" ? Number(input.value) : input.value);
-      const needsFullRender = input.dataset.path === "class" || input.dataset.path === "race" || input.dataset.path === "subrace" || input.dataset.path === "abilityMethod" || input.dataset.path.startsWith("abilities.") || input.dataset.path.startsWith("asiChoices.");
-      if (input.dataset.path === "class") {
-        await loadClassData(input.value);
-        state.character.savingThrows = defaultSaves(input.value);
-        state.character.classSkillChoices = [];
-        state.character.classFeatureChoices = {};
-        state.character.asiChoices = {};
-  character.bgSpellChoices = {};
-        state.character.equipmentChoices = {};
-        state.character.inventory = [];
-        state.character.equippedItems = [];
-        if (state.character.level === 1) state.character.hp = maxLevelOneHp(input.value, state.character.abilities);
+      const path = input.dataset.path;
+      const value = input.type === "number" ? Number(input.value) : input.value;
+      const isTypedCreationField = path === "class" || path === "race" || path === "subrace" || path === "alignment" || path === "background";
+
+      if (isTypedCreationField) {
+        state.character = updateCreationField(state.character, path, String(value), {
+          backgroundSkillProficiencies: (backgroundName) => backgroundSkillProficiencies(backgroundName),
+          defaultSaves,
+          defaultSubrace,
+          maxLevelOneHp,
+        });
+      } else {
+        setByPath(state.character, path, value);
+      }
+
+      const needsFullRender = path === "class" || path === "race" || path === "subrace" || path === "alignment" || path === "abilityMethod" || path.startsWith("abilities.") || path.startsWith("asiChoices.");
+      if (path === "class") {
+        await loadClassData(String(value));
       }
       if (input.dataset.path.startsWith("abilities.") && state.character.level === 1) {
         state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
       }
-      if (input.dataset.path === "abilityMethod") {
-        applyAbilityMethod(input.value);
+      if (path === "abilityMethod") {
+        applyAbilityMethod(String(value));
       }
-      if (input.dataset.path === "race") {
-        await loadRaceData(input.value);
-        state.character.subrace = defaultSubrace(input.value);
-      }
-      if (input.dataset.path === "background") {
-        const backgroundSkills = backgroundSkillProficiencies(input.value);
-        state.character.classSkillChoices = (state.character.classSkillChoices ?? []).filter((skill) => !backgroundSkills.includes(skill));
-        state.character.equipmentChoices = {};
-        state.character.inventory = [];
-        state.character.equippedItems = [];
+      if (path === "race") {
+        await loadRaceData(String(value));
       }
       normalizeCharacterState();
       persist();
@@ -1578,6 +1517,7 @@ els.form.querySelectorAll("[data-bg-spell]").forEach((input) => {
     } else {
       state.character.bgSpellChoices[key] = state.character.bgSpellChoices[key].filter(v => v !== value);
     }
+    persist();
     render();
   });
 });
@@ -1585,22 +1525,12 @@ els.form.querySelectorAll("[data-bg-spell]").forEach((input) => {
   // Background step event handlers
 els.form.querySelectorAll("[data-bg-select]").forEach((select) => {
   select.addEventListener("change", (e) => {
-    state.character.bgChoices = state.character.bgChoices || {
-      background: null,
-      source: 'XPHB',
-      abilityIncrement: null,
-      abilityScores: [],
-      skillChoices: [],
-      toolChoices: [],
-      equipmentChoice: null,
-      spellcastingAbility: null,
-    };
-    state.character.bgChoices.background = e.target.value;
-    state.character.background = e.target.value; // Keep for compatibility
-    state.character.bgChoices.abilityIncrement = null;
-    state.character.bgChoices.abilityScores = [];
-    state.character.bgChoices.equipmentChoice = null;
-    state.character.bgChoices.spellcastingAbility = null;
+    state.character = applyBackgroundStepSelection(
+      state.character,
+      e.target.value,
+      (backgroundName) => backgroundSkillProficiencies(backgroundName)
+    );
+    normalizeCharacterState();
     persist();
     render();
   });
@@ -1608,11 +1538,11 @@ els.form.querySelectorAll("[data-bg-select]").forEach((select) => {
 
 els.form.querySelectorAll("[data-bg-increment]").forEach((input) => {
   input.addEventListener("change", () => {
-    state.character.bgChoices ??= {};
-    state.character.bgChoices.abilityIncrement = input.value;
-    if (input.value === '2_1' && state.character.bgChoices.abilityScores.length > 2) {
-      state.character.bgChoices.abilityScores = state.character.bgChoices.abilityScores.slice(0, 2);
-    }
+    state.character.bgChoices = applyGuidedBackgroundIncrement(
+      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
+      input.value
+    );
+    normalizeCharacterState();
     persist();
     render();
   });
@@ -1620,14 +1550,13 @@ els.form.querySelectorAll("[data-bg-increment]").forEach((input) => {
 
 els.form.querySelectorAll("[data-bg-ability]").forEach((input) => {
   input.addEventListener("change", () => {
-    state.character.bgChoices ??= {};
-    state.character.bgChoices.abilityScores ??= [];
     const ability = input.dataset.bgAbility;
-    if (input.checked) {
-      state.character.bgChoices.abilityScores.push(ability);
-    } else {
-      state.character.bgChoices.abilityScores = state.character.bgChoices.abilityScores.filter(a => a !== ability);
-    }
+    state.character.bgChoices = toggleGuidedBackgroundAbility(
+      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
+      ability,
+      input.checked
+    );
+    normalizeCharacterState();
     persist();
     render();
   });
@@ -1635,8 +1564,11 @@ els.form.querySelectorAll("[data-bg-ability]").forEach((input) => {
 
 els.form.querySelectorAll("[data-bg-equipment]").forEach((input) => {
   input.addEventListener("change", () => {
-    state.character.bgChoices ??= {};
-    state.character.bgChoices.equipmentChoice = input.value;
+    state.character.bgChoices = applyGuidedBackgroundEquipmentChoice(
+      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
+      input.value
+    );
+    normalizeCharacterState();
     persist();
     render();
   });
@@ -1644,8 +1576,11 @@ els.form.querySelectorAll("[data-bg-equipment]").forEach((input) => {
 
 els.form.querySelectorAll("[name='spellcasting-ability']").forEach((input) => {
   input.addEventListener("change", () => {
-    state.character.bgChoices ??= {};
-    state.character.bgChoices.spellcastingAbility = input.value;
+    state.character.bgChoices = applyGuidedBackgroundSpellcastingAbility(
+      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
+      input.value
+    );
+    normalizeCharacterState();
     persist();
     render();
   });
@@ -1700,6 +1635,9 @@ els.form.querySelectorAll("[data-level-hp-gain]").forEach((input) => {
 
   els.form.querySelectorAll("[data-move]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (state.step === "background" && !state.character.background && state.character.bgChoices?.background) {
+        state.character.background = state.character.bgChoices.background;
+      }
       const index = STEPS.findIndex(([id]) => id === state.step);
       const nextIndex = Number(button.dataset.move);
       const finishing = button.dataset.finishBuilder !== undefined;
@@ -2496,8 +2434,9 @@ function actionKindFromCastingTime(castingTime = "") {
 
 function spellHitOrDc(spell) {
   const description = String(spell.description ?? "").toLowerCase();
-  if (description.includes("saving throw")) return String(8 + proficiency() + mod(spellAbility()));
-  if (description.includes("spell attack")) return signed(proficiency() + mod(spellAbility()));
+  const metrics = spellcastingMetricsForAbility(spellAbilityForSpell(spell));
+  if (description.includes("saving throw")) return String(metrics.saveDc);
+  if (description.includes("spell attack")) return signed(metrics.attackBonus);
   return "--";
 }
 
@@ -2568,14 +2507,15 @@ function renderSpellsSheet() {
   const autoLeveledSpells = autoSpells.filter((spell) => spell.level > 0);
   const autoCantrips = autoGrantedCantripNames();
   const backgroundSpells = backgroundSelectedSpellNames();
+  const globalSpellcasting = spellcastingMetricsForAbility(spellAbility());
   const spells = currentKnownSpellNames();
   const selected = state.selectedSpell && spells.includes(state.selectedSpell) ? state.selectedSpell : "";
   const knownSpells = spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level));
   return `
     <div class="metric-row">
       ${smallStat("C Level", casterLevel())}
-      ${smallStat("Spell Attack", signed(proficiency() + mod(spellAbility())))}
-      ${smallStat("Spell DC", 8 + proficiency() + mod(spellAbility()))}
+      ${smallStat("Spell Attack", signed(globalSpellcasting.attackBonus))}
+      ${smallStat("Spell DC", globalSpellcasting.saveDc)}
     </div>
     ${autoLeveledSpells.length ? renderAutoGrantedSpells(autoLeveledSpells) : ""}
     ${renderSpellSheetGroups(knownSpells, selected)}
@@ -2593,6 +2533,8 @@ function currentKnownSpellNames() {
 }
 
 function renderBackgroundSpellSource(spells) {
+  const backgroundAbility = backgroundSpellAbility();
+  const metrics = backgroundAbility ? spellcastingMetricsForAbility(backgroundAbility) : null;
   return `
     <section class="feature-section">
       <h3>Magias de background</h3>
@@ -2603,6 +2545,7 @@ function renderBackgroundSpellSource(spells) {
             <article class="auto-spell-card">
               <strong>${escapeHtml(name)}</strong>
               <span>${escapeHtml(detail?.level === 0 ? "Cantrip" : `${ordinalLabel(detail?.level ?? 1)}-level spell`)}</span>
+              ${metrics ? `<span>Spell Attack ${signed(metrics.attackBonus)} • Spell DC ${metrics.saveDc}</span>` : ""}
               <em>Magic Initiate</em>
             </article>
           `;
@@ -2845,7 +2788,7 @@ function smallStat(label, value) {
 }
 
 function abilityCard(key, label) {
-  const save = state.derived?.savingThrows?.[key] ?? mod(key) + (state.character.savingThrows.includes(key) ? proficiency() : 0);
+  const save = saveBonus(key);
   return `
     <article class="ability-card">
       <h3>${label}</h3>
@@ -4023,7 +3966,9 @@ function fixedHpGain() {
 
 function maxLevelOneHp(className, abilities = state.character.abilities) {
   const die = state.api.classes?.[className]?.hit_die ?? CLASS_HIT_DIE[className] ?? 8;
-  return Math.max(1, die + Math.floor(((abilities.con ?? 10) - 10) / 2));
+  const bonuses = calculateCharacterAbilityBonuses(state.character);
+  const scores = deriveAbilityScores(abilities ?? {}, bonuses);
+  return deriveLevelOneMaxHp(die, scores.con);
 }
 
 function normalizeSubrace() {
@@ -4255,9 +4200,13 @@ function backgroundSkillProficiencies() { return []; }
 
 
 // Magic Initiate Background Spell Choices
-function getBackgroundGrantedSpells() { return []; }
+function getBackgroundGrantedSpells() {
+  return getMagicInitiateBackgroundGrants(state.character.background, state.api.source?.backgroundDetails);
+}
 
-function backgroundSpellChoiceRules() { return []; }
+function backgroundSpellChoiceRules() {
+  return createMagicInitiateSpellRules(getBackgroundGrantedSpells());
+}
 
 function renderBgSpellChoice(rule) {
   const storageKey = `bg-${rule.id}`;
@@ -4293,9 +4242,13 @@ function renderBgSpellChoice(rule) {
   `;
 }
 
-function backgroundSpellOptions() { return []; }
+function backgroundSpellOptions(spellList) {
+  return getMagicInitiateSpellOptions(spellList, state.api.classSpells);
+}
 
-function backgroundSelectedSpellNames() { return []; }
+function backgroundSelectedSpellNames() {
+  return getSelectedMagicInitiateSpellNames(state.character.bgSpellChoices, backgroundSpellChoiceRules());
+}
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
   const legalNames = legalSpellNames();
@@ -4503,33 +4456,34 @@ function setByPath(target, path, value) {
 }
 
 function mod(key) {
-  return state.derived?.abilityModifiers?.[key] ?? Math.floor((abilityScore(key) - 10) / 2);
+  return deriveAbilityModifier(abilityScore(key));
 }
 
 function abilityScore(key) {
-  if (state.derived?.abilityScores?.[key] != null) return state.derived.abilityScores[key];
-  return clamp((Number(state.character.abilities[key]) || 10) + abilityBonusFromChoices(key), 1, 30);
-}
-
-function abilityBonusFromChoices(key) {
-  return Object.entries(state.character.asiChoices ?? {}).reduce((total, [ruleId, choice]) => {
-    const normalized = normalizedAsiChoice({ id: ruleId }, choice);
-    if (normalized.mode !== "asi") return total;
-    if (normalized.pattern === "plus2" && normalized.ability1 === key) return total + 2;
-    if (normalized.pattern === "plus1plus1" && (normalized.ability1 === key || normalized.ability2 === key)) return total + 1;
-    return total;
-  }, 0);
+  const bonuses = calculateCharacterAbilityBonuses(state.character);
+  return deriveAbilityScores(state.character.abilities ?? {}, bonuses)[key];
 }
 
 function abilityScoreBeforeAsiRule(key, ruleId) {
-  return clamp((Number(state.character.abilities[key]) || 10) + Object.entries(state.character.asiChoices ?? {}).reduce((total, [id, choice]) => {
-    if (id === ruleId) return total;
-    const normalized = normalizedAsiChoice({ id }, choice);
-    if (normalized.mode !== "asi") return total;
-    if (normalized.pattern === "plus2" && normalized.ability1 === key) return total + 2;
-    if (normalized.pattern === "plus1plus1" && (normalized.ability1 === key || normalized.ability2 === key)) return total + 1;
-    return total;
-  }, 0), 1, 30);
+  const bonuses = calculateCharacterAbilityBonuses(state.character, { omitAsiRuleId: ruleId });
+  return deriveAbilityScores(state.character.abilities ?? {}, bonuses)[key];
+}
+
+function saveBonus(key) {
+  const base = deriveSavingThrowBonus(
+    abilityScore(key),
+    state.character.savingThrows.includes(key),
+    proficiency()
+  );
+  const derivedSave = state.derived?.savingThrows?.[key];
+  if (derivedSave == null) return base;
+
+  const derivedBase = deriveSavingThrowBonus(
+    (state.derived?.abilityScores?.[key] ?? abilityScore(key)) || 10,
+    state.character.savingThrows.includes(key),
+    proficiency()
+  );
+  return base + (derivedSave - derivedBase);
 }
 
 function skillBonus(name) {
@@ -4552,7 +4506,12 @@ function proficiency() {
 }
 
 function proficiencyForLevel(level) {
-  return Math.ceil(level / 4) + 1;
+  return deriveProficiencyBonus(level);
+}
+
+function currentAbilityScores() {
+  const bonuses = calculateCharacterAbilityBonuses(state.character);
+  return deriveAbilityScores(state.character.abilities ?? {}, bonuses);
 }
 
 function hitDie() {
@@ -4570,7 +4529,7 @@ function casterLevel() {
   return state.character.level;
 }
 
-function spellAbility() {
+function classSpellAbility() {
   const apiAbility = state.api.classes[state.character.class]?.spellcastingAbility;
   if (apiAbility) return apiAbility;
   const ability = {
@@ -4585,6 +4544,25 @@ function spellAbility() {
     monk: "wis",
   };
   return ability[state.character.class] ?? "int";
+}
+
+function backgroundSpellAbility() {
+  return resolveBackgroundSpellcastingAbility(state.character.bgChoices, backgroundSpellChoiceRules());
+}
+
+function spellAbility() {
+  if (classHasSpellList(state.character.class)) return classSpellAbility();
+  return backgroundSpellAbility() ?? classSpellAbility();
+}
+
+function spellAbilityForSpell(spell) {
+  const backgroundAbility = backgroundSpellAbility();
+  if (backgroundAbility && backgroundSelectedSpellNames().includes(spell?.name)) return backgroundAbility;
+  return classHasSpellList(state.character.class) ? classSpellAbility() : backgroundAbility ?? classSpellAbility();
+}
+
+function spellcastingMetricsForAbility(ability) {
+  return deriveSpellcastingMetrics(ability, currentAbilityScores(), proficiency());
 }
 
 function spellDeck() {

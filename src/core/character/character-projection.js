@@ -1,5 +1,6 @@
 import { createFormulaContext, evaluateFormula } from "../engine/expression-evaluator.js";
 import { deriveCarriedWeight, modifierTotal } from "../engine/modifier-engine.js";
+import { calculateCharacterAbilityBonuses } from "../../../dist/src/core/character/ability-bonuses.js";
 
 const DEFAULT_ABILITY_KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 
@@ -9,8 +10,9 @@ export function deriveCharacterSheet(character, options = {}) {
   const level = Math.max(1, Number(character?.level) || 1);
   const proficiencyBonus = proficiencyForLevel(level);
   const activeModifiers = options.modifiers ?? [];
+  const abilityBonuses = calculateCharacterAbilityBonuses(character ?? {});
   const abilityScores = Object.fromEntries(
-    abilityKeys.map((key) => [key, clamp((Number(character?.abilities?.[key]) || 10) + abilityBonusFromAsi(character, key), 1, 30)])
+    abilityKeys.map((key) => [key, clamp((Number(character?.abilities?.[key]) || 10) + (abilityBonuses[key] ?? 0), 1, 30)])
   );
   const abilityModifiers = Object.fromEntries(
     abilityKeys.map((key) => [key, abilityModifier(abilityScores[key])])
@@ -71,16 +73,6 @@ export function proficiencyForLevel(level) {
 
 export function abilityModifier(score) {
   return Math.floor(((Number(score) || 10) - 10) / 2);
-}
-
-function abilityBonusFromAsi(character, key) {
-  return Object.values(character?.asiChoices ?? {}).reduce((total, choice) => {
-    if (choice?.mode === "feat") return total;
-    const pattern = choice?.pattern === "plus1plus1" ? "plus1plus1" : "plus2";
-    if (pattern === "plus2" && choice?.ability1 === key) return total + 2;
-    if (pattern === "plus1plus1" && (choice?.ability1 === key || choice?.ability2 === key)) return total + 1;
-    return total;
-  }, 0);
 }
 
 function skillChoiceBonus(character, name, abilityModifiers) {

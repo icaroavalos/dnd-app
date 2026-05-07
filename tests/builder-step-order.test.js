@@ -7,13 +7,17 @@ function normalize(value) {
 }
 
 describe('builder step order', () => {
-  it('keeps Background as the second builder step in app.js', () => {
+  it('reads the builder step order from the TypeScript flow module in app.js', () => {
     const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
     const normalized = normalize(source);
 
     assert.match(
       normalized,
-      /const STEPS = \[\s*\["lineage", "Origem"\],\s*\["background", "Background"\],\s*\["abilities", "Atributos"\],\s*\["choices", "Escolhas"\],\s*\["leveling", "Niveis"\],\s*\];/
+      /import \{ CREATION_STEPS, .* \} from "\.\/dist\/src\/core\/state\/creation-flow\.js";/
+    );
+    assert.match(
+      normalized,
+      /const STEPS = CREATION_STEPS;/
     );
   });
 
@@ -24,6 +28,16 @@ describe('builder step order', () => {
     assert.match(
       normalized,
       /export type BuilderStepId = 'lineage' \| 'background' \| 'abilities' \| 'choices' \| 'leveling';/
+    );
+  });
+
+  it('keeps Background as the second step in the TypeScript flow module', () => {
+    const source = readFileSync(new URL('../src/core/state/creation-flow.ts', import.meta.url), 'utf8');
+    const normalized = normalize(source);
+
+    assert.match(
+      normalized,
+      /export const CREATION_STEPS: \[BuilderStepId, string\]\[] = \[\s*\['lineage', 'Origem'\],\s*\['background', 'Background'\],\s*\['abilities', 'Atributos'\],\s*\['choices', 'Escolhas'\],\s*\['leveling', 'Niveis'\],\s*\];/
     );
   });
 });

@@ -5,6 +5,7 @@
  */
 
 import type { AppState, Character } from '../../types/state';
+import { getDefaultBackgroundChoice } from '../../types/background';
 
 const STATE_KEY = 'dnd-character-state';
 
@@ -78,6 +79,7 @@ export function createDefaultCharacter(): Character {
     spells: [],
     notes: '',
     bgSpellChoices: {},
+    bgChoices: getDefaultBackgroundChoice(),
   };
 }
 
