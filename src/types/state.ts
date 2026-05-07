@@ -5,6 +5,8 @@
 
 import type { SpellDetail, ClassData, RaceData, BackgroundData, ItemData, FeatureData, SubclassData } from './character';
 
+export type BuilderStepId = 'lineage' | 'background' | 'abilities' | 'choices' | 'leveling';
+
 /**
  * Dados da API/5etools
  */
@@ -90,7 +92,7 @@ export interface Character {
  * Estado da UI
  */
 export interface UiState {
-  step: 'lineage' | 'abilities' | 'choices' | 'leveling';
+  step: BuilderStepId;
   tab: string;
   builderVisible: boolean;
   levelUpMode: boolean;
@@ -113,7 +115,7 @@ export interface UiState {
  * Reflete a estrutura do estado global em app.js
  */
 export interface AppState {
-  step: string;
+  step: BuilderStepId;
   tab: string;
   dataStatus: 'local' | 'remote';
   derived: unknown;

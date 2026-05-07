@@ -160,9 +160,9 @@ const CLASS_DECKS = {
 
 const STEPS = [
   ["lineage", "Origem"],
+  ["background", "Background"],
   ["abilities", "Atributos"],
   ["choices", "Escolhas"],
-  ["background", "Background"],
   ["leveling", "Niveis"],
 ];
 
@@ -1407,6 +1407,10 @@ function missingChoicesForStep(step) {
       missing.push(`${POINT_BUY_BUDGET - pointBuySpent()} pontos de Point Buy`);
     }
     return missing;
+  }
+
+  if (step === "background") {
+    return state.character.background ? [] : ["background"];
   }
 
   if (step === "choices") return missingCreationChoices();
