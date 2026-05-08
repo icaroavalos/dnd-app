@@ -12,7 +12,8 @@ import {
   getSelectedBackgroundSpellNames,
   resolveBackgroundSpellcastingAbility,
   createBackgroundSpellRules,
-  getBackgroundGrantedSpells
+  getBackgroundGrantedSpells,
+  getBackgroundSpellOptions,
 } from '../../lib/magic-initiate-validator.js';
 
 import { calculateCharacterAbilityBonuses } from './ability-bonuses.js';
@@ -33,19 +34,93 @@ export interface SpellChoiceStatus {
   hint: string;
 }
 
+export interface SpellEntry {
+  name: string;
+  level: number;
+  origin: 'class' | 'background' | 'auto';
+  castMode: 'at-will' | 'slots' | 'resource';
+  slotLevel: number | null;
+  resourceId?: string;
+  sourceLabel?: string;
+}
+
+export interface SpellResourceDefinition {
+  id: string;
+  name: string;
+  kind: 'spell';
+  sourceLabel: string;
+  body: string;
+  level: number;
+  max: number;
+  recovery: { long: 'all' };
+  actionKind: 'action' | 'bonus' | 'reaction' | 'other';
+}
+
+interface BackgroundSelectedSpell {
+  name: string;
+  level: number;
+  ruleName: string;
+}
+
 export function currentKnownSpellNames(
   character: Character,
   api: ApiState,
   activeFeatures: any[] = []
 ): string[] {
-  const explicit = [...new Set(character.spells ?? [])];
-  const autoGranted = autoGrantedSpellEntries(character, api, activeFeatures).map((spell) => spell.name);
-  const backgroundSelected = getSelectedBackgroundSpellNames(
-    character.bgSpellChoices,
-    backgroundSpellChoiceRules(character, api)
-  );
+  return currentSpellEntries(character, api, activeFeatures).map((spell) => spell.name);
+}
 
-  return [...new Set([...explicit, ...autoGranted, ...backgroundSelected])];
+export function currentSpellEntries(
+  character: Character,
+  api: ApiState,
+  activeFeatures: any[] = []
+): SpellEntry[] {
+  const entries = new Map<string, SpellEntry>();
+  const explicit = [...new Set(character.spells ?? [])];
+  const autoGranted = autoGrantedSpellEntries(character, api, activeFeatures);
+  const backgroundSelected = selectedBackgroundSpells(character, api);
+  const detailLookup = api.source?.spellDetails ?? {};
+  const classSpellcasting = classHasSpellList(character.class, api);
+
+  explicit.forEach((name) => {
+    const detail = detailLookup[String(name).toLowerCase()];
+    const level = Number(detail?.level) || 0;
+    entries.set(name, {
+      name,
+      level,
+      origin: 'class',
+      castMode: level === 0 ? 'at-will' : 'slots',
+      slotLevel: level > 0 ? level : null,
+    });
+  });
+
+  autoGranted.forEach((spell) => {
+    if (entries.has(spell.name)) return;
+    entries.set(spell.name, {
+      name: spell.name,
+      level: Number(spell.level) || 0,
+      origin: 'auto',
+      castMode: Number(spell.level) > 0 && classSpellcasting ? 'slots' : 'at-will',
+      slotLevel: Number(spell.level) > 0 && classSpellcasting ? Number(spell.level) : null,
+      sourceLabel: spell.origin,
+    });
+  });
+
+  backgroundSelected.forEach((spell) => {
+    if (entries.has(spell.name)) return;
+    const resourceId = spell.level > 0 ? backgroundSpellResourceId(spell.name) : undefined;
+    entries.set(spell.name, {
+      name: spell.name,
+      level: spell.level,
+      origin: 'background',
+      castMode: spell.level === 0 ? 'at-will' : 'resource',
+      slotLevel: null,
+      resourceId,
+      sourceLabel: spell.ruleName,
+    });
+  });
+
+  return [...entries.values()];
 }
 
 export function resolveSelectedSpellName(selectedSpell: string, spellNames: string[]): string {
@@ -101,6 +176,25 @@ export function backgroundSpellChoiceRules(character: Character, api: ApiState) 
 export function backgroundSpellAbility(character: Character, api: ApiState): string | null {
   const rules = backgroundSpellChoiceRules(character, api);
   return resolveBackgroundSpellcastingAbility(character.bgChoices, rules);
+}
+
+export function backgroundSpellResourceDefinitions(
+  character: Character,
+  api: ApiState
+): SpellResourceDefinition[] {
+  return selectedBackgroundSpells(character, api)
+    .filter((spell) => spell.level > 0)
+    .map((spell) => ({
+      id: backgroundSpellResourceId(spell.name),
+      name: spell.name,
+      kind: 'spell',
+      sourceLabel: spell.ruleName,
+      body: `Cast ${spell.name} once without using a class spell slot. You regain the ability to cast it this way when you finish a Long Rest.`,
+      level: spell.level,
+      max: 1,
+      recovery: { long: 'all' as const },
+      actionKind: 'action',
+    }));
 }
 
 export function spellAbility(character: Character, api: ApiState): string {
@@ -207,4 +301,44 @@ export function spellFromKnownData(name: string, api: ApiState) {
   }
 
   return { name, level: Infinity };
+}
+
+function selectedBackgroundSpells(character: Character, api: ApiState): BackgroundSelectedSpell[] {
+  const rules = backgroundSpellChoiceRules(character, api);
+  if (!rules.length) return [];
+
+  return rules.flatMap((rule) => {
+    const selected = character.bgSpellChoices?.[`bg-${rule.id}`] ?? [];
+    const options = getBackgroundSpellOptions(rule.spellList, api.classSpells ?? {});
+    const optionByName = new Map(options.map((spell) => [spell.name.toLowerCase(), spell]));
+    const spellDetails = api.source?.spellDetails ?? {};
+
+    return selected
+      .map((name) => {
+        const detail =
+          optionByName.get(String(name).toLowerCase())
+          ?? spellDetails[String(name).toLowerCase()]
+          ?? null;
+        if (!detail) return null;
+        return {
+          name: detail.name,
+          level: Number(detail.level) || 0,
+          ruleName: rule.name,
+        };
+      })
+      .filter((spell): spell is BackgroundSelectedSpell => Boolean(spell));
+  });
+}
+
+function backgroundSpellResourceId(spellName: string): string {
+  return `bgSpell:${slugify(spellName)}`;
+}
+
+function slugify(value: string): string {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
 }

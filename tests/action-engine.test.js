@@ -119,4 +119,43 @@ describe('action engine', () => {
     assert.doesNotMatch(source, /function spellHitOrDc\(/);
     assert.doesNotMatch(source, /function spellDamageChips\(/);
   });
+
+  it('uses dedicated resources for Magic Initiate leveled spells instead of class slots', () => {
+    const actions = module.deriveAvailableActions(createContext({
+      character: {
+        class: 'barbarian',
+        attacks: [],
+        inventory: [],
+        spells: [],
+        spellEntries: [
+          {
+            name: 'Bless',
+            level: 1,
+            castMode: 'resource',
+            resourceId: 'bgSpell:bless',
+          },
+        ],
+        resources: { 'bgSpell:bless': { used: 0, max: 1 } },
+        spellSlots: {},
+      },
+      spellDetails: {
+        bless: {
+          name: 'Bless',
+          level: 1,
+          castingTime: '1 action',
+          range: '30 feet',
+          components: 'V, S, M',
+          description: 'Up to three creatures gain a bonus to attack rolls and saving throws.',
+        },
+      },
+      loadedSpellDetails: {},
+      resourceDefinitions: [],
+    }));
+
+    const bless = actions.find((action) => action.id === 'spell-action:bless');
+
+    assert.equal(bless?.resource, 'bgSpell:bless');
+    assert.equal(bless?.slotLevel, null);
+    assert.equal(bless?.disabled, false);
+  });
 });

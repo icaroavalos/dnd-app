@@ -60,6 +60,13 @@ export interface SpellLike {
   components?: string;
   levelLine?: string;
   description?: string;
+  castMode?: 'at-will' | 'slots' | 'resource';
+  resourceId?: string;
+}
+
+interface DerivedSpellSource extends SpellLike {
+  castMode?: 'at-will' | 'slots' | 'resource';
+  resourceId?: string;
 }
 
 export interface ActionEngineCharacter {
@@ -67,6 +74,7 @@ export interface ActionEngineCharacter {
   attacks?: AttackLike[];
   inventory?: InventoryItemLike[];
   spells?: string[];
+  spellEntries?: SpellLike[];
   resources?: Record<string, { used?: number; max?: number }>;
   spellSlots?: Record<string | number, { used?: number; max?: number }>;
 }
@@ -241,13 +249,28 @@ function deriveAttackActions(context: ActionEngineContext): DerivedAction[] {
 
 function deriveSpellActions(context: ActionEngineContext): DerivedAction[] {
   const character = context.character ?? {};
-  return (character.spells ?? [])
-    .map((name) => context.spellDetails?.[name.toLowerCase()] ?? context.loadedSpellDetails?.[name] ?? null)
-    .filter((spell): spell is SpellLike => Boolean(spell))
+  const spellEntries = (character.spellEntries?.length
+    ? character.spellEntries
+    : (character.spells ?? []).map((name) => {
+        const detail = context.spellDetails?.[name.toLowerCase()] ?? context.loadedSpellDetails?.[name] ?? null;
+        return {
+          name,
+          level: Number(detail?.level) || 0,
+          castMode: Number(detail?.level) > 0 ? 'slots' : 'at-will',
+        };
+      })) as DerivedSpellSource[];
+
+  return spellEntries
+    .map<DerivedSpellSource | null>((entry) => {
+      const detail = context.spellDetails?.[entry.name.toLowerCase()] ?? context.loadedSpellDetails?.[entry.name] ?? null;
+      return detail ? { ...detail, castMode: entry.castMode, resourceId: entry.resourceId } : null;
+    })
+    .filter((spell): spell is DerivedSpellSource => Boolean(spell))
     .filter((spell) => spellActionVisible(spell, context))
     .map((spell) => {
       const kind = actionKindForSpell(spell, context);
-      const slotLevel = spell.level > 0 ? spell.level : null;
+      const slotLevel = spell.castMode === 'slots' && spell.level > 0 ? spell.level : null;
+      const resourceId = spell.castMode === 'resource' ? spell.resourceId : undefined;
       return {
         id: `spell-action:${context.slugify(spell.name)}`,
         kind,
@@ -260,9 +283,14 @@ function deriveSpellActions(context: ActionEngineContext): DerivedAction[] {
         damage: spellDamageChips(spell.description),
         notes: spell.components || spell.levelLine || 'Magic',
         detail: spell.description ?? '',
+        resource: resourceId,
         slotLevel,
         source: { type: 'spell', spellName: spell.name },
-        cost: slotLevel ? { resource: 'spell_slot', slotLevel, economy: kind } : { economy: kind },
+        cost: resourceId
+          ? { resource: resourceId, economy: kind }
+          : slotLevel
+            ? { resource: 'spell_slot', slotLevel, economy: kind }
+            : { economy: kind },
       };
     });
 }
@@ -270,6 +298,7 @@ function deriveSpellActions(context: ActionEngineContext): DerivedAction[] {
 function deriveFeatureActions(context: ActionEngineContext): DerivedAction[] {
   const items: DerivedAction[] = [];
   (context.resourceDefinitions ?? []).forEach((resourceDef) => {
+    if (resourceDef.kind === 'spell') return;
     const resource = context.character?.resources?.[resourceDef.id];
     const remaining = resource ? Math.max(0, Number(resource.max) - Number(resource.used)) : 0;
     const subtitle = resourceDef.kind === 'species' ? (resourceDef.sourceLabel ?? '') : `${resourceDef.className} Feature`;

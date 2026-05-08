@@ -238,6 +238,41 @@ Com isso, o caminho de dados ficou simples:
 ## Estado atual da arquitetura
 
 - o `app.js` é o shell de UI e hidratação
+- o core de regras, projeção e renderização de folha vive em módulos TypeScript
+- o runtime do navegador consome apenas `dist/`
+
+## Fluxo da aba Magia
+
+Hoje a aba de magias segue uma separação explícita entre **origem da magia** e **forma de consumo**:
+
+- magias da classe principal usam `castMode: "slots"`
+- cantrips usam `castMode: "at-will"`
+- magias especiais de background/feat, como `Magic Initiate`, usam `castMode: "resource"`
+
+### Fonte de verdade
+
+- [src/core/character/spell-engine.ts](/Users/icaro/codes/dnd-app/src/core/character/spell-engine.ts): deriva `SpellEntry`, separa origem (`class`, `background`, `auto`) e decide `at-will`, `slots` ou `resource`
+- [src/core/character/spell-detail.ts](/Users/icaro/codes/dnd-app/src/core/character/spell-detail.ts): normaliza o detalhe da magia a partir do 5etools local, incluindo:
+  - `levelLine`
+  - `concentration`
+  - `ritual`
+  - `saveOrAttack`
+  - `damageTypes`
+  - `traditions`
+  - `classes`
+  - `reference`
+- [src/core/state/spells-view.ts](/Users/icaro/codes/dnd-app/src/core/state/spells-view.ts): renderiza a aba `Magia` com grupos por nível e botões `At Will`, `Use` e `Cast`
+
+### Regra importante de manutenção
+
+Se uma magia estiver com card incompleto, classe errada, lista errada ou consumo incorreto:
+
+1. verificar `state.api.source.spellDetails`
+2. verificar `src/core/character/spell-detail.ts`
+3. verificar `src/core/character/spell-engine.ts`
+4. só então verificar o shell em `app.js`
+
+Isso evita colocar parsing de spell detail ou regra de consumo diretamente no `app.js`.
 - a lógica de ficha está migrando para TypeScript
 - regras e cálculo devem nascer no core tipado, não no shell
 - qualquer nova feature de personagem deve consumir os dados compactados do 5etools, não fontes paralelas

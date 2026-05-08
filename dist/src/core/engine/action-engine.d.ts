@@ -54,12 +54,15 @@ export interface SpellLike {
     components?: string;
     levelLine?: string;
     description?: string;
+    castMode?: 'at-will' | 'slots' | 'resource';
+    resourceId?: string;
 }
 export interface ActionEngineCharacter {
     class?: string;
     attacks?: AttackLike[];
     inventory?: InventoryItemLike[];
     spells?: string[];
+    spellEntries?: SpellLike[];
     resources?: Record<string, {
         used?: number;
         max?: number;

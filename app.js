@@ -23,10 +23,11 @@ import {
 } from "./dist/src/core/character/character-engine.js";
 import {
   autoGrantedSpellEntries as typedAutoGrantedSpellEntries,
-  backgroundSpellAbility as typedBackgroundSpellAbility,
+  backgroundSpellResourceDefinitions as typedBackgroundSpellResourceDefinitions,
   casterLevel as typedCasterLevel,
   classSpellAbility as typedClassSpellAbility,
   currentKnownSpellNames as typedCurrentKnownSpellNames,
+  currentSpellEntries as typedCurrentSpellEntries,
   spellAbility as typedSpellAbility,
   spellAbilityForSpell as typedSpellAbilityForSpell,
   resolveSelectedSpellName as typedResolveSelectedSpellName,
@@ -35,6 +36,11 @@ import {
   spellSlotsMaxByLevel as typedSpellSlotsMaxByLevel,
   classHasSpellList as typedClassHasSpellList,
 } from "./dist/src/core/character/spell-engine.js";
+import {
+  buildSpellClassIndex,
+  normalize5etoolsSpell as typedNormalize5etoolsSpell,
+  resolveSpellDetail as typedResolveSpellDetail,
+} from "./dist/src/core/character/spell-detail.js";
 import {
   itemDetail as typedItemDetail,
   itemTypeLabel as typedItemTypeLabel,
@@ -63,7 +69,7 @@ import {
   renderLevelingForm as renderTypedLevelingForm,
 } from "./dist/src/core/state/builder-views.js";
 import { titleCase, ordinalSuffix, slugifyName, escapeRegExp, escapeHtml, setByPath, clamp, clean5etoolsText, paragraphs } from "./dist/src/lib/utils.js";
-import { format5etoolsTime, format5etoolsRange, format5etoolsComponents, format5etoolsDuration, entriesToText, entryToText, spellSchoolName } from "./dist/src/lib/formatter.js";
+import { entriesToText, entryToText } from "./dist/src/lib/formatter.js";
 import { CREATION_STEPS, getMissingChoicesForStep as getTypedMissingChoicesForStep, validateCreationStep } from "./dist/src/core/state/creation-flow.js";
 import {
   applyGuidedBackgroundEquipmentChoice,
@@ -102,7 +108,6 @@ import {
 import {
   ABILITIES,
   ALIGNMENT_OPTIONS,
-  CLASS_DECKS,
   CLASSES,
   CLASS_HIT_DIE,
   DATA_SOURCE,
@@ -112,7 +117,6 @@ import {
   SKILLS,
   STARTER_ATTACKS,
   TABS,
-  DECK_LABELS,
 } from "./dist/src/core/rules/constants.js";
 
 const STEPS = CREATION_STEPS;
@@ -427,20 +431,23 @@ function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, cla
   const featResults = feats.results ?? [];
   const spellByKey = new Map(spellResults.map((spell) => [`${spell.name.toLowerCase()}|${spell.source.toLowerCase()}`, spell]));
 
+  const normalizedClassSpells = Object.fromEntries(Object.values(classSpellResults).map((list) => {
+    const classKey = slugifyName(list.className);
+    const options = (list.spells ?? [])
+      .map((ref) => spellByKey.get(`${ref.name.toLowerCase()}|${ref.source.toLowerCase()}`))
+      .filter(Boolean)
+      .map((spell) => ({ name: spell.name, level: spell.level, source: spell.source }))
+      .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+    return [classKey, options];
+  }));
+  const spellClassIndex = buildSpellClassIndex(normalizedClassSpells);
+
   state.api = {
     classes: Object.fromEntries(classResults.map((klass) => [slugifyName(klass.name), normalize5etoolsClass(klass)])),
     levels: Object.fromEntries(classResults.map((klass) => [slugifyName(klass.name), build5etoolsLevels(klass)])),
     races: Object.fromEntries(raceResults.map((race) => [slugifyName(race.name), normalize5etoolsRace(race, subraceResults)])),
     spells: spellResults.map((spell) => spell.name),
-    classSpells: Object.fromEntries(Object.values(classSpellResults).map((list) => {
-      const classKey = slugifyName(list.className);
-      const options = (list.spells ?? [])
-        .map((ref) => spellByKey.get(`${ref.name.toLowerCase()}|${ref.source.toLowerCase()}`))
-        .filter(Boolean)
-        .map((spell) => ({ name: spell.name, level: spell.level, source: spell.source }))
-        .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
-      return [classKey, options];
-    })),
+    classSpells: normalizedClassSpells,
     spellDetails: {},
     source: {
       classOptions: classResults.map((klass) => [slugifyName(klass.name), klass.name]).sort((a, b) => a[1].localeCompare(b[1])),
@@ -456,7 +463,7 @@ function hydrate5etoolsSource({ classes, races, subraces, equipment, spells, cla
       subclassFeatures: subclassFeatureResults.map(normalize5etoolsFeature),
       subclasses: subclassResults,
       featDetails: Object.fromEntries(featResults.map((feat) => [slugifyName(feat.name), normalize5etoolsFeature({ ...feat, type: "feat" })])),
-      spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), normalize5etoolsSpell(spell)])),
+      spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), typedNormalize5etoolsSpell(spell, spellClassIndex)])),
     },
   };
   ruleRepository = RuleRepository.fromApi(state.api);
@@ -528,24 +535,6 @@ function normalize5etoolsRace(race, subraceResults) {
   return {
     details: race,
     subraces: explicitSubraces.length ? explicitSubraces : ancestryOptions,
-  };
-}
-
-function normalize5etoolsSpell(spell) {
-  const levelLine = spell.level === 0
-    ? `${spellSchoolName(spell.school)} cantrip`.trim()
-    : `${spell.level}${ordinalSuffix(spell.level)}-level ${spellSchoolName(spell.school)}`.trim();
-  return {
-    name: spell.name,
-    level: spell.level,
-    levelLine,
-    castingTime: format5etoolsTime(spell.time),
-    range: format5etoolsRange(spell.range),
-    components: format5etoolsComponents(spell.components),
-    duration: format5etoolsDuration(spell.duration),
-    material: typeof spell.components?.m === "string" ? clean5etoolsText(spell.components.m) : "",
-    description: entriesToText(spell.entries),
-    higherLevel: entriesToText(spell.entriesHigherLevel),
   };
 }
 
@@ -1619,28 +1608,33 @@ function renderFeaturesSheetWrapper() {
 
 function renderSpellsSheetWrapper() {
   const globalSpellcasting = typedSpellcastingMetricsForAbility(typedSpellAbility(state.character, state.api), state.character, state.derived);
-  const backgroundAbility = typedBackgroundSpellAbility(state.character, state.api);
-  const backgroundAbilityMetrics = backgroundAbility ? typedSpellcastingMetricsForAbility(backgroundAbility, state.character, state.derived) : null;
-  const spells = knownSheetSpellNames();
+  const spellEntries = currentSheetSpellEntries();
+  const sheetSpells = spellEntries
+    .map((spell) => {
+      const detail = typedResolveSpellDetail(spell.name, state.api) ?? spellFromKnownData(spell.name);
+      const resourceState = spell.resourceId ? state.character.resources?.[spell.resourceId] : null;
+      const maxUses = Number(resourceState?.max ?? (spell.castMode === "resource" ? 1 : 0));
+      const used = Number(resourceState?.used ?? 0);
+      return {
+        ...detail,
+        ...spell,
+        remainingUses: spell.castMode === "resource" ? Math.max(0, maxUses - used) : undefined,
+        maxUses: spell.castMode === "resource" ? maxUses : undefined,
+        recoveryLabel: spell.castMode === "resource" ? "Long Rest Resource" : undefined,
+      };
+    })
+    .filter((spell) => spell?.name && Number.isFinite(spell.level));
 
   return renderSpellsSheet(
-    [],
-    spells.map(spellFromKnownData).filter((spell) => spell?.name && Number.isFinite(spell.level)),
+    sheetSpells,
     typedCasterLevel(state.character, state.api),
     globalSpellcasting.attackBonus,
     globalSpellcasting.saveDc,
     state.selectedSpell ?? "",
-    [],
-    backgroundAbilityMetrics,
     spellSlotsMaxByLevel(),
     state.character.spellSlots ?? {},
     availableSpellSlotsAtLevel,
-    spellFromKnownData,
-    spellLevelLabel,
-    ordinalLabel,
-    DECK_LABELS,
-    CLASS_DECKS,
-    state.character.class
+    (name) => typedResolveSpellDetail(name, state.api) ?? spellFromKnownData(name)
   );
 }
 
@@ -1969,7 +1963,11 @@ function currentActionItems() {
 
 function actionEngineContext() {
   return {
-    character: { ...state.character, spells: knownSheetSpellNames() },
+    character: {
+      ...state.character,
+      spells: knownSheetSpellNames(),
+      spellEntries: currentSheetSpellEntries(),
+    },
     projection: state.derived,
     resourceDefinitions: currentResourceDefinitions(),
     spellDetails: state.api.source?.spellDetails ?? {},
@@ -1987,6 +1985,10 @@ function actionEngineContext() {
 
 function knownSheetSpellNames() {
   return typedCurrentKnownSpellNames(state.character, state.api, currentFeatureItems());
+}
+
+function currentSheetSpellEntries() {
+  return typedCurrentSpellEntries(state.character, state.api, currentFeatureItems());
 }
 
 function compactRange(range = "") {
@@ -2062,10 +2064,14 @@ function currentFeatureItems() {
 
 function currentResourceDefinitions() {
   const byId = new Map();
-  currentFeatureItems()
+  const resources = [
+    ...currentFeatureItems()
     .map((feature) => feature.resource)
-    .filter(Boolean)
-    .forEach((resource) => {
+    .filter(Boolean),
+    ...typedBackgroundSpellResourceDefinitions(state.character, state.api),
+  ];
+
+  resources.forEach((resource) => {
       const existing = byId.get(resource.id);
       if (!existing) {
         byId.set(resource.id, resource);

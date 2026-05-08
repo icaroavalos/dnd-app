@@ -2,14 +2,57 @@
  * Spell Engine - Lógica para derivação de magias, slots e métricas de conjuração
  */
 import { deriveProficiencyBonus } from './character-engine.js';
-import { getSelectedBackgroundSpellNames, resolveBackgroundSpellcastingAbility, createBackgroundSpellRules, getBackgroundGrantedSpells } from '../../lib/magic-initiate-validator.js';
+import { resolveBackgroundSpellcastingAbility, createBackgroundSpellRules, getBackgroundGrantedSpells, getBackgroundSpellOptions, } from '../../lib/magic-initiate-validator.js';
 import { calculateCharacterAbilityBonuses } from './ability-bonuses.js';
 import { deriveAbilityScores, deriveAbilityModifier } from './character-engine.js';
 export function currentKnownSpellNames(character, api, activeFeatures = []) {
+    return currentSpellEntries(character, api, activeFeatures).map((spell) => spell.name);
+}
+export function currentSpellEntries(character, api, activeFeatures = []) {
+    const entries = new Map();
     const explicit = [...new Set(character.spells ?? [])];
-    const autoGranted = autoGrantedSpellEntries(character, api, activeFeatures).map((spell) => spell.name);
-    const backgroundSelected = getSelectedBackgroundSpellNames(character.bgSpellChoices, backgroundSpellChoiceRules(character, api));
-    return [...new Set([...explicit, ...autoGranted, ...backgroundSelected])];
+    const autoGranted = autoGrantedSpellEntries(character, api, activeFeatures);
+    const backgroundSelected = selectedBackgroundSpells(character, api);
+    const detailLookup = api.source?.spellDetails ?? {};
+    const classSpellcasting = classHasSpellList(character.class, api);
+    explicit.forEach((name) => {
+        const detail = detailLookup[String(name).toLowerCase()];
+        const level = Number(detail?.level) || 0;
+        entries.set(name, {
+            name,
+            level,
+            origin: 'class',
+            castMode: level === 0 ? 'at-will' : 'slots',
+            slotLevel: level > 0 ? level : null,
+        });
+    });
+    autoGranted.forEach((spell) => {
+        if (entries.has(spell.name))
+            return;
+        entries.set(spell.name, {
+            name: spell.name,
+            level: Number(spell.level) || 0,
+            origin: 'auto',
+            castMode: Number(spell.level) > 0 && classSpellcasting ? 'slots' : 'at-will',
+            slotLevel: Number(spell.level) > 0 && classSpellcasting ? Number(spell.level) : null,
+            sourceLabel: spell.origin,
+        });
+    });
+    backgroundSelected.forEach((spell) => {
+        if (entries.has(spell.name))
+            return;
+        const resourceId = spell.level > 0 ? backgroundSpellResourceId(spell.name) : undefined;
+        entries.set(spell.name, {
+            name: spell.name,
+            level: spell.level,
+            origin: 'background',
+            castMode: spell.level === 0 ? 'at-will' : 'resource',
+            slotLevel: null,
+            resourceId,
+            sourceLabel: spell.ruleName,
+        });
+    });
+    return [...entries.values()];
 }
 export function resolveSelectedSpellName(selectedSpell, spellNames) {
     if (selectedSpell && spellNames.includes(selectedSpell))
@@ -62,6 +105,21 @@ export function backgroundSpellChoiceRules(character, api) {
 export function backgroundSpellAbility(character, api) {
     const rules = backgroundSpellChoiceRules(character, api);
     return resolveBackgroundSpellcastingAbility(character.bgChoices, rules);
+}
+export function backgroundSpellResourceDefinitions(character, api) {
+    return selectedBackgroundSpells(character, api)
+        .filter((spell) => spell.level > 0)
+        .map((spell) => ({
+        id: backgroundSpellResourceId(spell.name),
+        name: spell.name,
+        kind: 'spell',
+        sourceLabel: spell.ruleName,
+        body: `Cast ${spell.name} once without using a class spell slot. You regain the ability to cast it this way when you finish a Long Rest.`,
+        level: spell.level,
+        max: 1,
+        recovery: { long: 'all' },
+        actionKind: 'action',
+    }));
 }
 export function spellAbility(character, api) {
     if (classHasSpellList(character.class, api)) {
@@ -150,5 +208,41 @@ export function spellFromKnownData(name, api) {
         return { name: sourceDetail.name, level: sourceDetail.level };
     }
     return { name, level: Infinity };
+}
+function selectedBackgroundSpells(character, api) {
+    const rules = backgroundSpellChoiceRules(character, api);
+    if (!rules.length)
+        return [];
+    return rules.flatMap((rule) => {
+        const selected = character.bgSpellChoices?.[`bg-${rule.id}`] ?? [];
+        const options = getBackgroundSpellOptions(rule.spellList, api.classSpells ?? {});
+        const optionByName = new Map(options.map((spell) => [spell.name.toLowerCase(), spell]));
+        const spellDetails = api.source?.spellDetails ?? {};
+        return selected
+            .map((name) => {
+            const detail = optionByName.get(String(name).toLowerCase())
+                ?? spellDetails[String(name).toLowerCase()]
+                ?? null;
+            if (!detail)
+                return null;
+            return {
+                name: detail.name,
+                level: Number(detail.level) || 0,
+                ruleName: rule.name,
+            };
+        })
+            .filter((spell) => Boolean(spell));
+    });
+}
+function backgroundSpellResourceId(spellName) {
+    return `bgSpell:${slugify(spellName)}`;
+}
+function slugify(value) {
+    return String(value ?? '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '')
+        .trim();
 }
 //# sourceMappingURL=spell-engine.js.map

@@ -98,40 +98,76 @@ describe('sheet views', () => {
 
   it('renders spells tab with spell selectors and metrics row', () => {
     const html = spellsView.renderSpellsSheet(
-      [],
       [
-        { name: 'Sacred Flame', level: 0 },
-        { name: 'Healing Word', level: 1 },
+        {
+          name: 'Dancing Lights',
+          level: 0,
+          castMode: 'at-will',
+          sourceLabel: 'Magic Initiate (Cleric)',
+        },
+        {
+          name: 'Healing Word',
+          level: 1,
+          castMode: 'slots',
+          slotLevel: 1,
+        },
+        {
+          name: 'Bless',
+          level: 1,
+          castMode: 'resource',
+          resourceId: 'bgSpell:bless',
+          remainingUses: 1,
+          maxUses: 1,
+          recoveryLabel: 'Long Rest Resource',
+          sourceLabel: 'Magic Initiate (Cleric)',
+        },
       ],
-      0,
+      1,
       3,
       11,
-      'Sacred Flame',
-      [],
-      null,
+      'Bless',
       { 1: 2 },
       { 1: { max: 2, used: 0 } },
       () => 2,
       (name) => ({
         name,
-        level: name === 'Sacred Flame' ? 0 : 1,
-        levelLine: name === 'Sacred Flame' ? 'Cantrip' : '1st-level Evocation',
-        description: 'Spell description.',
+        level: name === 'Dancing Lights' ? 0 : 1,
+        levelLine: name === 'Dancing Lights' ? 'Evocation cantrip' : '1st-level Enchantment',
+        description: name === 'Bless' ? 'Targets add 1d4 to attack rolls and saving throws.' : 'Spell description.',
         castingTime: '1 action',
         range: '60 feet',
-        components: 'V, S',
-        duration: 'Instantaneous',
-      }),
-      (level) => (level === 0 ? 'Cantrips' : `${level}st Level`),
-      (level) => `${level}st`,
-      { cleric: 'Cleric' },
-      { fighter: 'cleric' },
-      'fighter'
+        components: 'V, S, M',
+        componentFlags: ['V', 'S', 'M'],
+        duration: name === 'Dancing Lights' ? 'Concentration, up to 1 minute' : 'Concentration, up to 1 minute',
+        saveOrAttack: name === 'Bless' ? 'DEX Save' : '-',
+        concentration: true,
+        ritual: name === 'Bless',
+        damageTypes: name === 'Dancing Lights' ? [] : ['Radiant'],
+        material: 'a small bell',
+        higherLevel: name === 'Bless' ? 'You can target one additional creature for each spell slot level above 1.' : '',
+        traditions: ['Divine'],
+        classes: ['Cleric', 'Paladin'],
+        reference: 'XPHB • p. 247',
+        source: 'XPHB',
+      })
     );
 
     assert.match(html, /class="metric-row"/);
-    assert.match(html, /data-spell-name="Sacred Flame"/);
+    assert.match(html, /Cantrips/);
+    assert.match(html, /1st Level/);
+    assert.match(html, /data-spell-name="Dancing Lights"/);
     assert.match(html, /data-cast-spell-level="1"/);
+    assert.match(html, />\s*Use\s*</);
+    assert.match(html, />\s*Cast\s*</);
+    assert.match(html, /Magic Initiate \(Cleric\)/);
+    assert.match(html, /data-use-resource="bgSpell:bless"/);
+    assert.match(html, /1\/1 use/);
+    assert.match(html, /DEX Save/);
+    assert.match(html, />C</);
+    assert.match(html, />R</);
+    assert.match(html, /Radiant/);
+    assert.match(html, /Cleric, Paladin/);
+    assert.match(html, /XPHB • p\. 247/);
     assert.match(html, /data-close-spell/);
   });
 
