@@ -44,6 +44,190 @@ Abra em:
 http://localhost:5173
 ```
 
+## Backend NestJS + Fastify
+
+O backend novo vive isolado em:
+
+- [backend](/Users/icaro/codes/dnd-app/backend)
+
+Ele ainda está no primeiro slice de implementação e hoje expõe:
+
+- `GET /health`
+- `GET /health/ready`
+- `GET /rules/backgrounds`
+- `GET /rules/classes`
+- `GET /rules/spells`
+- `GET /rules/class-spells`
+- `GET /rules/species`
+- `GET /rules/items`
+- `GET /rules/features`
+- `GET /rules/feats`
+- `POST /characters/project`
+- `POST /actions/derive`
+- `POST /resources/use`
+- `POST /resources/recover`
+
+### Instalação do backend
+
+```bash
+cd backend
+npm install
+```
+
+### Rodar o backend em desenvolvimento
+
+```bash
+npm run backend:dev
+```
+
+ou, de dentro da pasta `backend`:
+
+```bash
+npm run dev
+```
+
+O servidor sobe por padrão em:
+
+```text
+http://localhost:3100
+```
+
+Configuração suportada hoje:
+
+- `NODE_ENV`: `development`, `test` ou `production`
+- `PORT`: porta HTTP do backend
+- `HOST`: host de bind do Fastify
+- `LOG_LEVEL`: `silent`, `error`, `warn`, `info` ou `debug`
+- `RULES_DATA_DIR`: override opcional para o dataset compacto local
+
+### Verificações do backend
+
+```bash
+npm run backend:typecheck
+npm run backend:test
+npm run backend:build
+```
+
+### Endpoints de domínio já implementados
+
+#### `POST /characters/project`
+
+Projeta uma ficha derivada tipada a partir de um `CharacterRecord`.
+
+Retorna:
+
+- nível total
+- bônus de proficiência
+- atributos finais
+- modificadores
+- saves
+- skills
+- HP
+- Armor Class derivada a partir de `equipped_armor` e `equipped_shield`
+- spellcasting derivado
+- spell slots máximos por nível
+- resources atuais
+
+#### `POST /resources/use`
+
+Consome um recurso limitado do personagem sem o frontend precisar reimplementar a regra.
+
+Entrada:
+
+- `character`
+- `resourceId`
+- `amount` opcional
+
+Comportamento:
+
+- reduz `current`
+- erros agora usam um shape estável com `statusCode`, `error.code`, `error.message`, `path`, `requestId` e `timestamp`
+- retorna `409` com `error.code: "RESOURCE_UNAVAILABLE"` se não houver uso suficiente
+- retorna `404` com `error.code: "RESOURCE_NOT_FOUND"` se o recurso não existir
+
+#### `POST /actions/derive`
+
+Deriva uma lista tipada de ações a partir do `CharacterRecord` e do catálogo compacto local.
+
+Escopo atual deste slice:
+
+- ações básicas do sistema (`Attack`, `Dash`, `Dodge`, etc.)
+- ataques explícitos vindos de `character.attacks`
+- ataques de arma derivados de itens equipados em `character.inventory`
+- cantrips e magias de nível 1 vindas de `spellChoices`
+- magias de classe vindas de `character.spells`, validadas contra `GET /rules/class-spells`
+- ações e contadores de recursos limitados já presentes em `character.resources`
+
+Limitação atual intencional:
+
+- o backend já consegue derivar ataques de armas simples/ranged a partir de itens equipados, incluindo uso de dano versátil quando a arma principal está livre para duas mãos
+- notas de ataque também já expõem propriedades relevantes como `Ammunition`, `Heavy`, `Versatile`, `Reach`, `Loading` e `Reload`, além da munição restante quando a arma depende dela
+- ataques de armas com `Ammunition` já ficam desabilitados quando o inventário não tem quantidade compatível do tipo correto
+- ataques com arma `Two-Handed` já ficam desabilitados quando um escudo ou item na outra mão impede empunhá-las corretamente
+- armas de munição de uma mão já ficam desabilitadas quando a ficha não tem mão livre para carregar a arma
+- armas corpo a corpo com a propriedade `Thrown` agora geram duas ações derivadas: uma versão corpo a corpo e outra de arremesso usando o alcance do item
+- para esse slice, `character.inventory[].quantity` é o campo canônico usado para contar munição, tanto em pilhas (`arrows-20`) quanto em entradas unitárias equivalentes (`arrow`)
+- a partir deste ponto, o backend também já possui comandos de inventário para gastar e recuperar munição com base na arma equipada
+- `Opportunity Attack` agora usa o alcance real da arma corpo a corpo equipada, incluindo `Reach`
+- `Two-Weapon Fighting` agora é derivado como ação básica contextual e fica desabilitado quando a ficha não tem duas armas `Light` equipadas
+- ainda faltam partes mais profundas de combate de equipamento, como escolhas mais detalhadas por propriedade e interações mais amplas de armadura/escudo no mesmo slice de ação
+
+#### `POST /inventory/spend-ammo`
+
+Gasta munição a partir de uma arma equipada, sem obrigar o frontend a descobrir manualmente qual item de munição deve ser decrementado.
+
+Entrada:
+
+- `character`
+- `weaponItemId`
+- `amount` opcional
+
+Comportamento atual:
+
+- identifica o grupo de munição correto pela arma equipada (`bow`, `crossbow`, `sling`)
+- soma entradas equivalentes do inventário, como `arrow` + `arrows-20`
+- consome a quantidade solicitada nas entradas compatíveis
+- retorna `409` com `error.code: "AMMO_UNAVAILABLE"` se a munição total for insuficiente
+
+#### `POST /inventory/recover-ammo`
+
+Recupera munição de volta ao inventário com base na arma equipada.
+
+Entrada:
+
+- `character`
+- `weaponItemId`
+- `amount` opcional
+
+Comportamento atual:
+
+- prefere acrescentar em uma pilha compatível já existente
+- se não houver pilha compatível, cria uma nova entrada `backpack` com o `baseItemId` preferido para aquele tipo de munição
+
+#### `GET /rules/class-spells`
+
+Expõe a lista compactada de magias por classe a partir do dataset local do 5etools.
+
+Uso atual:
+
+- validação de magias de classe na derivação de ações
+- base para futuros fluxos de seleção/preparação de magias pelo backend
+
+#### `POST /resources/recover`
+
+Aplica recuperação por descanso com base no `recovery` já salvo em cada recurso.
+
+Entrada:
+
+- `character`
+- `recovery`: `short_rest` ou `long_rest`
+
+Comportamento atual:
+
+- `short_rest` recupera recursos marcados como `short_rest`
+- `long_rest` recupera recursos marcados como `short_rest` e `long_rest`
+- `long_rest` também limpa `spellSlotsUsed` e zera `hitDiceUsed`
+
 ## Verificações úteis
 
 TypeScript:
@@ -90,6 +274,16 @@ node --test tests/*.test.js
 - [src/core/rules](/Users/icaro/codes/dnd-app/src/core/rules): constantes, repositório de regras e contratos centrais
 - [src/lib](/Users/icaro/codes/dnd-app/src/lib): helpers compartilhados de formatação, texto e parsing
 - [src/types](/Users/icaro/codes/dnd-app/src/types): tipos centrais do app
+
+### Backend TypeScript
+
+- [backend/src/domain/contracts](/Users/icaro/codes/dnd-app/backend/src/domain/contracts): contratos canônicos do backend para personagem, escolhas, regras e projeção derivada
+- [backend/src/modules/characters](/Users/icaro/codes/dnd-app/backend/src/modules/characters): projeção tipada de ficha
+- [backend/src/config](/Users/icaro/codes/dnd-app/backend/src/config): carregamento e validação explícita de ambiente para o backend
+- [backend/src/modules/health](/Users/icaro/codes/dnd-app/backend/src/modules/health): health endpoint e readiness check do dataset compacto local
+- [backend/src/modules/actions](/Users/icaro/codes/dnd-app/backend/src/modules/actions): derivação tipada de ações usando o contrato canônico do backend
+- [backend/src/modules/resources](/Users/icaro/codes/dnd-app/backend/src/modules/resources): uso e recuperação de recursos por descanso
+- [backend/src/modules/rules](/Users/icaro/codes/dnd-app/backend/src/modules/rules): catálogos read-only vindos do dataset compacto local, incluindo `class-spells`
 
 ### Saída compilada
 
@@ -234,6 +428,19 @@ Com isso, o caminho de dados ficou simples:
 ```text
 5etools-v2.28.0  ->  scripts/build-5etools-data.mjs  ->  data/5etools/5e-2024  ->  app.js + core TS
 ```
+
+No backend novo, o primeiro slice segue esta trilha:
+
+```text
+data/5etools/5e-2024  ->  backend/src/modules/rules  ->  NestJS + Fastify endpoints
+```
+
+O módulo [backend/src/modules/rules](/Users/icaro/codes/dnd-app/backend/src/modules/rules) já aplica duas regras de manutenção importantes:
+
+- lê apenas do dataset compacto local
+- mantém cache simples em memória por catálogo, para evitar releitura de JSON a cada request durante o desenvolvimento
+
+Os contratos em [backend/src/domain/contracts](/Users/icaro/codes/dnd-app/backend/src/domain/contracts) são o começo da fonte de verdade do backend. Os módulos `characters`, `resources` e `actions` já dependem deles diretamente.
 
 ## Estado atual da arquitetura
 

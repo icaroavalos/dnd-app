@@ -4,12 +4,29 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "backend:build": "npm --prefix backend run build",
+    "backend:dev": "npm --prefix backend run dev",
+    "backend:start": "npm --prefix backend run start",
+    "backend:test": "npm --prefix backend run test",
+    "backend:typecheck": "npm --prefix backend run typecheck",
     "test": "node tests/test-recovery.js",
     "test:watch": "node --watch tests/test-recovery.js",
     "typecheck": "tsc --noEmit",
     "dev": "npx serve ."
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@types/node": "^25.6.2",
+    "supertest": "^7.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.19",
+    "@nestjs/core": "^11.1.19",
+    "@nestjs/platform-fastify": "^11.1.19",
+    "@nestjs/testing": "^11.1.19",
+    "fastify": "^5.8.5",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   }
 }

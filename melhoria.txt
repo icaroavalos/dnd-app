@@ -47,3 +47,80 @@ Suggested execution order:
 
 Best next implementation target:
 Refine character state persistence, specifically focusing on manual HP gains during level-up and background choice validation. With sheet and builder rendering now modularized, the next step is tightening state consistency and reducing the remaining event/wiring complexity in app.js.
+
+Backend implementation roadmap (recommended stack: NestJS + Fastify):
+Phase G: [in progress] introduce a typed NestJS backend as the source of truth for persistence and rule execution
+1. [in progress] Bootstrap the backend workspace in `backend/` with NestJS + Fastify and keep it isolated from the frontend runtime.
+   - [ok] Create `backend/src/main.ts` with Fastify adapter and environment-aware bootstrap
+   - [ok] Create `backend/src/app.module.ts` as the composition root
+   - [ok] Add `backend/package.json`, `backend/tsconfig.json`, `backend/test/` and lint/test scripts
+   - [ok] Document backend run commands in README after the first working server is up
+2. [in progress] Extract and share canonical domain contracts between app and backend.
+   - [ok] Create `backend/src/domain/contracts/` for Character, RuleDefinition, SpellChoiceState, BackgroundChoiceState, DerivedCharacterSheet
+   - [ ] Prefer moving stable shared contracts into `src/shared/` or `packages/shared/` once the backend API shape settles
+   - [ ] Keep frontend-only view models out of the shared domain layer
+3. [in progress] Introduce a read-only rules module backed only by local compacted 5etools data.
+   - [ok] Create `backend/src/modules/rules/` with loaders, repository, cache and typed query services
+   - [ok] Read only from `data/5etools/5e-2024/`, never from legacy datasets or ad hoc project files
+   - [ok] Expose catalog endpoints for classes, species, backgrounds, spells, features and items
+   - [ok] Expose feats endpoint for creation-related read flows
+4. [ ] Move rule execution into backend domain modules with thin controllers.
+   - [in progress] Create `backend/src/modules/characters/` for character CRUD and projections
+     - [ok] Add `POST /characters/project` for typed sheet projection from `CharacterRecord`
+     - [ok] Derive armor class from equipped armor and shield items using local compacted equipment rules
+   - [in progress] Create `backend/src/modules/actions/` for typed action derivation
+     - [ok] Add `POST /actions/derive` for basic actions, background spell actions, and limited-use resource actions
+     - [ok] Extend the backend `CharacterRecord` with canonical `attacks` and `spells`
+     - [ok] Add `GET /rules/class-spells` for canonical class spell lists
+     - [ok] Derive class spell actions that consume spell slots based on backend projection state
+     - [ok] Derive equipped weapon attacks from canonical inventory item instances plus the local compacted item catalog
+     - [ok] Respect versatile weapon damage when a main-hand weapon can be used two-handed
+     - [ok] Surface ammunition as part of derived ranged-weapon attack notes
+     - [ok] Disable ammunition-based ranged attacks when the inventory has no matching ammo quantity
+     - [ok] Count ammunition across equivalent single-item and stacked inventory entries
+     - [ok] Add backend inventory commands to spend and recover ammunition using equipped-weapon context
+     - [ok] Derive `Opportunity Attack` reach from equipped melee weapons with the `Reach` property
+     - [ok] Disable `Two-Weapon Fighting` unless two equipped Light weapons are available
+     - [ok] Surface additional weapon property labels like `Reach`, `Loading`, and `Reload`
+     - [ok] Disable `Two-Handed` weapon attacks when shield/off-hand occupancy prevents wielding them
+     - [ok] Disable one-handed ammunition weapons when no free hand is available to load them
+     - [ok] Derive separate thrown attack actions for melee weapons with the `Thrown` property while keeping their melee attack profile intact
+     - [ ] Expand action derivation for the remaining richer equipment combat details (broader armor/shield interactions and deeper property-specific combat edge cases)
+   - [in progress] Create `backend/src/modules/resources/` for spell slots, limited uses and rest recovery
+     - [ok] Add `POST /resources/use` for limited-use resource spending
+     - [ok] Add `POST /resources/recover` for short-rest and long-rest recovery
+   - [ ] Reuse the current TypeScript rule-engine behavior as the specification, porting only stable typed modules
+5. [ ] Add persistence with PostgreSQL and Prisma only after the read-only API and projection flow are stable.
+   - [ ] Store character state, inventory instances, spell choices, level choices and event history
+   - [ ] Keep rule datasets out of PostgreSQL; database is for user state, not 5etools source data
+   - [ ] Add migration scripts and a seed only for development fixtures
+6. [ ] Introduce an event-sourced character ledger for long-term maintainability.
+   - [ ] Model level-up, damage taken, healing received, rest recovery, equipment changes and resource usage as events
+   - [ ] Keep a projected read model for fast UI reads
+   - [ ] Start with append-only events for character progression and combat resources before broader adoption
+7. [ ] Migrate the frontend gradually to API-backed state instead of rewriting everything at once.
+   - [ ] First consume read-only catalog endpoints
+   - [ ] Then consume derived sheet/projection endpoints
+   - [ ] Then move character mutations (level up, rests, resource usage, spell casting) to backend commands
+   - [ ] Keep app.js as a shell until it can be replaced safely by typed API clients and frontend state modules
+8. [ ] Add backend-focused tests before broad feature migration.
+   - [ ] Unit tests for rules repository, projection services, action services and recovery logic
+   - [ ] Contract tests for DTO validation and API responses
+   - [ ] Integration tests for character creation, level-up, spell usage and rest recovery
+9. [ ] Add operational basics early so the backend stays maintainable as it grows.
+   - [ok] Structured logging
+   - [ok] Config module with explicit env validation
+   - [ok] Health endpoint and readiness checks
+   - [ok] Request-scoped error mapping with stable API error shapes
+10. [ ] Keep the migration disciplined.
+   - [ ] Do not duplicate two business-rule sources for long periods
+   - [ ] Frontend can temporarily render from local TS modules, but backend-target modules should become the canonical rule execution path
+   - [ ] Once an API slice is stable, remove the superseded local execution path
+
+[] in the level up, show new features and abilities of that level
+[] when i click in magia is already open one description of spell, fix that
+[] show all the equipments given in the background
+[] when i delete one character sheet ask a confirmation card and improve the ui design of x button
+[] in the spell selections insert a i icon that shows the spell card, to help to choose
+[] improve the features section design
+[] barbarian lvl 19 are showing just You gain the following benefits.
