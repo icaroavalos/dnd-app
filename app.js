@@ -127,6 +127,7 @@ import { createGlobalEvents } from "./src/app/global-events.js";
 import { createBuilderRenderers } from "./src/app/builder-renderers.js";
 import { createMainRenderController } from "./src/app/main-render-controller.js";
 import { createCreationEventHandlers } from "./src/app/creation-event-handlers.js";
+import { createCharacterStorageFacade } from "./src/app/character-storage-facade.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -456,6 +457,13 @@ const creationEventHandlers = createCreationEventHandlers({
   escapeHtml,
 });
 
+const storageFacade = createCharacterStorageFacade({
+  getActiveCharacterId: () => state.activeCharacterId,
+  setActiveCharacterId: (id) => { state.activeCharacterId = id; },
+  getCharacters: () => state.characters,
+  setCharacters: (characters) => { state.characters = characters; },
+});
+
 init();
 
 async function init() {
@@ -477,12 +485,21 @@ async function init() {
   render();
 }
 
-function loadState() {
-  return typedLoadState(defaultState);
+async function loadState() {
+  // Load characters from storage facade (API with localStorage fallback)
+  const characters = await storageFacade.loadAll();
+  // Sync with localStorage
+  storageFacade.syncLocalState(characters);
+  return typedLoadState({ ...defaultState, characters });
 }
 
-function persist() {
+async function persist() {
   syncActiveCharacter();
+  // Save character to storage facade (API with localStorage fallback)
+  const activeChar = state.characters?.find(c => c.id === state.activeCharacterId) || state.character;
+  if (activeChar && activeChar.id) {
+    await storageFacade.save(activeChar);
+  }
   typedSaveState(state);
 }
 
