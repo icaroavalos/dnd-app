@@ -120,6 +120,7 @@ import { createSpellHelpers } from "./src/app/spell-helpers.js";
 import { createResourceHelpers } from "./src/app/resource-helpers.js";
 import { createModalRenderers } from "./src/app/modal-renderers.js";
 import { createCharacterMenu } from "./src/app/character-menu.js";
+import { createCharacterRoster } from "./src/app/character-roster.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -310,6 +311,23 @@ const modalRenderers = createModalRenderers({
   cancelRest,
   confirmRest,
 });
+const characterRoster = createCharacterRoster({
+  getState: () => state,
+  defaultCharacter: defaultState.character,
+  abilityDefinitions: ABILITIES,
+  standardArray: STANDARD_ARRAY,
+  clone: structuredClone,
+  randomUUID: () => crypto.randomUUID(),
+  defaultSubrace,
+  maxLevelOneHp,
+  defaultSaves,
+  normalizeCharacterState,
+  resolveSelectedSpellName: typedResolveSelectedSpellName,
+  knownSheetSpellNames,
+  persist,
+  render,
+  renderCharacterMenu,
+});
 const characterMenu = createCharacterMenu({
   getState: () => state,
   els,
@@ -357,28 +375,11 @@ function persist() {
 }
 
 function ensureRosterState() {
-  state.character.id ??= state.activeCharacterId ?? crypto.randomUUID();
-  state.character.subrace ??= defaultSubrace(state.character.race);
-  state.characters = Array.isArray(state.characters) ? state.characters : [];
-  if (!state.characters.length) state.characters = [structuredClone(state.character)];
-  state.activeCharacterId ??= state.character.id;
-  const active = state.characters.find((character) => character.id === state.activeCharacterId);
-  if (active) state.character = structuredClone(active);
-  else {
-    state.activeCharacterId = state.characters[0].id;
-    state.character = structuredClone(state.characters[0]);
-  }
-  state.creationComplete = Boolean(state.character.creationComplete ?? state.creationComplete);
-  if (state.creationComplete && !state.levelUpMode) state.builderVisible = false;
+  return characterRoster.ensureRosterState();
 }
 
 function syncActiveCharacter() {
-  state.character.id ??= state.activeCharacterId ?? crypto.randomUUID();
-  state.character.creationComplete = Boolean(state.creationComplete || state.character.creationComplete);
-  state.activeCharacterId = state.character.id;
-  const index = state.characters.findIndex((character) => character.id === state.character.id);
-  if (index >= 0) state.characters[index] = structuredClone(state.character);
-  else state.characters.push(structuredClone(state.character));
+  return characterRoster.syncActiveCharacter();
 }
 
 function bindGlobalEvents() {
@@ -409,94 +410,27 @@ document.getElementById("restModalBackdrop")?.addEventListener("click", () => {
 }
 
 function createStartingCharacter() {
-  const character = structuredClone(defaultState.character);
-  character.id = crypto.randomUUID();
-  character.name = "Nova Ficha";
-  character.level = 1;
-  character.abilityMethod = "standard";
-  character.abilities = Object.fromEntries(ABILITIES.map(([key], index) => [key, STANDARD_ARRAY[index]]));
-  character.classFeatureChoices = {};
-  character.asiChoices = {};
-  character.bgSpellChoices = {};
-  character.equipmentChoices = {};
-  character.inventory = [];
-  character.equippedItems = [];
-  character.hitDiceUsed = 0;
-  character.spellSlots = {};
-  character.resources = {};
-  character.race = "human";
-  character.subrace = "Human";
-  character.class = "fighter";
-  
-  character.hp = maxLevelOneHp(character.class, character.abilities);
-  character.armorClass = 10 + Math.floor(((character.abilities.dex ?? 10) - 10) / 2);
-  character.speed = 30;
-  character.attacks = [];
-  character.spells = [];
-  character.notes = "";
-  character.classSkillChoices = [];
-  character.skillProficiencies = [];
-  character.savingThrows = defaultSaves(character.class);
-  return character;
+  return characterRoster.createStartingCharacter();
 }
 
 function createNewCharacter() {
-  syncActiveCharacter();
-  const fresh = createStartingCharacter();
-  state.character = fresh;
-  state.activeCharacterId = fresh.id;
-  state.characters.push(structuredClone(fresh));
-  state.step = "lineage";
-  state.selectedSpell = "";
-  state.levelUpMode = false;
-  state.creationComplete = false;
-  state.builderVisible = true;
-  state.character.bgSpellChoices = {};
-  persist();
-  render();
+  return characterRoster.createNewCharacter();
 }
 
 function switchCharacter(characterId) {
-  syncActiveCharacter();
-  const character = state.characters.find((item) => item.id === characterId);
-  if (!character) return;
-  state.activeCharacterId = character.id;
-  state.character = structuredClone(character);
-  state.levelUpMode = false;
-  state.creationComplete = Boolean(state.character.creationComplete);
-  if (state.creationComplete) state.builderVisible = false;
-  normalizeCharacterState();
-  state.selectedSpell = typedResolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
-  persist();
-  render();
+  return characterRoster.switchCharacter(characterId);
 }
 
 function deleteCharacter(characterId) {
-  syncActiveCharacter();
-  state.characters = state.characters.filter((character) => character.id !== characterId);
-  if (!state.characters.length) {
-    const fresh = createStartingCharacter();
-    state.characters = [structuredClone(fresh)];
-    state.character = fresh;
-    state.activeCharacterId = fresh.id;
-  } else if (state.activeCharacterId === characterId) {
-    state.activeCharacterId = state.characters[0].id;
-    state.character = structuredClone(state.characters[0]);
-  }
-  state.deleteConfirmId = null;
-  normalizeCharacterState();
-  persist();
-  render();
+  return characterRoster.deleteCharacter(characterId);
 }
 
 function requestDeleteCharacter(characterId) {
-  state.deleteConfirmId = characterId;
-  renderCharacterMenu();
+  return characterRoster.requestDeleteCharacter(characterId);
 }
 
 function cancelDeleteCharacter() {
-  state.deleteConfirmId = null;
-  renderCharacterMenu();
+  return characterRoster.cancelDeleteCharacter();
 }
 
 async function hydrateApiData() {
