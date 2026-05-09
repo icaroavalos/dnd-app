@@ -118,7 +118,9 @@ test('GET /rules/species returns local compacted species', async () => {
     assert.equal(payload.ruleset, '5.5e-2024');
     assert.ok(Array.isArray(payload.results));
     assert.ok(payload.results.length > 0);
-    assert.equal(payload.results[0].name, 'Aasimar');
+    const speciesResults = payload.results as Array<{ name?: string; source?: string }>;
+    assert.ok(speciesResults.some((species) => species.name === 'Aarakocra' && species.source === 'MPMM'));
+    assert.ok(speciesResults.some((species) => species.name === 'Human' && species.source === 'XPHB'));
   } finally {
     await app.close();
   }

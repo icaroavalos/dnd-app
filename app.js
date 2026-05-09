@@ -977,6 +977,7 @@ els.form.querySelectorAll("[data-bg-equipment]").forEach((input) => {
       ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
       input.value
     );
+    rebuildInventoryFromChoices();
     normalizeCharacterState();
     persist();
     render();

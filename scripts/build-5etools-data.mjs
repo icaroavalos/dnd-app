@@ -13,6 +13,7 @@ const rulesets = {
   "5e-2014": {
     label: "5e / 2014 rules from local 5etools",
     classEdition: (it) => (it.edition ?? "classic") !== "one",
+    raceEdition: (it) => (it.edition ?? "classic") !== "one" && it.source !== "XPHB",
     contentEdition: (it) => (it.edition ?? "classic") !== "one" && it.source !== "XPHB",
     spellSource: (source) => source !== "XPHB",
     classSource: (source) => source !== "XPHB",
@@ -20,6 +21,7 @@ const rulesets = {
   "5e-2024": {
     label: "5.5e / 2024 rules from local 5etools",
     classEdition: (it) => it.edition === "one" || it.source === "XPHB",
+    raceEdition: (it) => it.edition === "one" || it.source === "XPHB" || it.source === "MPMM",
     contentEdition: (it) => it.edition === "one" || it.source === "XPHB",
     spellSource: (source) => source === "XPHB",
     classSource: (source) => source === "XPHB",
@@ -81,10 +83,10 @@ for (const [ruleset, config] of Object.entries(rulesets)) {
     .map(normalizeSubclassFeature);
 
   const races = (raceData.race ?? [])
-    .filter(config.contentEdition)
+    .filter(config.raceEdition)
     .map(normalizeRace);
   const subraces = (raceData.subrace ?? [])
-    .filter((subrace) => config.contentEdition({ ...subrace, edition: subrace.edition ?? raceData.race?.find((race) => race.name === subrace.raceName && race.source === subrace.raceSource)?.edition }))
+    .filter((subrace) => config.raceEdition({ ...subrace, edition: subrace.edition ?? raceData.race?.find((race) => race.name === subrace.raceName && race.source === subrace.raceSource)?.edition }))
     .map(normalizeSubrace);
   const backgrounds = (backgroundData.background ?? [])
     .filter(config.contentEdition)

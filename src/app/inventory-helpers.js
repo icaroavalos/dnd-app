@@ -56,7 +56,7 @@ export function createInventoryHelpers({
     const state = getState();
     const inventory = [];
     equipmentChoiceRules().forEach((rule) => {
-      const selected = state.character.equipmentChoices?.[rule.id];
+      const selected = selectedEquipmentOption(state, rule.id);
       const option = rule.options.find((item) => item.value === selected);
       if (!option) return;
       option.items.forEach((entry, index) => {
@@ -65,6 +65,13 @@ export function createInventoryHelpers({
     });
     state.character.inventory = inventory;
     state.character.equippedItems = (state.character.equippedItems ?? []).filter((id) => inventory.some((item) => item.id === id));
+  }
+
+  function selectedEquipmentOption(state, ruleId) {
+    if (ruleId === "background-starting-equipment") {
+      return state.character.bgChoices?.equipmentChoice ?? state.character.equipmentChoices?.[ruleId];
+    }
+    return state.character.equipmentChoices?.[ruleId];
   }
 
   function inventoryItemsFromEntry(entry, idBase) {
