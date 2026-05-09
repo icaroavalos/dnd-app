@@ -125,6 +125,7 @@ import { createApiData } from "./src/app/api-data.js";
 import { createAppShell } from "./src/app/app-shell.js";
 import { createGlobalEvents } from "./src/app/global-events.js";
 import { createBuilderRenderers } from "./src/app/builder-renderers.js";
+import { createMainRenderController } from "./src/app/main-render-controller.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -418,6 +419,15 @@ const globalEvents = createGlobalEvents({
   cancelRest,
 });
 
+const renderController = createMainRenderController({
+  getState: () => state,
+  appShell,
+  renderSheet,
+  renderCharacterMenu: () => characterMenu.renderCharacterMenu(),
+  renderHpModal: () => modalRenderers.renderHpModal(),
+  renderRestModal: () => modalRenderers.renderRestModal(),
+});
+
 init();
 
 async function init() {
@@ -505,7 +515,7 @@ async function loadSpellDetails(spellName) {
 }
 
 function render() {
-  return appShell.render();
+  return renderController.renderApp();
 }
 
 function renderChrome() {
