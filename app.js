@@ -115,6 +115,7 @@ import { createFormControls } from "./src/app/form-controls.js";
 import { compactRange, damageTypeLabel, ordinalLabel, propertyLabel, rangeLabel, spellLevelLabel } from "./src/app/labels.js";
 import { createInventoryHelpers } from "./src/app/inventory-helpers.js";
 import { build5etoolsApi, walkEntries } from "./src/app/5etools-source.js";
+import { createSheetRenderers } from "./src/app/sheet-renderers.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -209,6 +210,29 @@ const {
   itemTypeLabel: typedItemTypeLabel,
   normalizeInventoryItem: typedNormalizeInventoryItem,
   parseItemRef: typedParseItemRef,
+});
+const sheetRenderers = createSheetRenderers({
+  getState: () => state,
+  renderSummarySheet,
+  renderSkillsSheet,
+  renderAttacksSheet,
+  renderInventorySheet,
+  renderFeaturesSheet,
+  renderSpellsSheet,
+  deriveActiveModifiers,
+  currentActionItems,
+  availableSpellSlotsAtLevel,
+  resourceRecoveryLabel,
+  isEquipableItem,
+  itemTags,
+  currentFeatureItems,
+  spellcastingMetricsForAbility: typedSpellcastingMetricsForAbility,
+  spellAbility: typedSpellAbility,
+  currentSheetSpellEntries,
+  resolveSpellDetail: typedResolveSpellDetail,
+  spellFromKnownData,
+  casterLevel: typedCasterLevel,
+  spellSlotsMaxByLevel,
 });
 
 const els = {
@@ -1427,107 +1451,8 @@ function swapStandardArrayAbilities(from, to) {
   render();
 }
 
-function renderSummarySheetWrapper() {
-  return renderSummarySheet(state.character, state.derived);
-}
-
-function renderSkillsSheetWrapper() {
-  return renderSkillsSheet(state.character, state.derived);
-}
-
-function renderAttacksSheetWrapper() {
-  return renderAttacksSheet(
-    currentActionItems(),
-    state.actionFilter ?? "all",
-    availableSpellSlotsAtLevel,
-    state.selectedAction ?? "",
-    state.character.resources ?? {},
-    resourceRecoveryLabel
-  );
-}
-
-function renderInventorySheetWrapper() {
-  return renderInventorySheet(
-    state.character.inventory ?? [],
-    state.derived?.activeModifiers ?? deriveActiveModifiers(state.character),
-    state.derived?.encumbrance,
-    state.character.equippedItems ?? [],
-    isEquipableItem,
-    itemTags
-  );
-}
-
-function renderFeaturesSheetWrapper() {
-  const featureItems = currentFeatureItems().map((feature) => {
-    const resourceState = feature.resource ? state.character.resources?.[feature.resource.id] : null;
-    const max = Number(resourceState?.max ?? feature.resource?.max ?? 0);
-    const used = Number(resourceState?.used ?? 0);
-    const remaining = Math.max(0, max - used);
-
-    return {
-      id: feature.id,
-      kind: feature.kind,
-      name: feature.name,
-      meta: feature.meta,
-      description: feature.body,
-      resource: feature.resource ? {
-        id: feature.resource.id,
-        remaining,
-        max,
-        recoveryLabel: resourceRecoveryLabel(feature.resource.recovery),
-      } : undefined,
-    };
-  });
-
-  return renderFeaturesSheet(
-    featureItems,
-    state.featureFilter ?? "all",
-    state.selectedFeature ?? ""
-  );
-}
-
-function renderSpellsSheetWrapper() {
-  const globalSpellcasting = typedSpellcastingMetricsForAbility(typedSpellAbility(state.character, state.api), state.character, state.derived);
-  const spellEntries = currentSheetSpellEntries();
-  const sheetSpells = spellEntries
-    .map((spell) => {
-      const detail = typedResolveSpellDetail(spell.name, state.api) ?? spellFromKnownData(spell.name);
-      const resourceState = spell.resourceId ? state.character.resources?.[spell.resourceId] : null;
-      const maxUses = Number(resourceState?.max ?? (spell.castMode === "resource" ? 1 : 0));
-      const used = Number(resourceState?.used ?? 0);
-      return {
-        ...detail,
-        ...spell,
-        remainingUses: spell.castMode === "resource" ? Math.max(0, maxUses - used) : undefined,
-        maxUses: spell.castMode === "resource" ? maxUses : undefined,
-        recoveryLabel: spell.castMode === "resource" ? "Long Rest Resource" : undefined,
-      };
-    })
-    .filter((spell) => spell?.name && Number.isFinite(spell.level));
-
-  return renderSpellsSheet(
-    sheetSpells,
-    typedCasterLevel(state.character, state.api),
-    globalSpellcasting.attackBonus,
-    globalSpellcasting.saveDc,
-    state.selectedSpell ?? "",
-    spellSlotsMaxByLevel(),
-    state.character.spellSlots ?? {},
-    availableSpellSlotsAtLevel,
-    (name) => typedResolveSpellDetail(name, state.api) ?? spellFromKnownData(name)
-  );
-}
-
 function renderSheet() {
-  const renderers = {
-    summary: renderSummarySheetWrapper,
-    skills: renderSkillsSheetWrapper,
-    attacks: renderAttacksSheetWrapper,
-    spells: renderSpellsSheetWrapper,
-    inventory: renderInventorySheetWrapper,
-    features: renderFeaturesSheetWrapper,
-  };
-  els.sheetView.innerHTML = renderers[state.tab]();
+  els.sheetView.innerHTML = sheetRenderers[state.tab]();
   bindSheetEvents();
 }
 
