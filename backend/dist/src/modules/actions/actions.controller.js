@@ -17,7 +17,9 @@ let ActionsController = class ActionsController {
     constructor(actionsService) {
         this.actionsService = actionsService;
     }
-    deriveActions(character) {
+    deriveActions(request) {
+        // Support both legacy format (direct CharacterRecord) and DTO format
+        const character = 'classes' in request ? request : request.character;
         return this.actionsService.deriveActions(character);
     }
 };

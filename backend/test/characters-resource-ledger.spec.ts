@@ -22,7 +22,7 @@ async function getTestUserId(): Promise<string> {
 async function createTestCharacter(userId: string, app: any) {
   const res = await app.inject({
     method: 'POST',
-    url: '/characters-storage',
+    url: '/characters',
     payload: {
       userId,
       name: 'Ledger Legacy Test',
@@ -176,6 +176,143 @@ test('GET /characters/:id/resources/ledger returns event history', async () => {
     const ledger = response.json();
     assert.ok(Array.isArray(ledger));
     assert.ok(ledger.length >= 2);
+  } finally {
+    await app.close();
+  }
+});
+
+test('Ledger integration: create character, apply damage via ledger, rebuild projection, read projection', async () => {
+  const app = await createApp();
+  await app.init();
+  await app.getHttpAdapter().getInstance().ready();
+
+  try {
+    const userId = await getTestUserId();
+    const character = await createTestCharacter(userId, app);
+
+    // Apply damage via ledger
+    const damageRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/damage`,
+      payload: { amount: 5, currentHp: 12, description: 'Goblin attack' },
+    });
+    assert.equal(damageRes.statusCode, 201);
+
+    // Apply healing via ledger
+    const healRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/heal`,
+      payload: { amount: 3, currentHp: 7, description: 'Cure Wounds' },
+    });
+    assert.equal(healRes.statusCode, 201);
+
+    // Rebuild projection from ledger events
+    const rebuildRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/projection/rebuild`,
+    });
+    assert.equal(rebuildRes.statusCode, 200);
+    const projection = rebuildRes.json();
+    assert.equal(projection.characterId, character.id);
+    assert.ok(projection.currentHp !== undefined);
+
+    // Read projection by characterId
+    const getRes = await app.inject({
+      method: 'GET',
+      url: `/characters/${character.id}/resources/projection`,
+    });
+    assert.equal(getRes.statusCode, 200);
+    const readModel = getRes.json();
+    assert.equal(readModel.characterId, character.id);
+    assert.ok(readModel.currentHp !== undefined);
+    assert.ok(readModel.spellSlots !== undefined);
+    assert.ok(readModel.ammo !== undefined);
+  } finally {
+    await app.close();
+  }
+});
+
+test('Ledger covers all event types: HP_CHANGE, HIT_DIE, SPELL_SLOT, RESOURCE_USED, REST_APPLIED, AMMO_SPENT, AMMO_RECOVERED', async () => {
+  const app = await createApp();
+  await app.init();
+  await app.getHttpAdapter().getInstance().ready();
+
+  try {
+    const userId = await getTestUserId();
+    const character = await createTestCharacter(userId, app);
+
+    // HP_CHANGE (damage)
+    const damageRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/damage`,
+      payload: { amount: 5, currentHp: 12 },
+    });
+    assert.equal(damageRes.statusCode, 201);
+    assert.equal(damageRes.json().event.eventType, 'HP_CHANGE');
+
+    // HIT_DIE
+    const hitDieRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/hit-die`,
+      payload: { amount: -1, source: 'short_rest' },
+    });
+    assert.equal(hitDieRes.statusCode, 201);
+    assert.equal(hitDieRes.json().event.eventType, 'HIT_DIE');
+
+    // SPELL_SLOT
+    const spellSlotRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/spell-slot`,
+      payload: { slotLevel: 3, description: 'Cast Fireball' },
+    });
+    assert.equal(spellSlotRes.statusCode, 201);
+    assert.equal(spellSlotRes.json().event.eventType, 'SPELL_SLOT');
+
+    // RESOURCE_USED
+    const resourceUsedRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/use-resource`,
+      payload: { resourceType: 'ki', amount: 2, source: 'flurry_of_blows' },
+    });
+    assert.equal(resourceUsedRes.statusCode, 201);
+    assert.equal(resourceUsedRes.json().event.eventType, 'RESOURCE_USED');
+
+    // REST_APPLIED
+    const restRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/rest`,
+      payload: { restType: 'short', hpRegained: 5 },
+    });
+    assert.equal(restRes.statusCode, 201);
+    assert.equal(restRes.json().event.eventType, 'REST_APPLIED');
+
+    // AMMO_SPENT
+    const ammoSpendRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/ammo/spend`,
+      payload: { itemId: 'arrow', quantity: 3, source: 'attack' },
+    });
+    assert.equal(ammoSpendRes.statusCode, 201);
+    assert.equal(ammoSpendRes.json().event.eventType, 'AMMO_SPENT');
+
+    // AMMO_RECOVERED
+    const ammoRecoverRes = await app.inject({
+      method: 'POST',
+      url: `/characters/${character.id}/resources/ammo/recover`,
+      payload: { itemId: 'arrow', quantity: 10, source: 'loot' },
+    });
+    assert.equal(ammoRecoverRes.statusCode, 201);
+    assert.equal(ammoRecoverRes.json().event.eventType, 'AMMO_RECOVERED');
+
+    // Verify all events are in the ledger
+    const ledgerRes = await app.inject({
+      method: 'GET',
+      url: `/characters/${character.id}/resources/ledger`,
+    });
+    assert.equal(ledgerRes.statusCode, 200);
+    const ledger = ledgerRes.json();
+    assert.ok(Array.isArray(ledger));
+    assert.ok(ledger.length >= 7, 'Should have at least 7 events');
   } finally {
     await app.close();
   }

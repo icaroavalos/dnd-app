@@ -2,9 +2,19 @@
  * Character Projection - Deriva o estado completo para exibição (combate, perícias, etc)
  *
  * Esta é a única fonte de verdade para o que é exibido na ficha.
+ *
+ * Nota: Esta versão usa projeção local. Para usar a backend, importe
+ * `projectCharacter` de `../../lib/api-character-project-client.js`
  */
 import type { AbilityName } from '../../types/background.js';
 import type { Character, DerivedCharacterSheet, AbilityScores } from '../../types/state.js';
+export declare function enableBackendProjection(enabled: boolean): void;
+export declare function isBackendProjectionEnabled(): boolean;
+/**
+ * Projeta personagem usando backend se disponível, ou fallback local.
+ * Esta é a função principal para projeção da ficha.
+ */
+export declare function projectCharacterSheet(character: Character, options?: ProjectionOptions): Promise<DerivedCharacterSheet>;
 export interface ProjectionOptions {
     skills?: [string, AbilityName][];
     activeModifiers?: any[];

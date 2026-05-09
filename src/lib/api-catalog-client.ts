@@ -10,6 +10,8 @@
  * - /rules/items
  * - /rules/features
  * - /rules/feats
+ *
+ * Fallback: Se o backend estiver indisponível, usa dados locais de data/5etools/5e-2024.
  */
 
 export const getBaseUrl = (): string => {
@@ -17,7 +19,7 @@ export const getBaseUrl = (): string => {
   if (typeof process !== 'undefined' && process.env?.VITE_API_URL) {
     return process.env.VITE_API_URL;
   }
-  // Fallback para import.meta.env (Vite)
+  // Suporte a import.meta.env (Vite)
   try {
     // @ts-ignore - import.meta.env pode não estar definido
     const env = import.meta?.env;
@@ -27,10 +29,49 @@ export const getBaseUrl = (): string => {
   } catch {
     // Ignora se não tiver import.meta.env
   }
-  return 'http://localhost:3000';
+  // Default: backend local NestJS na porta 3100
+  return 'http://localhost:3100';
 };
 
 const BASE_URL = getBaseUrl();
+
+// Dados locais em fallback (carregados sob demanda)
+let localDataCache: Record<string, any> | null = null;
+
+async function loadLocalData(): Promise<Record<string, any>> {
+  if (localDataCache) {
+    return localDataCache;
+  }
+
+  try {
+    // Tenta carregar do módulo de dados locais
+    const modules = {
+      backgrounds: () => import('../../data/5etools/5e-2024/backgrounds.json'),
+      classes: () => import('../../data/5etools/5e-2024/classes.json'),
+      spells: () => import('../../data/5etools/5e-2024/spells.json'),
+      'class-spells': () => import('../../data/5etools/5e-2024/class-spells.json'),
+      species: () => import('../../data/5etools/5e-2024/races.json'),
+      items: () => import('../../data/5etools/5e-2024/equipment.json'),
+      features: () => import('../../data/5etools/5e-2024/class-features.json'),
+      feats: () => import('../../data/5etools/5e-2024/feats.json'),
+    };
+
+    const results: Record<string, any> = {};
+    for (const [key, loader] of Object.entries(modules)) {
+      try {
+        const data = await loader();
+        results[key] = data.default || data;
+      } catch {
+        // Dados locais não disponíveis para este catálogo
+        results[key] = { results: [] };
+      }
+    }
+    localDataCache = results;
+    return results;
+  } catch {
+    return {};
+  }
+}
 
 export interface CatalogEntry {
   id: string;
@@ -58,16 +99,42 @@ export type CatalogType =
   | 'feats';
 
 /**
- * Busca catálogo pelo tipo.
+ * Busca catálogo pelo tipo com fallback para dados locais.
  */
 export async function getCatalog(type: CatalogType): Promise<CatalogResponse> {
-  const response = await fetch(`${BASE_URL}/rules/${type}`);
+  // Tenta buscar do backend
+  try {
+    const response = await fetch(`${BASE_URL}/rules/${type}`, {
+      // Timeout de 5 segundos
+      signal: AbortSignal.timeout(5000),
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch catalog ${type}: ${response.statusText}`);
+    if (response.ok) {
+      return response.json();
+    }
+  } catch (error) {
+    // Backend indisponível, usa fallback local
+    console.warn(`Backend indisponível para ${type}, usando fallback local:`, error);
   }
 
-  return response.json();
+  // Fallback: dados locais
+  const localData = await loadLocalData();
+  const data = localData[type];
+
+  if (data?.results) {
+    return {
+      results: data.results,
+      total: data.results.length,
+      source: 'local-fallback',
+    };
+  }
+
+  // Sem dados locais disponíveis
+  return {
+    results: [],
+    total: 0,
+    source: 'none',
+  };
 }
 
 /**

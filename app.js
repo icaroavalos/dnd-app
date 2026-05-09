@@ -147,6 +147,7 @@ const defaultState = {
   levelUpHpGain: 0,
   levelUpSnapshot: null,
   levelUpClassMode: "same",
+  deleteConfirmId: null,
   api: { classes: {}, levels: {}, races: {}, spells: [], classSpells: {}, spellDetails: {}, source: {} },
   activeCharacterId: "default",
   characters: [],
@@ -364,9 +365,20 @@ function deleteCharacter(characterId) {
     state.activeCharacterId = state.characters[0].id;
     state.character = structuredClone(state.characters[0]);
   }
+  state.deleteConfirmId = null;
   normalizeCharacterState();
   persist();
   render();
+}
+
+function requestDeleteCharacter(characterId) {
+  state.deleteConfirmId = characterId;
+  renderCharacterMenu();
+}
+
+function cancelDeleteCharacter() {
+  state.deleteConfirmId = null;
+  renderCharacterMenu();
 }
 
 async function hydrateApiData() {
@@ -590,6 +602,9 @@ function renderChrome() {
 }
 
 function renderCharacterMenu() {
+  const characterToDelete = state.deleteConfirmId ? state.characters.find(c => c.id === state.deleteConfirmId) : null;
+  const isConfirming = !!characterToDelete;
+
   els.characterMenu.innerHTML = `
     <div class="character-menu-head">
       <div>
@@ -604,6 +619,20 @@ function renderCharacterMenu() {
       ${state.builderVisible === false ? `<button type="button" class="secondary-button" data-menu-toggle-builder>Mostrar criador</button>` : ""}
       <button type="button" class="danger-button" data-menu-delete-active>Excluir ficha</button>
     </div>
+    ${isConfirming ? `
+      <div class="delete-confirmation-card">
+        <p class="delete-confirmation-title">Tem certeza que deseja excluir?</p>
+        <p class="delete-confirmation-character">
+          <strong>${escapeHtml(characterToDelete.name || "Sem nome")}</strong> -
+          ${titleCase(characterToDelete.subrace || characterToDelete.race)} ${titleCase(characterToDelete.class)} ${characterToDelete.level}
+        </p>
+        <p class="delete-confirmation-warning">Esta ação não pode ser desfeita.</p>
+        <div class="delete-confirmation-actions">
+          <button type="button" class="secondary-button" data-cancel-delete>Cancelar</button>
+          <button type="button" class="danger-button" data-confirm-delete>Excluir</button>
+        </div>
+      </div>
+    ` : ''}
     <div class="menu-current">
       <span>Nivel ${state.character.level}</span>
       <strong>${titleCase(state.character.subrace || state.character.race)} ${titleCase(state.character.class)}</strong>
@@ -639,8 +668,7 @@ function bindCharacterMenuEvents() {
     closeCharacterMenu();
   });
   els.characterMenu.querySelector("[data-menu-delete-active]")?.addEventListener("click", () => {
-    deleteCharacter(state.activeCharacterId);
-    closeCharacterMenu();
+    requestDeleteCharacter(state.activeCharacterId);
   });
   els.characterMenu.querySelectorAll("[data-menu-roster-id]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -651,9 +679,19 @@ function bindCharacterMenuEvents() {
   els.characterMenu.querySelectorAll("[data-menu-delete-id]").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.stopPropagation();
-      deleteCharacter(button.dataset.menuDeleteId);
-      closeCharacterMenu();
+      requestDeleteCharacter(button.dataset.menuDeleteId);
     });
+  });
+  // Confirmation buttons only exist when delete confirmation is shown
+  const confirmBtn = els.characterMenu.querySelector("[data-confirm-delete]");
+  const cancelBtn = els.characterMenu.querySelector("[data-cancel-delete]");
+  confirmBtn?.addEventListener("click", () => {
+    if (state.deleteConfirmId) {
+      deleteCharacter(state.deleteConfirmId);
+    }
+  });
+  cancelBtn?.addEventListener("click", () => {
+    cancelDeleteCharacter();
   });
 }
 
@@ -703,6 +741,10 @@ function renderTabs() {
   els.sheetTabs.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
       state.tab = button.dataset.tab;
+      // Clear spell selection when entering spells tab to avoid auto-opening card
+      if (state.tab === 'spells') {
+        state.selectedSpell = '';
+      }
       persist();
       renderSheet();
       renderTabs();
@@ -1677,6 +1719,16 @@ function bindSheetEvents() {
       renderSheet();
     });
   }
+
+  // Info button - shows spell details without selecting it
+  els.sheetView.querySelectorAll("[data-spell-info]").forEach((button) => {
+    button.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const spellName = button.dataset.spellInfo;
+      await loadSpellDetails(spellName);
+      renderSheet();
+    });
+  });
 
   els.sheetView.querySelectorAll("[data-feature-filter]").forEach((button) => {
     button.addEventListener("click", () => {

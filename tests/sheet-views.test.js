@@ -225,4 +225,71 @@ describe('sheet views', () => {
     assert.match(html, /data-use-resource="secondWind"/);
     assert.match(html, /1\/2 uses/);
   });
+
+  it('renders features grouped by source with compact cards', () => {
+    const html = featuresView.renderFeaturesSheet(
+      [
+        {
+          id: 'second-wind',
+          name: 'Second Wind',
+          kind: 'class',
+          meta: 'Fighter 1 • XPHB',
+          description: 'Recover hit points as bonus action.',
+          resource: {
+            id: 'secondWind',
+            remaining: 2,
+            max: 2,
+            recoveryLabel: 'Short Rest Resource',
+          },
+        },
+        {
+          id: 'extra-attack',
+          name: 'Extra Attack',
+          kind: 'class',
+          meta: 'Fighter 5 • XPHB',
+          description: 'Attack twice when you take the Attack action.',
+        },
+        {
+          id: 'darkvision',
+          name: 'Darkvision',
+          kind: 'species',
+          meta: 'Human • XPHB',
+          description: 'You can see in dim light within 60 feet.',
+        },
+      ],
+      'all',
+      ''
+    );
+
+    assert.match(html, /feature-filter-row/);
+    assert.match(html, /feature-section-list/);
+    assert.match(html, /feature-group-list/);
+    assert.match(html, /feature-source-group/);
+    assert.match(html, /feature-compact-list/);
+    assert.match(html, /feature-card/);
+    assert.match(html, /feature-card-header/);
+    assert.match(html, /feature-meta-source/);
+    assert.match(html, /XPHB/);
+  });
+
+  it('feature cards are expandable with aria attributes', () => {
+    const html = featuresView.renderFeaturesSheet(
+      [
+        {
+          id: 'test-feature',
+          name: 'Test Feature',
+          kind: 'class',
+          meta: 'Fighter 1 • XPHB',
+          description: 'Test description.',
+        },
+      ],
+      'all',
+      'test-feature'
+    );
+
+    assert.match(html, /aria-expanded="true"/);
+    assert.match(html, /aria-controls="feature-content-test-feature"/);
+    assert.match(html, /id="feature-content-test-feature"/);
+    assert.match(html, /class="feature-card expanded"/);
+  });
 });

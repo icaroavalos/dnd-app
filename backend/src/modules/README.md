@@ -55,7 +55,8 @@ module-name/
 1. **DTOs em `dto/`:** Todo request/response complexo tem seu DTO na pasta `dto/`
 2. **Documentação:** Cada módulo documenta seus DTOs em `dto/README.md`
 3. **Contratos:** Tipos compartilhados em `@shared/contracts`
-4. **Validação:** Usar class-validator (futuro) para validação de DTOs
+4. **Persistência:** Prisma/SQLite é o caminho canônico para persistência de personagens
+5. **Validação:** Usar class-validator (futuro) para validação de DTOs
 
 ## Histórico
 

@@ -1,20 +1,11 @@
-import type { CharacterRecord } from '../../domain/contracts/index.js';
+import type { CharacterRecord } from '@shared/contracts';
 import { RulesService } from '../rules/rules.service.js';
-export interface SpendAmmoRequest {
-    character: CharacterRecord;
-    weaponItemId: string;
-    amount?: number;
-}
-export interface RecoverAmmoRequest {
-    character: CharacterRecord;
-    weaponItemId: string;
-    amount?: number;
-}
+import type { SpendAmmoRequestDto, RecoverAmmoRequestDto } from './dto/index.js';
 export declare class InventoryService {
     private readonly rulesService;
     constructor(rulesService: RulesService);
-    spendAmmo(request: SpendAmmoRequest): Promise<CharacterRecord>;
-    recoverAmmo(request: RecoverAmmoRequest): Promise<CharacterRecord>;
+    spendAmmo(request: SpendAmmoRequestDto): Promise<CharacterRecord>;
+    recoverAmmo(request: RecoverAmmoRequestDto): Promise<CharacterRecord>;
     private resolveWeaponAmmoContext;
 }
 //# sourceMappingURL=inventory.service.d.ts.map

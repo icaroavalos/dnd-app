@@ -1,10 +1,12 @@
-import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { PrismaCharacterRepository } from '../persistence/prisma-character-repository.js';
-import type { CreateCharacterDto } from './characters-storage.controller.js';
+import type { CreateCharacterDto } from '../dto/create-character.dto.js';
+import type { UpdateCharacterDto } from '../dto/update-character.dto.js';
+import type { CharacterRecord } from '@shared/contracts';
 
 /**
- * Serviço de armazenamento básico de personagens.
- * Usa Prisma para persistência, sem projeção ou cálculo de derivados.
+ * Serviço de armazenamento de personagens usando Prisma.
+ * Gerencia CharacterRecord completo, sem projeção.
  */
 @Injectable()
 export class CharactersStorageService {
@@ -13,43 +15,44 @@ export class CharactersStorageService {
     private readonly repository: PrismaCharacterRepository,
   ) {}
 
-  async list(): Promise<Array<{ id: string; name: string }>> {
-    const characters = await this.repository.list();
-    return characters.map(({ id, name }) => ({ id, name }));
+  /**
+   * Lista todos os personagens (apenas resumo).
+   */
+  async list(): Promise<Array<{ id: string; name: string; level: number; primaryClass: string }>> {
+    return this.repository.list();
   }
 
-  async findById(id: string): Promise<any> {
-    try {
-      return await this.repository.findById(id);
-    } catch (err: any) {
-      if (err.status === 404) {
-        throw new NotFoundException({
-          code: 'CHARACTER_NOT_FOUND',
-          message: `Character "${id}" not found.`,
-        });
-      }
-      throw err;
-    }
+  /**
+   * Busca um personagem por ID.
+   */
+  async findById(id: string): Promise<CharacterRecord> {
+    return this.repository.findById(id);
   }
 
-  async create(dto: CreateCharacterDto): Promise<any> {
-    const id = `char-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  /**
+   * Cria um novo personagem.
+   */
+  async create(dto: CreateCharacterDto): Promise<CharacterRecord> {
+    const id = dto.id || `char-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    const data = {
+    const characterRecord: CharacterRecord = {
       id,
-      userId: dto.userId || 'default',
-      name: dto.name || 'Unnamed',
       ruleset: dto.ruleset || '5e',
+      name: dto.name || 'Unnamed',
       lineageId: dto.lineageId || 'human',
       backgroundId: dto.backgroundId || 'custom',
-      alignment: dto.alignment || 'Neutral',
-      experience: dto.experience || 0,
-      abilities: dto.abilities || { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+      alignment: dto.alignment ?? 'Neutral',
+      experience: dto.experience ?? 0,
       classes: dto.classes || [{ classId: 'commoner', level: 1 }],
+      abilities: dto.abilities || { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+      skillProficiencies: dto.skillProficiencies || [],
+      savingThrowProficiencies: dto.savingThrowProficiencies || [],
       inventory: dto.inventory || [],
       spellChoices: dto.spellChoices || [],
-      backgroundChoices: dto.backgroundChoices || [],
-      runtimeState: dto.runtimeState || {
+      backgroundChoices: dto.backgroundChoices ?? null,
+      attacks: dto.attacks || [],
+      resources: dto.resources || {},
+      state: dto.state || {
         hp: 10,
         maxHpOverride: null,
         tempHp: 0,
@@ -59,6 +62,42 @@ export class CharactersStorageService {
       },
     };
 
-    return this.repository.create(data as any);
+    return this.repository.create(characterRecord);
+  }
+
+  /**
+   * Atualiza um personagem existente.
+   */
+  async update(id: string, dto: UpdateCharacterDto): Promise<CharacterRecord> {
+    const existing = await this.repository.findById(id);
+
+    const updatedRecord: CharacterRecord = {
+      ...existing,
+      name: dto.name ?? existing.name,
+      ruleset: dto.ruleset ?? existing.ruleset,
+      lineageId: dto.lineageId ?? existing.lineageId,
+      backgroundId: dto.backgroundId ?? existing.backgroundId,
+      alignment: dto.alignment ?? existing.alignment,
+      experience: dto.experience ?? existing.experience,
+      classes: dto.classes ?? existing.classes,
+      abilities: dto.abilities ?? existing.abilities,
+      skillProficiencies: dto.skillProficiencies ?? existing.skillProficiencies,
+      savingThrowProficiencies: dto.savingThrowProficiencies ?? existing.savingThrowProficiencies,
+      inventory: dto.inventory ?? existing.inventory,
+      spellChoices: dto.spellChoices ?? existing.spellChoices,
+      backgroundChoices: dto.backgroundChoices ?? existing.backgroundChoices,
+      attacks: dto.attacks ?? existing.attacks,
+      resources: dto.resources ?? existing.resources,
+      state: dto.state ?? existing.state,
+    };
+
+    return this.repository.update(id, updatedRecord);
+  }
+
+  /**
+   * Remove um personagem por ID.
+   */
+  async delete(id: string): Promise<void> {
+    await this.repository.delete(id);
   }
 }

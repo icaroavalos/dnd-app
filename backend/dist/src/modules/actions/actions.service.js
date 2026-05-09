@@ -203,6 +203,9 @@ function deriveInventoryAttackActions(character, projection, itemLookup) {
         if (!detail || !isWeapon(detail)) {
             continue;
         }
+        const properties = weaponPropertySet(detail);
+        const hasLoading = properties.has('LD');
+        const hasReload = properties.has('RLD');
         const attackAbility = resolveAttackAbilityForItem(detail, projection);
         const abilityMod = projection.abilityModifiers[attackAbility] ?? 0;
         const hitBonus = projection.proficiencyBonus + abilityMod;
@@ -225,7 +228,9 @@ function deriveInventoryAttackActions(character, projection, itemLookup) {
             ammoState,
             detailText,
             twoHandedBlocked,
-            loadingBlocked
+            loadingBlocked,
+            loading: hasLoading,
+            reload: hasReload
         }));
         if (canMakeThrownAttack(detail)) {
             actions.push(createInventoryAttackAction({
@@ -267,7 +272,9 @@ function createInventoryAttackAction(input) {
             ammoCount: input.ammoState.count,
             twoHandedBlocked: input.twoHandedBlocked,
             loadingBlocked: input.loadingBlocked,
-            thrownVariant: isThrownVariant
+            thrownVariant: isThrownVariant,
+            loading: input.loading,
+            reload: input.reload
         },
         cost: { economy: 'action' }
     };
@@ -677,6 +684,10 @@ function normalizeWeaponProperties(properties) {
         switch (code) {
             case 'A':
                 return 'Ammunition';
+            case 'AF':
+                return 'Automatic Fire';
+            case 'BF':
+                return 'Burst Fire';
             case 'F':
                 return 'Finesse';
             case 'H':

@@ -10,44 +10,109 @@ export function renderFeaturesSheet(items, filter, selectedFeatureId) {
         ["species", "Species Traits"],
         ["feat", "Feats"],
     ];
+    const groupedByOrigin = groupFeaturesByOrigin(items);
     return `
     <div class="feature-filter-row">
       ${filters.map(([id, label]) => `<button type="button" class="feature-filter ${filter === id ? "active" : ""}" data-feature-filter="${id}">${label}</button>`).join("")}
     </div>
     <div class="feature-section-list">
-      ${renderFeatureSection("Class Features", filtered.filter((item) => item.kind === "class"), selectedFeatureId)}
-      ${renderFeatureSection("Species Traits", filtered.filter((item) => item.kind === "species"), selectedFeatureId)}
-      ${renderFeatureSection("Feats", filtered.filter((item) => item.kind === "feat"), selectedFeatureId)}
+      ${renderGroupedFeatures(groupedByOrigin, selectedFeatureId)}
     </div>
   `;
 }
-function renderFeatureSection(title, features, selectedFeatureId) {
+function groupFeaturesByOrigin(items) {
+    const groups = {
+        class: [],
+        species: [],
+        feat: [],
+    };
+    items.forEach(item => {
+        if (groups[item.kind]) {
+            groups[item.kind].push(item);
+        }
+    });
+    return groups;
+}
+function renderGroupedFeatures(groups, selectedFeatureId) {
+    const sections = [];
+    if (groups.class && groups.class.length > 0) {
+        sections.push(renderFeatureGroup("Class Features", groups.class, selectedFeatureId));
+    }
+    if (groups.species && groups.species.length > 0) {
+        sections.push(renderFeatureGroup("Species Traits", groups.species, selectedFeatureId));
+    }
+    if (groups.feat && groups.feat.length > 0) {
+        sections.push(renderFeatureGroup("Feats", groups.feat, selectedFeatureId));
+    }
+    return sections.join("");
+}
+function renderFeatureGroup(title, features, selectedFeatureId) {
     if (!features.length)
         return "";
+    const sourceGroups = groupFeaturesBySource(features);
     return `
     <section class="feature-section">
       <h3>${escapeHtml(title)}</h3>
-      ${features.map(feature => renderFeatureRow(feature, selectedFeatureId)).join("")}
+      <div class="feature-group-list">
+        ${Object.entries(sourceGroups).map(([source, sourceFeatures]) => `
+          <div class="feature-source-group">
+            <div class="feature-source-header">${escapeHtml(source)}</div>
+            <div class="feature-compact-list">
+              ${sourceFeatures.map(feature => renderFeatureCard(feature, selectedFeatureId)).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>
     </section>
   `;
 }
-function renderFeatureRow(feature, selectedFeatureId) {
+function groupFeaturesBySource(features) {
+    const groups = {};
+    features.forEach(item => {
+        const source = extractSourceFromMeta(item.meta || "");
+        if (!groups[source]) {
+            groups[source] = [];
+        }
+        groups[source].push(item);
+    });
+    return groups;
+}
+function extractSourceFromMeta(meta) {
+    const match = meta.match(/([^•]+)\s*([•|XPHB|PHB]+\s*[0-9]*)/);
+    if (match) {
+        return match[1].trim();
+    }
+    const parts = meta.split("•").map(s => s.trim());
+    return parts[0] || "Unknown";
+}
+function renderFeatureCard(feature, selectedFeatureId) {
     const open = selectedFeatureId === feature.id;
+    const levelInfo = extractLevelFromMeta(feature.meta || "");
     return `
-    <article class="feature-row">
-      <button type="button" class="feature-header ${open ? "active" : ""}" data-feature-id="${escapeHtml(feature.id)}">
-        <strong>${escapeHtml(feature.name)}</strong>
-        ${feature.meta ? `<small>${escapeHtml(feature.meta)}</small>` : ""}
-        <span class="chevron"></span>
+    <article class="feature-card ${open ? "expanded" : ""}">
+      <button type="button" class="feature-card-header ${open ? "active" : ""}" data-feature-id="${escapeHtml(feature.id)}" aria-expanded="${open}" aria-controls="feature-content-${escapeHtml(feature.id)}">
+        <div class="feature-card-title">
+          <strong>${escapeHtml(feature.name)}</strong>
+          ${levelInfo ? `<span class="feature-level-badge">${escapeHtml(levelInfo)}</span>` : ""}
+        </div>
+        <span class="feature-meta-source">${escapeHtml(feature.meta || "")}</span>
+        <span class="chevron" aria-hidden="true"></span>
       </button>
       ${open ? `
-        <div class="feature-body">
+        <div id="feature-content-${escapeHtml(feature.id)}" class="feature-card-body">
           ${feature.resource ? renderFeatureResource(feature.resource) : ""}
           ${paragraphs(feature.description)}
         </div>
       ` : ""}
     </article>
   `;
+}
+function extractLevelFromMeta(meta) {
+    const match = meta.match(/(\w+)\s+\d+/);
+    if (match) {
+        return match[0];
+    }
+    return "";
 }
 function renderFeatureResource(resource) {
     return `

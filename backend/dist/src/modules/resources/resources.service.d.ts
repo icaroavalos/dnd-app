@@ -1,15 +1,7 @@
-import type { CharacterRecord, RecoveryType } from '../../domain/contracts/index.js';
-export interface UseResourceRequest {
-    character: CharacterRecord;
-    resourceId: string;
-    amount?: number;
-}
-export interface RecoverResourcesRequest {
-    character: CharacterRecord;
-    recovery: Extract<RecoveryType, 'short_rest' | 'long_rest'>;
-}
+import type { CharacterRecord } from '@shared/contracts';
+import { type UseResourceRequestDto, type RecoverResourcesRequestDto } from './dto/index.js';
 export declare class ResourcesService {
-    useResource(request: UseResourceRequest): CharacterRecord;
-    recoverResources(request: RecoverResourcesRequest): CharacterRecord;
+    useResource(request: UseResourceRequestDto): CharacterRecord;
+    recoverResources(request: RecoverResourcesRequestDto): CharacterRecord;
 }
 //# sourceMappingURL=resources.service.d.ts.map

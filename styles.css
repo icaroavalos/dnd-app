@@ -333,16 +333,69 @@ h1 {
 }
 
 .delete-character {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   color: #fff;
-  background: #3a1113;
-  border: 1px solid #cf3036;
-  border-radius: 999px;
+  background: #cf3036;
+  border: 2px solid #9a1f24;
+  border-radius: 6px;
   font-weight: 900;
+  font-size: 0.85rem;
   flex: 0 0 auto;
+  transition: all 0.15s ease;
+}
+
+.delete-character:hover {
+  background: #e04046;
+  border-color: #cf3036;
+  transform: scale(1.08);
+}
+
+.delete-confirmation-card {
+  background: linear-gradient(135deg, #3a1113 0%, #2a0a0c 100%);
+  border: 2px solid #cf3036;
+  border-radius: 10px;
+  padding: 18px;
+  margin: 14px 0;
+  box-shadow: 0 8px 32px rgba(207, 48, 54, 0.25);
+}
+
+.delete-confirmation-title {
+  margin: 0 0 10px 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #f7f7f7;
+}
+
+.delete-confirmation-character {
+  margin: 0 0 10px 0;
+  color: #d4d4d4;
+  font-size: 0.92rem;
+}
+
+.delete-confirmation-warning {
+  margin: 0 0 14px 0;
+  color: #cf3036;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.delete-confirmation-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.delete-confirmation-actions .secondary-button {
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+.delete-confirmation-actions .danger-button {
+  min-height: 38px;
+  padding: 0 16px;
 }
 
 .form-grid {
@@ -943,7 +996,7 @@ h1 {
 
 .spell-row {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-columns: 54px minmax(0, 1fr) auto;
   gap: 7px;
   align-items: stretch;
 }
@@ -1003,6 +1056,29 @@ h1 {
   background: #e9eaec;
   line-height: 1;
   text-align: center;
+}
+
+.spell-info-button {
+  position: relative;
+  min-height: 28px;
+  min-width: 28px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #4a90d9;
+  border: 0;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.spell-info-button:hover {
+  background: #3a7fc8;
+}
+
+.info-icon {
+  font-style: normal;
 }
 
 .spell-level-badge {
@@ -2102,6 +2178,114 @@ h1 {
 .feature-button span {
   color: #5e686e;
   font-size: 0.76rem;
+}
+
+.feature-group-list {
+  display: grid;
+  gap: 12px;
+}
+
+.feature-source-group {
+  display: grid;
+  gap: 6px;
+}
+
+.feature-source-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.feature-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.feature-card.expanded {
+  border-color: #cf3036;
+}
+
+.feature-card-header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: #f0f0f0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.feature-card-header:hover {
+  background: #222;
+}
+
+.feature-card-header.active {
+  background: #222;
+}
+
+.feature-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.feature-card-title strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+
+.feature-level-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b142d6;
+  background: rgba(177, 66, 214, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.feature-meta-source {
+  font-size: 0.72rem;
+  color: #888;
+}
+
+.feature-card-header .chevron {
+  width: 16px;
+  height: 16px;
+  border-right: 2px solid #888;
+  border-bottom: 2px solid #888;
+  transform: rotate(135deg);
+  transition: transform 0.2s;
+}
+
+.feature-card-header.active .chevron {
+  transform: rotate(-45deg);
+  border-color: #cf3036;
+}
+
+.feature-card-body {
+  padding: 12px;
+  background: #151515;
+  border-top: 1px solid #333;
+  color: #d0d0d0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.feature-card-body p {
+  margin: 0 0 8px;
 }
 
 .feature-detail-card {

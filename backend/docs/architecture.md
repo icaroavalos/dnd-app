@@ -108,17 +108,21 @@ The RulesRepository:
 - `characters.controller.ts` - HTTP endpoint
 - `characters.module.ts` - Module definition
 
-### `characters-storage/` and persistence - Partial
+### `characters-storage/` - Canonical Persistence
 
 **Purpose:** Store and load character state.
 
-**Current state:**
-- `characters-storage` uses Prisma/SQLite through `PrismaCharacterRepository`.
-- `characters-persistence` still uses JSON file storage through `backend/data/characters.json`.
-- This is intentionally marked partial until one persistence path becomes canonical.
+**Implementation:**
+- Uses Prisma/SQLite through `PrismaCharacterRepository`.
+- JSON file persistence removed (previously in `characters-persistence`).
+- `CharacterRecord` is stored as JSON snapshot in `recordJson` column.
 
-**Known contract gap:**
-The Prisma repository shape does not yet fully match `CharacterRecord`. In particular, `state`, `resources`, `spellChoices`, `backgroundChoices`, `skillProficiencies`, `savingThrowProficiencies`, `attacks`, and `spells` need alignment before this slice is MVP-stable.
+**Status:** MVP-stable canonical persistence.
+
+**Key files:**
+- `prisma-character-repository.ts` - Repository implementation
+- `characters-storage.controller.ts` - HTTP endpoints (CRUD under `/characters`)
+- `characters-storage.module.ts` - Module definition
 
 ---
 

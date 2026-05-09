@@ -1,12 +1,20 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Post, Put } from '@nestjs/common';
 import { CharactersStorageService } from './characters-storage.service.js';
+import type { CreateCharacterDto } from '../dto/create-character.dto.js';
+import type { UpdateCharacterDto } from '../dto/update-character.dto.js';
 
 /**
- * Controller básico para persistência de personagens.
- * Diferente do characters-persistence, este não faz projeção,
- * apenas armazena e recupera dados brutos.
+ * Controller CRUD canônico para personagens.
+ * Usa Prisma para persistência de CharacterRecord completo.
+ *
+ * Rotas:
+ * - GET /characters - Lista todos os personagens (resumo)
+ * - GET /characters/:id - Busca um personagem por ID
+ * - POST /characters - Cria um novo personagem
+ * - PUT /characters/:id - Atualiza um personagem existente
+ * - DELETE /characters/:id - Remove um personagem
  */
-@Controller('characters-storage')
+@Controller('characters')
 export class CharactersStorageController {
   constructor(
     @Inject(CharactersStorageService)
@@ -14,16 +22,16 @@ export class CharactersStorageController {
   ) {}
 
   /**
-   * Lista todos os personagens armazenados (apenas IDs e nomes).
+   * Lista todos os personagens (apenas resumo).
    */
   @Get()
   @HttpCode(200)
-  async list(): Promise<Array<{ id: string; name: string }>> {
+  async list(): Promise<Array<{ id: string; name: string; level: number; primaryClass: string }>> {
     return this.storageService.list();
   }
 
   /**
-   * Busca um personagem por ID (dados brutos, sem projeção).
+   * Busca um personagem por ID (CharacterRecord completo).
    */
   @Get(':id')
   @HttpCode(200)
@@ -32,41 +40,29 @@ export class CharactersStorageController {
   }
 
   /**
-   * Cria um novo personagem (armazenamento puro, sem projeção).
+   * Cria um novo personagem.
    */
   @Post()
   @HttpCode(201)
   async create(@Body() dto: CreateCharacterDto): Promise<any> {
     return this.storageService.create(dto);
   }
-}
 
-export interface CreateCharacterDto {
-  userId: string;
-  name: string;
-  ruleset?: string;
-  lineageId?: string;
-  backgroundId?: string;
-  alignment?: string;
-  experience?: number;
-  abilities?: {
-    str: number;
-    dex: number;
-    con: number;
-    int: number;
-    wis: number;
-    cha: number;
-  };
-  classes?: Array<{ classId: string; level: number }>;
-  inventory?: Array<{ baseItemId: string; quantity: number; status: string }>;
-  spellChoices?: Array<{ spellId: string; spellcastingAbility?: string }>;
-  backgroundChoices?: Array<{ choiceType: string; value: string }>;
-  runtimeState?: {
-    hp: number;
-    maxHpOverride: number | null;
-    tempHp: number;
-    hitDiceUsed: number;
-    spellSlotsUsed: Record<string, number>;
-    activeConditions: string[];
-  };
+  /**
+   * Atualiza um personagem existente.
+   */
+  @Put(':id')
+  @HttpCode(200)
+  async update(@Param('id') id: string, @Body() dto: UpdateCharacterDto): Promise<any> {
+    return this.storageService.update(id, dto);
+  }
+
+  /**
+   * Remove um personagem por ID.
+   */
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: string): Promise<void> {
+    return this.storageService.delete(id);
+  }
 }

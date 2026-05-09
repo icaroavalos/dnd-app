@@ -22,7 +22,7 @@ async function getTestUserId(): Promise<string> {
 async function createTestCharacter(userId: string, app: any) {
   const res = await app.inject({
     method: 'POST',
-    url: '/characters-storage',
+    url: '/characters',
     payload: {
       userId,
       name: 'Ledger Events Test',

@@ -1,6 +1,9 @@
+/**
+ * Feature Engine Tests
+ */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 
 const module = await import('../dist/src/core/character/feature-engine.js');
 
@@ -51,9 +54,9 @@ describe('feature engine', () => {
   });
 
   it('keeps app.js using feature-engine resources instead of duplicating resource parsing', async () => {
-    const source = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+    const source = await import('node:fs').then(fs => fs.promises.readFile(new URL('../app.js', import.meta.url), 'utf8'));
 
-    assert.match(source, /currentFeatureItems\(\)\s*\.map\(\(feature\) => feature\.resource\)/);
+    assert.match(source, /currentFeatureItems\(\s*\)\s*\.map\(\s*\(\s*feature\s*\)\s*=>\s*feature\.resource\s*\)/);
     assert.doesNotMatch(source, /function currentClassResourceDefinitions\(/);
     assert.doesNotMatch(source, /function resourceDefinitionFromFeature\(/);
     assert.doesNotMatch(source, /const RESOURCE_META = \[/);
@@ -296,7 +299,7 @@ describe('feature engine', () => {
               level: 14,
               entries: [
                 'As a Bonus Action, you can strike terror into others.',
-                'Once you use this feature, you can\'t use it again until you finish a Long Rest.',
+                "Once you use this feature, you can't use it again until you finish a Long Rest.",
               ],
             },
           ],
@@ -324,5 +327,153 @@ describe('feature engine', () => {
     assert.equal(intimidatingPresence?.resource?.actionKind, 'bonus');
     assert.equal(intimidatingPresence?.resource?.recovery.long, 'all');
     assert.match(intimidatingPresence?.meta ?? '', /Path of the Berserker/);
+  });
+
+  it('Barbarian level 19 Epic Boon - shows concrete feature text not placeholder', () => {
+    const classFeaturesData = JSON.parse(readFileSync('./data/5etools/5e-2024/class-features.json', 'utf-8'));
+    const epicBoonFeature = classFeaturesData.results.find(
+      f => f.className === 'Barbarian' && f.level === 19 && f.source === 'XPHB'
+    );
+
+    assert.ok(epicBoonFeature, 'Barbarian level 19 Epic Boon feature should exist');
+    assert.ok(epicBoonFeature.entries, 'Epic Boon should have entries');
+    assert.ok(epicBoonFeature.entries.length > 0, 'Epic Boon entries should not be empty');
+
+    const bodyText = Array.isArray(epicBoonFeature.entries) ? epicBoonFeature.entries.join(' ') : epicBoonFeature.entries;
+    assert.match(bodyText, /Epic Boon/i, 'Epic Boon should mention Epic Boon');
+    assert.match(bodyText, /feat/i, 'Epic Boon should mention feat selection');
+    assert.doesNotMatch(bodyText, /^You gain the following benefits\.$/i, 'Should not be just placeholder text');
+
+    console.log(' Barbarian level 19 Epic Boon: OK - Has concrete feature text');
+  });
+
+  it('Level up shows new features from chosen level - not just placeholder', () => {
+    const barbarian19 = {
+      class: 'barbarian',
+      level: 19,
+      race: 'human',
+      classFeatureChoices: {},
+      asiChoices: {},
+      abilities: { str: 18, dex: 14, con: 16, int: 10, wis: 12, cha: 8 },
+    };
+
+    const api = {
+      classes: {
+        barbarian: { name: 'Barbarian' },
+      },
+      races: {
+        human: { name: 'Human', source: 'XPHB', traits: [] },
+      },
+      source: {
+        classFeatures: [
+          {
+            name: 'Epic Boon',
+            className: 'Barbarian',
+            level: 19,
+            source: 'XPHB',
+            entries: ['You gain an Epic Boon feat or another feat of your choice. Boon of Irresistible Offense is recommended.'],
+          },
+        ],
+        featDetails: {},
+      },
+    };
+
+    const items = module.deriveActiveFeatures(barbarian19, api, []);
+    const level19Features = items.filter(item => item.name === 'Epic Boon');
+
+    assert.ok(level19Features.length > 0, 'Should have Epic Boon feature at level 19');
+    const epicBoon = level19Features[0];
+    assert.match(epicBoon.body, /Epic Boon/i, 'Feature body should contain Epic Boon description');
+    assert.match(epicBoon.body, /feat/i, 'Feature body should mention feat');
+    assert.doesNotMatch(epicBoon.body, /^You gain the following benefits\.$/, 'Should not be just placeholder text');
+
+    console.log(' Level up features: OK - Shows concrete feature text');
+  });
+
+  it('features are grouped by origin (class/species/feat) with source metadata', () => {
+    const character = {
+      class: 'fighter',
+      level: 5,
+      race: 'human',
+      classFeatureChoices: {},
+      asiChoices: {},
+      abilities: { str: 16, dex: 14, con: 14, int: 10, wis: 12, cha: 8 },
+    };
+
+    const api = {
+      classes: { fighter: { name: 'Fighter' } },
+      races: { human: { name: 'Human', source: 'XPHB', traits: [{ name: 'Darkvision', entries: ['You can see in dim light within 60 feet.'] }] } },
+      source: {
+        classFeatures: [
+          { name: 'Second Wind', className: 'Fighter', level: 1, source: 'XPHB', entries: ['Regain hit points as bonus action.'] },
+          { name: 'Extra Attack', className: 'Fighter', level: 5, source: 'XPHB', entries: ['Attack twice when you take the Attack action.'] },
+        ],
+        subclassFeatures: [],
+        subclasses: [],
+        featDetails: {},
+      },
+    };
+
+    const items = module.deriveActiveFeatures(character, api, []);
+
+    const classFeatures = items.filter(item => item.kind === 'class');
+    assert.ok(classFeatures.length >= 2, 'Should have at least 2 class features');
+    classFeatures.forEach(f => {
+      assert.match(f.meta, /Fighter/, 'Class feature meta should include class name');
+      assert.match(f.meta, /XPHB/, 'Class feature meta should include source');
+    });
+
+    const speciesFeatures = items.filter(item => item.kind === 'species');
+    assert.ok(speciesFeatures.length >= 1, 'Should have at least 1 species trait');
+    speciesFeatures.forEach(f => {
+      assert.match(f.meta, /Human/, 'Species feature meta should include race name');
+      assert.match(f.meta, /XPHB/, 'Species feature meta should include source');
+    });
+
+    console.log(' Feature grouping by origin: OK - class/species/feat with source metadata');
+  });
+
+  it('subclass features include subclass name in meta', () => {
+    const items = module.deriveActiveFeatures(
+      {
+        class: 'barbarian',
+        level: 6,
+        race: 'human',
+        classFeatureChoices: { subclass: 'path-of-the-zealot' },
+        asiChoices: {},
+        abilities: { str: 16, dex: 14, con: 15, int: 8, wis: 10, cha: 12 },
+      },
+      {
+        classes: { barbarian: { name: 'Barbarian' } },
+        races: { human: { name: 'Human', source: 'XPHB', traits: [] } },
+        source: {
+          classFeatures: [
+            { name: 'Barbarian Subclass', className: 'Barbarian', level: 3, source: 'XPHB', entries: ['You gain a Barbarian subclass.'] },
+            { name: 'Subclass Feature', className: 'Barbarian', level: 6, source: 'XPHB', entries: ['You gain a feature from your Barbarian subclass.'] },
+          ],
+          subclasses: [
+            {
+              name: 'Path of the Zealot',
+              shortName: 'Zealot',
+              source: 'XPHB',
+              className: 'Barbarian',
+              subclassFeatures: ['Path of the Zealot|Barbarian|XPHB|Zealot|XPHB|3', 'Fanatical Focus|Barbarian|XPHB|Zealot|XPHB|6'],
+            },
+          ],
+          subclassFeatures: [
+            { name: 'Path of the Zealot', source: 'XPHB', className: 'Barbarian', classSource: 'XPHB', subclassShortName: 'Zealot', subclassSource: 'XPHB', level: 3, entries: ['Divine fury and fanatic devotion guide your rage.'] },
+            { name: 'Fanatical Focus', source: 'XPHB', className: 'Barbarian', classSource: 'XPHB', subclassShortName: 'Zealot', subclassSource: 'XPHB', level: 6, entries: ['Your rage keeps your focus locked on battle.'] },
+          ],
+          featDetails: {},
+        },
+      },
+      []
+    );
+
+    const zealotFeature = items.find(item => item.name === 'Fanatical Focus');
+    assert.ok(zealotFeature, 'Should have Fanatical Focus feature');
+    assert.match(zealotFeature.meta, /Path of the Zealot/, 'Subclass feature meta should include subclass name');
+
+    console.log(' Subclass feature grouping: OK - includes subclass name in meta');
   });
 });

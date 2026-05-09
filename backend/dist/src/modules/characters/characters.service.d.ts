@@ -1,4 +1,4 @@
-import type { CharacterRecord, DerivedCharacterSheet } from '../../domain/contracts/index.js';
+import type { CharacterRecord, DerivedCharacterSheet } from '@shared/contracts';
 import { RulesService } from '../rules/rules.service.js';
 export declare class CharactersService {
     private readonly rulesService;

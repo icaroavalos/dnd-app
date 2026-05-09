@@ -1,4 +1,4 @@
-import type { CharacterRecord, DerivedAction } from '../../domain/contracts/index.js';
+import type { CharacterRecord, DerivedAction } from '@shared/contracts';
 import { CharactersService } from '../characters/characters.service.js';
 import { RulesService } from '../rules/rules.service.js';
 export declare class ActionsService {

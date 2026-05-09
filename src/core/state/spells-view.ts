@@ -85,6 +85,9 @@ function renderSpellSheetRow(
         ${sourceLine ? `<span class="spell-button-source">${escapeHtml(sourceLine)}</span>` : ''}
       </button>
     </div>
+    <button type="button" class="spell-info-button" data-spell-info="${escapeHtml(spell.name)}" aria-label="View ${escapeHtml(spell.name)} details" title="View spell details">
+      <span class="info-icon">ℹ</span>
+    </button>
     ${isSelected ? renderSpellCard(detail) : ''}
   `;
 }

@@ -1,7 +1,15 @@
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveProficiencyBonus(level) {
     return Math.ceil((Number(level) || 1) / 4) + 1;
 }
 const ABILITY_KEYS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveAbilityScores(baseScores, bonuses = {}) {
     return {
         str: clamp((Number(baseScores.str) || 10) + (Number(bonuses.str) || 0), 1, 30),
@@ -12,9 +20,17 @@ export function deriveAbilityScores(baseScores, bonuses = {}) {
         cha: clamp((Number(baseScores.cha) || 10) + (Number(bonuses.cha) || 0), 1, 30),
     };
 }
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveAbilityModifier(score) {
     return Math.floor(((Number(score) || 10) - 10) / 2);
 }
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveSpellcastingMetrics(ability, abilityScores, proficiencyBonus) {
     const normalizedAbility = normalizeAbility(ability);
     const score = clamp(Number(abilityScores[normalizedAbility]) || 10, 1, 30);
@@ -30,6 +46,10 @@ export function deriveSpellcastingMetrics(ability, abilityScores, proficiencyBon
 export function deriveLevelOneMaxHp(hitDie, constitutionScore) {
     return Math.max(1, (Number(hitDie) || 8) + deriveAbilityModifier(constitutionScore));
 }
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveMaxHp(level, hitDie, constitutionModifier) {
     const first = Math.max(1, hitDie + constitutionModifier);
     const later = Math.max(1, Math.floor(hitDie / 2) + 1 + constitutionModifier);
@@ -41,6 +61,10 @@ export function calculateFixedHpGain(hitDie, constitutionModifier) {
 export function calculateMaxHpGain(hitDie, constitutionModifier) {
     return Math.max(1, hitDie + constitutionModifier);
 }
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveSavingThrowBonus(abilityScore, proficient, proficiencyBonus) {
     return deriveAbilityModifier(abilityScore) + (proficient ? proficiencyBonus : 0);
 }
