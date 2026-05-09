@@ -83,7 +83,6 @@ import {
   createBackgroundSpellRules as createMagicInitiateSpellRules,
   getBackgroundGrantedSpells as getMagicInitiateBackgroundGrants,
   getBackgroundSpellOptions as getMagicInitiateSpellOptions,
-  getSelectedBackgroundSpellNames as getSelectedMagicInitiateSpellNames,
 } from "./dist/src/lib/magic-initiate-validator.js";
 import {
   buildScoreCards,
@@ -1107,16 +1106,6 @@ function validateStep(step) {
   return result.valid;
 }
 
-function missingSpellChoices() {
-  const rule = spellChoiceRule();
-  if (rule.totalMax === 0) return [];
-  const counts = selectedSpellCounts();
-  const missing = [];
-  if (counts.cantrips !== rule.cantrips) missing.push(`${rule.cantrips} cantrip(s)`);
-  if (counts.leveled !== rule.spellsMax) missing.push(`${rule.spellsMax} magia(s) de nivel 1+`);
-  return missing;
-}
-
 function missingLevelUpChoices() {
   if (!state.levelUpMode) return [];
   return state.levelUpHpGain ? [] : ["ganho de HP do nivel"];
@@ -2021,31 +2010,6 @@ function autoGrantedSpellNameSet() {
   return new Set(autoGrantedSpellEntries().map((spell) => spell.name));
 }
 
-function getLevelPlan() {
-  const levels = state.api.levels[state.character.class];
-  if (Array.isArray(levels) && levels.length) {
-    return levels.slice(0, state.character.level).map((level) => ({
-      level: level.level,
-      title: `${titleCase(state.character.class)} progression`,
-      summary: `Proficiency ${signed(level.prof_bonus)}${level.ability_score_bonuses ? `, ASI total ${level.ability_score_bonuses}` : ""}.`,
-      choices: [
-        ...(level.features ?? []).map((feature) => feature.name),
-        ...classSpecificChoices(level),
-      ],
-    }));
-  }
-
-  return [];
-}
-
-function classSpecificChoices(level) {
-  const details = [];
-  if (level.class_specific?.ki_points) details.push(`Ki Points: ${level.class_specific.ki_points}`);
-  if (level.spellcasting) details.push(`Spell slots e magias liberadas neste nivel`);
-  if (level.ability_score_bonuses) details.push("Escolha ASI ou feat, conforme a mesa permitir");
-  return details;
-}
-
 function currentFeatureItems() {
   return deriveActiveFeatures(state.character, state.api, classCreationChoiceRules());
 }
@@ -2429,55 +2393,6 @@ function classFeatureByRef(ref) {
 
 function firstTextEntry(entries) {
   return (entries ?? []).find((entry) => typeof entry === "string") ?? "";
-}
-
-function currentSpeciesTraitItems() {
-  const race = state.api.races[state.character.race]?.details;
-  if (!race) return [];
-  const selectedSubrace = selectedSubraceDetails();
-  const entries = new Map();
-  [...entriesNamedItems(race.entries), ...entriesNamedItems(selectedSubrace?.entries)].forEach((entry) => {
-    entries.set(slugifyName(entry.name), entry);
-  });
-  return [...entries.values()].map((entry) => ({
-    id: `species:${slugifyName(entry.name)}`,
-    kind: "species",
-    name: entry.name,
-    meta: `${race.name}${selectedSubrace?.name ? ` • ${selectedSubrace.name}` : ""} • ${selectedSubrace?.source ?? race.source}`,
-    body: entry.body,
-  }));
-}
-
-function selectedSubraceDetails() {
-  const subraceKey = slugifyName(state.character.subrace ?? "");
-  if (!subraceKey) return null;
-  return state.api.source?.subraceDetails?.[subraceKey] ?? null;
-}
-
-function entriesNamedItems(entries) {
-  return (entries ?? [])
-    .filter((entry) => entry?.type === "entries" && entry.name)
-    .map((entry) => ({
-      name: entry.name,
-      body: entriesToText(entry.entries),
-    }));
-}
-
-function parseFeatRef(ref) {
-  const [namePart] = String(ref).split("|");
-  const [name, variant = ""] = namePart.split(";");
-  const cleanName = titleCase(name.trim());
-  return {
-    name: cleanName,
-    variant: variant.trim(),
-    slug: slugifyName(name.trim()),
-  };
-}
-
-function spellOptions() {
-  if (!typedClassHasSpellList(state.character.class, state.api)) return state.character.spells;
-  const legalOptions = legalSpellOptions();
-  return [...new Set([...state.character.spells.filter((name) => legalSpellNames().has(name)), ...legalOptions.map((spell) => spell.name)])].slice(0, 60);
 }
 
 function renderSpellChoiceGroups(spellRule, spellCounts) {
@@ -3118,9 +3033,6 @@ function backgroundSpellOptions(spellList) {
   return getMagicInitiateSpellOptions(spellList, state.api.classSpells);
 }
 
-function backgroundSelectedSpellNames() {
-  return getSelectedMagicInitiateSpellNames(state.character.bgSpellChoices, backgroundSpellChoiceRules());
-}
 function enforceSpellLimit() {
   const rule = spellChoiceRule();
   const legalNames = legalSpellNames();
