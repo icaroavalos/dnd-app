@@ -121,6 +121,7 @@ import { createResourceHelpers } from "./src/app/resource-helpers.js";
 import { createModalRenderers } from "./src/app/modal-renderers.js";
 import { createCharacterMenu } from "./src/app/character-menu.js";
 import { createCharacterRoster } from "./src/app/character-roster.js";
+import { createApiData } from "./src/app/api-data.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -343,6 +344,24 @@ const characterMenu = createCharacterMenu({
   deleteCharacter,
   cancelDeleteCharacter,
 });
+const apiData = createApiData({
+  getState: () => state,
+  dataSource: DATA_SOURCE,
+  dataSourceLabel: DATA_SOURCE_LABEL,
+  fetchJson,
+  build5etoolsApi,
+  buildSpellClassIndex,
+  normalize5etoolsSpell: typedNormalize5etoolsSpell,
+  RuleRepository,
+  setRuleRepository: (repository) => { ruleRepository = repository; },
+  slugifyName,
+  entriesToText,
+  itemKey,
+  deriveProficiencyBonus,
+  normalizeCharacterState,
+  persist,
+  renderChrome,
+});
 
 init();
 
@@ -434,62 +453,23 @@ function cancelDeleteCharacter() {
 }
 
 async function hydrateApiData() {
-  state.dataStatus = "carregando 5etools 2024";
-  renderChrome();
-  try {
-    const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds] = await Promise.all([
-      fetchJson(`${DATA_SOURCE}/classes.json`),
-      fetchJson(`${DATA_SOURCE}/races.json`),
-      fetchJson(`${DATA_SOURCE}/subraces.json`),
-      fetchJson(`${DATA_SOURCE}/equipment.json`),
-      fetchJson(`${DATA_SOURCE}/spells.json`),
-      fetchJson(`${DATA_SOURCE}/class-spells.json`),
-      fetchJson(`${DATA_SOURCE}/class-features.json`),
-      fetchJson(`${DATA_SOURCE}/subclass-features.json`),
-      fetchJson(`${DATA_SOURCE}/subclasses.json`),
-      fetchJson(`${DATA_SOURCE}/feats.json`),
-      fetchJson(`${DATA_SOURCE}/backgrounds.json`),
-    ]);
-    state.api = build5etoolsApi(
-      { classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds },
-      {
-        slugifyName,
-        entriesToText,
-        itemKey,
-        deriveProficiencyBonus,
-        buildSpellClassIndex,
-        normalize5etoolsSpell: typedNormalize5etoolsSpell,
-      },
-    );
-    ruleRepository = RuleRepository.fromApi(state.api);
-    state.dataStatus = DATA_SOURCE_LABEL;
-    normalizeCharacterState();
-    persist();
-  } catch {
-    state.dataStatus = "erro 5etools 2024";
-  }
+  return apiData.hydrateApiData();
 }
 
 async function loadClassData(className) {
-  if (!className) return;
-  await loadClassSpellOptions(className);
+  return apiData.loadClassData(className);
 }
 
 async function loadRaceData(raceName) {
-  return raceName;
+  return apiData.loadRaceData(raceName);
 }
 
 async function loadClassSpellOptions(className) {
-  return className;
+  return apiData.loadClassSpellOptions(className);
 }
 
 async function loadSpellDetails(spellName) {
-  if (!spellName || state.api.spellDetails[spellName]) return;
-  const detail = state.api.source?.spellDetails?.[spellName.toLowerCase()];
-  if (detail) {
-    state.api.spellDetails[spellName] = detail;
-    persist();
-  }
+  return apiData.loadSpellDetails(spellName);
 }
 
 function render() {
