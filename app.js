@@ -68,9 +68,9 @@ import {
   renderBackgroundForm as renderTypedBackgroundForm,
   renderLevelingForm as renderTypedLevelingForm,
 } from "./dist/src/core/state/builder-views.js";
-import { titleCase, ordinalSuffix, slugifyName, escapeRegExp, escapeHtml, setByPath, clamp, clean5etoolsText, paragraphs } from "./dist/src/lib/utils.js";
-import { entriesToText, entryToText } from "./dist/src/lib/formatter.js";
-import { CREATION_STEPS, getMissingChoicesForStep as getTypedMissingChoicesForStep, validateCreationStep } from "./dist/src/core/state/creation-flow.js";
+import { titleCase, slugifyName, escapeHtml, setByPath, clamp, clean5etoolsText } from "./dist/src/lib/utils.js";
+import { entriesToText } from "./dist/src/lib/formatter.js";
+import { CREATION_STEPS, validateCreationStep } from "./dist/src/core/state/creation-flow.js";
 import {
   applyGuidedBackgroundEquipmentChoice,
   applyGuidedBackgroundIncrement,
@@ -84,23 +84,16 @@ import {
   getBackgroundGrantedSpells as getMagicInitiateBackgroundGrants,
   getBackgroundSpellOptions as getMagicInitiateSpellOptions,
   getSelectedBackgroundSpellNames as getSelectedMagicInitiateSpellNames,
-  resolveBackgroundSpellcastingAbility,
 } from "./dist/src/lib/magic-initiate-validator.js";
 import {
-  abilityBonusFromChoices,
   buildScoreCards,
   buildPointBuyViewModel,
   buildStandardArrayCards,
   swapAbilities,
   adjustPointBuyScore as typedAdjustPointBuyScore,
   applyAbilityMethod as typedApplyAbilityMethod,
-  trimPointBuyToBudget as typedTrimPointBuyToBudget,
   pointBuySpent as typedPointBuySpent,
-  pointBuyCost as typedPointBuyCost,
   getClassSavingThrows as typedGetClassSavingThrows,
-  getAbilityScore as typedGetAbilityScore,
-  getAbilityModifier as typedGetAbilityModifier,
-  getAbilityScoreBeforeAsiRule as typedGetAbilityScoreBeforeAsiRule,
   ABILITY_METHODS,
   STANDARD_ARRAY,
   POINT_BUY_BUDGET,
@@ -1113,10 +1106,6 @@ function validateStep(step) {
   return result.valid;
 }
 
-function missingChoicesForStep(step) {
-  return getTypedMissingChoicesForStep(step, buildCreationFlowState());
-}
-
 function missingSpellChoices() {
   const rule = spellChoiceRule();
   if (rule.totalMax === 0) return [];
@@ -2027,22 +2016,8 @@ function rangeLabel(range = "") {
   return /feet|ft\.?/i.test(String(range)) ? "Reach" : "Range";
 }
 
-function normalizeComparableText(value) {
-  return String(value ?? "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function autoGrantedSpellEntries() {
   return typedAutoGrantedSpellEntries(state.character, state.api, currentFeatureItems());
-}
-
-function explicitSpellRefsFromText(text) {
-  return [...String(text ?? "").matchAll(/\{@spell ([^|}]+)(?:\|[^}]*)?\}/gi)]
-    .map((match) => clean5etoolsText(match[1]).trim())
-    .filter(Boolean);
 }
 
 function autoGrantedCantripNames() {
@@ -2051,14 +2026,6 @@ function autoGrantedCantripNames() {
 
 function autoGrantedSpellNameSet() {
   return new Set(autoGrantedSpellEntries().map((spell) => spell.name));
-}
-
-function bigStat(label, value) {
-  return `<div class="stat-card"><span>${label}</span><strong>${value}</strong></div>`;
-}
-
-function smallStat(label, value) {
-  return `<div class="small-card"><span>${label}</span><strong>${value}</strong></div>`;
 }
 
 function getLevelPlan() {
@@ -2124,16 +2091,6 @@ function resourceRecoveryFromBody(body) {
 
 function resourceActionKindFromBody(body) {
   return typedResourceActionKindFromBody(body);
-}
-
-function actionIconForKind(kind) {
-  return {
-    action: "A",
-    bonus: "BA",
-    reaction: "R",
-    other: "O",
-    limited: "LU",
-  }[kind] ?? "LU";
 }
 
 function classCreationChoiceRules() {
@@ -2442,11 +2399,6 @@ function itemDetail(name, source = "XPHB") {
 
 function itemKey(name, source = "XPHB") {
   return `${String(name).toLowerCase()}|${String(source).toLowerCase()}`;
-}
-
-function displayItemName(name) {
-  if (String(name).toLowerCase() === "druidic focus") return "Quarterstaff";
-  return name;
 }
 
 function itemTypeLabel(item) {
@@ -3302,16 +3254,8 @@ function adjustPointBuyAbility(key, delta) {
   state.character.abilities = result;
 }
 
-function trimPointBuyToBudget() {
-  state.character.abilities = typedTrimPointBuyToBudget(state.character.abilities);
-}
-
 function pointBuySpent() {
   return typedPointBuySpent(state.character.abilities);
-}
-
-function pointBuyCost(score) {
-  return typedPointBuyCost(score);
 }
 
 function updateChoiceList(listName, value, checked) {
@@ -3319,16 +3263,6 @@ function updateChoiceList(listName, value, checked) {
   const current = state.character[listName] ?? [];
   const next = checked ? [...current, value] : current.filter((item) => item !== value);
   state.character[listName] = [...new Set(next)];
-}
-
-function spellIndex(spellName) {
-  return String(spellName)
-    .trim()
-    .toLowerCase()
-    .replaceAll("'", "")
-    .replaceAll("/", " ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 function defaultSaves(className) {
