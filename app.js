@@ -123,6 +123,7 @@ import { createCharacterMenu } from "./src/app/character-menu.js";
 import { createCharacterRoster } from "./src/app/character-roster.js";
 import { createApiData } from "./src/app/api-data.js";
 import { createAppShell } from "./src/app/app-shell.js";
+import { createGlobalEvents } from "./src/app/global-events.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -382,6 +383,17 @@ const appShell = createAppShell({
   renderHpModal,
   renderRestModal,
 });
+const globalEvents = createGlobalEvents({
+  getState: () => state,
+  els,
+  document,
+  persist,
+  renderChrome,
+  toggleCharacterMenu,
+  closeCharacterMenu,
+  closeHpModal,
+  cancelRest,
+});
 
 init();
 
@@ -422,30 +434,7 @@ function syncActiveCharacter() {
 }
 
 function bindGlobalEvents() {
-  els.saveButton.addEventListener("click", () => {
-    persist();
-    state.dataStatus = state.dataStatus.includes("API") ? "salvo + API" : "salvo local";
-    renderChrome();
-  });
-
-  els.characterMenuButton.addEventListener("click", () => {
-    toggleCharacterMenu();
-  });
-
-  els.menuBackdrop.addEventListener("click", () => {
-    closeCharacterMenu();
-  });
-
-  els.hpModalBackdrop.addEventListener("click", closeHpModal);
-
-document.getElementById("restModalBackdrop")?.addEventListener("click", () => {
-  if (state.restModalOpen) cancelRest();
-});
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && state.hpModalOpen) closeHpModal();
-  if (event.key === "Escape" && state.restModalOpen) cancelRest();
-  });
+  return globalEvents.bindGlobalEvents();
 }
 
 function createStartingCharacter() {
