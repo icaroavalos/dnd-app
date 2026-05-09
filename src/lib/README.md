@@ -10,9 +10,7 @@ src/
 │   └── character.ts # Types para Character, SpellDetail, etc.
 └── lib/             # Funções e utilitários
     ├── api-catalog-client.ts        # Cliente API para catálogos do backend
-    ├── background-spell-fix.ts      # Validação robusta de Magic Initiate
-    ├── background-spell-validation.ts # Funções de validação de spells
-    ├── magic-initiate-debug.ts      # Debug utilities
+    ├── magic-initiate-validator.ts  # Validação de Magic Initiate
     └── resource-recovery.ts         # Recuperação de recursos (Rage, etc.)
 ```
 
@@ -30,9 +28,9 @@ npm run test       # Roda testes
 npm run typecheck  # Apenas type check
 ```
 
-## Magic Initiate Fix
+## Magic Initiate
 
-Veja `background-spell-fix.ts` para a solução do bug onde a mensagem
+Veja `magic-initiate-validator.ts` para a solução do bug onde a mensagem
 "Ainda falta: Magic Initiate (cleric): 2 cantrips..." aparecia mesmo
 após o usuário selecionar as magias corretamente.
 
