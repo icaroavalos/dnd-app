@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../data/app.db"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  username     String?
+  passwordHash String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  state        UserState?
+  characters   Character[]
+}
+
+model UserState {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  state     String   // JSON serialized
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// Personagem - dados principais
+model Character {
+  id              String   @id @default(cuid())
+  userId          String
+  name            String
+  ruleset         String   @default("5e")
+  lineageId       String   @default("human")
+  backgroundId    String   @default("soldier")
+  alignment       String   @default("Neutral")
+  experience      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
+  classes         CharacterClass[]
+  abilities       AbilityScores?
+  inventory       InventoryItem[]
+  spellChoices    SpellChoice[]
+  backgroundChoices BackgroundChoice[]
+  runtimeState    RuntimeState?
+  resourceLedger  ResourceLedgerEntry[]
+  resourceReadModel ResourceReadModel?
+}
+
+// Classes do personagem (multiclass)
+model CharacterClass {
+  id        String  @id @default(cuid())
+  characterId String
+  classId   String
+  level     Int     @default(1)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Ability scores
+model AbilityScores {
+  id        String  @id @default(cuid())
+  characterId String  @unique
+  str       Int     @default(10)
+  dex       Int     @default(10)
+  con       Int     @default(10)
+  int       Int     @default(10)
+  wis       Int     @default(10)
+  cha       Int     @default(10)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Inventário
+model InventoryItem {
+  id          String  @id @default(cuid())
+  characterId String
+  baseItemId  String
+  quantity    Int     @default(1)
+  status      String  @default("carried") // carried, equipped_armor, equipped_weapon, etc.
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Spell choices
+model SpellChoice {
+  id          String  @id @default(cuid())
+  characterId String
+  spellId     String
+  spellcastingAbility String?
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Background choices (skills, tools, languages, etc.)
+model BackgroundChoice {
+  id          String  @id @default(cuid())
+  characterId String
+  choiceType  String  // skill, tool, language, equipment
+  value       String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Runtime state (HP, hit dice, spell slots, conditions)
+model RuntimeState {
+  id              String  @id @default(cuid())
+  characterId     String  @unique
+  hp              Int     @default(10)
+  maxHpOverride   Int?
+  tempHp          Int     @default(0)
+  hitDiceUsed     Int     @default(0)
+  spellSlotsUsed  String  @default("{}") // JSON serialized
+  activeConditions String @default("[]") // JSON serialized
+  character       Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Ledger de eventos para recursos e descansos (event sourcing)
+// Tipos de evento: RESOURCE_USED, REST_APPLIED, AMMO_SPENT, AMMO_RECOVERED, HP_CHANGE, HIT_DIE, SPELL_SLOT
+model ResourceLedgerEntry {
+  id          String   @id @default(cuid())
+  characterId String
+  eventType   String   // RESOURCE_USED, REST_APPLIED, AMMO_SPENT, AMMO_RECOVERED, HP_CHANGE, HIT_DIE, SPELL_SLOT
+  amount      Int      // quantidade (positiva para ganho, negativa para perda)
+  resourceType String  @default("hp")  // "hp", "hit_die", "spell_slot", "ammo", etc.
+  source      String   // origem: "damage", "healing", "spell_cast", "attack", "rest", etc.
+  description String?
+  metadata    String?  // JSON adicional (ex: { itemId: "arrow", spellLevel: 1 })
+  createdAt   DateTime @default(now())
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+// Read model projetado - estado atual dos recursos (projeção do ledger)
+model ResourceReadModel {
+  id              String   @id @default(cuid())
+  characterId     String   @unique
+  // HP
+  currentHp       Int      @default(10)
+  tempHp          Int      @default(0)
+  // Hit Dice
+  hitDiceTotal    Int      @default(0)  // total de dados disponíveis
+  hitDiceUsed     Int      @default(0)
+  // Spell slots (JSON: { "1": 4, "2": 3, ... })
+  spellSlots      String   @default("{}")
+  spellSlotsUsed  String   @default("{}")
+  // Recursos gerais (JSON: { "ki": 5, "rage": 2, ... })
+  generalResources String  @default("{}")
+  // Munição por item (JSON: { "arrow": 20, "bolt": 10, ... })
+  ammo            String   @default("{}")
+  // Última atualização
+  lastUpdated     DateTime @default(now())
+  character       Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}

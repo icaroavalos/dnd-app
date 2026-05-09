@@ -2,6 +2,18 @@
 
 Aplicativo web estático para criação e acompanhamento de fichas de D&D, com foco atual em regras 2024/5.5e e arquitetura orientada a TypeScript.
 
+## Memoria do projeto
+
+A memoria viva da arquitetura agora fica em:
+
+- [docs/README.md](/Users/icaro/codes/dnd-app/docs/README.md)
+- [docs/Architecture_memory.md](/Users/icaro/codes/dnd-app/docs/Architecture_memory.md)
+- [docs/preferences.md](/Users/icaro/codes/dnd-app/docs/preferences.md)
+- [docs/sessions.md](/Users/icaro/codes/dnd-app/docs/sessions.md)
+- [docs/learnings.md](/Users/icaro/codes/dnd-app/docs/learnings.md)
+
+Estado auditado em 2026-05-08: o backend passa `npm test` com 136 testes, mas ainda falha `npm run typecheck`. O proximo passo do MVP backend e corrigir typecheck antes de adicionar novas features.
+
 ## Como rodar
 
 ### Requisitos
@@ -50,7 +62,7 @@ O backend novo vive isolado em:
 
 - [backend](/Users/icaro/codes/dnd-app/backend)
 
-Ele ainda está no primeiro slice de implementação e hoje expõe:
+Ele ja passou do primeiro slice de implementação e hoje expõe:
 
 - `GET /health`
 - `GET /health/ready`
@@ -66,6 +78,17 @@ Ele ainda está no primeiro slice de implementação e hoje expõe:
 - `POST /actions/derive`
 - `POST /resources/use`
 - `POST /resources/recover`
+- `POST /inventory/spend-ammo`
+- `POST /inventory/recover-ammo`
+
+Tambem existem slices parciais de persistencia e ledger:
+
+- `GET/POST/PUT/DELETE /characters-persistence`
+- `GET/POST /characters-storage`
+- `POST/GET /characters/:characterId/resources/*`
+- `GET/POST /characters/:characterId/resources/projection`
+
+Esses slices de persistencia ainda precisam de alinhamento de contrato antes de virar caminho canonico do MVP.
 
 ### Instalação do backend
 
@@ -107,6 +130,8 @@ npm run backend:typecheck
 npm run backend:test
 npm run backend:build
 ```
+
+Observacao atual: em 2026-05-08, `npm run backend:test` passa, mas `npm run backend:typecheck` falha por inconsistencias entre testes/contratos e resource projection. Consulte [docs/Architecture_memory.md](/Users/icaro/codes/dnd-app/docs/Architecture_memory.md) antes de prosseguir no backend.
 
 ### Endpoints de domínio já implementados
 
@@ -277,7 +302,7 @@ node --test tests/*.test.js
 
 ### Backend TypeScript
 
-- [backend/src/domain/contracts](/Users/icaro/codes/dnd-app/backend/src/domain/contracts): contratos canônicos do backend para personagem, escolhas, regras e projeção derivada
+- [backend/src/shared/contracts](/Users/icaro/codes/dnd-app/backend/src/shared/contracts): contratos canônicos do backend para personagem, escolhas, regras e projeção derivada
 - [backend/src/modules/characters](/Users/icaro/codes/dnd-app/backend/src/modules/characters): projeção tipada de ficha
 - [backend/src/config](/Users/icaro/codes/dnd-app/backend/src/config): carregamento e validação explícita de ambiente para o backend
 - [backend/src/modules/health](/Users/icaro/codes/dnd-app/backend/src/modules/health): health endpoint e readiness check do dataset compacto local
@@ -299,8 +324,10 @@ node --test tests/*.test.js
 
 ### Documentação de projeto
 
-- [docs/project](/Users/icaro/codes/dnd-app/docs/project): notas históricas de implementação e migração
-- [melhoria.txt](/Users/icaro/codes/dnd-app/melhoria.txt): roadmap incremental do app
+- [docs](/Users/icaro/codes/dnd-app/docs): memoria viva, planos e historico do projeto
+- [docs/agents](/Users/icaro/codes/dnd-app/docs/agents): handoff para agentes operacionais
+- [docs/archive/project](/Users/icaro/codes/dnd-app/docs/archive/project): notas históricas de implementação e migração
+- [docs/superpowers/plans/2026-05-08-backend-mvp-system-roadmap.md](/Users/icaro/codes/dnd-app/docs/superpowers/plans/2026-05-08-backend-mvp-system-roadmap.md): plano mestre atual de backend MVP e sistema
 
 ## Fonte de dados oficial
 
@@ -440,7 +467,7 @@ O módulo [backend/src/modules/rules](/Users/icaro/codes/dnd-app/backend/src/mod
 - lê apenas do dataset compacto local
 - mantém cache simples em memória por catálogo, para evitar releitura de JSON a cada request durante o desenvolvimento
 
-Os contratos em [backend/src/domain/contracts](/Users/icaro/codes/dnd-app/backend/src/domain/contracts) são o começo da fonte de verdade do backend. Os módulos `characters`, `resources` e `actions` já dependem deles diretamente.
+Os contratos em [backend/src/shared/contracts](/Users/icaro/codes/dnd-app/backend/src/shared/contracts) são a fonte de verdade atual do backend. Os módulos `characters`, `resources`, `inventory` e `actions` já dependem deles via `@shared/contracts`.
 
 ## Estado atual da arquitetura
 

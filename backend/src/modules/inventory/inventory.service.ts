@@ -1,6 +1,6 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
-import type { CharacterInventoryItem, CharacterRecord } from '../../domain/contracts/index.js';
+import type { CharacterInventoryItem, CharacterRecord } from '@shared/contracts';
 import { RulesService } from '../rules/rules.service.js';
 import {
   countAmmoInInventory,
@@ -9,22 +9,11 @@ import {
   slugify,
   type AmmoGroup
 } from './ammo-rules.js';
+import type { SpendAmmoRequestDto, RecoverAmmoRequestDto } from './dto/index.js';
 
 interface ItemCatalogEntry {
   name: string;
   property?: string[];
-}
-
-export interface SpendAmmoRequest {
-  character: CharacterRecord;
-  weaponItemId: string;
-  amount?: number;
-}
-
-export interface RecoverAmmoRequest {
-  character: CharacterRecord;
-  weaponItemId: string;
-  amount?: number;
 }
 
 @Injectable()
@@ -34,7 +23,7 @@ export class InventoryService {
     private readonly rulesService: RulesService
   ) {}
 
-  async spendAmmo(request: SpendAmmoRequest): Promise<CharacterRecord> {
+  async spendAmmo(request: SpendAmmoRequestDto): Promise<CharacterRecord> {
     const amount = Math.max(1, Math.floor(request.amount ?? 1));
     const { ammoGroup } = await this.resolveWeaponAmmoContext(request.character, request.weaponItemId);
     const available = countAmmoInInventory(request.character.inventory, ammoGroup);
@@ -75,7 +64,7 @@ export class InventoryService {
     };
   }
 
-  async recoverAmmo(request: RecoverAmmoRequest): Promise<CharacterRecord> {
+  async recoverAmmo(request: RecoverAmmoRequestDto): Promise<CharacterRecord> {
     const amount = Math.max(1, Math.floor(request.amount ?? 1));
     const { ammoGroup } = await this.resolveWeaponAmmoContext(request.character, request.weaponItemId);
 

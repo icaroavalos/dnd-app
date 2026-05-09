@@ -1,7 +1,6 @@
 import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
-
-import type { CharacterRecord } from '../../domain/contracts/index.js';
-import type { RecoverAmmoRequest, SpendAmmoRequest } from './inventory.service.js';
+import type { CharacterRecord } from '@shared/contracts';
+import type { RecoverAmmoRequestDto, SpendAmmoRequestDto } from './dto/index.js';
 import { InventoryService } from './inventory.service.js';
 
 @Controller('inventory')
@@ -13,13 +12,13 @@ export class InventoryController {
 
   @Post('spend-ammo')
   @HttpCode(200)
-  spendAmmo(@Body() request: SpendAmmoRequest): Promise<CharacterRecord> {
+  spendAmmo(@Body() request: SpendAmmoRequestDto): Promise<CharacterRecord> {
     return this.inventoryService.spendAmmo(request);
   }
 
   @Post('recover-ammo')
   @HttpCode(200)
-  recoverAmmo(@Body() request: RecoverAmmoRequest): Promise<CharacterRecord> {
+  recoverAmmo(@Body() request: RecoverAmmoRequestDto): Promise<CharacterRecord> {
     return this.inventoryService.recoverAmmo(request);
   }
 }

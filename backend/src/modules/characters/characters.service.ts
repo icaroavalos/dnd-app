@@ -6,7 +6,7 @@ import type {
   CharacterRecord,
   DerivedCharacterSheet,
   DerivedSpellcasting
-} from '../../domain/contracts/index.js';
+} from '@shared/contracts';
 import type { RulesCatalogEntry } from '../rules/contracts/rules-catalog-entry.js';
 import { RulesService } from '../rules/rules.service.js';
 

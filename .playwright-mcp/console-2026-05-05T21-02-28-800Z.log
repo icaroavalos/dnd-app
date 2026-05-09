@@ -1,3 +1,0 @@
-[      70ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:5173/favicon.ico:0
-[    1035ms] [LOG] === Verifying Berserker Features === @ http://localhost:5173/app.js:4633
-[    1035ms] [ERROR] ❌ Berserker subclass not found or has no features @ http://localhost:5173/app.js:4607

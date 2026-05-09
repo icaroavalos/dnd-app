@@ -6,7 +6,7 @@ import type {
   DerivedAction,
   DerivedActionKind,
   DerivedCharacterSheet
-} from '../../domain/contracts/index.js';
+} from '@shared/contracts';
 import type { RulesCatalogEntry } from '../rules/contracts/rules-catalog-entry.js';
 import {
   countAmmoInInventory,
@@ -269,6 +269,9 @@ function deriveInventoryAttackActions(
       continue;
     }
 
+    const properties = weaponPropertySet(detail);
+    const hasLoading = properties.has('LD');
+    const hasReload = properties.has('RLD');
     const attackAbility = resolveAttackAbilityForItem(detail, projection);
     const abilityMod = projection.abilityModifiers[attackAbility] ?? 0;
     const hitBonus = projection.proficiencyBonus + abilityMod;
@@ -293,7 +296,9 @@ function deriveInventoryAttackActions(
         ammoState,
         detailText,
         twoHandedBlocked,
-        loadingBlocked
+        loadingBlocked,
+        loading: hasLoading,
+        reload: hasReload
       })
     );
 
@@ -330,6 +335,8 @@ function createInventoryAttackAction(input: {
   detailText: string;
   twoHandedBlocked: boolean;
   loadingBlocked: boolean;
+  loading?: boolean;
+  reload?: boolean;
   variant?: 'thrown';
 }): DerivedAction {
   const isThrownVariant = input.variant === 'thrown';
@@ -354,7 +361,9 @@ function createInventoryAttackAction(input: {
       ammoCount: input.ammoState.count,
       twoHandedBlocked: input.twoHandedBlocked,
       loadingBlocked: input.loadingBlocked,
-      thrownVariant: isThrownVariant
+      thrownVariant: isThrownVariant,
+      loading: input.loading,
+      reload: input.reload
     },
     cost: { economy: 'action' }
   };
@@ -889,6 +898,10 @@ function normalizeWeaponProperties(properties: string[]): string {
       switch (code) {
         case 'A':
           return 'Ammunition';
+        case 'AF':
+          return 'Automatic Fire';
+        case 'BF':
+          return 'Burst Fire';
         case 'F':
           return 'Finesse';
         case 'H':

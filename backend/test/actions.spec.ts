@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createApp } from '../src/main.js';
-import { RULESET_ID, type CharacterRecord } from '../src/domain/contracts/index.js';
+import { RULESET_ID, type CharacterRecord } from '@shared/contracts';
 
 function createBaseCharacter(): CharacterRecord {
   return {
@@ -1051,7 +1051,7 @@ test('POST /actions/derive handles finesse weapon using dex modifier correctly',
     const rapier = actions.find((action: any) => action.id === 'attack:item-inst-rapier');
 
     assert.equal(rapier?.kind, 'attack');
-    assert.equal(rapier?.hit, '+4');
+    assert.equal(rapier?.hit, '+6');
     assert.deepEqual(rapier?.damage, ['1d8+4']);
     assert.equal(rapier?.rangeLabel, 'Melee');
     assert.match(rapier?.notes ?? '', /Finesse/i);
@@ -1205,6 +1205,1222 @@ test('POST /actions/derive disables ammunition weapons when ammo count is zero, 
 
     assert.equal(longbow?.disabled, true);
     assert.match(longbow?.notes ?? '', /Ammo: 0/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive derives both melee and thrown attack for javelin (melee 15ft, thrown 30/120)', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-015',
+    ruleset: RULESET_ID,
+    name: 'Javelin Thrower',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 16,
+      dex: 12,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-javelin',
+        baseItemId: 'javelin',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const melee = actions.find((action: any) => action.id === 'attack:item-inst-javelin');
+    const thrown = actions.find((action: any) => action.id === 'attack:item-inst-javelin:thrown');
+
+    assert.equal(melee?.range, '5 feet');
+    assert.equal(melee?.rangeLabel, 'Melee');
+    assert.equal(melee?.hit, '+5');
+    assert.deepEqual(melee?.damage, ['1d6+3']);
+
+    assert.equal(thrown?.range, '30/120');
+    assert.equal(thrown?.rangeLabel, 'Thrown');
+    assert.equal(thrown?.hit, '+5');
+    assert.deepEqual(thrown?.damage, ['1d6+3']);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive uses strength for melee weapon attacks without finesse', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-016',
+    ruleset: RULESET_ID,
+    name: 'Strong Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral Good',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 18,
+      dex: 10,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-longsword',
+        baseItemId: 'longsword',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const longsword = actions.find((action: any) => action.id === 'attack:item-inst-longsword');
+
+    assert.equal(longsword?.kind, 'attack');
+    assert.equal(longsword?.hit, '+6');
+    // Longsword is versatile, hand is free (no shield/off-hand item), so uses versatile damage d10
+    assert.deepEqual(longsword?.damage, ['1d10+4']);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive derives spell attack action from character spells', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-017',
+    ruleset: RULESET_ID,
+    name: 'Cleric Caster',
+    lineageId: 'human',
+    backgroundId: 'acolyte',
+    alignment: 'Neutral Good',
+    experience: 0,
+    classes: [{ classId: 'cleric', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 12,
+      con: 14,
+      int: 10,
+      wis: 18,
+      cha: 8
+    },
+    skillProficiencies: ['Insight', 'Religion'],
+    savingThrowProficiencies: ['wis', 'cha'],
+    inventory: [],
+    spellChoices: [],
+    spells: ['Sacred Flame', 'Guidance'],
+    backgroundChoices: {
+      backgroundId: 'acolyte',
+      abilityMode: 'plus2_plus1',
+      abilityAssignments: {
+        str: 0,
+        dex: 0,
+        con: 0,
+        int: 1,
+        wis: 2,
+        cha: 0
+      },
+      equipmentSelection: ['holy-symbol']
+    },
+    resources: {},
+    state: {
+      hp: 9,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const sacredFlame = actions.find((action: any) => action.id === 'spell-action:sacred-flame');
+    const guidance = actions.find((action: any) => action.id === 'spell-action:guidance');
+
+    assert.ok(sacredFlame, 'Sacred Flame action should exist');
+    assert.ok(guidance, 'Guidance action should exist');
+    assert.equal(guidance.kind, 'action');
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive handles Heavy weapon (greatsword) with strength-based attack', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-018',
+    ruleset: RULESET_ID,
+    name: 'Barbarian',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Chaotic Neutral',
+    experience: 0,
+    classes: [{ classId: 'barbarian', level: 1 }],
+    abilities: {
+      str: 18,
+      dex: 10,
+      con: 16,
+      int: 8,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics', 'Intimidation'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-greatsword',
+        baseItemId: 'greatsword',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 13,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const greatsword = actions.find((action: any) => action.id === 'attack:item-inst-greatsword');
+
+    assert.ok(greatsword, 'Greatsword attack should exist');
+    assert.equal(greatsword.kind, 'attack');
+    // STR 18 => +4 mod, prof +2 => +6 hit
+    assert.equal(greatsword.hit, '+6');
+    // Greatsword: 2d6 slashing, Heavy property
+    assert.deepEqual(greatsword.damage, ['2d6+4']);
+    assert.match(greatsword.notes ?? '', /Heavy/i);
+    assert.match(greatsword.notes ?? '', /Slashing/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive handles Loading property (hand crossbow) correctly', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-019',
+    ruleset: RULESET_ID,
+    name: 'Rogue',
+    lineageId: 'human',
+    backgroundId: 'criminal',
+    alignment: 'Chaotic Neutral',
+    experience: 0,
+    classes: [{ classId: 'rogue', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 16,
+      con: 12,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Stealth', 'Sleight of Hand'],
+    savingThrowProficiencies: ['dex', 'int'],
+    inventory: [
+      {
+        instanceId: 'item-inst-hand-crossbow',
+        baseItemId: 'hand-crossbow',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-bolts',
+        baseItemId: 'bolts-20',
+        status: 'backpack',
+        quantity: 10
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 10,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const handCrossbow = actions.find((action: any) => action.id === 'attack:item-inst-hand-crossbow');
+
+    assert.ok(handCrossbow, 'Hand crossbow attack should exist');
+    assert.equal(handCrossbow.kind, 'attack');
+    // DEX 16 => +3 mod, prof +2 => +5 hit
+    assert.equal(handCrossbow.hit, '+5');
+    assert.deepEqual(handCrossbow.damage, ['1d6+3']);
+    assert.match(handCrossbow.notes ?? '', /Loading/i);
+    assert.match(handCrossbow.notes ?? '', /Ammunition/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive handles Two-Weapon Fighting with only one Light weapon (should be disabled)', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-020',
+    ruleset: RULESET_ID,
+    name: 'Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 16,
+      dex: 14,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-shortsword',
+        baseItemId: 'shortsword',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-dagger',
+        baseItemId: 'dagger',
+        status: 'backpack'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const twoWeapon = actions.find((action: any) => action.id === 'rule:two-weapon');
+
+    assert.ok(twoWeapon, 'Two-Weapon Fighting action should exist');
+    assert.equal(twoWeapon.disabled, true);
+    assert.match(twoWeapon.detail ?? '', /two equipped Light weapons/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive handles Reach weapon for opportunity attack range', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-021',
+    ruleset: RULESET_ID,
+    name: 'Pike Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Lawful Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 16,
+      dex: 12,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-pike',
+        baseItemId: 'pike',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const opportunity = actions.find((action: any) => action.id === 'rule:opportunity');
+
+    // Pike has Reach (10 feet)
+    assert.equal(opportunity?.range, '10 feet');
+    assert.match(opportunity?.notes ?? '', /10 feet/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive blocks Loading weapon (hand crossbow) when off-hand is occupied by another weapon', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-022',
+    ruleset: RULESET_ID,
+    name: 'Rogue with Off-Hand',
+    lineageId: 'human',
+    backgroundId: 'criminal',
+    alignment: 'Chaotic Neutral',
+    experience: 0,
+    classes: [{ classId: 'rogue', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 16,
+      con: 12,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Stealth', 'Sleight of Hand'],
+    savingThrowProficiencies: ['dex', 'int'],
+    inventory: [
+      {
+        instanceId: 'item-inst-hand-crossbow',
+        baseItemId: 'hand-crossbow',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-dagger',
+        baseItemId: 'dagger',
+        status: 'equipped_off_hand'
+      },
+      {
+        instanceId: 'item-inst-bolts',
+        baseItemId: 'bolts-20',
+        status: 'backpack',
+        quantity: 5
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 10,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const handCrossbow = actions.find((action: any) => action.id === 'attack:item-inst-hand-crossbow');
+
+    assert.ok(handCrossbow, 'Hand crossbow attack should exist');
+    assert.equal(handCrossbow.disabled, true);
+    assert.match(handCrossbow.detail ?? '', /free hand/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive displays Heavy property on heavy crossbow correctly', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-023',
+    ruleset: RULESET_ID,
+    name: 'Heavy Crossbow Guy',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 14,
+      dex: 16,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Perception'],
+    savingThrowProficiencies: ['str', 'dex'],
+    inventory: [
+      {
+        instanceId: 'item-inst-heavy-crossbow',
+        baseItemId: 'heavy-crossbow',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-bolts',
+        baseItemId: 'bolts-20',
+        status: 'backpack',
+        quantity: 10
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const heavyCrossbow = actions.find((action: any) => action.id === 'attack:item-inst-heavy-crossbow');
+
+    assert.ok(heavyCrossbow, 'Heavy crossbow attack should exist');
+    assert.equal(heavyCrossbow.kind, 'attack');
+    // DEX 16 => +3 mod, prof +2 => +5 hit. Heavy crossbow damage 1d10
+    assert.equal(heavyCrossbow.hit, '+5');
+    assert.deepEqual(heavyCrossbow.damage, ['1d10+3']);
+    // Heavy crossbow has Heavy, Loading, Ammunition, Two-Handed properties
+    assert.match(heavyCrossbow.notes ?? '', /Heavy/i);
+    assert.match(heavyCrossbow.notes ?? '', /Loading/i);
+    assert.match(heavyCrossbow.notes ?? '', /Ammunition/i);
+    assert.match(heavyCrossbow.notes ?? '', /Two-Handed/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive blocks Two-Handed heavy crossbow when shield is equipped', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-024',
+    ruleset: RULESET_ID,
+    name: 'Blocked Heavy Crossbow',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 14,
+      dex: 16,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Perception'],
+    savingThrowProficiencies: ['str', 'dex'],
+    inventory: [
+      {
+        instanceId: 'item-inst-heavy-crossbow',
+        baseItemId: 'heavy-crossbow',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-shield',
+        baseItemId: 'shield',
+        status: 'equipped_shield'
+      },
+      {
+        instanceId: 'item-inst-bolts',
+        baseItemId: 'bolts-20',
+        status: 'backpack',
+        quantity: 5
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const heavyCrossbow = actions.find((action: any) => action.id === 'attack:item-inst-heavy-crossbow');
+
+    assert.ok(heavyCrossbow, 'Heavy crossbow attack should exist');
+    assert.equal(heavyCrossbow.disabled, true);
+    assert.match(heavyCrossbow.detail ?? '', /two hands/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive handles glaive (Heavy, Reach, Two-Handed) correctly', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-025',
+    ruleset: RULESET_ID,
+    name: 'Glaive Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Lawful Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 16,
+      dex: 12,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-glaive',
+        baseItemId: 'glaive',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const glaive = actions.find((action: any) => action.id === 'attack:item-inst-glaive');
+    const opportunity = actions.find((action: any) => action.id === 'rule:opportunity');
+
+    assert.ok(glaive, 'Glaive attack should exist');
+    assert.equal(glaive.kind, 'attack');
+    // STR 16 => +3 mod, prof +2 => +5 hit. Glaive damage 1d10 slashing
+    assert.equal(glaive.hit, '+5');
+    assert.deepEqual(glaive.damage, ['1d10+3']);
+    // Glaive has Heavy, Reach, Two-Handed properties
+    assert.match(glaive.notes ?? '', /Heavy/i);
+    assert.match(glaive.notes ?? '', /Reach/i);
+    assert.match(glaive.notes ?? '', /Two-Handed/i);
+    assert.match(glaive.notes ?? '', /Slashing/i);
+
+    // Opportunity attack should use Reach (10 feet)
+    assert.equal(opportunity?.range, '10 feet');
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive handles whip (Finesse, Reach) correctly with DEX', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-026',
+    ruleset: RULESET_ID,
+    name: 'Whip Rogue',
+    lineageId: 'human',
+    backgroundId: 'criminal',
+    alignment: 'Chaotic Neutral',
+    experience: 0,
+    classes: [{ classId: 'rogue', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 16,
+      con: 12,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Stealth', 'Sleight of Hand'],
+    savingThrowProficiencies: ['dex', 'int'],
+    inventory: [
+      {
+        instanceId: 'item-inst-whip',
+        baseItemId: 'whip',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 10,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const whip = actions.find((action: any) => action.id === 'attack:item-inst-whip');
+    const opportunity = actions.find((action: any) => action.id === 'rule:opportunity');
+
+    assert.ok(whip, 'Whip attack should exist');
+    assert.equal(whip.kind, 'attack');
+    // Whip is Finesse, uses DEX. DEX 16 => +3 mod, prof +2 => +5 hit
+    assert.equal(whip.hit, '+5');
+    // Whip damage 1d4 slashing
+    assert.deepEqual(whip.damage, ['1d4+3']);
+    // Whip has Finesse, Reach properties
+    assert.match(whip.notes ?? '', /Finesse/i);
+    assert.match(whip.notes ?? '', /Reach/i);
+
+    // Opportunity attack should use Reach (10 feet)
+    assert.equal(opportunity?.range, '10 feet');
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive marks Loading weapons (light crossbow) with Loading note and source.loading flag', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-027',
+    ruleset: RULESET_ID,
+    name: 'Crossbow Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 16,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Perception'],
+    savingThrowProficiencies: ['str', 'dex'],
+    inventory: [
+      {
+        instanceId: 'item-inst-light-crossbow',
+        baseItemId: 'light-crossbow',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-bolts',
+        baseItemId: 'bolts-20',
+        status: 'backpack',
+        quantity: 10
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const lightCrossbow = actions.find((action: any) => action.id === 'attack:item-inst-light-crossbow');
+
+    assert.ok(lightCrossbow, 'Light crossbow attack should exist');
+    assert.equal(lightCrossbow.kind, 'attack');
+    // DEX 16 => +3 mod, prof +2 => +5 hit
+    assert.equal(lightCrossbow.hit, '+5');
+    assert.deepEqual(lightCrossbow.damage, ['1d8+3']);
+    // Light crossbow has Loading, Ammunition, Two-Handed properties
+    assert.match(lightCrossbow.notes ?? '', /Loading/i);
+    assert.match(lightCrossbow.notes ?? '', /Ammunition/i);
+    assert.match(lightCrossbow.notes ?? '', /Two-Handed/i);
+    // source.loading flag for canonical Loading property rule
+    assert.equal(lightCrossbow.source?.loading, true);
+    assert.ok(!lightCrossbow.source?.reload, 'reload should be falsy for Loading weapon');
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive marks Reload weapons (revolver) with Reload note and source.reload flag', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-028',
+    ruleset: RULESET_ID,
+    name: 'Gunslinger',
+    lineageId: 'human',
+    backgroundId: 'criminal',
+    alignment: 'Chaotic Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 16,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Stealth'],
+    savingThrowProficiencies: ['str', 'dex'],
+    inventory: [
+      {
+        instanceId: 'item-inst-revolver',
+        baseItemId: 'revolver',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const revolver = actions.find((action: any) => action.id === 'attack:item-inst-revolver');
+
+    assert.ok(revolver, 'Revolver attack should exist');
+    assert.equal(revolver.kind, 'attack');
+    // DEX 16 => +3 mod, prof +2 => +5 hit
+    assert.equal(revolver.hit, '+5');
+    // Revolver has Reload, Automatic Fire properties
+    assert.match(revolver.notes ?? '', /Reload/i);
+    assert.match(revolver.notes ?? '', /Automatic Fire/i);
+    // source.reload flag for canonical Reload property rule
+    assert.equal(revolver.source?.reload, true);
+    assert.ok(!revolver.source?.loading, 'loading should be falsy for Reload weapon');
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive uses melee weapon reach for opportunity attack, ignoring equipped ranged weapons', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-029',
+    ruleset: RULESET_ID,
+    name: 'Melee+Ranged Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 16,
+      dex: 14,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-longsword',
+        baseItemId: 'longsword',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-longbow',
+        baseItemId: 'longbow',
+        status: 'equipped_off_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const opportunity = actions.find((action: any) => action.id === 'rule:opportunity');
+
+    // Should use melee weapon (longsword, no reach) for opportunity attack range
+    // Longsword is melee with 5 feet reach, so opportunity attack range is 5 feet
+    assert.ok(opportunity, 'Opportunity attack should exist');
+    assert.equal(opportunity.range, '5 feet');
+    assert.match(opportunity.notes ?? '', /5 feet/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive uses 10 feet reach for opportunity attack when character has reach melee weapon', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-030',
+    ruleset: RULESET_ID,
+    name: 'Reach Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 16,
+      dex: 12,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      {
+        instanceId: 'item-inst-glaive',
+        baseItemId: 'glaive',
+        status: 'equipped_main_hand'
+      },
+      {
+        instanceId: 'item-inst-hand-crossbow',
+        baseItemId: 'hand-crossbow',
+        status: 'equipped_off_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const opportunity = actions.find((action: any) => action.id === 'rule:opportunity');
+
+    // Glaive has Reach (10 feet), so opportunity attack range should be 10 feet
+    assert.ok(opportunity, 'Opportunity attack should exist');
+    assert.equal(opportunity.range, '10 feet');
+    assert.match(opportunity.notes ?? '', /10 feet/i);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /actions/derive uses 5 feet reach for opportunity attack when only ranged weapon is equipped', async () => {
+  const app = await createApp();
+
+  const character: CharacterRecord = {
+    id: 'char-action-031',
+    ruleset: RULESET_ID,
+    name: 'Ranged Only Fighter',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: {
+      str: 10,
+      dex: 16,
+      con: 14,
+      int: 10,
+      wis: 10,
+      cha: 10
+    },
+    skillProficiencies: ['Perception'],
+    savingThrowProficiencies: ['str', 'dex'],
+    inventory: [
+      {
+        instanceId: 'item-inst-longbow',
+        baseItemId: 'longbow',
+        status: 'equipped_main_hand'
+      }
+    ],
+    spellChoices: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/actions/derive',
+      payload: character
+    });
+
+    assert.equal(response.statusCode, 200);
+
+    const actions = response.json();
+    const opportunity = actions.find((action: any) => action.id === 'rule:opportunity');
+
+    // No melee weapon equipped, so opportunity attack uses unarmed strike range (5 feet)
+    assert.ok(opportunity, 'Opportunity attack should exist');
+    assert.equal(opportunity.range, '5 feet');
   } finally {
     await app.close();
   }

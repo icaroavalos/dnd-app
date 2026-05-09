@@ -1,3 +1,11 @@
+/**
+ * @deprecated Use backend projection via `projectCharacter()` from `../../lib/api-character-project-client.js`
+ * quando o slice backend estiver estável.
+ *
+ * Backend: POST /characters/project
+ * Frontend client: src/lib/api-character-project-client.ts
+ * Migration guide: docs/migration-review.md
+ */
 import type { AbilityName } from '../../types/background';
 
 export interface AbilityScores {
@@ -17,12 +25,20 @@ export interface SpellcastingMetrics {
   saveDc: number;
 }
 
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveProficiencyBonus(level: number): number {
   return Math.ceil((Number(level) || 1) / 4) + 1;
 }
 
 const ABILITY_KEYS: AbilityName[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveAbilityScores(
   baseScores: Partial<Record<AbilityName, number>>,
   bonuses: Partial<Record<AbilityName, number>> = {}
@@ -37,10 +53,18 @@ export function deriveAbilityScores(
   };
 }
 
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveAbilityModifier(score: number): number {
   return Math.floor(((Number(score) || 10) - 10) / 2);
 }
 
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveSpellcastingMetrics(
   ability: AbilityName | string,
   abilityScores: Partial<Record<AbilityName, number>>,
@@ -63,6 +87,10 @@ export function deriveLevelOneMaxHp(hitDie: number, constitutionScore: number): 
   return Math.max(1, (Number(hitDie) || 8) + deriveAbilityModifier(constitutionScore));
 }
 
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveMaxHp(
   level: number,
   hitDie: number,
@@ -81,6 +109,10 @@ export function calculateMaxHpGain(hitDie: number, constitutionModifier: number)
   return Math.max(1, hitDie + constitutionModifier);
 }
 
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
 export function deriveSavingThrowBonus(
   abilityScore: number,
   proficient: boolean,

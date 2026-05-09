@@ -13,7 +13,11 @@
     "types": ["node"],
     "baseUrl": ".",
     "rootDir": ".",
-    "outDir": "dist"
+    "outDir": "dist",
+    "paths": {
+      "@shared/contracts": ["./src/shared/contracts/index.ts"],
+      "@shared": ["./src/shared/index.ts"]
+    }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createApp } from '../src/main.js';
-import { RULESET_ID, type CharacterRecord } from '../src/domain/contracts/index.js';
+import { RULESET_ID, type CharacterRecord } from '@shared/contracts';
 
 test('POST /characters/project derives a fighter sheet with background-based spellcasting', async () => {
   const app = await createApp();
@@ -567,6 +567,240 @@ test('POST /characters/project calculates armor class with no armor using defaul
     assert.equal(response.statusCode, 200);
     // No armor: 10 + Dex mod (+3) = 13
     assert.equal(response.json().armorClass, 13);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /characters/project calculates armor class with shield but no armor', async () => {
+  const app = await createApp();
+
+  const payload: CharacterRecord = {
+    id: 'char-ac-shield-only',
+    ruleset: RULESET_ID,
+    name: 'ShieldOnly',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 14, dex: 16, con: 14, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      { instanceId: 'item-inst-shield', baseItemId: 'shield', status: 'equipped_shield' }
+    ],
+    spellChoices: [],
+    backgroundChoices: {
+      backgroundId: 'soldier',
+      abilityMode: 'plus1_plus1_plus1',
+      abilityAssignments: { str: 1, dex: 0, con: 1, int: 0, wis: 1, cha: 0 },
+      equipmentSelection: []
+    },
+    resources: {},
+    state: { hp: 13, maxHpOverride: null, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/characters/project',
+      payload
+    });
+
+    assert.equal(response.statusCode, 200);
+    // No armor (10 + 3 dex) + shield (+2) = 15
+    assert.equal(response.json().armorClass, 15);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /characters/project calculates armor class with half-plate (medium armor) and high dex', async () => {
+  const app = await createApp();
+
+  const payload: CharacterRecord = {
+    id: 'char-ac-halfplate',
+    ruleset: RULESET_ID,
+    name: 'HalfPlate',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 14, dex: 18, con: 14, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Stealth'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      { instanceId: 'item-inst-half-plate', baseItemId: 'half-plate-armor', status: 'equipped_armor' }
+    ],
+    spellChoices: [],
+    backgroundChoices: {
+      backgroundId: 'soldier',
+      abilityMode: 'plus1_plus1_plus1',
+      abilityAssignments: { str: 1, dex: 0, con: 1, int: 0, wis: 1, cha: 0 },
+      equipmentSelection: []
+    },
+    resources: {},
+    state: { hp: 13, maxHpOverride: null, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/characters/project',
+      payload
+    });
+
+    assert.equal(response.statusCode, 200);
+    // Half plate (AC 15) + Dex mod capped at +2 = 17
+    assert.equal(response.json().armorClass, 17);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /characters/project calculates armor class with splint (heavy armor) and negative dex', async () => {
+  const app = await createApp();
+
+  const payload: CharacterRecord = {
+    id: 'char-ac-splint',
+    ruleset: RULESET_ID,
+    name: 'Splint',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 16, dex: 8, con: 16, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      { instanceId: 'item-inst-splint', baseItemId: 'splint-armor', status: 'equipped_armor' }
+    ],
+    spellChoices: [],
+    backgroundChoices: {
+      backgroundId: 'soldier',
+      abilityMode: 'plus1_plus1_plus1',
+      abilityAssignments: { str: 1, dex: 0, con: 1, int: 0, wis: 1, cha: 0 },
+      equipmentSelection: []
+    },
+    resources: {},
+    state: { hp: 13, maxHpOverride: null, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/characters/project',
+      payload
+    });
+
+    assert.equal(response.statusCode, 200);
+    // Splint (AC 17) + 0 (heavy armor ignores dex) = 17
+    assert.equal(response.json().armorClass, 17);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /characters/project calculates armor class with half-plate and shield (medium armor + shield)', async () => {
+  const app = await createApp();
+
+  const payload: CharacterRecord = {
+    id: 'char-ac-halfplate-shield',
+    ruleset: RULESET_ID,
+    name: 'HalfPlateShield',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 14, dex: 16, con: 14, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [
+      { instanceId: 'item-inst-half-plate', baseItemId: 'half-plate-armor', status: 'equipped_armor' },
+      { instanceId: 'item-inst-shield', baseItemId: 'shield', status: 'equipped_shield' }
+    ],
+    spellChoices: [],
+    backgroundChoices: {
+      backgroundId: 'soldier',
+      abilityMode: 'plus1_plus1_plus1',
+      abilityAssignments: { str: 1, dex: 0, con: 1, int: 0, wis: 1, cha: 0 },
+      equipmentSelection: []
+    },
+    resources: {},
+    state: { hp: 13, maxHpOverride: null, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/characters/project',
+      payload
+    });
+
+    assert.equal(response.statusCode, 200);
+    // Half plate (AC 15) + Dex mod capped at +2 + shield (+2) = 19
+    assert.equal(response.json().armorClass, 19);
+  } finally {
+    await app.close();
+  }
+});
+
+test('POST /characters/project calculates armor class with no armor and negative dex modifier', async () => {
+  const app = await createApp();
+
+  const payload: CharacterRecord = {
+    id: 'char-ac-no-armor-neg-dex',
+    ruleset: RULESET_ID,
+    name: 'LowDex',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 16, dex: 8, con: 14, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [],
+    spellChoices: [],
+    backgroundChoices: {
+      backgroundId: 'soldier',
+      abilityMode: 'plus1_plus1_plus1',
+      abilityAssignments: { str: 1, dex: 0, con: 1, int: 0, wis: 1, cha: 0 },
+      equipmentSelection: []
+    },
+    resources: {},
+    state: { hp: 13, maxHpOverride: null, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] }
+  };
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/characters/project',
+      payload
+    });
+
+    assert.equal(response.statusCode, 200);
+    // No armor: 10 + Dex mod (-1) = 9
+    assert.equal(response.json().armorClass, 9);
   } finally {
     await app.close();
   }

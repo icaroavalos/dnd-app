@@ -1,3 +1,0 @@
-[  792456ms] TypeError: Cannot read properties of undefined (reading 'character')
-    at startLevelUpAssistant (http://localhost:5173/app.js:3771:15)
-    at HTMLButtonElement.<anonymous> (http://localhost:5173/app.js:710:5)

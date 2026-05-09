@@ -4,22 +4,15 @@ import type {
   CharacterRecord,
   CharacterResourceState,
   RecoveryType
-} from '../../domain/contracts/index.js';
-
-export interface UseResourceRequest {
-  character: CharacterRecord;
-  resourceId: string;
-  amount?: number;
-}
-
-export interface RecoverResourcesRequest {
-  character: CharacterRecord;
-  recovery: Extract<RecoveryType, 'short_rest' | 'long_rest'>;
-}
+} from '@shared/contracts';
+import {
+  type UseResourceRequestDto,
+  type RecoverResourcesRequestDto
+} from './dto/index.js';
 
 @Injectable()
 export class ResourcesService {
-  useResource(request: UseResourceRequest): CharacterRecord {
+  useResource(request: UseResourceRequestDto): CharacterRecord {
     const amount = Math.max(1, Math.floor(request.amount ?? 1));
     const resource = request.character.resources[request.resourceId];
 
@@ -49,7 +42,7 @@ export class ResourcesService {
     };
   }
 
-  recoverResources(request: RecoverResourcesRequest): CharacterRecord {
+  recoverResources(request: RecoverResourcesRequestDto): CharacterRecord {
     const resources = Object.fromEntries(
       Object.entries(request.character.resources).map(([resourceId, resourceState]) => [
         resourceId,

@@ -9,7 +9,7 @@ import {
   type DerivedCharacterSheet,
   type RuleDefinition,
   type SpellChoiceState
-} from '../src/domain/contracts/index.js';
+} from '@shared/contracts';
 
 test('domain contracts export canonical backend constants', () => {
   assert.equal(RULESET_ID, '5.5e-2024');

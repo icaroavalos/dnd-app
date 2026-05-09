@@ -1,4 +1,4 @@
-import type { CharacterRecord } from '../../domain/contracts/index.js';
+import type { CharacterRecord } from '@shared/contracts';
 
 interface ItemLike {
   name: string;

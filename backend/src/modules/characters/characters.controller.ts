@@ -3,7 +3,7 @@ import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import type {
   CharacterRecord,
   DerivedCharacterSheet
-} from '../../domain/contracts/index.js';
+} from '@shared/contracts';
 import { CharactersService } from './characters.service.js';
 
 @Controller('characters')

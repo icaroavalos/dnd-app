@@ -2,6 +2,9 @@
  * Character Projection - Deriva o estado completo para exibição (combate, perícias, etc)
  *
  * Esta é a única fonte de verdade para o que é exibido na ficha.
+ *
+ * Nota: Esta versão usa projeção local. Para usar a backend, importe
+ * `projectCharacter` de `../../lib/api-character-project-client.js`
  */
 
 import type { AbilityName } from '../../types/background.js';
@@ -14,6 +17,79 @@ import {
   deriveProficiencyBonus,
   deriveSavingThrowBonus
 } from './character-engine.js';
+
+/**
+ * Flag para habilitar projeção via backend (se disponível).
+ * Quando true, tenta usar POST /characters/project do backend.
+ */
+let useBackendProjection = false;
+
+export function enableBackendProjection(enabled: boolean) {
+  useBackendProjection = enabled;
+}
+
+export function isBackendProjectionEnabled(): boolean {
+  return useBackendProjection;
+}
+
+/**
+ * Projeta personagem usando backend se disponível, ou fallback local.
+ * Esta é a função principal para projeção da ficha.
+ */
+export async function projectCharacterSheet(
+  character: Character,
+  options: ProjectionOptions = {}
+): Promise<DerivedCharacterSheet> {
+  // Tenta backend se habilitado
+  if (useBackendProjection) {
+    try {
+      const { projectCharacter } = await import('../../lib/api-character-project-client.js');
+      const projected = await projectCharacter(character as any);
+      // Converte do formato backend para o formato local
+      return convertBackendProjection(projected, character, options);
+    } catch (err) {
+      console.warn('Backend projection failed, falling back to local:', err);
+      // Fallback para projeção local
+    }
+  }
+
+  // Fallback local
+  return deriveCharacterSheet(character, options);
+}
+
+/**
+ * Converte projeção do backend para formato local DerivedCharacterSheet.
+ */
+function convertBackendProjection(
+  backend: any,
+  character: Character,
+  options: ProjectionOptions = {}
+): DerivedCharacterSheet {
+  return {
+    level: backend.level,
+    proficiencyBonus: backend.proficiencyBonus,
+    abilityScores: backend.abilityScores,
+    abilityModifiers: backend.abilityModifiers,
+    savingThrows: backend.savingThrows,
+    skillBonuses: backend.skillBonuses,
+    passivePerception: backend.passivePerception,
+    armorClass: backend.armorClass,
+    initiative: backend.initiative,
+    maxHp: backend.maxHp,
+    currentHp: backend.currentHp ?? backend.maxHp,
+    tempHp: backend.tempHp ?? 0,
+    hitDie: options.hitDie ?? 8,
+    hitDiceTotal: character.level ?? 1,
+    spellAttack: backend.spellcasting?.attackBonus ?? 0,
+    spellSaveDc: backend.spellcasting?.saveDc ?? 0,
+    spellSlotsMax: backend.spellSlotsMax ?? {},
+    encumbrance: {
+      carriedWeight: 0,
+      carryingCapacity: (backend.abilityScores?.str ?? 10) * 15,
+      encumbered: false,
+    },
+  };
+}
 
 const ABILITY_KEYS: AbilityName[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 

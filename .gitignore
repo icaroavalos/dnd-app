@@ -1,1 +1,22 @@
 node_modules/
+
+# OS/editor noise
+.DS_Store
+
+# Local env files
+.env
+backend/.env
+
+# Local tool/runtime caches
+.vite/
+.playwright-mcp/
+
+# Build outputs
+dist/
+backend/dist/
+backend/generated/
+
+# Local backend data
+backend/data/*.db
+backend/data/*.db-journal
+backend/data/characters.json
