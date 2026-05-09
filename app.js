@@ -118,6 +118,7 @@ import {
   STARTER_ATTACKS,
   TABS,
 } from "./dist/src/core/rules/constants.js";
+import { createFormControls } from "./src/app/form-controls.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -191,6 +192,7 @@ const defaultState = {
 
 let state = loadState();
 let ruleRepository = new RuleRepository();
+const { field, numberField, selectField, checkbox } = createFormControls({ escapeHtml });
 
 const els = {
   app: document.querySelector("#app"),
@@ -1074,32 +1076,6 @@ function renderLevelUpHpControl() {
       <p class="choice-counter complete">HP: ${state.levelUpHpBase || state.character.hp - (state.levelUpHpGain || 0)} + ${state.levelUpHpGain || fixed} = ${state.character.hp}</p>
     </fieldset>
   `;
-}
-
-function field(path, label, value) {
-  const id = path.replace(".", "-");
-  return `<div class="field"><label for="${id}">${label}</label><input id="${id}" data-path="${path}" value="${escapeHtml(value)}" /></div>`;
-}
-
-function numberField(path, label, value, min, max) {
-  const id = path.replace(".", "-");
-  return `<div class="field"><label for="${id}">${label}</label><input id="${id}" data-path="${path}" type="number" min="${min}" max="${max}" value="${value}" /></div>`;
-}
-
-function selectField(path, label, value, options, disabled = false) {
-  const id = path.replace(".", "-");
-  return `
-    <div class="field">
-      <label for="${id}">${label}</label>
-      <select id="${id}" data-path="${path}" ${disabled ? "disabled" : ""}>
-        ${options.map(([optionValue, optionLabel]) => `<option value="${optionValue}" ${String(optionValue).toLowerCase() === String(value).toLowerCase() ? "selected" : ""}>${optionLabel}</option>`).join("")}
-      </select>
-    </div>
-  `;
-}
-
-function checkbox(path, value, label, checked, disabled = false, locked = false) {
-  return `<label class="${disabled ? "disabled" : ""} ${locked ? "locked" : ""}"><input type="checkbox" data-list="${path}" value="${escapeHtml(value)}" ${checked ? "checked" : ""} ${disabled || locked ? "disabled" : ""} /><span class="checkbox-label">${label}</span></label>`;
 }
 
 function navButtons() {
