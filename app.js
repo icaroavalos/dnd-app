@@ -126,6 +126,7 @@ import { createAppShell } from "./src/app/app-shell.js";
 import { createGlobalEvents } from "./src/app/global-events.js";
 import { createBuilderRenderers } from "./src/app/builder-renderers.js";
 import { createMainRenderController } from "./src/app/main-render-controller.js";
+import { createCreationEventHandlers } from "./src/app/creation-event-handlers.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -426,6 +427,33 @@ const renderController = createMainRenderController({
   renderCharacterMenu: () => characterMenu.renderCharacterMenu(),
   renderHpModal: () => modalRenderers.renderHpModal(),
   renderRestModal: () => modalRenderers.renderRestModal(),
+});
+
+const creationEventHandlers = createCreationEventHandlers({
+  getState: () => state,
+  setState: (newState) => { state = newState; },
+  persist,
+  render,
+  renderChrome,
+  renderSheet,
+  loadClassData,
+  loadRaceData,
+  normalizeCharacterState,
+  setByPath,
+  updateCreationField,
+  applyAbilityMethod,
+  applyBackgroundStepSelection,
+  applyGuidedBackgroundIncrement,
+  toggleGuidedBackgroundAbility,
+  applyGuidedBackgroundEquipmentChoice,
+  applyGuidedBackgroundSpellcastingAbility,
+  rebuildInventoryFromChoices,
+  ensureGuidedBackgroundChoiceState,
+  backgroundSkillProficiencies,
+  classSkillRule,
+  equipmentChoiceRules,
+  creationChoicesLocked,
+  escapeHtml,
 });
 
 init();
@@ -836,277 +864,8 @@ function attackEditorRow(attack, index) {
 }
 
 function bindFormEvents() {
-  els.form.querySelectorAll("[data-path]").forEach((input) => {
-    const updatePathValue = async () => {
-      const path = input.dataset.path;
-      const value = input.type === "number" ? Number(input.value) : input.value;
-      const isTypedCreationField = path === "class" || path === "race" || path === "subrace" || path === "alignment" || path === "background";
-
-      if (isTypedCreationField) {
-        state.character = updateCreationField(state.character, path, String(value), {
-          backgroundSkillProficiencies: (backgroundName) => backgroundSkillProficiencies(backgroundName),
-          defaultSaves,
-          defaultSubrace,
-          maxLevelOneHp,
-        });
-      } else {
-        setByPath(state.character, path, value);
-      }
-
-      const needsFullRender = path === "class" || path === "race" || path === "subrace" || path === "alignment" || path === "abilityMethod" || path.startsWith("abilities.") || path.startsWith("asiChoices.");
-      if (path === "class") {
-        await loadClassData(String(value));
-      }
-      if (input.dataset.path.startsWith("abilities.") && state.character.level === 1) {
-        state.character.hp = maxLevelOneHp(state.character.class, state.character.abilities);
-      }
-      if (path === "abilityMethod") {
-        applyAbilityMethod(String(value));
-      }
-      if (path === "race") {
-        await loadRaceData(String(value));
-      }
-      normalizeCharacterState();
-      persist();
-      renderChrome();
-      if (needsFullRender) render();
-      else renderSheet();
-    };
-    input.addEventListener("input", updatePathValue);
-    if (input.tagName === "SELECT") input.addEventListener("change", updatePathValue);
-  });
-
-  els.form.querySelectorAll("[data-ability-adjust]").forEach((button) => {
-    button.addEventListener("click", () => {
-      adjustPointBuyAbility(button.dataset.abilityAdjust, Number(button.dataset.delta));
-      normalizeCharacterState();
-      persist();
-      render();
-    });
-  });
-
-  bindStandardArrayDrag();
-
-  els.form.querySelectorAll("[data-class-feature-choice]").forEach((input) => {
-    input.addEventListener("change", () => {
-      state.character.classFeatureChoices ??= {};
-      state.character.classFeatureChoices[input.dataset.classFeatureChoice] = input.value;
-      normalizeCharacterState();
-      persist();
-      render();
-    });
-  });
-
-  els.form.querySelectorAll("[data-asi-mode]").forEach((input) => {
-    input.addEventListener("change", () => {
-      state.character.asiChoices ??= {};
-      const ruleId = input.dataset.asiMode;
-      state.character.asiChoices[ruleId] = { ...normalizedAsiChoice({ id: ruleId }), mode: input.value };
-      normalizeCharacterState();
-      persist();
-      render();
-    });
-  });
-
-  els.form.querySelectorAll("[data-equipment-choice]").forEach((input) => {
-    input.addEventListener("change", () => {
-      state.character.equipmentChoices ??= {};
-      state.character.equipmentChoices[input.dataset.equipmentChoice] = input.value;
-      rebuildInventoryFromChoices();
-      normalizeCharacterState();
-      persist();
-      render();
-    });
-  });
-
-  // Background spell choices (Magic Initiate)
-els.form.querySelectorAll("[data-bg-spell]").forEach((input) => {
-  input.addEventListener("change", (e) => {
-    state.character.bgSpellChoices = state.character.bgSpellChoices || {};
-    const key = e.target.dataset.bgSpell;
-    const value = e.target.value;
-    const checked = e.target.checked;
-    if (!state.character.bgSpellChoices[key]) {
-      state.character.bgSpellChoices[key] = [];
-    }
-    if (checked) {
-      if (!state.character.bgSpellChoices[key].includes(value)) {
-        state.character.bgSpellChoices[key].push(value);
-      }
-    } else {
-      state.character.bgSpellChoices[key] = state.character.bgSpellChoices[key].filter(v => v !== value);
-    }
-    persist();
-    render();
-  });
-});
-
-  // Background step event handlers
-els.form.querySelectorAll("[data-bg-select]").forEach((select) => {
-  select.addEventListener("change", (e) => {
-    state.character = applyBackgroundStepSelection(
-      state.character,
-      e.target.value,
-      (backgroundName) => backgroundSkillProficiencies(backgroundName)
-    );
-    normalizeCharacterState();
-    persist();
-    render();
-  });
-});
-
-els.form.querySelectorAll("[data-bg-increment]").forEach((input) => {
-  input.addEventListener("change", () => {
-    state.character.bgChoices = applyGuidedBackgroundIncrement(
-      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
-      input.value
-    );
-    normalizeCharacterState();
-    persist();
-    render();
-  });
-});
-
-els.form.querySelectorAll("[data-bg-ability]").forEach((input) => {
-  input.addEventListener("change", () => {
-    const ability = input.dataset.bgAbility;
-    state.character.bgChoices = toggleGuidedBackgroundAbility(
-      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
-      ability,
-      input.checked
-    );
-    normalizeCharacterState();
-    persist();
-    render();
-  });
-});
-
-els.form.querySelectorAll("[data-bg-equipment]").forEach((input) => {
-  input.addEventListener("change", () => {
-    state.character.bgChoices = applyGuidedBackgroundEquipmentChoice(
-      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
-      input.value
-    );
-    rebuildInventoryFromChoices();
-    normalizeCharacterState();
-    persist();
-    render();
-  });
-});
-
-els.form.querySelectorAll("[name='spellcasting-ability']").forEach((input) => {
-  input.addEventListener("change", () => {
-    state.character.bgChoices = applyGuidedBackgroundSpellcastingAbility(
-      ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background),
-      input.value
-    );
-    normalizeCharacterState();
-    persist();
-    render();
-  });
-});
-
-els.form.querySelectorAll("[data-level-hp-gain]").forEach((input) => {
-    input.addEventListener("input", () => {
-      setLevelUpHpGain(Number(input.value));
-      persist();
-      render();
-    });
-  });
-
-  els.form.querySelectorAll("[data-hp-preset]").forEach((button) => {
-    button.addEventListener("click", () => {
-      setLevelUpHpGain(Number(button.dataset.hpPreset));
-      persist();
-      render();
-    });
-  });
-
-  els.form.querySelector("[data-cancel-level-up]")?.addEventListener("click", () => {
-    cancelLevelUpAssistant();
-    persist();
-    render();
-  });
-
-  els.form.querySelector("[data-apply-level-up]")?.addEventListener("click", () => {
-    if (!validateStep("leveling")) {
-      persist();
-      render();
-      return;
-    }
-    state.validationMessage = "";
-    state.creationComplete = true;
-    state.character.creationComplete = true;
-    state.builderVisible = false;
-    state.levelUpMode = false;
-    state.levelUpSnapshot = null;
-    normalizeCharacterState(); // Recalcular derived.maxHp agora com o novo level
-    persist();
-    render();
-  });
-
-  els.form.querySelectorAll("[data-list]").forEach((input) => {
-    input.addEventListener("change", () => {
-      updateChoiceList(input.dataset.list, input.value, input.checked);
-      normalizeCharacterState();
-      persist();
-      render();
-    });
-  });
-
-  els.form.querySelectorAll("[data-move]").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (state.step === "background" && !state.character.background && state.character.bgChoices?.background) {
-        state.character.background = state.character.bgChoices.background;
-      }
-      const index = STEPS.findIndex(([id]) => id === state.step);
-      const nextIndex = Number(button.dataset.move);
-      const finishing = button.dataset.finishBuilder !== undefined;
-      if ((nextIndex > index || finishing) && !validateStepRange(index, finishing ? STEPS.length : nextIndex)) {
-        persist();
-        render();
-        return;
-      }
-      state.validationMessage = "";
-      if (finishing) {
-        state.creationComplete = true;
-        state.character.creationComplete = true;
-        state.builderVisible = false;
-        state.levelUpMode = false;
-      } else {
-        state.step = STEPS[nextIndex][0];
-      }
-      persist();
-      render();
-    });
-  });
-
-  els.form.querySelectorAll("[data-remove-attack]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.character.attacks.splice(Number(button.dataset.removeAttack), 1);
-      persist();
-      render();
-    });
-  });
-
-  const addAttackButton = els.form.querySelector("#addAttackButton");
-  if (addAttackButton) {
-    addAttackButton.addEventListener("click", () => {
-      state.character.attacks.push({ name: "New", range: "5 feet", type: "Bludgeoning", damage: "1d4" });
-      persist();
-      render();
-    });
-  }
-
-  const suggestAttacksButton = els.form.querySelector("#suggestAttacksButton");
-  if (suggestAttacksButton) {
-    suggestAttacksButton.addEventListener("click", () => {
-      state.character.attacks = structuredClone(STARTER_ATTACKS[state.character.class] ?? STARTER_ATTACKS.fighter);
-      persist();
-      render();
-    });
-  }
-
+  // Delegate to creation event handlers
+  creationEventHandlers.bindCreationEvents(els.form, els);
 }
 
 function bindStandardArrayDrag() {
