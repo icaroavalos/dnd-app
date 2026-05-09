@@ -1,5 +1,58 @@
 # Sessions
 
+## 2026-05-09T17:30-0400 - Task 15: Baseline Read-Only Post-Merge Audit
+
+**Timestamp:** 2026-05-09T17:30-0400
+
+**Objective:** Baseline read-only post-merge sem editar arquivos.
+
+**Commands run:**
+```bash
+git status --short                      # clean
+git branch --verbose --no-abbrev        # master, 23 commits ahead
+wc -l app.js src/**/*.ts src/**/*.js    # 14,418 lines total
+npm test                                # 14/14 passed
+npm run typecheck                       # PASS
+cd backend && npm run test              # 136/136 passed
+cd backend && npm run typecheck         # PASS
+```
+
+**Top 10 files by size:**
+| File | Lines |
+|------|-------|
+| `backend/src/modules/actions/actions.service.ts` | 976 |
+| `backend/src/modules/characters/characters.service.ts` | 295 |
+| `src/core/character/character-projection.ts` | 295 |
+| `backend/src/modules/characters/ledger/resource-ledger.controller.ts` | 292 |
+| `backend/src/modules/characters/ledger/resource-ledger.service.ts` | 280 |
+| `backend/src/modules/characters/ledger/resource-projection.service.ts` | 271 |
+| `src/core/character/feature-engine.ts` | 322 |
+| `src/core/character/spell-engine.ts` | 344 |
+| `src/core/state/abilities-step.ts` | 315 |
+| `app.js` | 2,193 |
+
+**7 App Features Status:**
+| ID | Feature | Status |
+|----|---------|--------|
+| U0 | Level up mostra novas features | ✅ DONE |
+| U1 | Aba magia nao abre automaticamente | ✅ DONE |
+| U2 | Background equipamentos completos | ✅ DONE |
+| U3 | Exclusao pede confirmacao | ✅ DONE |
+| U4 | Selecao magia tem icone info | ✅ DONE |
+| U5 | Features layout revisado | ✅ DONE |
+| U6 | Barbarian 19 texto completo | ✅ DONE |
+
+**Refactoring progress:** ~85% (6/7 features complete, backend MVP estabilizado)
+
+**Risks identified:**
+1. Persistencia duplicada: JSON e Prisma coexistem (em resolucao)
+2. Prisma schema != CharacterRecord (campos diferentes)
+3. `app.js` com 2193 linhas (aceitavel durante migracao)
+
+**Result:** ✅ Baseline established. All tests passing. Typecheck green. 6/7 app features complete.
+
+**Status:** DONE
+
 ## 2026-05-09T17:00-0400 - Task 14: QA Final MVP Verification
 
 **Timestamp:** 2026-05-09T17:00-0400
