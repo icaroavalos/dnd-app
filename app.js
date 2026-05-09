@@ -745,13 +745,13 @@ function renderAsiChoice(rule) {
 }
 
 function renderBackgroundForm() {
-  const bgChoices = ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background);
+  const bgChoices = ensureGuidedBackgroundChoiceState(state.character.bgChoices, state.character.background, state.api.source);
   const currentBg = bgChoices.background || state.character.background;
   const locked = creationChoicesLocked();
   const viewModel = buildGuidedBackgroundViewModel({
     ...bgChoices,
     background: currentBg || bgChoices.background || null,
-  });
+  }, state.api.source);
   return renderTypedBackgroundForm({
     locked,
     bgChoices,
@@ -912,9 +912,8 @@ function buildCreationFlowState() {
       backgroundStepMissing.push(`${currentBackground} Equipment`);
     }
 
-    const guidedBackgrounds = ["Acolyte", "Soldier"];
-    const isGuided = guidedBackgrounds.includes(currentBackground);
-    const showsMagicInitiate = isGuided && (["Acolyte"].includes(currentBackground) || state.api.source?.backgroundDetails?.[currentBackground.toLowerCase()]?.feature?.name?.toLowerCase().includes("magic initiate"));
+    const isGuided = Boolean(state.api.source?.backgroundDetails?.[currentBackground.toLowerCase()]);
+    const showsMagicInitiate = isGuided && getBackgroundGrantedSpells().length > 0;
     if (showsMagicInitiate && !state.character.bgChoices?.spellcastingAbility) {
       backgroundStepMissing.push("Magic Initiate: habilidade de conjuracao");
     }

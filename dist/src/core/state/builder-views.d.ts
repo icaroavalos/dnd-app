@@ -74,6 +74,7 @@ export interface BackgroundViewModelLike {
     tools: string[];
     equipmentOptions: BackgroundEquipmentOption[];
     showsMagicInitiate: boolean;
+    magicInitiateClass?: string | null;
     spellcastingAbility: string | null;
 }
 export interface BackgroundFormArgs extends BasicHelpers {

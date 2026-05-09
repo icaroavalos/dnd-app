@@ -82,6 +82,7 @@ export interface BackgroundViewModelLike {
   tools: string[];
   equipmentOptions: BackgroundEquipmentOption[];
   showsMagicInitiate: boolean;
+  magicInitiateClass?: string | null;
   spellcastingAbility: string | null;
 }
 
@@ -233,7 +234,8 @@ export function renderBackgroundForm(args: BackgroundFormArgs): string {
     `;
 
     if (viewModel.showsMagicInitiate) {
-      bgContent += `<fieldset class="choice-group"><legend>Magic Initiate: Cleric</legend><p class="hint">Choose your spellcasting ability for Magic Initiate spells:</p><div class="choice-list">${['int', 'wis', 'cha'].map((ability) => `<label><input type="radio" name="spellcasting-ability" value="${ability}" ${viewModel.spellcastingAbility === ability ? 'checked' : ''} /><span><strong>${titleCase(ability === 'int' ? 'intelligence' : ability === 'wis' ? 'wisdom' : 'charisma')}</strong></span></label>`).join('')}</div></fieldset>`;
+      const magicInitiateClass = viewModel.magicInitiateClass ? titleCase(viewModel.magicInitiateClass) : 'Cleric';
+      bgContent += `<fieldset class="choice-group"><legend>Magic Initiate: ${escapeHtml(magicInitiateClass)}</legend><p class="hint">Choose your spellcasting ability for Magic Initiate spells:</p><div class="choice-list">${['int', 'wis', 'cha'].map((ability) => `<label><input type="radio" name="spellcasting-ability" value="${ability}" ${viewModel.spellcastingAbility === ability ? 'checked' : ''} /><span><strong>${titleCase(ability === 'int' ? 'intelligence' : ability === 'wis' ? 'wisdom' : 'charisma')}</strong></span></label>`).join('')}</div></fieldset>`;
       bgContent += renderBgSpellChoices();
     }
   }

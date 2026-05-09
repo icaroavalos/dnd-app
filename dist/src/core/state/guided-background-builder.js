@@ -1,4 +1,5 @@
-export const SUPPORTED_GUIDED_BACKGROUNDS = ['Acolyte', 'Soldier'];
+import { parseBackground } from '../character/background-parser.js';
+export const SUPPORTED_GUIDED_BACKGROUNDS = [];
 const ABILITY_LABELS = {
     str: 'Strength',
     dex: 'Dexterity',
@@ -6,26 +7,6 @@ const ABILITY_LABELS = {
     int: 'Intelligence',
     wis: 'Wisdom',
     cha: 'Charisma',
-};
-const GUIDED_BACKGROUND_DEFINITIONS = {
-    Acolyte: {
-        name: 'Acolyte',
-        abilityOptions: ['int', 'wis', 'cha'],
-        skills: ['Insight', 'Religion'],
-        tools: ["Calligrapher's Supplies"],
-        equipmentOptionAHint: 'Items based on background',
-        equipmentOptionBHint: '50 GP gold',
-        showsMagicInitiate: true,
-    },
-    Soldier: {
-        name: 'Soldier',
-        abilityOptions: ['str', 'dex', 'con'],
-        skills: ['Athletics', 'Intimidation'],
-        tools: ['Gaming Set', 'Land Vehicles'],
-        equipmentOptionAHint: 'Items based on background',
-        equipmentOptionBHint: '50 GP gold',
-        showsMagicInitiate: false,
-    },
 };
 export function createGuidedBackgroundChoiceState(background) {
     return {
@@ -39,8 +20,8 @@ export function createGuidedBackgroundChoiceState(background) {
         spellcastingAbility: null,
     };
 }
-export function ensureGuidedBackgroundChoiceState(bgChoices, backgroundFallback) {
-    const normalizedBackground = normalizeGuidedBackground(bgChoices?.background ?? backgroundFallback);
+export function ensureGuidedBackgroundChoiceState(bgChoices, backgroundFallback, source) {
+    const normalizedBackground = normalizeGuidedBackground(bgChoices?.background ?? backgroundFallback, source);
     return {
         background: normalizedBackground,
         source: bgChoices?.source ?? 'XPHB',
@@ -52,18 +33,17 @@ export function ensureGuidedBackgroundChoiceState(bgChoices, backgroundFallback)
         spellcastingAbility: bgChoices?.spellcastingAbility ?? null,
     };
 }
-export function buildGuidedBackgroundViewModel(bgChoices) {
-    const backgroundName = normalizeGuidedBackground(bgChoices?.background);
-    const background = backgroundName ? GUIDED_BACKGROUND_DEFINITIONS[backgroundName] : null;
+export function buildGuidedBackgroundViewModel(bgChoices, source) {
+    const backgroundName = normalizeGuidedBackground(bgChoices?.background, source);
+    const background = backgroundName ? getGuidedBackgroundDefinition(backgroundName, source) : null;
     const selectedAbilityCount = Array.isArray(bgChoices?.abilityScores) ? bgChoices.abilityScores.length : 0;
     const maxAbilityChoices = bgChoices?.abilityIncrement === '2_1' ? 2 : bgChoices?.abilityIncrement === '1_1_1' ? 3 : 0;
     const bonuses = calculateGuidedBackgroundAbilityBonuses(bgChoices ?? null);
     return {
         currentBackground: backgroundName,
-        options: SUPPORTED_GUIDED_BACKGROUNDS.map((name) => ({
-            value: name,
-            label: name,
-            selected: name === backgroundName,
+        options: getGuidedBackgroundOptions(source).map((option) => ({
+            ...option,
+            selected: option.value === backgroundName,
         })),
         abilityOptions: (background?.abilityOptions ?? []).map((ability) => {
             const selected = Boolean(bgChoices?.abilityScores?.includes(ability));
@@ -95,6 +75,7 @@ export function buildGuidedBackgroundViewModel(bgChoices) {
         selectedAbilityCount,
         maxAbilityChoices,
         showsMagicInitiate: Boolean(background?.showsMagicInitiate),
+        magicInitiateClass: background?.magicInitiateClass ?? null,
         spellcastingAbility: bgChoices?.spellcastingAbility ?? null,
     };
 }
@@ -140,10 +121,62 @@ export function applyGuidedBackgroundSpellcastingAbility(bgChoices, spellcasting
         spellcastingAbility,
     };
 }
-export function normalizeGuidedBackground(background) {
-    return SUPPORTED_GUIDED_BACKGROUNDS.includes(background)
+export function normalizeGuidedBackground(background, source) {
+    if (!background)
+        return null;
+    if (!source)
+        return background;
+    return getGuidedBackgroundOptions(source).some((option) => option.value === background)
         ? background
         : null;
+}
+function getGuidedBackgroundOptions(source) {
+    return (source?.backgroundOptions ?? [])
+        .filter(([value]) => Boolean(getRawBackground(value, source)))
+        .map(([value, label]) => ({ value, label }));
+}
+function getGuidedBackgroundDefinition(backgroundName, source) {
+    const rawBackground = getRawBackground(backgroundName, source);
+    if (!rawBackground)
+        return null;
+    const parsed = parseBackground(rawBackground);
+    const abilityOptions = uniqueAbilities(parsed.abilityScores.flatMap((ability) => ability.options));
+    return {
+        name: parsed.name,
+        abilityOptions,
+        skills: parsed.skillProficiencies.map(formatChoiceLabel),
+        tools: parsed.toolProficiencies.map(formatChoiceLabel),
+        equipmentOptionAHint: formatEquipmentOption(parsed.equipment.optionA),
+        equipmentOptionBHint: formatEquipmentOption(parsed.equipment.optionB),
+        showsMagicInitiate: parsed.magicInitiate !== null,
+        magicInitiateClass: parsed.magicInitiate?.className ?? null,
+    };
+}
+function getRawBackground(backgroundName, source) {
+    return source?.backgroundDetails?.[backgroundName.toLowerCase()] ?? null;
+}
+function uniqueAbilities(abilities) {
+    return [...new Set(abilities)];
+}
+function formatChoiceLabel(value) {
+    return value
+        .replace(/^any([A-Z])/, '$1')
+        .replace(/_/g, ' ')
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+}
+function formatEquipmentOption(option) {
+    const itemsText = (option.items ?? [])
+        .map((item) => `${item.quantity ? `${item.quantity}x ` : ''}${cleanItemName(item.displayName ?? item.name)}`)
+        .join(', ');
+    const goldText = typeof option.goldValue === 'number' ? `${Math.floor(option.goldValue / 100)} GP` : '';
+    return [itemsText, goldText].filter(Boolean).join(', ') || 'Items based on background';
+}
+function cleanItemName(value) {
+    return value.split('|')[0] ?? value;
 }
 function calculateGuidedBackgroundAbilityBonuses(bgChoices) {
     const bonuses = {

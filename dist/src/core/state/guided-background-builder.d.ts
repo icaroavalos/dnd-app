@@ -1,9 +1,12 @@
-import type { AbilityName, AbilityIncrementPattern, BackgroundChoiceState } from '../../types/background.js';
-export declare const SUPPORTED_GUIDED_BACKGROUNDS: readonly ["Acolyte", "Soldier"];
-type SupportedGuidedBackground = typeof SUPPORTED_GUIDED_BACKGROUNDS[number];
+import type { AbilityName, AbilityIncrementPattern, BackgroundChoiceState, RawBackground } from '../../types/background.js';
+export declare const SUPPORTED_GUIDED_BACKGROUNDS: readonly string[];
+interface GuidedBackgroundSource {
+    backgroundOptions?: [string, string][];
+    backgroundDetails?: Record<string, RawBackground>;
+}
 export interface GuidedBackgroundOption {
-    value: SupportedGuidedBackground;
-    label: SupportedGuidedBackground;
+    value: string;
+    label: string;
     selected: boolean;
 }
 export interface GuidedAbilityOption {
@@ -14,7 +17,7 @@ export interface GuidedAbilityOption {
     bonus: number;
 }
 export interface GuidedBackgroundViewModel {
-    currentBackground: SupportedGuidedBackground | null;
+    currentBackground: string | null;
     options: GuidedBackgroundOption[];
     abilityOptions: GuidedAbilityOption[];
     skills: string[];
@@ -28,15 +31,16 @@ export interface GuidedBackgroundViewModel {
     selectedAbilityCount: number;
     maxAbilityChoices: number;
     showsMagicInitiate: boolean;
+    magicInitiateClass: string | null;
     spellcastingAbility: AbilityName | null;
 }
-export declare function createGuidedBackgroundChoiceState(background: SupportedGuidedBackground): BackgroundChoiceState;
-export declare function ensureGuidedBackgroundChoiceState(bgChoices: BackgroundChoiceState | null | undefined, backgroundFallback?: string | null): BackgroundChoiceState;
-export declare function buildGuidedBackgroundViewModel(bgChoices?: BackgroundChoiceState | null): GuidedBackgroundViewModel;
+export declare function createGuidedBackgroundChoiceState(background: string): BackgroundChoiceState;
+export declare function ensureGuidedBackgroundChoiceState(bgChoices: BackgroundChoiceState | null | undefined, backgroundFallback?: string | null, source?: GuidedBackgroundSource | null): BackgroundChoiceState;
+export declare function buildGuidedBackgroundViewModel(bgChoices?: BackgroundChoiceState | null, source?: GuidedBackgroundSource | null): GuidedBackgroundViewModel;
 export declare function applyGuidedBackgroundIncrement(bgChoices: BackgroundChoiceState, increment: AbilityIncrementPattern): BackgroundChoiceState;
 export declare function toggleGuidedBackgroundAbility(bgChoices: BackgroundChoiceState, ability: AbilityName, checked: boolean): BackgroundChoiceState;
 export declare function applyGuidedBackgroundEquipmentChoice(bgChoices: BackgroundChoiceState | null | undefined, equipmentChoice: 'A' | 'B'): BackgroundChoiceState;
 export declare function applyGuidedBackgroundSpellcastingAbility(bgChoices: BackgroundChoiceState | null | undefined, spellcastingAbility: AbilityName): BackgroundChoiceState;
-export declare function normalizeGuidedBackground(background: string | null | undefined): SupportedGuidedBackground | null;
+export declare function normalizeGuidedBackground(background: string | null | undefined, source?: GuidedBackgroundSource | null): string | null;
 export {};
 //# sourceMappingURL=guided-background-builder.d.ts.map

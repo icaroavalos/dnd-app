@@ -54,7 +54,9 @@ function parseToolProficiencies(raw: RawBackground['toolProficiencies']): string
 
   return raw.flatMap((group) => {
     if (typeof group === 'object' && group !== null) {
-      return Object.keys(group).filter((key) => group[key] === true);
+      return Object.entries(group)
+        .filter(([, value]) => value === true || typeof value === 'number')
+        .map(([key]) => key);
     }
     return [];
   });
