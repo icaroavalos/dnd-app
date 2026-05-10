@@ -26,7 +26,7 @@ import {
   getDefaultSaves,
   getDefaultSubrace,
   getSubracesFor,
-  hasLoadedRules as hasLoadedRulesCore,
+  hasLoadedRulesCore,
   isStandardArrayPermutation as isStandardArrayPermutationCore,
   optionNames,
   signed,
@@ -126,7 +126,7 @@ import {
 import { createFormControls } from "./src/app/form-controls.js";
 import { compactRange, damageTypeLabel, ordinalLabel, propertyLabel, rangeLabel, spellLevelLabel } from "./src/app/labels.js";
 import { createInventoryHelpers } from "./src/app/inventory-helpers.js";
-import { build5etoolsApi, walkEntries } from "./src/app/5etools-source.js";
+import { build5etoolsApi, walkEntries } from "./src/app/5etools-source.js?v=species-catalog";
 import { createSheetRenderers } from "./src/app/sheet-renderers.js";
 import { createSpellHelpers } from "./src/app/spell-helpers.js";
 import { createResourceHelpers } from "./src/app/resource-helpers.js";
@@ -212,7 +212,7 @@ const defaultState = {
   },
 };
 
-let state = loadState();
+let state = typedLoadState(defaultState);
 let ruleRepository = new RuleRepository();
 const { field, numberField, selectField, checkbox } = createFormControls({ escapeHtml });
 const {
@@ -483,6 +483,7 @@ const storageFacade = createCharacterStorageFacade({
 init();
 
 async function init() {
+  state = await loadState();
   state.api.spellDetails ??= {};
   state.api.classSpells ??= {};
   Object.entries(state.api.classSpells).forEach(([className, spells]) => {
@@ -1790,6 +1791,10 @@ function backgroundSkillProficiencies(backgroundName = state.character.backgroun
   );
 }
 
+function classSkillRule(className = state.character.class) {
+  return getClassSkillRule(className, state.api.classes, SKILLS);
+}
+
 
 // Magic Initiate Background Spell Choices
 function getBackgroundGrantedSpells() {
@@ -1920,4 +1925,3 @@ function updateChoiceList(listName, value, checked) {
   const next = checked ? [...current, value] : current.filter((item) => item !== value);
   state.character[listName] = [...new Set(next)];
 }
-

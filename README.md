@@ -12,7 +12,7 @@ A memoria viva da arquitetura agora fica em:
 - [docs/sessions.md](/Users/icaro/codes/dnd-app/docs/sessions.md)
 - [docs/learnings.md](/Users/icaro/codes/dnd-app/docs/learnings.md)
 
-Estado auditado em 2026-05-08: o backend passa `npm test` com 136 testes, mas ainda falha `npm run typecheck`. O proximo passo do MVP backend e corrigir typecheck antes de adicionar novas features.
+Estado auditado em 2026-05-10: backend e frontend estao com typecheck e testes principais verdes. A revisao de QA tambem validou o carregamento real do app no navegador e corrigiu quebras de runtime em imports/boot.
 
 ## Como rodar
 
@@ -81,14 +81,13 @@ Ele ja passou do primeiro slice de implementação e hoje expõe:
 - `POST /inventory/spend-ammo`
 - `POST /inventory/recover-ammo`
 
-Tambem existem slices parciais de persistencia e ledger:
+Persistencia e ledger hoje tambem estao expostos em:
 
-- `GET/POST/PUT/DELETE /characters-persistence`
-- `GET/POST /characters-storage`
+- `GET/POST/PUT/DELETE /characters`
 - `POST/GET /characters/:characterId/resources/*`
 - `GET/POST /characters/:characterId/resources/projection`
 
-Esses slices de persistencia ainda precisam de alinhamento de contrato antes de virar caminho canonico do MVP.
+Observacao: o Prisma e o caminho canonico atual para `CharacterRecord`; ainda existe residuo documental/dados locais de persistencia JSON legado.
 
 ### Instalação do backend
 
@@ -131,7 +130,7 @@ npm run backend:test
 npm run backend:build
 ```
 
-Observacao atual: em 2026-05-08, `npm run backend:test` passa, mas `npm run backend:typecheck` falha por inconsistencias entre testes/contratos e resource projection. Consulte [docs/Architecture_memory.md](/Users/icaro/codes/dnd-app/docs/Architecture_memory.md) antes de prosseguir no backend.
+Observacao atual: em 2026-05-10, `npm run backend:test` e `npm run backend:typecheck` passam. Consulte [docs/Architecture_memory.md](/Users/icaro/codes/dnd-app/docs/Architecture_memory.md) e [docs/agents/task-board.md](/Users/icaro/codes/dnd-app/docs/agents/task-board.md) antes de prosseguir no backend.
 
 ### Endpoints de domínio já implementados
 
@@ -272,6 +271,7 @@ Testes:
 ```bash
 npm test
 node --test tests/*.test.js
+node --test tests/*.test.js tests/contract/*.test.js
 ```
 
 Fluxo recomendado antes de fechar uma mudança:
@@ -280,7 +280,10 @@ Fluxo recomendado antes de fechar uma mudança:
 npm run build
 npm run typecheck
 node --check app.js
+for f in src/app/*.js src/app/builder/*.js; do node --check "$f" || exit 1; done
 node --test tests/*.test.js
+npm --prefix backend run test
+npm --prefix backend run typecheck
 ```
 
 ## Visão rápida do repositório

@@ -46,14 +46,14 @@ async function loadLocalData(): Promise<Record<string, any>> {
   try {
     // Tenta carregar do módulo de dados locais
     const modules = {
-      backgrounds: () => import('../../data/5etools/5e-2024/backgrounds.json'),
-      classes: () => import('../../data/5etools/5e-2024/classes.json'),
-      spells: () => import('../../data/5etools/5e-2024/spells.json'),
-      'class-spells': () => import('../../data/5etools/5e-2024/class-spells.json'),
-      species: () => import('../../data/5etools/5e-2024/races.json'),
-      items: () => import('../../data/5etools/5e-2024/equipment.json'),
-      features: () => import('../../data/5etools/5e-2024/class-features.json'),
-      feats: () => import('../../data/5etools/5e-2024/feats.json'),
+      backgrounds: () => loadLocalCatalog('../../data/5etools/5e-2024/backgrounds.json'),
+      classes: () => loadLocalCatalog('../../data/5etools/5e-2024/classes.json'),
+      spells: () => loadLocalCatalog('../../data/5etools/5e-2024/spells.json'),
+      'class-spells': () => loadLocalCatalog('../../data/5etools/5e-2024/class-spells.json'),
+      species: () => loadLocalCatalog('../../data/5etools/5e-2024/races.json'),
+      items: () => loadLocalCatalog('../../data/5etools/5e-2024/equipment.json'),
+      features: () => loadLocalCatalog('../../data/5etools/5e-2024/class-features.json'),
+      feats: () => loadLocalCatalog('../../data/5etools/5e-2024/feats.json'),
     };
 
     const results: Record<string, any> = {};
@@ -70,6 +70,23 @@ async function loadLocalData(): Promise<Record<string, any>> {
     return results;
   } catch {
     return {};
+  }
+}
+
+async function loadLocalCatalog(path: string): Promise<any> {
+  try {
+    const data = await import(path);
+    return data.default || data;
+  } catch (importError) {
+    if (typeof fetch !== 'function') {
+      throw importError;
+    }
+    const url = new URL(path, import.meta.url);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw importError;
+    }
+    return response.json();
   }
 }
 

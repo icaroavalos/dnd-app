@@ -67,7 +67,7 @@ function createBaseCharacter(overrides = {}) {
 }
 
 test('api-character-project-client: projectCharacter returns backend projection on success', async () => {
-  const { projectCharacter } = await import('../src/lib/api-character-project-client.ts');
+  const { projectCharacter } = await import('../dist/src/lib/api-character-project-client.js');
 
   mockFetchSuccess({
     ruleset: '5.5e-2024',
@@ -111,7 +111,7 @@ test('api-character-project-client: projectCharacter returns backend projection 
 });
 
 test('api-character-project-client: projectCharacter throws on backend failure', async () => {
-  const { projectCharacter } = await import('../src/lib/api-character-project-client.ts');
+  const { projectCharacter } = await import('../dist/src/lib/api-character-project-client.js');
 
   mockFetchFailure();
 
@@ -126,7 +126,7 @@ test('api-character-project-client: projectCharacter throws on backend failure',
 });
 
 test('api-character-project-client: projectCharacter handles spellcasting correctly', async () => {
-  const { projectCharacter } = await import('../src/lib/api-character-project-client.ts');
+  const { projectCharacter } = await import('../dist/src/lib/api-character-project-client.js');
 
   mockFetchSuccess({
     ruleset: '5.5e-2024',
@@ -166,7 +166,7 @@ test('api-character-project-client: projectCharacter handles spellcasting correc
 });
 
 test('api-character-project-client: createDebouncedProjector debounces calls', async () => {
-  const { createDebouncedProjector } = await import('../src/lib/api-character-project-client.ts');
+  const { createDebouncedProjector } = await import('../dist/src/lib/api-character-project-client.js');
 
   mockFetchSuccess({
     ruleset: '5.5e-2024',
@@ -210,7 +210,7 @@ test('api-character-project-client: createDebouncedProjector debounces calls', a
 });
 
 test('api-character-project-client: createDebouncedProjector cancel works', async () => {
-  const { createDebouncedProjector } = await import('../src/lib/api-character-project-client.ts');
+  const { createDebouncedProjector } = await import('../dist/src/lib/api-character-project-client.js');
 
   mockFetchSuccess({
     ruleset: '5.5e-2024',
@@ -250,8 +250,8 @@ test('api-character-project-client: createDebouncedProjector cancel works', asyn
 });
 
 test('character-projection: projectCharacterSheet uses backend by default', async () => {
-  const { projectCharacter } = await import('../src/lib/api-character-project-client.ts');
-  const { projectCharacterSheet } = await import('../src/core/character/character-projection.ts');
+  const { projectCharacter } = await import('../dist/src/lib/api-character-project-client.js');
+  const { projectCharacterSheet } = await import('../dist/src/core/character/character-projection.js');
 
   mockFetchSuccess({
     ruleset: '5.5e-2024',
@@ -287,7 +287,7 @@ test('character-projection: projectCharacterSheet uses backend by default', asyn
 });
 
 test('character-projection: projectCharacterSheet falls back to local when backend fails', async () => {
-  const { projectCharacterSheet } = await import('../src/core/character/character-projection.ts');
+  const { projectCharacterSheet } = await import('../dist/src/core/character/character-projection.js');
 
   mockFetchFailure();
 
@@ -304,7 +304,7 @@ test('character-projection: projectCharacterSheet falls back to local when backe
 });
 
 test('character-projection: enableBackendProjection can disable backend', async () => {
-  const { projectCharacterSheet, enableBackendProjection } = await import('../src/core/character/character-projection.ts');
+  const { projectCharacterSheet, enableBackendProjection } = await import('../dist/src/core/character/character-projection.js');
 
   // Disable backend
   enableBackendProjection(false);
@@ -324,7 +324,7 @@ test('character-projection: enableBackendProjection can disable backend', async 
 });
 
 test('api-character-project-client: shape equivalence with backend', async () => {
-  const { projectCharacter } = await import('../src/lib/api-character-project-client.ts');
+  const { projectCharacter } = await import('../dist/src/lib/api-character-project-client.js');
 
   const backendResponse = {
     ruleset: '5.5e-2024',

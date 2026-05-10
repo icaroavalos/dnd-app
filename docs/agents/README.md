@@ -15,6 +15,8 @@ Este diretorio e o ponto de entrada para agentes operacionais de menor capacidad
 
 Use `docs/agents/prompts-para-copiar.md`. Ele contem prompts sequenciais prontos para enviar a outros agentes, incluindo prompts de implementacao, revisao e QA final.
 
+Para a demanda especifica de tornar o backend a fonte obrigatoria do frontend e remover fallback/hardcode de runtime, use `docs/agents/conexao-backend-frontend-prompts.txt`.
+
 ## Regra de trabalho
 
 - Execute uma tarefa por vez.

@@ -2,17 +2,17 @@ export function build5etoolsApi(
   { classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds },
   { slugifyName, entriesToText, itemKey, deriveProficiencyBonus, buildSpellClassIndex, normalize5etoolsSpell },
 ) {
-  const classResults = classes.results ?? [];
-  const raceResults = races.results ?? [];
-  const subraceResults = subraces.results ?? [];
-  const backgroundResults = backgrounds.results ?? [];
-  const equipmentResults = equipment.results ?? [];
-  const spellResults = spells.results ?? [];
-  const classSpellResults = classSpells.results ?? {};
-  const classFeatureResults = classFeatures.results ?? [];
-  const subclassFeatureResults = subclassFeatures.results ?? [];
-  const subclassResults = subclasses.results ?? [];
-  const featResults = feats.results ?? [];
+  const classResults = resultsOf(classes);
+  const raceResults = resultsOf(races);
+  const subraceResults = resultsOf(subraces);
+  const backgroundResults = resultsOf(backgrounds);
+  const equipmentResults = resultsOf(equipment);
+  const spellResults = resultsOf(spells);
+  const classSpellResults = resultsObjectOf(classSpells);
+  const classFeatureResults = resultsOf(classFeatures);
+  const subclassFeatureResults = resultsOf(subclassFeatures);
+  const subclassResults = resultsOf(subclasses);
+  const featResults = resultsOf(feats);
   const spellByKey = new Map(spellResults.map((spell) => [`${spell.name.toLowerCase()}|${spell.source.toLowerCase()}`, spell]));
 
   const normalizedClassSpells = Object.fromEntries(Object.values(classSpellResults).map((list) => {
@@ -132,6 +132,16 @@ export function build5etoolsApi(
       spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), normalize5etoolsSpell(spell, spellClassIndex)])),
     },
   };
+}
+
+function resultsOf(value) {
+  if (Array.isArray(value)) return value;
+  return value?.results ?? [];
+}
+
+function resultsObjectOf(value) {
+  if (Array.isArray(value)) return value;
+  return value?.results ?? {};
 }
 
 function inferAncestryOptionsFromEntries(entries) {

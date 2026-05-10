@@ -242,7 +242,7 @@ export function createLevelUpRenderer({
     };
   }
 
-  function slugify(value: string): string {
+  function slugify(value) {
     return String(value ?? '')
       .toLowerCase()
       .normalize('NFD')

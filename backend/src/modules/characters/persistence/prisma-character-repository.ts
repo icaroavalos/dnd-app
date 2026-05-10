@@ -60,7 +60,7 @@ export class PrismaCharacterRepository {
       },
     });
 
-    return characters.map((char) => ({
+    return characters.map((char: any) => ({
       id: char.id,
       name: char.name,
       level: this.calculateTotalLevel(char),

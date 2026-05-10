@@ -13,4 +13,4 @@ export {
   entriesToText,
   entryToText,
   spellSchoolName,
-} from '../lib/formatter.js';
+} from '../../dist/src/lib/formatter.js';
