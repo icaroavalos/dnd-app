@@ -21,8 +21,9 @@ import {
 /**
  * Flag para habilitar projeção via backend (se disponível).
  * Quando true, tenta usar POST /characters/project do backend.
+ * Habilitado por default - backend tem fallback local embutido.
  */
-let useBackendProjection = false;
+let useBackendProjection = true;
 
 export function enableBackendProjection(enabled: boolean) {
   useBackendProjection = enabled;
