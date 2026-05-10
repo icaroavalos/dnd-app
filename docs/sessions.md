@@ -46,6 +46,63 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T19:15-0400 - Task 10: Persistencia de personagens backend-only (sem localStorage fallback)
+
+**Timestamp:** 2026-05-10T19:15-0400
+
+**Objetivo:** Tornar persistencia de personagens backend-only para dados canonicos. Remover fallback localStorage de create/list/get/update/delete. Manter localStorage apenas para preferencias/ultimo personagem.
+
+**Arquivos modificados:**
+- `src/lib/api-character-storage-client.ts` - Reescrito com CharacterStorageError, sem fallback
+- `src/app/character-storage-facade.js` - Remove fallback localStorage
+- `src/core/state/persistence.ts` - Remove fallback local das funcoes
+
+**Arquivos criados:**
+- `tests/character-storage-client.test.js` - 13 testes (CRUD sucesso/falha, sem fallback)
+
+**Comandos rodados:**
+```bash
+node --import tsx --test tests/character-storage-client.test.js  # 13/13 passed
+npm run typecheck  # exit 0
+npm --prefix backend run test  # 177/177 passed
+```
+
+**Mudancas:**
+1. `api-character-storage-client.ts`:
+   - Nova classe `CharacterStorageError` extends Error
+   - listCharacters, getCharacter, createCharacter, updateCharacter, deleteCharacter lancam erro se backend falhar
+   - Sem fallback local - backend e obrigatorio para dados canonicos
+
+2. `character-storage-facade.js`:
+   - Remove `loadAll()` com fallback localStorage
+   - Remove `save()` com fallback localStorage
+   - Remove `deleteCharacter()` com fallback localStorage
+   - Mantem `clearLocal()` apenas para ID do personagem ativo (preferencia de sessao)
+
+3. `persistence.ts`:
+   - `saveCharacterToBackend()`: sem fallback, lanca erro
+   - `loadCharacterFromBackend()`: sem fallback, lanca erro
+   - `listAllCharacters()`: sem fallback, lanca erro
+   - `deleteCharacterFromBackend()`: sem fallback, lanca erro
+
+4. localStorage mantido para:
+   - Preferencias de UI (tema, layout, expansao de secoes)
+   - ID do ultimo personagem selecionado (restaurar sessao)
+   - Nao para dados canonicos de personagens
+
+5. Testes:
+   - Sucesso: list, get, create, update, delete retornam dados do backend
+   - Falha de rede: lanca CharacterStorageError
+   - HTTP 404: getCharacter retorna null, outros lancam erro
+   - HTTP 500: lanca CharacterStorageError
+   - Sem fallback: confirma que erro e lancado, sem localStorage
+
+**Resultado:** ✅ Persistencia de personagens agora exige backend. Erro visivel ao usuario se indisponivel. localStorage usado apenas para preferencias de UI e sessao. Consistente com padroes de actions (Task 08) e resources (Task 09).
+
+**Commit:** `1175fd4 refactor: require backend for character storage (no localStorage fallback)`
+
+**Status:** DONE
+
 ## 2026-05-10T19:00-0400 - Task 09: Mutacoes de resources e inventory backend-only no frontend
 
 **Timestamp:** 2026-05-10T19:00-0400
