@@ -46,6 +46,38 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T14:58-0400 - Task 03: Expor catálogos completos no backend
+
+**Timestamp:** 2026-05-10T14:58-0400
+
+**Objective:** Garantir que o backend exponha catálogos completos para criacao sem depender de fallback no frontend.
+
+**Files modified:**
+- `backend/test/contract/rules-catalog-contract.spec.ts` - Testes de contrato para catálogos de regras
+
+**Commands run:**
+```bash
+npm --prefix backend run test # all tests passed
+npm --prefix backend run typecheck # PASS
+git commit -m "test: fix rules catalog contract tests"
+```
+
+**Correções nos testes:**
+- backgrounds: removido 'Folk Hero' (não está nos dados 2024), adicionado 'Noble'
+- class-spells: removido Fighter (não é caster), adicionado Paladin e Ranger
+
+**Catálogos validados:**
+- `/rules/species` - 40+ espécies (PHB + MPMM)
+- `/rules/classes` - 13 classes
+- `/rules/backgrounds` - 56 backgrounds (2024 rules)
+- `/rules/spells` - 350+ spells
+- `/rules/features` - 300+ features (class + subclass)
+- `/rules/items` - 100+ itens
+- `/rules/feats` - 70+ feats
+- `/rules/class-spells` - 8 listas de magia (apenas classes caster)
+
+**Status:** DONE
+
 ## 2026-05-10T13:30-0400 - QA Senior Runtime Audit
 
 **Objective:** testar o app depois da refatoracao completa, corrigir regressões necessarias e documentar o estado atual.
