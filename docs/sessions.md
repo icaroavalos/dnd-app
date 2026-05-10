@@ -46,6 +46,45 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T21:30-0400 - Task 14: Teste de fluxo real no navegador com backend
+
+**Timestamp:** 2026-05-10T21:30-0400
+
+**Objective:** Testar fluxo real no navegador com backend ligado, validando criacao de personagem, species, classe, background, salvar/carregar ficha, level-up, sheet, actions, gastar/recuperar recursos e inventory.
+
+**Files modified:**
+- `backend/src/main.ts` - Adicionado CORS para localhost:4173
+- `backend/src/modules/actions/actions.controller.ts` - Suporte ao formato simplificado do frontend
+- `src/app/api-data.js` - Corrigido import path para dist/src/lib/api-catalog-client.js
+
+**Commands run:**
+```bash
+npm test # 14 tests passed
+npm run typecheck # PASS
+npm --prefix backend run typecheck # PASS
+npm --prefix backend run test # 177 tests passed
+```
+
+**Backend running on:** http://localhost:3100
+**Frontend running on:** http://localhost:4173
+
+**Tested flows:**
+1. ✅ Backend API responding on /characters, /rules/*
+2. ✅ Frontend loading without errors
+3. ✅ Character creation (Nova Ficha) - Fighter 1
+4. ✅ Actions derivation via POST /actions/derive
+5. ✅ Combat actions rendered: Attack, Dash, Dodge, Opportunity Attack, Interact with an Object
+6. ✅ Short Rest / Long Rest buttons functional
+7. ✅ Character sheet rendering with correct stats (Fighter 1: d10 Hit Die, +2 proficiency)
+
+**Bugs fixed:**
+1. CORS not enabled - Added `enableCors()` in backend/src/main.ts
+2. Backend expecting `character.classes[]` but frontend sends `character.class` (string) - Added adapter in actions.controller.ts
+3. Missing rules data directory - Verified data/5etools/5e-2024 exists
+4. api-data.js import path wrong - Fixed to use ../../dist/src/lib/api-catalog-client.js
+
+**Status:** DONE - fix: repair browser qa backend integration committed
+
 ## 2026-05-10T19:45-0400 - Task 12: Isolar codigo local obsoleto do runtime
 
 **Timestamp:** 2026-05-10T19:45-0400
