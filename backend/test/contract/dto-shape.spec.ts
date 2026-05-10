@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createApp } from '../../src/main.js';
+import { RULESET_ID } from '@shared/contracts';
 
 /**
  * Testes de contrato para o shape dos DTOs da API.
@@ -9,6 +10,40 @@ import { createApp } from '../../src/main.js';
  * Estes testes validam que os endpoints aceitam e retornam
  * os formatos esperados, garantindo estabilidade da API.
  */
+
+// ============================================================================
+// CharacterRecord DTO
+// ============================================================================
+
+function createBaseCharacter(overrides: any = {}) {
+  return {
+    id: `char-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    ruleset: RULESET_ID,
+    name: 'Test Character',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 16, dex: 14, con: 14, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [],
+    spellChoices: [],
+    backgroundChoices: null,
+    attacks: [],
+    resources: {},
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: [],
+    },
+    ...overrides,
+  };
+}
 
 // ============================================================================
 // UseResourceRequestDto
@@ -21,11 +56,17 @@ test('DTO shape: POST /resources/use accepts UseResourceRequestDto', async () =>
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
+    const characterWithResources = createBaseCharacter({
+      resources: {
+        second_wind: { current: 1, max: 1, recovery: 'short_rest' }
+      }
+    });
+
     const response = await app.inject({
       method: 'POST',
       url: '/resources/use',
       payload: {
-        character: createBaseCharacter(),
+        character: characterWithResources,
         resourceId: 'second_wind',
         amount: 1
       }
@@ -48,26 +89,32 @@ test('DTO shape: POST /resources/use accepts amount as optional (defaults to 1)'
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
+    const characterWithResources = createBaseCharacter({
+      resources: {
+        second_wind: { current: 1, max: 1, recovery: 'short_rest' }
+      }
+    });
+
     // Without amount
     const response1 = await app.inject({
       method: 'POST',
       url: '/resources/use',
       payload: {
-        character: createBaseCharacter(),
+        character: characterWithResources,
         resourceId: 'second_wind'
       }
     });
 
     assert.equal(response1.statusCode, 200);
     const body1 = response1.json();
-    assert.equal(body1.resources.second_wind.current, 0);
+    assert.equal(body1.resources.second_wind?.current, 0);
 
     // With amount = 0 (should use 1 as minimum)
     const response2 = await app.inject({
       method: 'POST',
       url: '/resources/use',
       payload: {
-        character: createBaseCharacter(),
+        character: characterWithResources,
         resourceId: 'second_wind',
         amount: 0
       }
@@ -90,11 +137,17 @@ test('DTO shape: POST /resources/recover accepts RecoverResourcesRequestDto', as
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
+    const characterWithUsedResources = createBaseCharacter({
+      resources: {
+        second_wind: { current: 0, max: 1, recovery: 'short_rest' }
+      }
+    });
+
     const response = await app.inject({
       method: 'POST',
       url: '/resources/recover',
       payload: {
-        character: createBaseCharacter(),
+        character: characterWithUsedResources,
         recovery: 'short_rest'
       }
     });
@@ -103,7 +156,7 @@ test('DTO shape: POST /resources/recover accepts RecoverResourcesRequestDto', as
 
     const body = response.json();
     assert.ok(body.resources, 'Should return character with resources');
-    assert.equal(body.resources.second_wind.current, 1, 'Should recover short_rest resources');
+    assert.equal(body.resources.second_wind?.current, 1, 'Should recover short_rest resources');
   } finally {
     await app.close();
   }
@@ -332,37 +385,210 @@ test('DTO shape: POST /actions/derive returns DerivedAction[] with consistent st
 });
 
 // ============================================================================
-// Helper Functions
+// Characters CRUD DTOs
 // ============================================================================
 
-function createBaseCharacter() {
-  return {
-    id: 'char-test',
-    ruleset: 'ld-2024',
-    name: 'Test',
-    lineageId: 'human',
-    backgroundId: 'soldier',
-    alignment: 'Neutral',
-    experience: 0,
-    classes: [{ classId: 'fighter', level: 1 }],
-    abilities: { str: 10, dex: 16, con: 14, int: 10, wis: 10, cha: 10 },
-    skillProficiencies: [],
-    savingThrowProficiencies: [],
-    inventory: [],
-    spellChoices: [],
-    resources: {
-      second_wind: { current: 1, max: 1, recovery: 'short_rest' }
-    },
-    state: {
-      hp: 10,
-      maxHpOverride: null,
-      tempHp: 0,
-      hitDiceUsed: 0,
-      spellSlotsUsed: {},
-      activeConditions: []
+test('DTO shape: POST /characters accepts CreateCharacterDto and returns CharacterRecord', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const payload = createBaseCharacter({ name: 'Contract Test' });
+    const response = await app.inject({
+      method: 'POST',
+      url: '/characters',
+      payload,
+    });
+
+    assert.equal(response.statusCode, 201);
+    const created = response.json();
+    assert.ok(created.id, 'Should return character with id');
+    assert.equal(created.name, 'Contract Test');
+    assert.ok(created.ruleset, 'Should return ruleset');
+  } finally {
+    await app.close();
+  }
+});
+
+test('DTO shape: GET /characters returns array of character summaries', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/characters',
+    });
+
+    assert.equal(response.statusCode, 200);
+    const list = response.json();
+    assert.ok(Array.isArray(list), 'Should return array');
+  } finally {
+    await app.close();
+  }
+});
+
+test('DTO shape: GET /characters/:id returns full CharacterRecord', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const createResponse = await app.inject({
+      method: 'POST',
+      url: '/characters',
+      payload: createBaseCharacter({ name: 'Find Test' }),
+    });
+    const created = createResponse.json();
+
+    const getResponse = await app.inject({
+      method: 'GET',
+      url: `/characters/${created.id}`,
+    });
+
+    assert.equal(getResponse.statusCode, 200);
+    const found = getResponse.json();
+    assert.equal(found.name, 'Find Test');
+    assert.equal(found.id, created.id);
+    assert.ok(found.abilities, 'Should return abilities');
+    assert.ok(found.state, 'Should return state');
+  } finally {
+    await app.close();
+  }
+});
+
+test('DTO shape: PUT /characters/:id accepts partial update and returns CharacterRecord', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const createResponse = await app.inject({
+      method: 'POST',
+      url: '/characters',
+      payload: createBaseCharacter({ name: 'Original Name' }),
+    });
+    const created = createResponse.json();
+
+    const updateResponse = await app.inject({
+      method: 'PUT',
+      url: `/characters/${created.id}`,
+      payload: { name: 'Updated Name' },
+    });
+
+    assert.equal(updateResponse.statusCode, 200);
+    const updated = updateResponse.json();
+    assert.equal(updated.name, 'Updated Name');
+  } finally {
+    await app.close();
+  }
+});
+
+test('DTO shape: DELETE /characters/:id returns 204 No Content', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const createResponse = await app.inject({
+      method: 'POST',
+      url: '/characters',
+      payload: createBaseCharacter({ name: 'To Delete' }),
+    });
+    const created = createResponse.json();
+
+    const deleteResponse = await app.inject({
+      method: 'DELETE',
+      url: `/characters/${created.id}`,
+    });
+
+    assert.equal(deleteResponse.statusCode, 204);
+  } finally {
+    await app.close();
+  }
+});
+
+// ============================================================================
+// Rules DTOs
+// ============================================================================
+
+test('DTO shape: GET /rules/backgrounds returns catalog response with results array', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/rules/backgrounds',
+    });
+
+    assert.equal(response.statusCode, 200);
+    const result = response.json();
+    assert.ok(result.ruleset, 'Should return ruleset');
+    assert.ok(Array.isArray(result.results), 'Should return results array');
+    if (result.results.length > 0) {
+      const first = result.results[0];
+      assert.ok(first.name, 'Should have name');
     }
-  };
-}
+  } finally {
+    await app.close();
+  }
+});
+
+test('DTO shape: GET /rules/classes returns catalog response with results array', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/rules/classes',
+    });
+
+    assert.equal(response.statusCode, 200);
+    const result = response.json();
+    assert.ok(result.ruleset, 'Should return ruleset');
+    assert.ok(Array.isArray(result.results), 'Should return results array');
+  } finally {
+    await app.close();
+  }
+});
+
+test('DTO shape: GET /rules/spells returns catalog response with results array', async () => {
+  const app = await createApp();
+
+  try {
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/rules/spells',
+    });
+
+    assert.equal(response.statusCode, 200);
+    const result = response.json();
+    assert.ok(result.ruleset, 'Should return ruleset');
+    assert.ok(Array.isArray(result.results), 'Should return results array');
+  } finally {
+    await app.close();
+  }
+});
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
 
 function createCharacterWithBow() {
   return {
