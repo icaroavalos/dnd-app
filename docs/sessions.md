@@ -85,6 +85,44 @@ npm --prefix backend run test # 177 tests passed
 
 **Status:** DONE - fix: repair browser qa backend integration committed
 
+## 2026-05-10T22:30-0400 - Task 15: Backend outage explicit in UI
+
+**Timestamp:** 2026-05-10T22:30-0400
+
+**Objective:** Testar fluxo real no navegador com backend desligado ou endpoint inválido; validar que a UI mostra falha clara, bloqueia ações dependentes e não exibe species/classes/backgrounds reduzidos ou mockados.
+
+**Files modified:**
+- `app.js` - Added apiError to defaultState, catch loadState errors, display error banner
+- `src/app/api-data.js` - Call renderChrome() after setting apiError in catch block
+
+**Commands run:**
+```bash
+npm test # 14 tests passed
+npm run typecheck # PASS
+```
+
+**Tested scenarios:**
+1. ✅ Backend desligado - UI exibe banner "Backend indisponível" com mensagem de erro clara
+2. ✅ Status bar mostra "erro ao carregar do backend" (não "local")
+3. ✅ Formulário de criação vazio - sem species, classes ou backgrounds mockados
+4. ✅ Sem fallback silencioso para dados canônicos
+5. ✅ Backend ligado - UI carrega normalmente com dados completos (5etools 2024)
+
+**Error handling flow:**
+- `loadState()` falha ao chamar `storageFacade.loadAll()` sem backend
+- Erro capturado no `init()`, define `state.apiError` e `state.dataStatus`
+- `renderChrome()` exibe banner `.backend-error-banner` no topo
+- `hydrateApiData()` não é executado se `apiError` já estiver definido
+- Formulário permanece vazio (sem dados mockados)
+
+**Visual indicators when backend unavailable:**
+- Banner vermelho no topo: "Backend indisponível" + ícone de erro
+- Message: "Backend indisponível para listar personagens. Certifique-se de que o backend está rodando."
+- Hint: "Certifique-se de que o backend está rodando em http://localhost:3100"
+- Status: "erro ao carregar do backend"
+
+**Status:** DONE - fix: make backend outage explicit in ui committed
+
 ## 2026-05-10T19:45-0400 - Task 12: Isolar codigo local obsoleto do runtime
 
 **Timestamp:** 2026-05-10T19:45-0400
