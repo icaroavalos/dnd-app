@@ -1411,3 +1411,59 @@ npm test           # 131 tests passed
 - Setup/fixtures de testes repetem blocos grandes.
 
 **Status:** DONE
+
+## 2026-05-10T20:00-0400 - Task 17: Auditoria final backend-frontend integration
+
+**Timestamp:** 2026-05-10T20:00-0400
+
+**Objective:** Auditoria final da demanda backend-only. Verificar git status, grep por fallback residuais, testes, typecheck e QA no browser com backend ligado/desligado.
+
+**Comandos rodados:**
+```bash
+git status --short # limpo
+rg -n "fallback|falling back|using fallback|local fallback|RACES.map|CLASSES.map|localStorage fallback|console.warn\(.*Backend" app.js src tests docs/agents
+npm test # 14/14 passed
+npm run typecheck # PASS
+npm --prefix backend run test # 153/153 passed
+npm --prefix backend run typecheck # PASS
+```
+
+**Resultados:**
+
+1. **Git status:** limpo, sem modificacoes pendentes
+2. **Grep por fallback:** 109 ocorrencias em 35 arquivos, todas em:
+   - Docs historicos (`docs/agents/conexao-backend-frontend-prompts.txt`, `docs/agents/prompts-para-copiar.md`, `docs/agents/refatoracao-completa-prompts.txt`)
+   - Comentarios de codigo desatualizados em `app.js:522,531` (corrigidos para "backend-only, no fallback")
+   - Implementacoes explicitas "no fallback" (ex: `api-catalog-client.ts`, `api-actions-client.ts`, `api-resource-mutations.ts`)
+   - Testes de contrato que validam erro ao inves de fallback
+3. **QA no Browser (backend desligado):**
+   - Banner "Backend indisponivel" visivel no topo
+   - Mensagem: "Backend indisponivel para listar personagens. Certifique-se de que o backend está rodando."
+   - Hint: "Certifique-se de que o backend está rodando em http://localhost:3100"
+   - Status: "erro ao carregar do backend"
+   - Formulário vazio: sem species, classes ou backgrounds mockados
+   - Console: `CharacterStorageError: Backend indisponível para listar personagens`
+4. **QA no Browser (backend ligado):**
+   - Backend health: `{"status":"ok","app":"dnd-app-backend"}`
+   - Backend ready: `{"status":"ready","rulesData":"ok"}`
+   - Frontend carrega dados completos do 5etools 2024
+
+**Arquivos grandes:**
+- `app.js`: 1.923 linhas (shell legado, extraindo para `src/app/*` gradualmente)
+- Maior arquivo de dominio: `src/core/engine/action-engine.ts` com 424 linhas
+
+**Riscos residuais:**
+- Nenhum fallback silencioso em runtime para dados canonicos
+- `character-projection.ts`: sem fallback, lanca erro se backend falhar
+- `action-engine.ts`: sem fallback, requer backend
+- `api-resource-mutations.ts`: sem fallback, lanca `ResourceMutationError`
+- `api-actions-client.ts`: sem fallback, lanca `ActionDerivationError`
+- `api-character-storage-client.ts`: sem fallback, lanca `CharacterStorageError`
+
+**Recomendacao de merge:**
+- Backend-only frontend: **APROVADO**
+- Erro visivel em falha de backend: **APROVADO**
+- Sem fallback silencioso para dados canonicos: **APROVADO**
+- Testes e typecheck verdes: **APROVADO**
+
+**Status:** DONE - docs: finalize backend-frontend integration audit

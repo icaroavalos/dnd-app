@@ -519,7 +519,7 @@ async function init() {
 }
 
 async function loadState() {
-  // Load characters from storage facade (API with localStorage fallback)
+  // Load characters from storage facade (backend-only, no fallback)
   const characters = await storageFacade.loadAll();
   // Sync with localStorage
   storageFacade.syncLocalState(characters);
@@ -528,7 +528,7 @@ async function loadState() {
 
 async function persist() {
   syncActiveCharacter();
-  // Save character to storage facade (API with localStorage fallback)
+  // Save character to storage facade (backend-only, no fallback)
   const activeChar = state.characters?.find(c => c.id === state.activeCharacterId) || state.character;
   if (activeChar && activeChar.id) {
     await storageFacade.save(activeChar);
