@@ -149,6 +149,7 @@ const defaultState = {
   step: "lineage",
   tab: "summary",
   dataStatus: "local",
+  apiError: null,
   derived: null,
   selectedSpell: "",
   actionFilter: "all",
@@ -489,7 +490,17 @@ const storageFacade = createCharacterStorageFacade({
 init();
 
 async function init() {
-  state = await loadState();
+  try {
+    state = await loadState();
+  } catch (error) {
+    state = { ...defaultState, apiError: error.message, dataStatus: "erro ao carregar do backend" };
+    console.error('Falha ao carregar estado:', error);
+  }
+  render();
+  if (state.apiError) {
+    // Erro já ocorreu, não continuar com hydrateApiData
+    return;
+  }
   state.api.spellDetails ??= {};
   state.api.classSpells ??= {};
   Object.entries(state.api.classSpells).forEach(([className, spells]) => {
@@ -503,7 +514,6 @@ async function init() {
   normalizeCharacterState();
   state.selectedSpell = typedResolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
   bindGlobalEvents();
-  render();
   await hydrateApiData();
   render();
 }

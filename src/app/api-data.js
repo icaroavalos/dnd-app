@@ -78,6 +78,7 @@ export function createApiData({
       state.dataStatus = "erro ao carregar do backend";
       state.apiError = error.message;
       console.error('Falha ao carregar catálogos do backend:', error);
+      renderChrome();
     }
   }
 
