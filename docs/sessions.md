@@ -46,6 +46,57 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T19:30-0400 - Task 11: Revisao de fallbacks silent (Tasks 07-10)
+
+**Timestamp:** 2026-05-10T19:30-0400
+
+**Objetivo:** RevisarTasks 07-10 focando dados canonicos e mutacoes. Nao aceitar fallback silencioso em projection/actions/resources/inventory/storage.
+
+**Comandos rodados:**
+```bash
+rg -n "fallback|falling back|localStorage|console.warn|derive.*local|project.*local" app.js src tests
+npm --prefix backend run test  # 177/177 passed
+npm run typecheck  # exit 0
+```
+
+**Achados da revisao:**
+
+1. **character-projection.ts (CORRIGIDO):**
+   - Tinha fallback local via `console.warn` quando backend falhava
+   - Removido: agora lanca erro se backend falhar
+   - `deriveCharacterSheet` mantida como funcao local para uso direto quando necessario
+
+2. **tests/character-projection-api.test.js (CORRIGIDO):**
+   - Teste `falls back to local when backend fails` removido
+   - Teste `enableBackendProjection can disable backend` removido
+   - Novo teste: `throws on backend failure (no fallback)`
+
+3. **tests/resource-mutations-api.test.js (CORRIGIDO):**
+   - 4 testes de fallback removidos: `useResource falls back`, `recoverShortRestResources falls back`, `spendAmmo falls back`, `recoverAmmo falls back`
+   - 4 novos testes de erro: todos validam `ResourceMutationError` ao inves de fallback local
+
+4. **character-storage-facade.js (OK):**
+   - Comentario menciona localStorage mas codigo esta correto (sem fallback)
+   - Manter apenas para preferencias/ultimo personagem
+
+5. **resource-helpers.js (OK):**
+   - Sem fallback local apos Tasks 09-10
+   - Dependentes devem tratar erro
+
+6. **api-*.ts clients (OK):**
+   - Todos com erro tipado (`ActionDerivationError`, `ResourceMutationError`, `CharacterStorageError`)
+   - Sem fallback local
+
+**Riscos encontrados:**
+- Nenhum risco critico - todas as falhas de fallback foram corrigidas
+- localStorage mantido apenas para preferencias de UI (tema, layout) e ID do ultimo personagem (sessao)
+
+**Padrao estabelecido:**
+- Dados canonicos (personagens, resources, inventory, actions, projection): backend-only, erro visivel
+- Preferencias UI (tema, layout, ultimo personagem): localStorage permitido
+
+**Status:** DONE
+
 ## 2026-05-10T19:15-0400 - Task 10: Persistencia de personagens backend-only (sem localStorage fallback)
 
 **Timestamp:** 2026-05-10T19:15-0400

@@ -286,38 +286,19 @@ test('character-projection: projectCharacterSheet uses backend by default', asyn
   }
 });
 
-test('character-projection: projectCharacterSheet falls back to local when backend fails', async () => {
+test('character-projection: projectCharacterSheet throws on backend failure (no fallback)', async () => {
   const { projectCharacterSheet } = await import('../dist/src/core/character/character-projection.js');
 
   mockFetchFailure();
 
   try {
-    // Consola.warn será chamado, mas não deve throw
-    const result = await projectCharacterSheet(createBaseCharacter());
-    assert.ok(result, 'Should return projection');
-    assert.equal(result.level, 1);
-    assert.ok(result.abilityScores);
-    assert.ok(result.armorClass);
-  } finally {
-    restoreFetch();
-  }
-});
-
-test('character-projection: enableBackendProjection can disable backend', async () => {
-  const { projectCharacterSheet, enableBackendProjection } = await import('../dist/src/core/character/character-projection.js');
-
-  // Disable backend
-  enableBackendProjection(false);
-
-  try {
-    mockFetchSuccess({}); // Should not be called
-
-    const result = await projectCharacterSheet(createBaseCharacter());
-    assert.ok(result, 'Should return local projection');
-    assert.equal(result.level, 1); // Local projection returns level=1
-
-    // Re-enable for other tests
-    enableBackendProjection(true);
+    await assert.rejects(
+      async () => projectCharacterSheet(createBaseCharacter()),
+      {
+        message: /Network error|Failed/,
+      },
+      'Should throw on backend failure - no local fallback'
+    );
   } finally {
     restoreFetch();
   }

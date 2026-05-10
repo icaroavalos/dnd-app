@@ -1,9 +1,9 @@
 /**
- * Testes de contrato para mutações de recursos via API.
+ * Testes de contrato para mutacoes de recursos via API.
  * Valida:
  * - Gasto de recurso (useResource)
- * - Recuperação de recursos (shortRest, longRest)
- * - Fallback local quando backend falha
+ * - Recuperacao de recursos (shortRest, longRest)
+ * - Erro quando backend falha (sem fallback local)
  */
 
 import { describe, it } from 'node:test';
@@ -76,8 +76,8 @@ describe('resource-mutations-api', () => {
     const { useResource } = createResourceHelpers({
       getState: () => state,
       currentResourceDefinitions: () => [
-    { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
-  ],
+        { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
+      ],
       clamp: (v, min, max) => Math.min(max, Math.max(min, v)),
       currentActionItems: () => [],
       castSpell: () => {},
@@ -97,7 +97,7 @@ describe('resource-mutations-api', () => {
     restoreFetch();
   });
 
-  it('useResource falls back to local on failure', async () => {
+  it('useResource throws on backend failure (no fallback)', async () => {
     const { createResourceHelpers } = await import('../src/app/resource-helpers.js');
     const { useResource: apiUseResource } = await import('../dist/src/lib/api-resource-mutations.js');
 
@@ -109,8 +109,8 @@ describe('resource-mutations-api', () => {
     const { useResource } = createResourceHelpers({
       getState: () => state,
       currentResourceDefinitions: () => [
-    { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
-  ],
+        { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
+      ],
       clamp: (v, min, max) => Math.min(max, Math.max(min, v)),
       currentActionItems: () => [],
       castSpell: () => {},
@@ -124,9 +124,11 @@ describe('resource-mutations-api', () => {
       apiClient: { useResource: apiUseResource },
     });
 
-    await useResource('second_wind');
-
-    assert.equal(state.character.resources.second_wind.used, 1, 'Should fallback to local');
+    await assert.rejects(
+      async () => useResource('second_wind'),
+      { name: 'ResourceMutationError' },
+      'Should throw ResourceMutationError on backend failure'
+    );
     restoreFetch();
   });
 
@@ -144,8 +146,8 @@ describe('resource-mutations-api', () => {
     const { recoverShortRestResources } = createResourceHelpers({
       getState: () => state,
       currentResourceDefinitions: () => [
-    { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
-  ],
+        { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
+      ],
       clamp: (v, min, max) => Math.min(max, Math.max(min, v)),
       currentActionItems: () => [],
       castSpell: () => {},
@@ -165,7 +167,7 @@ describe('resource-mutations-api', () => {
     restoreFetch();
   });
 
-  it('recoverShortRestResources falls back to local on failure', async () => {
+  it('recoverShortRestResources throws on backend failure', async () => {
     const { createResourceHelpers } = await import('../src/app/resource-helpers.js');
     const { shortRest: apiShortRest } = await import('../dist/src/lib/api-resource-mutations.js');
 
@@ -177,8 +179,8 @@ describe('resource-mutations-api', () => {
     const { recoverShortRestResources } = createResourceHelpers({
       getState: () => state,
       currentResourceDefinitions: () => [
-    { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
-  ],
+        { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
+      ],
       clamp: (v, min, max) => Math.min(max, Math.max(min, v)),
       currentActionItems: () => [],
       castSpell: () => {},
@@ -192,9 +194,11 @@ describe('resource-mutations-api', () => {
       apiClient: { shortRest: apiShortRest },
     });
 
-    await recoverShortRestResources();
-
-    assert.equal(state.character.resources.second_wind.used, 0, 'Should fallback to local recovery');
+    await assert.rejects(
+      async () => recoverShortRestResources(),
+      { name: 'ResourceMutationError' },
+      'Should throw ResourceMutationError on backend failure'
+    );
     restoreFetch();
   });
 
@@ -212,8 +216,8 @@ describe('resource-mutations-api', () => {
     const { recoverLongRestResources } = createResourceHelpers({
       getState: () => state,
       currentResourceDefinitions: () => [
-    { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
-  ],
+        { id: 'second_wind', name: 'Second Wind', max: 1, recovery: 'short_rest' }
+      ],
       clamp: (v, min, max) => Math.min(max, Math.max(min, v)),
       currentActionItems: () => [],
       castSpell: () => {},
@@ -264,7 +268,7 @@ describe('resource-mutations-api', () => {
     restoreFetch();
   });
 
-  it('spendAmmo falls back to local on failure', async () => {
+  it('spendAmmo throws on backend failure', async () => {
     const { createResourceHelpers } = await import('../src/app/resource-helpers.js');
     const { spendAmmo: apiSpendAmmo } = await import('../dist/src/lib/api-resource-mutations.js');
 
@@ -289,9 +293,11 @@ describe('resource-mutations-api', () => {
       apiClient: { spendAmmo: apiSpendAmmo },
     });
 
-    await spendAmmo('arrows', 1);
-
-    assert.equal(state.character.inventory[0].quantity, 19, 'Should decrement ammo quantity');
+    await assert.rejects(
+      async () => spendAmmo('arrows', 1),
+      { name: 'ResourceMutationError' },
+      'Should throw ResourceMutationError on backend failure'
+    );
     restoreFetch();
   });
 
@@ -326,7 +332,7 @@ describe('resource-mutations-api', () => {
     restoreFetch();
   });
 
-  it('recoverAmmo falls back to local on failure', async () => {
+  it('recoverAmmo throws on backend failure', async () => {
     const { createResourceHelpers } = await import('../src/app/resource-helpers.js');
     const { recoverAmmo: apiRecoverAmmo } = await import('../dist/src/lib/api-resource-mutations.js');
 
@@ -351,9 +357,11 @@ describe('resource-mutations-api', () => {
       apiClient: { recoverAmmo: apiRecoverAmmo },
     });
 
-    await recoverAmmo('arrows', 5);
-
-    assert.equal(state.character.inventory[0].quantity, 15, 'Should increment ammo quantity');
+    await assert.rejects(
+      async () => recoverAmmo('arrows', 5),
+      { name: 'ResourceMutationError' },
+      'Should throw ResourceMutationError on backend failure'
+    );
     restoreFetch();
   });
 });

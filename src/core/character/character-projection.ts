@@ -3,8 +3,8 @@
  *
  * Esta é a única fonte de verdade para o que é exibido na ficha.
  *
- * Nota: Esta versão usa projeção local. Para usar a backend, importe
- * `projectCharacter` de `../../lib/api-character-project-client.js`
+ * Nota: Esta versão usa projeção via backend. Requer backend disponível.
+ * Para projeção local direta (sem backend), importe `deriveCharacterSheet`.
  */
 
 import type { AbilityName } from '../../types/background.js';
@@ -18,44 +18,34 @@ import {
   deriveSavingThrowBonus
 } from './character-engine.js';
 
-/**
- * Flag para habilitar projeção via backend (se disponível).
- * Quando true, tenta usar POST /characters/project do backend.
- * Habilitado por default - backend tem fallback local embutido.
- */
-let useBackendProjection = true;
-
-export function enableBackendProjection(enabled: boolean) {
-  useBackendProjection = enabled;
+export interface ProjectionOptions {
+  skills?: [string, AbilityName][];
+  activeModifiers?: any[];
+  spellAbility?: AbilityName;
+  hitDie?: number;
+  apiClasses?: Record<string, any>;
+  apiLevels?: Record<string, any[]>;
 }
 
-export function isBackendProjectionEnabled(): boolean {
-  return useBackendProjection;
+export interface ProjectionHelperOptions {
+  derivedSheet?: Partial<DerivedCharacterSheet> | null;
+  omitAsiRuleId?: string;
+  skills?: [string, AbilityName][];
+  slugify?: (value: string) => string;
 }
 
 /**
- * Projeta personagem usando backend se disponível, ou fallback local.
+ * Projeta personagem usando backend. Requer backend disponível.
  * Esta é a função principal para projeção da ficha.
+ * Lança erro se backend falhar - sem fallback local.
  */
 export async function projectCharacterSheet(
   character: Character,
   options: ProjectionOptions = {}
 ): Promise<DerivedCharacterSheet> {
-  // Tenta backend se habilitado
-  if (useBackendProjection) {
-    try {
-      const { projectCharacter } = await import('../../lib/api-character-project-client.js');
-      const projected = await projectCharacter(character as any);
-      // Converte do formato backend para o formato local
-      return convertBackendProjection(projected, character, options);
-    } catch (err) {
-      console.warn('Backend projection failed, falling back to local:', err);
-      // Fallback para projeção local
-    }
-  }
-
-  // Fallback local
-  return deriveCharacterSheet(character, options);
+  const { projectCharacter } = await import('../../lib/api-character-project-client.js');
+  const projected = await projectCharacter(character as any);
+  return convertBackendProjection(projected, character, options);
 }
 
 /**
@@ -92,26 +82,9 @@ function convertBackendProjection(
   };
 }
 
-const ABILITY_KEYS: AbilityName[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-
-export interface ProjectionOptions {
-  skills?: [string, AbilityName][];
-  activeModifiers?: any[];
-  spellAbility?: AbilityName;
-  hitDie?: number;
-  apiClasses?: Record<string, any>;
-  apiLevels?: Record<string, any[]>;
-}
-
-export interface ProjectionHelperOptions {
-  derivedSheet?: Partial<DerivedCharacterSheet> | null;
-  omitAsiRuleId?: string;
-  skills?: [string, AbilityName][];
-  slugify?: (value: string) => string;
-}
-
 /**
- * Deriva os dados da ficha baseados no estado bruto do personagem
+ * Deriva os dados da ficha baseados no estado bruto do personagem (projeção local).
+ * Use esta funcao para projecao local direta, sem backend.
  */
 export function deriveCharacterSheet(
   character: Character,
@@ -136,6 +109,7 @@ export function deriveCharacterSheet(
 
   // 3. Saving Throws
   const savingThrows: Record<string, number> = {};
+  const ABILITY_KEYS: AbilityName[] = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
   ABILITY_KEYS.forEach(key => {
     const isProficient = (character.savingThrows ?? []).includes(key);
     savingThrows[key] = deriveSavingThrowBonus(abilityScores[key], isProficient, proficiencyBonus);
@@ -147,8 +121,8 @@ export function deriveCharacterSheet(
     options.skills.forEach(([name, ability]) => {
       const isProficient = (character.skillProficiencies ?? []).includes(name);
       const isSpecialDruid = character.class === 'druid' &&
-                            character.classFeatureChoices?.['primal-order'] === 'magician' &&
-                            character.classFeatureChoices?.['magician-skill'] === slugify(name);
+        character.classFeatureChoices?.['primal-order'] === 'magician' &&
+        character.classFeatureChoices?.['magician-skill'] === slugify(name);
 
       let bonus = abilityModifiers[ability] + (isProficient ? proficiencyBonus : 0);
       if (isSpecialDruid) {
@@ -198,7 +172,7 @@ export function deriveCharacterSheet(
     spellSaveDc,
     spellSlotsMax,
     encumbrance: {
-      carriedWeight: 0, // A ser implementado com o motor de itens
+      carriedWeight: 0,
       carryingCapacity: abilityScores.str * 15,
       encumbered: false
     }
