@@ -22,6 +22,11 @@ Server: `http://localhost:3100`
 | GET | `/health` | Health check |
 | GET | `/health/ready` | Readiness check |
 | GET | `/rules/:catalog` | Rules data (classes, spells, items, etc.) |
+| GET | `/characters` | List all characters (summary) |
+| GET | `/characters/:id` | Get character by ID (full record) |
+| POST | `/characters` | Create new character |
+| PUT | `/characters/:id` | Update character |
+| DELETE | `/characters/:id` | Delete character |
 | POST | `/characters/project` | Derive character sheet |
 | POST | `/actions/derive` | Get available actions |
 | POST | `/resources/use` | Spend resource |
@@ -54,9 +59,10 @@ backend/
 
 **Contracts:** `src/shared/contracts/` via `@shared/contracts` (TypeScript types)
 
-## Current MVP Note
+## Persistence
 
-As of 2026-05-08, runtime tests pass, but backend typecheck is still failing. Fix `npm run typecheck` before treating persistence/ledger as MVP-stable.
+**Prisma** is the canonical persistence layer for character state.
+All character data is stored as `CharacterRecord` in the `recordJson` column.
 
 ## Scripts
 
