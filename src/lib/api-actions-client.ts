@@ -6,15 +6,15 @@
  */
 
 import { getBaseUrl } from './api-catalog-client.js';
-import type { DerivedAction, CharacterRecord } from '../core/engine/action-engine.js';
+import type { DerivedAction, ActionEngineCharacter } from '../core/engine/action-engine.js';
 
-export type { DerivedAction, CharacterRecord };
+export type { DerivedAction };
 
 /**
  * Deriva as acoes disponiveis para um personagem.
  * Usa POST /actions/derive do backend.
  */
-export async function deriveActions(character: CharacterRecord): Promise<DerivedAction[]> {
+export async function deriveActions(character: ActionEngineCharacter & { id?: string; name?: string }): Promise<DerivedAction[]> {
   const response = await fetch(`${getBaseUrl()}/actions/derive`, {
     method: 'POST',
     headers: {
