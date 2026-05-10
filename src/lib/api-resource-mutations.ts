@@ -1,22 +1,21 @@
 /**
- * API Client para mutações de recursos e descansos.
+ * API Client para mutações de recursos e inventário.
  *
  * Envia comandos de gasto/recuperação de recursos para o backend,
  * que aplica event sourcing via ResourceLedger.
  *
- * Endpoints:
- * - POST /characters/:id/resources/damage
- * - POST /characters/:id/resources/heal
- * - POST /characters/:id/resources/short-rest
- * - POST /characters/:id/resources/long-rest
- * - POST /characters/:id/resources/hit-die
- * - POST /characters/:id/resources/spell-slot
- * - POST /characters/:id/resources/use-resource
- * - POST /characters/:id/resources/ammo/spend
- * - POST /characters/:id/resources/ammo/recover
+ * Sem fallback local: requer backend disponível.
  */
 
 import { getBaseUrl } from './api-catalog-client.js';
+
+export class ResourceMutationError extends Error {
+  name = 'ResourceMutationError';
+
+  constructor(message: string, public cause?: Error) {
+    super(message);
+  }
+}
 
 export interface ResourceMutationResult {
   event: any;
@@ -72,6 +71,17 @@ export interface AmmoInput {
   description?: string;
 }
 
+export interface InventoryMutationInput {
+  itemId: string;
+  quantity: number;
+  source: string;
+  description?: string;
+}
+
+function buildMutationError(operation: string, response: Response): string {
+  return `Falha ao ${operation}: ${response.status} ${response.statusText}`;
+}
+
 /**
  * Aplica dano ao personagem.
  */
@@ -79,15 +89,22 @@ export async function applyDamage(
   characterId: string,
   input: DamageInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/damage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/damage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para aplicar dano. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to apply damage: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('aplicar dano', response));
   }
 
   return response.json();
@@ -100,15 +117,22 @@ export async function applyHealing(
   characterId: string,
   input: HealInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/heal`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/heal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para aplicar cura. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to apply healing: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('aplicar cura', response));
   }
 
   return response.json();
@@ -121,15 +145,22 @@ export async function shortRest(
   characterId: string,
   input: ShortRestInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/short-rest`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/short-rest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para short rest. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to short rest: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('realizar short rest', response));
   }
 
   return response.json();
@@ -142,15 +173,22 @@ export async function longRest(
   characterId: string,
   input: LongRestInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/long-rest`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/long-rest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para long rest. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to long rest: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('realizar long rest', response));
   }
 
   return response.json();
@@ -163,15 +201,22 @@ export async function useHitDie(
   characterId: string,
   input: HitDieInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/hit-die`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/hit-die`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para usar hit die. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to use hit die: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('usar hit die', response));
   }
 
   return response.json();
@@ -184,15 +229,22 @@ export async function useSpellSlot(
   characterId: string,
   input: SpellSlotInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/spell-slot`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/spell-slot`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para usar slot de magia. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to use spell slot: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('usar slot de magia', response));
   }
 
   return response.json();
@@ -205,15 +257,22 @@ export async function useResource(
   characterId: string,
   input: UseResourceInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/use-resource`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/use-resource`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para usar recurso. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to use resource: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('usar recurso', response));
   }
 
   return response.json();
@@ -226,15 +285,22 @@ export async function spendAmmo(
   characterId: string,
   input: AmmoInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/ammo/spend`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/ammo/spend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para gastar munição. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to spend ammo: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('gastar munição', response));
   }
 
   return response.json();
@@ -247,15 +313,22 @@ export async function recoverAmmo(
   characterId: string,
   input: AmmoInput
 ): Promise<ResourceMutationResult> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/ammo/recover`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/ammo/recover`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para recuperar munição. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to recover ammo: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('recuperar munição', response));
   }
 
   return response.json();
@@ -267,13 +340,20 @@ export async function recoverAmmo(
 export async function getResourceProjection(
   characterId: string
 ): Promise<any> {
-  const response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/projection`, {
-    method: 'GET',
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${characterId}/resources/projection`, {
+      method: 'GET',
+    });
+  } catch (error) {
+    throw new ResourceMutationError(
+      `Backend indisponível para buscar projeção de recursos. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to get resource projection: ${response.statusText} - ${error}`);
+    throw new ResourceMutationError(buildMutationError('buscar projeção de recursos', response));
   }
 
   return response.json();

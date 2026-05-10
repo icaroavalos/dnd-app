@@ -1,6 +1,6 @@
 /**
- * Resource Helpers - Backend-first with local fallback.
- * Uses POST /characters/:id/resources/* endpoints when online, falls back to local mutations.
+ * Resource Helpers - Backend-only mutations.
+ * Uses POST /characters/:id/resources/* endpoints. No local fallback.
  */
 export function createResourceHelpers({
   getState,
@@ -18,7 +18,6 @@ export function createResourceHelpers({
   apiClient,
 }) {
   const { useResource: apiUseResource, shortRest: apiShortRest, longRest: apiLongRest, spendAmmo: apiSpendAmmo, recoverAmmo: apiRecoverAmmo } = apiClient ?? {};
-  const USE_BACKEND = !!apiClient;
 
   function syncResources() {
     const state = getState();
@@ -44,21 +43,11 @@ export function createResourceHelpers({
     const resource = state.character.resources?.[resourceId];
     if (!resource || resource.used >= resource.max) return;
 
-    if (!USE_BACKEND || !apiUseResource) {
-      resource.used += 1;
-      return;
-    }
-
     const characterId = state.character.id ?? 'default';
-    try {
-      const result = await apiUseResource(characterId, { resourceType: resourceId, amount: 1, source: 'action' });
-      if (result.resources) {
-        state.character.resources = result.resources;
-      } else {
-        resource.used += 1;
-      }
-    } catch (err) {
-      console.warn('Backend useResource failed, falling back to local:', err);
+    const result = await apiUseResource(characterId, { resourceType: resourceId, amount: 1, source: 'action' });
+    if (result.resources) {
+      state.character.resources = result.resources;
+    } else {
       resource.used += 1;
     }
   }
@@ -76,46 +65,14 @@ export function createResourceHelpers({
 
   async function spendAmmo(itemId, quantity = 1) {
     const state = getState();
-    if (!USE_BACKEND || !apiSpendAmmo) {
-      const item = state.character.inventory?.find((i) => i.id === itemId);
-      if (item?.quantity) {
-        item.quantity = Math.max(0, item.quantity - quantity);
-      }
-      return;
-    }
-
     const characterId = state.character.id ?? 'default';
-    try {
-      await apiSpendAmmo(characterId, { itemId, quantity, source: 'attack' });
-    } catch (err) {
-      console.warn('Backend spendAmmo failed, falling back to local:', err);
-      const item = state.character.inventory?.find((i) => i.id === itemId);
-      if (item?.quantity) {
-        item.quantity = Math.max(0, item.quantity - quantity);
-      }
-    }
+    await apiSpendAmmo(characterId, { itemId, quantity, source: 'attack' });
   }
 
   async function recoverAmmo(itemId, quantity = 1) {
     const state = getState();
-    if (!USE_BACKEND || !apiRecoverAmmo) {
-      const item = state.character.inventory?.find((i) => i.id === itemId);
-      if (item?.quantity) {
-        item.quantity = (item.quantity || 0) + quantity;
-      }
-      return;
-    }
-
     const characterId = state.character.id ?? 'default';
-    try {
-      await apiRecoverAmmo(characterId, { itemId, quantity, source: 'recovery' });
-    } catch (err) {
-      console.warn('Backend recoverAmmo failed, falling back to local:', err);
-      const item = state.character.inventory?.find((i) => i.id === itemId);
-      if (item?.quantity) {
-        item.quantity = (item.quantity || 0) + quantity;
-      }
-    }
+    await apiRecoverAmmo(characterId, { itemId, quantity, source: 'recovery' });
   }
 
   function recoverShortRestResourcesLocal() {
@@ -144,44 +101,26 @@ export function createResourceHelpers({
   }
 
   async function recoverShortRestResources() {
-    if (!USE_BACKEND || !apiShortRest) {
-      recoverShortRestResourcesLocal();
-      return;
-    }
     const state = getState();
     const characterId = state.character.id ?? 'default';
-    try {
-      const selected = Object.values(state.restModalHitDice ?? {}).filter((entry) => entry?.value).length;
-      const usable = Math.min(selected, availableHitDice());
-      const healing = usable * hitDieHealingAmount();
-      const result = await apiShortRest(characterId, { hitDiceSpent: usable, hpRegained: healing });
-      if (result.resources) {
-        state.character.resources = result.resources;
-      } else {
-        recoverShortRestResourcesLocal();
-      }
-    } catch (err) {
-      console.warn('Backend short rest failed, falling back to local:', err);
+    const selected = Object.values(state.restModalHitDice ?? {}).filter((entry) => entry?.value).length;
+    const usable = Math.min(selected, availableHitDice());
+    const healing = usable * hitDieHealingAmount();
+    const result = await apiShortRest(characterId, { hitDiceSpent: usable, hpRegained: healing });
+    if (result.resources) {
+      state.character.resources = result.resources;
+    } else {
       recoverShortRestResourcesLocal();
     }
   }
 
   async function recoverLongRestResources() {
-    if (!USE_BACKEND || !apiLongRest) {
-      recoverLongRestResourcesLocal();
-      return;
-    }
     const state = getState();
     const characterId = state.character.id ?? 'default';
-    try {
-      const result = await apiLongRest(characterId, { hpRegained: maxHitPoints() });
-      if (result.resources) {
-        state.character.resources = result.resources;
-      } else {
-        recoverLongRestResourcesLocal();
-      }
-    } catch (err) {
-      console.warn('Backend long rest failed, falling back to local:', err);
+    const result = await apiLongRest(characterId, { hpRegained: maxHitPoints() });
+    if (result.resources) {
+      state.character.resources = result.resources;
+    } else {
       recoverLongRestResourcesLocal();
     }
   }
