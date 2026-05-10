@@ -6,6 +6,8 @@ Ultima revisao: 2026-05-08.
 
 O projeto esta no meio da migracao de um app estatico de ficha D&D 5e 2024 para um backend NestJS + Fastify que vira a fonte de verdade de regras, projecoes e mutacoes. O frontend ainda existe como shell local com bastante logica TypeScript, mas o backend ja implementa varios slices funcionais.
 
+**Atualizacao 2026-05-10:** Frontend agora e backend-only para dados canonicos. Nao ha mais fallback local para personagens, recursos, inventario ou actions. O backend e obrigatorio para operacao.
+
 O ponto critico do MVP backend nao e adicionar outro modulo. O ponto critico agora e estabilizar contratos e persistencia: os testes de runtime passam, mas `npm run typecheck` falha. Enquanto o typecheck estiver vermelho, o backend ainda nao deve ser tratado como MVP pronto.
 
 ## Decisoes de arquitetura atuais
@@ -18,7 +20,8 @@ O ponto critico do MVP backend nao e adicionar outro modulo. O ponto critico ago
 - DTOs ficam dentro de `backend/src/modules/*/dto/` quando o request/response nao e trivial.
 - O banco guarda estado de usuario/personagem. Dados de regra continuam fora do banco.
 - O backend atual usa SQLite via Prisma para desenvolvimento, apesar de roadmaps antigos citarem PostgreSQL.
-- O frontend pode manter fallback local durante a migracao, mas cada slice backend estabilizado deve remover duplicacao local depois.
+- **Frontend nao tem fallback canonico**: dados de personagens, recursos, inventario e actions exigem backend. localStorage e usado apenas para preferencias de UI (tema, layout) e ID do ultimo personagem (sessao).
+- **Erro visivel em falha de backend**: a UI exibe banner "Backend indisponivel" e o formulario permanece vazio (sem species/classes/backgrounds mockados).
 
 ## Modulos D&D 2024 implementados com sucesso
 

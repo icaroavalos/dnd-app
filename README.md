@@ -14,6 +14,8 @@ A memoria viva da arquitetura agora fica em:
 
 Estado auditado em 2026-05-10: backend e frontend estao com typecheck e testes principais verdes. A revisao de QA tambem validou o carregamento real do app no navegador e corrigiu quebras de runtime em imports/boot.
 
+**Backend-only frontend**: Desde a sessao 2026-05-10, o frontend **nao tem fallback canonico** para dados de personagens, recursos, inventario ou actions. O backend e obrigatorio - a UI exibe banner "Backend indisponivel" e bloqueia acoes quando o servidor nao esta rodando em http://localhost:3100.
+
 ## Como rodar
 
 ### Requisitos

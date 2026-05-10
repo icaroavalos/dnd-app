@@ -10,6 +10,8 @@ Atualizado em 2026-05-10.
 - Escrever teste primeiro quando tocar comportamento.
 - Nao declarar pronto sem rodar os comandos do plano.
 - Registrar resultado em `docs/sessions.md`.
+- **Frontend nao tem fallback canonico**: backend e obrigatorio para dados de personagens, resources, inventory e actions.
+- **Erro visivel em falha de backend**: UI deve exibir banner de erro e nao mockar dados.
 
 ## Backend MVP
 
@@ -25,11 +27,12 @@ Atualizado em 2026-05-10.
 ## Frontend/Core
 
 - [x] F0. Ligar cliente de catalogos ao backend com fallback local.
-- [ ] F1. Ligar projection client ao `POST /characters/project` por default.
-- [ ] F2. Ligar actions client ao `POST /actions/derive`.
-- [ ] F3. Ligar mutations de resources/inventory ao backend.
-- [ ] F4. Migrar persistencia de ficha para CRUD backend.
-- [ ] F5. Remover duplicacoes locais quando cada slice estiver estavel.
+- [x] F1. Ligar projection client ao `POST /characters/project` por default.
+- [x] F2. Ligar actions client ao `POST /actions/derive`.
+- [x] F3. Ligar mutations de resources/inventory ao backend.
+- [x] F4. Migrar persistencia de ficha para CRUD backend.
+- [x] F5. Remover duplicacoes locais quando cada slice estiver estavel.
+- [x] F6. Frontend backend-only: sem fallback canonico, erro visivel em falha de backend.
 
 ## Features do app
 
@@ -55,3 +58,4 @@ Cada item acima deve ser executado pelo plano formal em:
 - Arquivos de dominio em `src/` e `backend/src/`: nenhum acima de 500 linhas. Maior arquivo de dominio: `src/core/engine/action-engine.ts` com 424 linhas.
 - Duplicacoes obvias >=20 linhas: nenhuma em runtime de dominio; ocorrencias detectadas ficam em setup/fixtures de testes (`tests/*`).
 - Verificacao verde: `npm test`, `npm run typecheck`, `npm --prefix backend run test`, `npm --prefix backend run typecheck`.
+- Frontend backend-only: erro visivel, sem mock de dados canonicos quando backend indisponivel.
