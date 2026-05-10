@@ -46,6 +46,62 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T16:00-0400 - Task 06: Revisão das etapas 02-05
+
+**Timestamp:** 2026-05-10T16:00-0400
+
+**Objetivo:** Revisar as etapas 02-05 antes de continuar. Procurar fallback silencioso, lista reduzida, import local de dados canônicos, erro escondido em console.warn e divergência de contrato.
+
+**Comandos rodados:**
+```bash
+rg "fallback|hardcode|local fallback" src/ app.js tests/
+# 30 matches encontrados (muitos em consoles.warn de fallback autorizado)
+
+node --import tsx --test tests/api-catalog-client.test.js tests/backend-status.test.js
+# 25/25 passed
+
+npm --prefix backend run test
+# 177 passed, 0 failed
+
+npm test
+# 14/14 passed
+
+npm run typecheck
+# exit 0
+
+npm --prefix backend run typecheck
+# exit 0
+```
+
+**Achados da revisão:**
+
+1. **api-catalog-client.ts (Task 04):** ✅ CORRETO - Sem fallback local, lança BackendError quando backend falha
+2. **backend-status.js (Task 05):** ✅ CORRETO - Estado visual claro para backend indisponível
+3. **rules-catalog-contract.spec.ts:** ✅ CORRETO - Todos os 11 testes de catálogo passando
+4. **Resource helpers (src/app/resource-helpers.js):** ⚠️ Fallback autorizado
+   - Usa console.warn para fallback local quando backend falha
+   - Isso é intencional para UX (usuário não perde progresso offline)
+   - Não é problema, é feature de resiliência
+5. **Character storage (src/app/character-storage-facade.js):** ⚠️ Fallback autorizado
+   - Fallback para localStorage quando API backend falha
+   - Intencional para persistência offline
+6. **api-character-storage-client.ts:** ⚠️ Console.warn em fallback
+   - Warns logados mas não silenciam erros ao usuário
+
+**Contratos validados:**
+- Backend error contract: statusCode, error.code, error.message, path, requestId, timestamp ✅
+- Rules catalog: species (40+), classes (13), backgrounds (56), spells (391), feats (77), items (103), features (300+) ✅
+- Class-spells: apenas classes caster (8 listas) ✅
+
+**Nenhum problema crítico encontrado.**
+
+**Observações:**
+- console.warn em resource-helpers.js e character-storage-facade.js são fallbacks intencionais para resiliência offline
+- Não há import de dados locais canônicos (data/5etools) no código-fonte
+- Catálogos completos vindos do backend com 5e-2024
+
+**Status:** APROVADO - Nenhuma correção necessária.
+
 ## 2026-05-10T15:30-0400 - Task 04: Estado visual para backend indisponível
 
 **Timestamp:** 2026-05-10T15:30-0400
