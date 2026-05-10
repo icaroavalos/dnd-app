@@ -1,17 +1,17 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '../../../../generated/prisma/index.js';
 import {
-  resourceUsed,
-  restApplied as restAppliedFn,
-  ammoSpent,
-  ammoRecovered,
-  hpChange as hpChangeFn,
-  hitDieChange as hitDieChangeFn,
-  spellSlotChange,
-  shortRest as shortRestFn,
-  longRest as longRestFn,
-} from './domain/ledger-writes.js';
-import { getLedgerHistory, getLedgerByEventType } from './domain/ledger-reads.js';
+  useResource,
+  applyRest,
+  spendAmmo,
+  recoverAmmo,
+  applyHpChange,
+  applyHitDieChange,
+  applySpellSlotChange,
+  applyShortRest,
+  applyLongRest,
+} from './commands/index.js';
+import { getLedgerHistory, getLedgerByEventType } from './queries/index.js';
 
 @Injectable()
 export class ResourceLedgerService implements OnModuleInit {
@@ -33,7 +33,14 @@ export class ResourceLedgerService implements OnModuleInit {
     description?: string,
     metadata?: Record<string, any>,
   ): Promise<any> {
-    return resourceUsed(this.prisma, characterId, resourceType, amount, source, description, metadata);
+    return useResource(this.prisma, {
+      characterId,
+      resourceType,
+      amount,
+      source,
+      description,
+      metadata,
+    });
   }
 
   async restApplied(
@@ -43,7 +50,13 @@ export class ResourceLedgerService implements OnModuleInit {
     hitDiceRegained?: number,
     description?: string,
   ): Promise<any> {
-    return restAppliedFn(this.prisma, characterId, restType, hpRegained, hitDiceRegained, description);
+    return applyRest(this.prisma, {
+      characterId,
+      restType,
+      hpRegained,
+      hitDiceRegained,
+      description,
+    });
   }
 
   async ammoSpent(
@@ -53,7 +66,13 @@ export class ResourceLedgerService implements OnModuleInit {
     source: string,
     description?: string,
   ): Promise<any> {
-    return ammoSpent(this.prisma, characterId, itemId, quantity, source, description);
+    return spendAmmo(this.prisma, {
+      characterId,
+      itemId,
+      quantity,
+      source,
+      description,
+    });
   }
 
   async ammoRecovered(
@@ -63,7 +82,13 @@ export class ResourceLedgerService implements OnModuleInit {
     source: string,
     description?: string,
   ): Promise<any> {
-    return ammoRecovered(this.prisma, characterId, itemId, quantity, source, description);
+    return recoverAmmo(this.prisma, {
+      characterId,
+      itemId,
+      quantity,
+      source,
+      description,
+    });
   }
 
   async hpChange(
@@ -72,7 +97,12 @@ export class ResourceLedgerService implements OnModuleInit {
     source: 'damage' | 'healing' | 'temp_hp',
     description?: string,
   ): Promise<any> {
-    return hpChangeFn(this.prisma, characterId, amount, source, description);
+    return applyHpChange(this.prisma, {
+      characterId,
+      amount,
+      source,
+      description,
+    });
   }
 
   async hitDieChange(
@@ -81,7 +111,12 @@ export class ResourceLedgerService implements OnModuleInit {
     source: 'short_rest' | 'healing',
     description?: string,
   ): Promise<any> {
-    return hitDieChangeFn(this.prisma, characterId, amount, source, description);
+    return applyHitDieChange(this.prisma, {
+      characterId,
+      amount,
+      source,
+      description,
+    });
   }
 
   async spellSlotChange(
@@ -89,7 +124,11 @@ export class ResourceLedgerService implements OnModuleInit {
     slotLevel: number,
     description?: string,
   ): Promise<any> {
-    return spellSlotChange(this.prisma, characterId, slotLevel, description);
+    return applySpellSlotChange(this.prisma, {
+      characterId,
+      slotLevel,
+      description,
+    });
   }
 
   async getHistory(characterId: string, limit = 50): Promise<any[]> {
@@ -106,7 +145,12 @@ export class ResourceLedgerService implements OnModuleInit {
     hpRegained: number,
     description?: string,
   ): Promise<any> {
-    return shortRestFn(this.prisma, characterId, hitDiceSpent, hpRegained, description);
+    return applyShortRest(this.prisma, {
+      characterId,
+      hitDiceSpent,
+      hpRegained,
+      description,
+    });
   }
 
   async longRest(
@@ -114,6 +158,10 @@ export class ResourceLedgerService implements OnModuleInit {
     hpRegained: number,
     description?: string,
   ): Promise<any> {
-    return longRestFn(this.prisma, characterId, hpRegained, description);
+    return applyLongRest(this.prisma, {
+      characterId,
+      hpRegained,
+      description,
+    });
   }
 }
