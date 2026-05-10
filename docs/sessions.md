@@ -835,3 +835,38 @@ npm test           # 131 tests passed
 **Result:** ✅ Frontend pode buscar catalogos no backend NestJS com fallback local mantido.
 
 **Status:** DONE
+
+## 2026-05-10T13:35-0400
+
+**Task 30: Auditoria final de refactor**
+
+1. Confirmado estado inicial limpo com `git status --short`.
+2. Contadas linhas do repositorio ignorando `node_modules`, `dist`, `backend/dist`, `backend/generated` e `5etools-v2.28.0`.
+3. Verificado `app.js`:
+   - 1.923 linhas, acima do alvo ideal de 300.
+   - Excecao temporaria justificada por ainda ser o shell legado; proximo plano e seguir extraindo para `src/app/*`, `src/core/*` e `src/lib/*`.
+4. Verificados arquivos de dominio:
+   - Nenhum arquivo em `src/` ou `backend/src/` acima de 500 linhas.
+   - Maior arquivo de dominio: `src/core/engine/action-engine.ts` com 424 linhas.
+5. Procuradas duplicacoes obvias por janelas normalizadas de 20 linhas:
+   - Nenhuma duplicacao exata em runtime de dominio.
+   - Achados ficam em setup/fixtures de testes, principalmente entre `tests/action-engine.test.js`, `tests/character-projection-api.test.js`, `tests/resource-mutations-api.test.js`, `tests/api-catalog-client.test.js`, `tests/main-render-controller.test.js`, `tests/creation-event-handlers.test.js` e `tests/app-shell-extraction.test.js`.
+
+**LoC:**
+- Antes da atualizacao documental: 210.789
+- Depois da atualizacao documental: 210.842
+
+**Verification:**
+- `npm test`: 14 passed, 0 failed
+- `npm run typecheck`: exit 0
+- `npm --prefix backend run test`: 153 passed, 0 failed
+- `npm --prefix backend run typecheck`: exit 0
+
+**Smells nao corrigidos:**
+- `app.js` ainda monolitico.
+- `styles.css` ainda grande.
+- JSONs canonicos de `data/5etools/*` dominam a contagem e devem continuar tratados como dados, nao dominio.
+- `backend/data/characters.json` ainda existe enquanto B2 nao remove o caminho JSON de producao.
+- Setup/fixtures de testes repetem blocos grandes.
+
+**Status:** DONE
