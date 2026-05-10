@@ -3,6 +3,7 @@
  */
 import { escapeHtml } from '../../lib/utils.js';
 import { signed } from '../character/character-engine.js';
+import { spellLevelLabelEn as spellLevelLabel, ordinalLabel } from '../../lib/formatter.js';
 export function renderSpellsSheet(spells, casterLevel, spellAttack, spellSaveDc, selectedSpellName, spellSlotsMaxByLevel, spellSlotsUsed, availableSpellSlotsAtLevel, spellFromKnownData) {
     const selected = selectedSpellName && spells.some((spell) => spell.name === selectedSpellName) ? selectedSpellName : '';
     const spellDetailsByName = new Map(spells.map((spell) => [spell.name, { ...spellFromKnownData(spell.name), ...spell }]));
@@ -145,12 +146,5 @@ function renderSpellParagraphs(value) {
 }
 function highlightDiceAndScaledDice(value) {
     return value.replace(/\b\d+d\d+(?:\s*[+\-]\s*\d+)?\b/gi, '<strong>$&</strong>');
-}
-function spellLevelLabel(level) {
-    return level === 0 ? 'Cantrips' : `${ordinalLabel(level)} Level`;
-}
-function ordinalLabel(level) {
-    const labels = { 1: '1st', 2: '2nd', 3: '3rd' };
-    return labels[level] ?? `${level}th`;
 }
 //# sourceMappingURL=spells-view.js.map

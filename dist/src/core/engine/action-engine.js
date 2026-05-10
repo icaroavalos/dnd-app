@@ -1,3 +1,31 @@
+/**
+ * Flag para habilitar derivacao de actions via backend (se disponível).
+ * Habilitado por default - backend tem fallback local embutido.
+ */
+let useBackendDerivation = true;
+export function enableBackendDerivation(enabled) {
+    useBackendDerivation = enabled;
+}
+export function isBackendDerivationEnabled() {
+    return useBackendDerivation;
+}
+/**
+ * Deriva as acoes disponiveis usando backend se disponível, ou fallback local.
+ * Esta é a função principal para derivar ações da ficha.
+ */
+export async function deriveAvailableActionsAsync(character, context) {
+    if (useBackendDerivation) {
+        try {
+            const { deriveActions } = await import('../../lib/api-actions-client.js');
+            const actions = await deriveActions(character);
+            return actions;
+        }
+        catch (err) {
+            console.warn('Backend action derivation failed, falling back to local:', err);
+        }
+    }
+    return deriveAvailableActions(context);
+}
 const BASIC_ACTIONS = [
     {
         id: 'rule:attack',

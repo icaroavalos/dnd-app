@@ -7,7 +7,7 @@ import {
   deriveProjectedSaveBonus,
   deriveProjectedSkillBonus,
 } from "./dist/src/core/character/character-projection.js";
-import { deriveAvailableActions } from "./dist/src/core/engine/action-engine.js";
+import { deriveAvailableActions, deriveAvailableActionsAsync } from "./dist/src/core/engine/action-engine.js";
 import { deriveActiveModifiers, modifierTotal } from "./dist/src/core/engine/modifier-engine.js";
 import { RuleRepository } from "./dist/src/core/rules/rule-repository.js";
 import { applyBackgroundStepSelection, updateCreationField } from "./dist/src/core/state/creation-form-controller.js";
@@ -950,8 +950,14 @@ function swapStandardArrayAbilities(from, to) {
   render();
 }
 
+let renderSheetQueue = Promise.resolve();
+
 function renderSheet() {
-  els.sheetView.innerHTML = sheetRenderers[state.tab]();
+  renderSheetQueue = renderSheetQueue.then(() => renderSheetInner()).catch(err => console.error('renderSheet error:', err));
+}
+
+async function renderSheetInner() {
+  els.sheetView.innerHTML = await sheetRenderers[state.tab]();
   bindSheetEvents();
 }
 
@@ -1038,9 +1044,9 @@ function bindSheetEvents() {
   });
 
   els.sheetView.querySelectorAll("[data-use-action]").forEach((button) => {
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", async (event) => {
       event.stopPropagation();
-      useAction(button.dataset.useAction);
+      await useAction(button.dataset.useAction);
       persist();
       render();
     });
@@ -1146,8 +1152,14 @@ function applyDamage(amount) {
   }
 }
 
-function currentActionItems() {
-  return deriveAvailableActions(actionEngineContext());
+async function currentActionItems() {
+  const ctx = actionEngineContext();
+  const character = {
+    id: state.character.id,
+    name: state.character.name,
+    ...ctx.character,
+  };
+  return deriveAvailableActionsAsync(character, ctx);
 }
 
 function actionEngineContext() {

@@ -1,5 +1,15 @@
 type ActionKind = 'action' | 'bonus' | 'reaction' | 'other' | 'limited' | 'attack';
 type EconomyKind = 'action' | 'bonus' | 'reaction' | 'other' | 'free' | 'attack';
+export declare function enableBackendDerivation(enabled: boolean): void;
+export declare function isBackendDerivationEnabled(): boolean;
+/**
+ * Deriva as acoes disponiveis usando backend se disponível, ou fallback local.
+ * Esta é a função principal para derivar ações da ficha.
+ */
+export declare function deriveAvailableActionsAsync(character: ActionEngineCharacter & {
+    id?: string;
+    name?: string;
+}, context: ActionEngineContext): Promise<DerivedAction[]>;
 export interface ActionCost {
     economy?: EconomyKind | ActionKind;
     resource?: string;

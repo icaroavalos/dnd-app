@@ -1,20 +1,9 @@
-/**
- * Feature Engine - Agrega todas as características (features) do personagem
- *
- * Filtra e formata features de classe, raça, background e feats baseados nas escolhas.
- */
-import type { Character, ApiState } from '../../types/state.js';
-import { type ResourceDefinition } from './resource-engine.js';
-export interface CharacterFeature {
-    id: string;
-    kind: 'class' | 'species' | 'background' | 'feat';
-    name: string;
-    meta: string;
-    body: string;
-    resource?: ResourceDefinition;
-}
-/**
- * Retorna todas as características ativas do personagem
- */
-export declare function deriveActiveFeatures(character: Character, api: ApiState, classChoiceRules?: any[]): CharacterFeature[];
+export type { CharacterFeature, ResourceDefinition } from './feature-engine-types.js';
+export { deriveActiveFeatures } from './feature-engine-composition.js';
+export { deriveClassFeatures } from './feature-engine-class.js';
+export { deriveSpeciesTraits } from './feature-engine-species.js';
+export { deriveFeatFeatures } from './feature-engine-feats.js';
+export { mapClassFeature, mapFeatToFeature } from './feature-engine-mapping.js';
+export { deriveFeatureResource, deriveTraitResource } from './feature-engine-resources.js';
+export { resolveSelectedSubclass, resolveSubclassFeaturesForLevel } from './feature-engine-subclass.js';
 //# sourceMappingURL=feature-engine.d.ts.map

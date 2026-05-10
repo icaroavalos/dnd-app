@@ -109,8 +109,8 @@ describe('action engine', () => {
   it('keeps app.js as a shell instead of redefining legacy action builders', async () => {
     const source = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 
-    assert.match(source, /function currentActionItems\(\)/);
-    assert.match(source, /return deriveAvailableActions\(actionEngineContext\(\)\);/);
+    assert.match(source, /async function currentActionItems\(\)/);
+    assert.match(source, /return deriveAvailableActionsAsync\(character, ctx\);/);
     assert.doesNotMatch(source, /function currentAttackActions\(\)/);
     assert.doesNotMatch(source, /function currentSpellActions\(\)/);
     assert.doesNotMatch(source, /function rulesActionItems\(\)/);
@@ -226,7 +226,7 @@ function createBaseCharacter(overrides = {}) {
 
 describe('api-actions-client', () => {
   it('deriveActions returns backend actions on success', async () => {
-    const { deriveActions } = await import('../src/lib/api-actions-client.ts');
+    const { deriveActions } = await import('../dist/src/lib/api-actions-client.js');
 
     mockFetchSuccess([
       {
@@ -257,7 +257,7 @@ describe('api-actions-client', () => {
   });
 
   it('deriveActions throws on backend failure', async () => {
-    const { deriveActions } = await import('../src/lib/api-actions-client.ts');
+    const { deriveActions } = await import('../dist/src/lib/api-actions-client.js');
 
     mockFetchFailure();
 
@@ -274,7 +274,7 @@ describe('api-actions-client', () => {
 
 describe('action-engine with backend', () => {
   it('deriveAvailableActionsAsync uses backend by default', async () => {
-    const { deriveAvailableActionsAsync } = await import('../src/core/engine/action-engine.ts');
+    const { deriveAvailableActionsAsync } = await import('../dist/src/core/engine/action-engine.js');
 
     mockFetchSuccess([
       {
@@ -425,7 +425,7 @@ describe('action-engine with backend', () => {
   });
 
   it('shape equivalence between backend and local', async () => {
-    const { deriveAvailableActionsAsync, deriveAvailableActions } = await import('../src/core/engine/action-engine.ts');
+    const { deriveAvailableActionsAsync, deriveAvailableActions } = await import('../dist/src/core/engine/action-engine.js');
 
     const backendResponse = [
       {
