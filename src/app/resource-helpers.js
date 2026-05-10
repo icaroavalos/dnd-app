@@ -1,3 +1,7 @@
+/**
+ * Resource Helpers - Backend-first with local fallback.
+ * Uses POST /characters/:id/resources/* endpoints when online, falls back to local mutations.
+ */
 export function createResourceHelpers({
   getState,
   currentResourceDefinitions,
@@ -11,7 +15,11 @@ export function createResourceHelpers({
   renderSheet,
   renderRestModal,
   deriveProjectedAbilityModifier,
+  apiClient,
 }) {
+  const { useResource: apiUseResource, shortRest: apiShortRest, longRest: apiLongRest, spendAmmo: apiSpendAmmo, recoverAmmo: apiRecoverAmmo } = apiClient ?? {};
+  const USE_BACKEND = !!apiClient;
+
   function syncResources() {
     const state = getState();
     state.character.resources ??= {};
@@ -30,12 +38,29 @@ export function createResourceHelpers({
     state.character.resources = next;
   }
 
-  function useResource(resourceId) {
+  async function useResource(resourceId) {
     const state = getState();
     syncResources();
     const resource = state.character.resources?.[resourceId];
     if (!resource || resource.used >= resource.max) return;
-    resource.used += 1;
+
+    if (!USE_BACKEND || !apiUseResource) {
+      resource.used += 1;
+      return;
+    }
+
+    const characterId = state.character.id ?? 'default';
+    try {
+      const result = await apiUseResource(characterId, { resourceType: resourceId, amount: 1, source: 'action' });
+      if (result.resources) {
+        state.character.resources = result.resources;
+      } else {
+        resource.used += 1;
+      }
+    } catch (err) {
+      console.warn('Backend useResource failed, falling back to local:', err);
+      resource.used += 1;
+    }
   }
 
   async function useAction(actionId) {
@@ -46,15 +71,60 @@ export function createResourceHelpers({
       castSpell(action.slotLevel);
       return;
     }
-    if (action.resource) useResource(action.resource);
+    if (action.resource) await useResource(action.resource);
   }
 
-  function recoverShortRestResources() {
+  async function spendAmmo(itemId, quantity = 1) {
+    const state = getState();
+    if (!USE_BACKEND || !apiSpendAmmo) {
+      const item = state.character.inventory?.find((i) => i.id === itemId);
+      if (item?.quantity) {
+        item.quantity = Math.max(0, item.quantity - quantity);
+      }
+      return;
+    }
+
+    const characterId = state.character.id ?? 'default';
+    try {
+      await apiSpendAmmo(characterId, { itemId, quantity, source: 'attack' });
+    } catch (err) {
+      console.warn('Backend spendAmmo failed, falling back to local:', err);
+      const item = state.character.inventory?.find((i) => i.id === itemId);
+      if (item?.quantity) {
+        item.quantity = Math.max(0, item.quantity - quantity);
+      }
+    }
+  }
+
+  async function recoverAmmo(itemId, quantity = 1) {
+    const state = getState();
+    if (!USE_BACKEND || !apiRecoverAmmo) {
+      const item = state.character.inventory?.find((i) => i.id === itemId);
+      if (item?.quantity) {
+        item.quantity = (item.quantity || 0) + quantity;
+      }
+      return;
+    }
+
+    const characterId = state.character.id ?? 'default';
+    try {
+      await apiRecoverAmmo(characterId, { itemId, quantity, source: 'recovery' });
+    } catch (err) {
+      console.warn('Backend recoverAmmo failed, falling back to local:', err);
+      const item = state.character.inventory?.find((i) => i.id === itemId);
+      if (item?.quantity) {
+        item.quantity = (item.quantity || 0) + quantity;
+      }
+    }
+  }
+
+  function recoverShortRestResourcesLocal() {
     const state = getState();
     Object.entries(state.character.resources ?? {}).forEach(([resourceId, resource]) => {
-      const recovery = resource.recovery?.short;
+      // Handle both string format ('short_rest') and object format ({ short: true })
+      const recovery = resource.recovery === 'short_rest' ? true : resource.recovery?.short;
       if (!recovery) return;
-      if (resourceId === "secondWind") {
+      if (resourceId === "secondWind" || resourceId === "second_wind") {
         resource.used = Math.max(0, resource.used - 1);
         return;
       }
@@ -66,11 +136,54 @@ export function createResourceHelpers({
     });
   }
 
-  function recoverLongRestResources() {
+  function recoverLongRestResourcesLocal() {
     const state = getState();
     Object.values(state.character.resources ?? {}).forEach((resource) => {
       resource.used = 0;
     });
+  }
+
+  async function recoverShortRestResources() {
+    if (!USE_BACKEND || !apiShortRest) {
+      recoverShortRestResourcesLocal();
+      return;
+    }
+    const state = getState();
+    const characterId = state.character.id ?? 'default';
+    try {
+      const selected = Object.values(state.restModalHitDice ?? {}).filter((entry) => entry?.value).length;
+      const usable = Math.min(selected, availableHitDice());
+      const healing = usable * hitDieHealingAmount();
+      const result = await apiShortRest(characterId, { hitDiceSpent: usable, hpRegained: healing });
+      if (result.resources) {
+        state.character.resources = result.resources;
+      } else {
+        recoverShortRestResourcesLocal();
+      }
+    } catch (err) {
+      console.warn('Backend short rest failed, falling back to local:', err);
+      recoverShortRestResourcesLocal();
+    }
+  }
+
+  async function recoverLongRestResources() {
+    if (!USE_BACKEND || !apiLongRest) {
+      recoverLongRestResourcesLocal();
+      return;
+    }
+    const state = getState();
+    const characterId = state.character.id ?? 'default';
+    try {
+      const result = await apiLongRest(characterId, { hpRegained: maxHitPoints() });
+      if (result.resources) {
+        state.character.resources = result.resources;
+      } else {
+        recoverLongRestResourcesLocal();
+      }
+    } catch (err) {
+      console.warn('Backend long rest failed, falling back to local:', err);
+      recoverLongRestResourcesLocal();
+    }
   }
 
   function applyRest(type) {
@@ -86,7 +199,7 @@ export function createResourceHelpers({
     renderSheet();
   }
 
-  function confirmRest() {
+  async function confirmRest() {
     const state = getState();
     const type = state.restModalType;
     const isLong = type === "long";
@@ -95,11 +208,11 @@ export function createResourceHelpers({
       state.character.tempHp = 0;
       state.character.hitDiceUsed = 0;
       resetSpellSlots();
-      recoverLongRestResources();
+      await recoverLongRestResources();
     } else {
       applySelectedHitDice();
       resetSpellSlots({ pactOnly: true });
-      recoverShortRestResources();
+      await recoverShortRestResources();
     }
     state.validationMessage = `${isLong ? "Long Rest" : "Short Rest"} aplicado.`;
     state.restModalOpen = false;
@@ -143,7 +256,10 @@ export function createResourceHelpers({
     syncResources,
     useResource,
     useAction,
+    spendAmmo,
+    recoverAmmo,
     recoverShortRestResources,
+    recoverLongRestResources,
     applyRest,
     confirmRest,
     availableHitDice,

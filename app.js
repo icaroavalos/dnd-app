@@ -129,6 +129,7 @@ import { build5etoolsApi, walkEntries } from "./src/app/5etools-source.js";
 import { createSheetRenderers } from "./src/app/sheet-renderers.js";
 import { createSpellHelpers } from "./src/app/spell-helpers.js";
 import { createResourceHelpers } from "./src/app/resource-helpers.js";
+import * as resourceApi from "./dist/src/lib/api-resource-mutations.js";
 import { createModalRenderers } from "./src/app/modal-renderers.js";
 import { createCharacterMenu } from "./src/app/character-menu.js";
 import { createCharacterRoster } from "./src/app/character-roster.js";
@@ -278,6 +279,7 @@ const {
   renderSheet,
   renderRestModal,
   deriveProjectedAbilityModifier,
+  apiClient: resourceApi,
 });
 const sheetRenderers = createSheetRenderers({
   getState: () => state,
