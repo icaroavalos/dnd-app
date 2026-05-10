@@ -46,6 +46,51 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T19:00-0400 - Task 09: Mutacoes de resources e inventory backend-only no frontend
+
+**Timestamp:** 2026-05-10T19:00-0400
+
+**Objetivo:** Tornar mutacoes de resources (gastar/recuperar) e inventory (ammo) backend-only. Remover fallback silencioso de resource-helpers.js, handleError em useResource, spendAmmo, recoverAmmo, shortRest, longRest. Sem mutacao local escondida.
+
+**Arquivos modificados:**
+- `src/lib/api-resource-mutations.ts` - Reescrito com ResourceMutationError, sem fallback
+- `src/app/resource-helpers.js` - Remove USE_BACKEND flag e fallback local
+
+**Arquivos criados:**
+- `tests/resource-mutations-client.test.js` - 8 testes (sucesso, falha rede, 404, sem fallback)
+
+**Comandos rodados:**
+```bash
+node --import tsx --test tests/resource-mutations-client.test.js  # 8/8 passed
+npm run typecheck  # exit 0
+```
+
+**Mudancas:**
+1. `api-resource-mutations.ts`:
+   - Nova classe `ResourceMutationError` extends Error
+   - useResource, spendAmmo, recoverAmmo, shortRest, longRest lancam erro se backend falhar
+   - Sem fallback local - backend e obrigatorio
+
+2. `resource-helpers.js`:
+   - Remove `USE_BACKEND` flag
+   - remove `try/catch` com fallback local em `useResource`
+   - remove `try/catch` com fallback local em `spendAmmo`, `recoverAmmo`
+   - remove `try/catch` com fallback local em `shortRest`, `longRest`
+   - Agora lanca erro visivel se backend indisponivel
+
+3. Testes:
+   - Sucesso: useResource retorna dados do backend
+   - Falha de rede: lanca_resourceMutationError
+   - HTTP 404: lanca ResourceMutationError
+   - spendAmmo/recoverAmmo/shortRest/longRest: testam falha de backend
+   - Sem fallback: confirma que erro e lancado
+
+**Resultado:** ✅ Mutacoes de recursos e inventory agora exigem backend. Erro visivel ao usuario se indisponivel. Consistente com padrao de actions (Task 08) e catalogs (Tasks 04-05).
+
+**Commit:** `ae53c47 refactor: require backend for resource and inventory mutations`
+
+**Status:** DONE
+
 ## 2026-05-10T18:45-0400 - Task 08: Derivação de actions backend-only no frontend
 
 **Timestamp:** 2026-05-10T18:45-0400
