@@ -46,6 +46,53 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T19:45-0400 - Task 12: Isolar codigo local obsoleto do runtime
+
+**Timestamp:** 2026-05-10T19:45-0400
+
+**Objetivo:** Remover ou isolar codigo local obsoleto que nao deve mais estar no caminho de runtime do frontend.
+
+**Arquivos modificados:**
+- `src/core/character/character-projection.ts` - Removido deriveCharacterSheet e funcoes auxiliares
+- `src/core/character/local-character-projection.ts` - Novo modulo para projecao local (fora do runtime canonico)
+- `app.js` - Atualizado imports para usar local-character-projection.js
+- `app.js` - Removido import inutil `deriveAvailableActions`
+
+**Arquivos criados:**
+- `src/core/character/local-character-projection.ts` - Modulo separado para projecao local offline
+
+**Comandos rodados:**
+```bash
+npm run typecheck  # exit 0
+npm test  # 14/14 passed
+npm --prefix backend run test  # 177/177 passed
+```
+
+**Mudancas:**
+1. `character-projection.ts`:
+   - Mantido apenas `projectCharacterSheet` (backend)
+   - Removido `deriveCharacterSheet` e funcoes auxiliares
+   - Modulo agora e estritamente backend-first
+
+2. `local-character-projection.ts` (novo):
+   - `deriveCharacterSheet` - projecao local para edicao offline
+   - `deriveProjectedAbilityScores`, `deriveProjectedAbilityScore`, etc.
+   - Modulo isolado, nao e parte do runtime canonico
+
+3. `app.js`:
+   - Imports atualizados: `deriveCharacterSheet` e outros agora importam de `local-character-projection.js`
+   - Removido import inutil `deriveAvailableActions`
+
+4. `action-engine.ts`:
+   - Mantido `deriveAvailableActions` (local) para testes
+   - `deriveAvailableActionsAsync` usa backend
+
+**Resultado:** Codigo local isolado em modulo separado (`local-character-projection.ts`), fora do caminho de runtime canonico. Frontend agora usa backend para projecao canonica, com fallback local isolado e documentado.
+
+**Commit:** pendente
+
+**Status:** DONE
+
 ## 2026-05-10T19:30-0400 - Task 11: Revisao de fallbacks silent (Tasks 07-10)
 
 **Timestamp:** 2026-05-10T19:30-0400

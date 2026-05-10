@@ -6,8 +6,8 @@ import {
   deriveProjectedProficiencyBonus,
   deriveProjectedSaveBonus,
   deriveProjectedSkillBonus,
-} from "./dist/src/core/character/character-projection.js";
-import { deriveAvailableActions, deriveAvailableActionsAsync } from "./dist/src/core/engine/action-engine.js";
+} from "./dist/src/core/character/local-character-projection.js";
+import { deriveAvailableActionsAsync } from "./dist/src/core/engine/action-engine.js";
 import { deriveActiveModifiers, modifierTotal } from "./dist/src/core/engine/modifier-engine.js";
 import { RuleRepository } from "./dist/src/core/rules/rule-repository.js";
 import { applyBackgroundStepSelection, updateCreationField } from "./dist/src/core/state/creation-form-controller.js";
