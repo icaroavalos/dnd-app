@@ -80,3 +80,44 @@ export function spellSchoolName(school: string): string {
   };
   return schools[school] ?? school ?? "";
 }
+
+// Label formatting functions (consolidated from src/app/labels.js)
+
+export function compactRange(range = ""): string {
+  return String(range).replace(/\bfeet\b/i, "ft.").replace(/\bfoot\b/i, "ft.");
+}
+
+export function rangeLabel(range = ""): string {
+  return /feet|ft\.?/i.test(String(range)) ? "Range" : "Reach";
+}
+
+// Portuguese labels (for app UI)
+export function spellLevelLabel(level: number): string {
+  return level === 0 ? "Cantrips" : `Magias de nivel ${level}`;
+}
+
+// English labels (for spells-view.ts compatibility)
+export function spellLevelLabelEn(level: number): string {
+  return level === 0 ? "Cantrips" : `${ordinalLabel(level)} Level`;
+}
+
+export function ordinalLabel(level: number): string {
+  const labels: Record<number, string> = { 1: "1st", 2: "2nd", 3: "3rd" };
+  return labels[level] ?? `${level}th`;
+}
+
+export function damageTypeLabel(type: string): string {
+  const labels: Record<string, string> = { B: "Bludgeoning", P: "Piercing", S: "Slashing" };
+  return labels[type] ?? type ?? "";
+}
+
+export function propertyLabel(prop: string): string {
+  const key = String(prop).split("|")[0];
+  const labels: Record<string, string> = { V: "Versatile", L: "Light", T: "Thrown", F: "Finesse", H: "Heavy", R: "Reach", "2H": "Two-Handed" };
+  return labels[key] ?? key;
+}
+
+export function formatCurrency(value: number): string {
+  if (value >= 100) return `${Math.floor(value / 100)} GP`;
+  return `${value} CP`;
+}

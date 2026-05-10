@@ -3,6 +3,7 @@
  */
 import { escapeHtml } from '../../lib/utils.js';
 import { signed } from '../character/character-engine.js';
+import { spellLevelLabelEn as spellLevelLabel, ordinalLabel } from '../../lib/formatter.js';
 
 export interface SpellSheetItem {
   name: string;
@@ -197,13 +198,4 @@ function renderSpellParagraphs(value: string | null | undefined): string {
 
 function highlightDiceAndScaledDice(value: string): string {
   return value.replace(/\b\d+d\d+(?:\s*[+\-]\s*\d+)?\b/gi, '<strong>$&</strong>');
-}
-
-function spellLevelLabel(level: number): string {
-  return level === 0 ? 'Cantrips' : `${ordinalLabel(level)} Level`;
-}
-
-function ordinalLabel(level: number): string {
-  const labels: Record<number, string> = { 1: '1st', 2: '2nd', 3: '3rd' };
-  return labels[level] ?? `${level}th`;
 }
