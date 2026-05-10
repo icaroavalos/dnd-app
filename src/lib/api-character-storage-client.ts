@@ -55,7 +55,7 @@ export interface CharacterSummary {
   primaryClass: string;
 }
 
-let backendEnabled = false;
+let backendEnabled = true;
 
 /**
  * Habilita ou desabilita persistência via backend.

@@ -9,10 +9,13 @@
  */
 
 import {
-  loadCharactersFromApi,
-  saveCharacterToApi,
-  deleteCharacterFromApi,
-} from '../lib/api-character-storage-client.js';
+  listCharacters as apiListCharacters,
+  getCharacter as apiGetCharacter,
+  saveCharacter as apiSaveCharacter,
+  deleteCharacter as apiDeleteCharacter,
+  enableBackendStorage,
+  isBackendStorageEnabled,
+} from '../../dist/src/lib/api-character-storage-client.js';
 
 const STORAGE_KEY = 'dnd5e-characters';
 const ACTIVE_CHAR_KEY = 'dnd5e-active-character-id';
@@ -23,20 +26,37 @@ export function createCharacterStorageFacade({
   getCharacters,
   setCharacters,
 } = {}) {
+  // Enable backend storage by default
+  enableBackendStorage(true);
+
   /**
    * Carrega todos os personagens
    * Tenta API primeiro, fallback para localStorage
    */
   async function loadAll() {
     try {
-      const apiCharacters = await loadCharactersFromApi();
-      if (apiCharacters && apiCharacters.length >= 0) {
-        // Salva no localStorage como cache
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(apiCharacters));
-        return apiCharacters;
+      if (isBackendStorageEnabled()) {
+        // Get list of characters (summaries)
+        const summaries = await apiListCharacters();
+        if (summaries && summaries.length > 0) {
+          // Fetch full records for each character
+          const fullCharacters = await Promise.all(
+            summaries.map(async (summary) => {
+              try {
+                return await apiGetCharacter(summary.id);
+              } catch (e) {
+                console.warn(`Failed to fetch character ${summary.id}:`, e);
+                return null;
+              }
+            })
+          );
+          const characters = fullCharacters.filter(Boolean);
+          // Save to localStorage as cache
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(characters));
+          return characters;
+        }
       }
     } catch (error) {
-      // API falhou, fallback para localStorage
       console.warn('API load failed, using localStorage fallback:', error.message);
     }
 
@@ -63,16 +83,16 @@ export function createCharacterStorageFacade({
     }
 
     try {
-      // Tenta salvar na API
-      await saveCharacterToApi(character);
-      // Atualiza localStorage com dados da API
+      if (isBackendStorageEnabled()) {
+        await apiSaveCharacter(character);
+      }
+      // Update localStorage (always)
       const current = await loadAll();
       const updated = current.filter(c => c.id !== character.id);
       updated.push(character);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return character;
     } catch (error) {
-      // API falhou, fallback para localStorage
       console.warn('API save failed, using localStorage fallback:', error.message);
       const current = await loadAll();
       const updated = current.filter(c => c.id !== character.id);
@@ -92,10 +112,10 @@ export function createCharacterStorageFacade({
     }
 
     try {
-      // Tenta deletar da API
-      await deleteCharacterFromApi(characterId);
+      if (isBackendStorageEnabled()) {
+        await apiDeleteCharacter(characterId);
+      }
     } catch (error) {
-      // API falhou, fallback para localStorage
       console.warn('API delete failed, using localStorage fallback:', error.message);
     }
 
@@ -121,6 +141,23 @@ export function createCharacterStorageFacade({
    * Carrega um personagem por ID
    */
   async function loadById(characterId) {
+    try {
+      if (isBackendStorageEnabled()) {
+        const character = await apiGetCharacter(characterId);
+        if (character) {
+          // Cache it
+          const current = await loadAll();
+          const updated = current.filter(c => c.id !== characterId);
+          updated.push(character);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          return character;
+        }
+      }
+    } catch (error) {
+      console.warn('API load by id failed, using localStorage fallback:', error.message);
+    }
+
+    // Fallback to localStorage
     const all = await loadAll();
     return all.find(c => c.id === characterId) || null;
   }
@@ -150,6 +187,8 @@ export function createCharacterStorageFacade({
     list,
     syncLocalState,
     clearLocal,
+    enableBackendStorage: (enabled) => enableBackendStorage(enabled),
+    isBackendStorageEnabled: () => isBackendStorageEnabled(),
   };
 }
 

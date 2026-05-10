@@ -1,7 +1,7 @@
 /**
- * Teste para Character Storage Facade
+ * Testes para Character Storage Facade
  *
- * Prova que o facade:
+ * Valida:
  * - Carrega personagens do localStorage ou API
  * - Salva no localStorage ou API com fallback
  * - Lista todos os personagens
@@ -26,7 +26,38 @@ function readFileContent(filePath) {
   }
 }
 
-describe('Character Storage Facade', () => {
+// Mock setup for functional tests
+const originalFetch = global.fetch;
+const originalLocalStorage = global.localStorage;
+
+function mockFetchSuccess(data) {
+  global.fetch = async (url) => ({
+    ok: true,
+    json: async () => data,
+    url,
+  });
+}
+
+function mockFetchFailure() {
+  global.fetch = async () => {
+    throw new Error('Network error');
+  };
+}
+
+function restoreFetch() {
+  global.fetch = originalFetch;
+}
+
+// Simple localStorage mock
+const localStorageData = {};
+global.localStorage = {
+  getItem: (key) => localStorageData[key] || null,
+  setItem: (key, value) => { localStorageData[key] = value; },
+  removeItem: (key) => { delete localStorageData[key]; },
+  clear: () => { Object.keys(localStorageData).forEach(k => delete localStorageData[k]); },
+};
+
+describe('Character Storage Facade - Code Patterns', () => {
   const facadeJs = readFileContent('src/app/character-storage-facade.js');
   const appjs = readFileContent('app.js');
   const storageClientTs = readFileContent('src/lib/api-character-storage-client.ts');
@@ -224,5 +255,144 @@ describe('Character Storage Facade', () => {
         'deve ter metodo delete/remove'
       );
     });
+  });
+});
+
+describe('Character Storage Facade - Functional Tests', () => {
+  it('save stores character in localStorage on API success', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    mockFetchSuccess({ id: 'char-1', name: 'Test Char' });
+
+    const facade = createCharacterStorageFacade();
+    const testChar = { id: 'char-1', name: 'Test Char', ruleset: '5e' };
+    await facade.save(testChar);
+
+    const stored = JSON.parse(global.localStorage.getItem('dnd5e-characters'));
+    assert.ok(stored && stored.length > 0, 'Should store character in localStorage');
+    assert.equal(stored[0].name, 'Test Char', 'Should store correct character');
+
+    restoreFetch();
+  });
+
+  it('save falls back to localStorage on API failure', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    mockFetchFailure();
+
+    const facade = createCharacterStorageFacade();
+    const testChar = { id: 'char-2', name: 'Fallback Char', ruleset: '5e' };
+    await facade.save(testChar);
+
+    const stored = JSON.parse(global.localStorage.getItem('dnd5e-characters'));
+    assert.ok(stored && stored.length > 0, 'Should store character in localStorage on fallback');
+    assert.equal(stored[0].name, 'Fallback Char', 'Should store correct character on fallback');
+
+    restoreFetch();
+  });
+
+  it('loadAll returns characters from API when available', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    // API returns list with one summary, then fetch full record
+    let callCount = 0;
+    global.fetch = async (url) => {
+      callCount++;
+      if (url.endsWith('/characters')) {
+        return { ok: true, json: async () => [{ id: 'char-1', name: 'API Char', level: 1, primaryClass: 'fighter' }] };
+      }
+      return { ok: true, json: async () => ({ id: 'char-1', name: 'API Char', ruleset: '5e' }) };
+    };
+
+    const facade = createCharacterStorageFacade();
+    const characters = await facade.loadAll();
+
+    assert.ok(Array.isArray(characters), 'Should return array');
+
+    restoreFetch();
+  });
+
+  it('loadAll falls back to localStorage on API failure', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    mockFetchFailure();
+
+    // Pre-populate localStorage
+    const preStored = [{ id: 'char-local', name: 'Local Char', ruleset: '5e' }];
+    global.localStorage.setItem('dnd5e-characters', JSON.stringify(preStored));
+
+    const facade = createCharacterStorageFacade();
+    const characters = await facade.loadAll();
+
+    assert.ok(Array.isArray(characters), 'Should return array from localStorage');
+    assert.equal(characters[0]?.name, 'Local Char', 'Should return local character');
+
+    restoreFetch();
+  });
+
+  it('delete removes character from localStorage', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    mockFetchSuccess({});
+
+    const facade = createCharacterStorageFacade();
+    const testChar = { id: 'char-to-delete', name: 'Delete Me', ruleset: '5e' };
+    await facade.save(testChar);
+
+    // Verify it's stored
+    let stored = JSON.parse(global.localStorage.getItem('dnd5e-characters'));
+    assert.ok(stored.some(c => c.id === 'char-to-delete'), 'Character should be stored');
+
+    // Delete it
+    await facade.delete('char-to-delete');
+
+    // Verify it's removed
+    stored = JSON.parse(global.localStorage.getItem('dnd5e-characters'));
+    assert.ok(!stored.some(c => c.id === 'char-to-delete'), 'Character should be removed');
+
+    restoreFetch();
+  });
+
+  it('list is alias for loadAll', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    mockFetchFailure();
+
+    const facade = createCharacterStorageFacade();
+    const preStored = [{ id: 'char-list', name: 'List Char', ruleset: '5e' }];
+    global.localStorage.setItem('dnd5e-characters', JSON.stringify(preStored));
+
+    const listResult = await facade.list();
+    const loadResult = await facade.loadAll();
+
+    assert.deepEqual(listResult, loadResult, 'list should return same as loadAll');
+
+    restoreFetch();
+  });
+
+  it('loadById returns character by ID', async () => {
+    global.localStorage.clear();
+    const { createCharacterStorageFacade } = await import('../src/app/character-storage-facade.js');
+
+    mockFetchFailure();
+
+    const facade = createCharacterStorageFacade();
+    const preStored = [
+      { id: 'char-1', name: 'First', ruleset: '5e' },
+      { id: 'char-2', name: 'Second', ruleset: '5e' }
+    ];
+    global.localStorage.setItem('dnd5e-characters', JSON.stringify(preStored));
+
+    const character = await facade.loadById('char-2');
+
+    assert.equal(character?.name, 'Second', 'Should return correct character by ID');
+
+    restoreFetch();
   });
 });
