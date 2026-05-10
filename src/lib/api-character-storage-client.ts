@@ -8,10 +8,18 @@
  * - PUT /characters/:id - Atualiza personagem existente
  * - DELETE /characters/:id - Remove personagem
  *
- * Fallback: Se o backend estiver indisponível, usa localStorage.
+ * Sem fallback local: requer backend disponível.
  */
 
 import { getBaseUrl } from './api-catalog-client.js';
+
+export class CharacterStorageError extends Error {
+  name = 'CharacterStorageError';
+
+  constructor(message: string, public cause?: Error) {
+    super(message);
+  }
+}
 
 export interface CharacterRecord {
   id?: string;
@@ -55,72 +63,58 @@ export interface CharacterSummary {
   primaryClass: string;
 }
 
-let backendEnabled = true;
-
-/**
- * Habilita ou desabilita persistência via backend.
- */
-export function enableBackendStorage(enabled: boolean) {
-  backendEnabled = enabled;
-}
-
-/**
- * Verifica se persistência via backend está habilitada.
- */
-export function isBackendStorageEnabled(): boolean {
-  return backendEnabled;
+function buildStorageError(operation: string, response: Response): string {
+  return `Falha ao ${operation}: ${response.status} ${response.statusText}`;
 }
 
 /**
  * Lista todos os personagens (resumo).
  */
 export async function listCharacters(): Promise<CharacterSummary[]> {
-  if (!backendEnabled) {
-    return [];
-  }
-
+  let response: Response;
   try {
-    const response = await fetch(`${getBaseUrl()}/characters`, {
+    response = await fetch(`${getBaseUrl()}/characters`, {
       signal: AbortSignal.timeout(5000),
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to list characters: ${response.statusText}`);
-    }
-
-    return response.json();
   } catch (error) {
-    console.warn('Backend list failed, using fallback:', error);
-    return [];
+    throw new CharacterStorageError(
+      `Backend indisponível para listar personagens. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
   }
+
+  if (!response.ok) {
+    throw new CharacterStorageError(buildStorageError('listar personagens', response));
+  }
+
+  return response.json();
 }
 
 /**
  * Busca um personagem por ID.
  */
 export async function getCharacter(id: string): Promise<CharacterRecord | null> {
-  if (!backendEnabled) {
-    return null;
-  }
-
+  let response: Response;
   try {
-    const response = await fetch(`${getBaseUrl()}/characters/${id}`, {
+    response = await fetch(`${getBaseUrl()}/characters/${id}`, {
       signal: AbortSignal.timeout(5000),
     });
-
-    if (response.status === 404) {
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error(`Failed to get character: ${response.statusText}`);
-    }
-
-    return response.json();
   } catch (error) {
-    console.warn('Backend get failed, using fallback:', error);
+    throw new CharacterStorageError(
+      `Backend indisponível para buscar personagem. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
+
+  if (response.status === 404) {
     return null;
   }
+
+  if (!response.ok) {
+    throw new CharacterStorageError(buildStorageError('buscar personagem', response));
+  }
+
+  return response.json();
 }
 
 /**
@@ -129,15 +123,25 @@ export async function getCharacter(id: string): Promise<CharacterRecord | null> 
 export async function createCharacter(
   character: CharacterRecord
 ): Promise<CharacterRecord> {
-  const response = await fetch(`${getBaseUrl()}/characters`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(character),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(character),
+    });
+  } catch (error) {
+    throw new CharacterStorageError(
+      `Backend indisponível para criar personagem. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to create character: ${response.statusText} - ${error}`);
+    const errorText = await response.text().catch(() => 'unknown error');
+    throw new CharacterStorageError(
+      `Falha ao criar personagem: ${response.status} ${response.statusText} - ${errorText}`
+    );
   }
 
   return response.json();
@@ -150,15 +154,25 @@ export async function updateCharacter(
   id: string,
   character: Partial<CharacterRecord>
 ): Promise<CharacterRecord> {
-  const response = await fetch(`${getBaseUrl()}/characters/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(character),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(character),
+    });
+  } catch (error) {
+    throw new CharacterStorageError(
+      `Backend indisponível para atualizar personagem. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to update character: ${response.statusText} - ${error}`);
+    const errorText = await response.text().catch(() => 'unknown error');
+    throw new CharacterStorageError(
+      `Falha ao atualizar personagem: ${response.status} ${response.statusText} - ${errorText}`
+    );
   }
 
   return response.json();
@@ -168,12 +182,20 @@ export async function updateCharacter(
  * Remove um personagem por ID.
  */
 export async function deleteCharacter(id: string): Promise<void> {
-  const response = await fetch(`${getBaseUrl()}/characters/${id}`, {
-    method: 'DELETE',
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/characters/${id}`, {
+      method: 'DELETE',
+    });
+  } catch (error) {
+    throw new CharacterStorageError(
+      `Backend indisponível para deletar personagem. Certifique-se de que o backend está rodando.`,
+      error instanceof Error ? error : undefined
+    );
+  }
 
   if (!response.ok) {
-    throw new Error(`Failed to delete character: ${response.statusText}`);
+    throw new CharacterStorageError(buildStorageError('deletar personagem', response));
   }
 }
 
@@ -190,8 +212,10 @@ export async function saveCharacter(
   try {
     return await updateCharacter(character.id, character);
   } catch (error) {
-    // Se falhar atualização, tenta criar
-    console.warn('Update failed, trying create:', error);
-    return createCharacter(character);
+    // Se for erro de 404 (nao existe), tenta criar
+    if (error instanceof CharacterStorageError && error.message.includes('404')) {
+      return createCharacter(character);
+    }
+    throw error;
   }
 }

@@ -1,13 +1,19 @@
 /**
  * Persistence and API hydration logic
+ *
+ * Nota: Este modulo lida apenas com preferencias de UI e estado da sessao.
+ * Dados canonicos (personagens) sao persistidos via backend apenas.
+ * localStorage e usado apenas para:
+ * - Preferencias de UI (tema, layout, expansao de secoes)
+ * - ID do ultimo personagem selecionado (para restaurar sessao)
  */
 import type { AppState, Character } from '../../types/state.js';
 import {
-  saveCharacter,
-  getCharacter,
-  listCharacters,
-  deleteCharacter,
-  isBackendStorageEnabled,
+  saveCharacter as apiSaveCharacter,
+  getCharacter as apiGetCharacter,
+  listCharacters as apiListCharacters,
+  deleteCharacter as apiDeleteCharacter,
+  CharacterStorageError,
 } from '../../lib/api-character-storage-client.js';
 
 const STORAGE_KEY = "dnd-sheet-builder";
@@ -25,7 +31,7 @@ export function loadState(defaultState: AppState): AppState {
 
 export function saveState(state: AppState): void {
   const savedState = { ...state } as any;
-  // Don't persist big API data or volatile derived state
+  // Nao persistir dados de API ou estado derivado
   delete savedState.api;
   delete savedState.derived;
 
@@ -33,126 +39,62 @@ export function saveState(state: AppState): void {
 }
 
 /**
- * Saves active character ID to localStorage
+ * Salva ID do personagem ativo no localStorage (apenas preferencia de sessao)
  */
 export function saveActiveCharacterId(id: string): void {
   localStorage.setItem(ACTIVE_CHAR_ID_KEY, id);
 }
 
 /**
- * Loads active character ID from localStorage
+ * Carrega ID do personagem ativo do localStorage (apenas preferencia de sessao)
  */
 export function loadActiveCharacterId(): string | null {
   return localStorage.getItem(ACTIVE_CHAR_ID_KEY);
 }
 
 /**
- * Saves character to backend if enabled, otherwise localStorage
+ * Salva personagem no backend (sem fallback local)
+ * Lanca CharacterStorageError se backend falhar
  */
 export async function saveCharacterToBackend(character: Character & { id?: string }): Promise<Character & { id: string }> {
-  if (isBackendStorageEnabled()) {
-    try {
-      const saved = await saveCharacter(character as any);
-      return saved as any;
-    } catch (error) {
-      console.warn('Backend save failed, falling back to localStorage:', error);
-    }
-  }
-
-  // Fallback: localStorage
-  const chars = loadCharactersFromLocal();
-  const charWithId = character.id ? character : { ...character, id: String(Date.now()) };
-
-  if (character.id) {
-    const index = chars.findIndex(c => c.id === character.id);
-    if (index !== -1) {
-      chars[index] = charWithId as any;
-    } else {
-      chars.push(charWithId as any);
-    }
-  } else {
-    chars.push(charWithId as any);
-  }
-
-  localStorage.setItem('dnd-characters', JSON.stringify(chars));
-  return charWithId as any;
+  const saved = await apiSaveCharacter(character as any);
+  return saved as any;
 }
 
 /**
- * Loads character from backend or localStorage
+ * Carrega personagem do backend (sem fallback local)
+ * Lanca CharacterStorageError se backend falhar
  */
 export async function loadCharacterFromBackend(id: string): Promise<(Character & { id: string }) | null> {
-  if (isBackendStorageEnabled()) {
-    try {
-      const character = await getCharacter(id);
-      if (character) {
-        return character as any;
-      }
-    } catch (error) {
-      console.warn('Backend load failed, falling back to localStorage:', error);
-    }
-  }
-
-  // Fallback: localStorage
-  const chars = loadCharactersFromLocal();
-  return chars.find(c => c.id === id) || null;
+  const character = await apiGetCharacter(id);
+  return character as any;
 }
 
 /**
- * Lists all characters from backend or localStorage
+ * Lista todos os personagens do backend (sem fallback local)
+ * Lanca CharacterStorageError se backend falhar
  */
 export async function listAllCharacters(): Promise<Array<Character & { id: string }>> {
-  if (isBackendStorageEnabled()) {
-    try {
-      const summaries = await listCharacters();
-      // Backend returns summaries, need to fetch full records
-      const fullChars = await Promise.all(
-        summaries.map(async (s) => {
-          const full = await getCharacter(s.id!);
-          return full as any;
-        })
-      );
-      return fullChars.filter(Boolean) as any;
-    } catch (error) {
-      console.warn('Backend list failed, falling back to localStorage:', error);
-    }
+  const summaries = await apiListCharacters();
+  if (!summaries || summaries.length === 0) {
+    return [];
   }
 
-  return loadCharactersFromLocal();
+  const fullChars = await Promise.all(
+    summaries.map(async (s) => {
+      const full = await apiGetCharacter(s.id!);
+      return full as any;
+    })
+  );
+  return fullChars.filter(Boolean) as any;
 }
 
 /**
- * Deletes character from backend or localStorage
+ * Deleta personagem do backend (sem fallback local)
+ * Lanca CharacterStorageError se backend falhar
  */
 export async function deleteCharacterFromBackend(id: string): Promise<void> {
-  if (isBackendStorageEnabled()) {
-    try {
-      await deleteCharacter(id);
-      return;
-    } catch (error) {
-      console.warn('Backend delete failed, falling back to localStorage:', error);
-    }
-  }
-
-  // Fallback: localStorage
-  const chars = loadCharactersFromLocal();
-  const filtered = chars.filter(c => c.id !== id);
-  localStorage.setItem('dnd-characters', JSON.stringify(filtered));
-}
-
-/**
- * Loads characters from localStorage
- */
-function loadCharactersFromLocal(): Array<Character & { id: string }> {
-  try {
-    const stored = localStorage.getItem('dnd-characters');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.warn('Failed to load characters from localStorage:', error);
-  }
-  return [];
+  await apiDeleteCharacter(id);
 }
 
 export async function fetchJson<T = any>(url: string): Promise<T> {
