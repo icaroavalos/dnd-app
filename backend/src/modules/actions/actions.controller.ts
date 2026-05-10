@@ -14,7 +14,33 @@ export class ActionsController {
   @HttpCode(200)
   deriveActions(@Body() request: DeriveActionsRequestDto | CharacterRecord): Promise<DerivedAction[]> {
     // Support both legacy format (direct CharacterRecord) and DTO format
-    const character = 'classes' in request ? request : (request as DeriveActionsRequestDto).character;
+    let character: any;
+    if ('classes' in request && Array.isArray(request.classes)) {
+      character = request as CharacterRecord;
+    } else if ('character' in request) {
+      character = (request as DeriveActionsRequestDto).character;
+    } else {
+      // Frontend sends simplified format with single class string
+      // Convert to full CharacterRecord format
+      const frontendFormat = request as { class?: string; level?: number; abilities?: Record<string, number>; name?: string };
+      character = {
+        id: 'temp-id',
+        ruleset: '5.5e-2024',
+        name: frontendFormat.name || 'Unnamed',
+        lineageId: 'human',
+        backgroundId: 'commoner',
+        experience: 0,
+        classes: frontendFormat.class ? [{ className: frontendFormat.class, level: frontendFormat.level || 1 }] : [],
+        abilities: frontendFormat.abilities || { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+        skillProficiencies: [],
+        savingThrowProficiencies: [],
+        inventory: [],
+        spells: [],
+        spellChoices: [],
+        resources: {},
+        state: { maxHpOverride: undefined },
+      };
+    }
     return this.actionsService.deriveActions(character);
   }
 }

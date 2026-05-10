@@ -24,6 +24,13 @@ export async function createApp(): Promise<NestFastifyApplication> {
 
   app.useGlobalFilters(new ApiExceptionFilter());
 
+  // Enable CORS for local development
+  app.enableCors({
+    origin: ['http://localhost:4173', 'http://127.0.0.1:4173'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept'],
+  });
+
   return app;
 }
 

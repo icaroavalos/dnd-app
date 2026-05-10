@@ -7,7 +7,7 @@ import {
   getFeatures,
   getFeats,
   getBackgrounds,
-} from '../lib/api-catalog-client.js';
+} from '../../dist/src/lib/api-catalog-client.js';
 
 export function createApiData({
   getState,
