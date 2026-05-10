@@ -46,6 +46,36 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T15:30-0400 - Task 04: Estado visual para backend indisponível
+
+**Timestamp:** 2026-05-10T15:30-0400
+
+**Objective:** Implementar estado visual claro para backend indisponível no bootstrap e na criacao de personagem. Selects de classe/species/background ficam bloqueados com mensagem clara quando catalogo falha.
+
+**Files created/modified:**
+- `src/app/backend-status.js` - Novo módulo para gerenciar estado visual do backend (11 testes)
+- `src/app/app-shell.js` - Renderiza banner de erro dinamicamente
+- `styles.css` - Estilos para banner de erro e selects bloqueados
+- `app.js` - Integra backend-status no fluxo de criação
+- `tests/backend-status.test.js` - Testes de contrato para backend-status
+
+**Commands run:**
+```bash
+node --import tsx --test tests/backend-status.test.js tests/builder-views.test.js # 17/17 passed
+npm run typecheck # PASS
+npm run build # SUCCESS
+npm test # 14/14 passed
+git commit -m "feat: show explicit backend catalog failures"
+```
+
+**Features implementadas:**
+- Banner de erro mostra mensagem clara quando backend está offline
+- Selects de classe/species/background bloqueados com ícone de erro
+- Mensagem direta: "Backend indisponível" + URL esperada (localhost:3100)
+- Nenhum fallback silencioso - error state explícito
+
+**Status:** DONE
+
 ## 2026-05-10T15:15-0400 - Task 04: Refatorar frontend para exigir backend (sem fallback)
 
 **Timestamp:** 2026-05-10T15:15-0400
