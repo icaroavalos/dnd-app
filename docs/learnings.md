@@ -1,6 +1,20 @@
 # Learnings
 
-Ultima revisao: 2026-05-08.
+Ultima revisao: 2026-05-10.
+
+## Fallback silencioso em dados canonicos e um padrao nao permitido
+
+Tasks 08-10 removeram fallback localStorage de:
+- Actions derivation (api-actions-client.ts)
+- Resource mutations (api-resource-mutations.ts, resource-helpers.js)
+- Character storage (api-character-storage-client.ts, character-storage-facade.js)
+- Character projection (character-projection.ts)
+
+Padrao:
+- Dados canonicos (personagens, resources, inventory, actions, projection): backend-only, erro visivel
+- Preferencias UI (tema, layout, ultimo personagem ID): localStorage permitido
+
+Aprendizado: console.warn com fallback local em mutacoes deve ser removido; lance erro tipado (`ActionDerivationError`, `ResourceMutationError`, `CharacterStorageError`).
 
 ## Typecheck e testes medem coisas diferentes
 
