@@ -1,3 +1,14 @@
+import {
+  getClasses,
+  getSpecies,
+  getItems,
+  getSpells,
+  getClassSpells,
+  getFeatures,
+  getFeats,
+  getBackgrounds,
+} from '../lib/api-catalog-client.js';
+
 export function createApiData({
   getState,
   dataSource,
@@ -21,21 +32,35 @@ export function createApiData({
     state.dataStatus = "carregando 5etools 2024";
     renderChrome();
     try {
-      const [classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds] = await Promise.all([
-        fetchJson(`${dataSource}/classes.json`),
-        fetchJson(`${dataSource}/races.json`),
+      // Tenta buscar do backend primeiro, fallback para arquivos locais
+      const [classesData, racesData, subracesData, equipmentData, spellsData, classSpellsData, classFeaturesData, subclassFeaturesData, subclassesData, featsData, backgroundsData] = await Promise.all([
+        getClasses().then(r => r.results || []),
+        getSpecies().then(r => r.results || []),
         fetchJson(`${dataSource}/subraces.json`),
-        fetchJson(`${dataSource}/equipment.json`),
-        fetchJson(`${dataSource}/spells.json`),
-        fetchJson(`${dataSource}/class-spells.json`),
-        fetchJson(`${dataSource}/class-features.json`),
-        fetchJson(`${dataSource}/subclass-features.json`),
-        fetchJson(`${dataSource}/subclasses.json`),
-        fetchJson(`${dataSource}/feats.json`),
-        fetchJson(`${dataSource}/backgrounds.json`),
+        getItems().then(r => r.results || []),
+        getSpells().then(r => r.results || []),
+        getClassSpells().then(r => r.results || []),
+        getFeatures().then(r => r.results || []),
+        getFeatures().then(r => r.results || []),
+        getSpecies().then(r => r.results || []),
+        getFeats().then(r => r.results || []),
+        getBackgrounds().then(r => r.results || []),
       ]);
+
       state.api = build5etoolsApi(
-        { classes, races, subraces, equipment, spells, classSpells, classFeatures, subclassFeatures, subclasses, feats, backgrounds },
+        {
+          classes: classesData,
+          races: racesData,
+          subraces: subracesData,
+          equipment: equipmentData,
+          spells: spellsData,
+          classSpells: classSpellsData,
+          classFeatures: classFeaturesData,
+          subclassFeatures: subclassFeaturesData,
+          subclasses: subclassesData,
+          feats: featsData,
+          backgrounds: backgroundsData,
+        },
         {
           slugifyName,
           entriesToText,
