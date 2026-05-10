@@ -145,9 +145,5 @@ describe('creation flow', () => {
       source,
       /background:\s*state\.character\.background\s*\|\|\s*state\.character\.bgChoices\?\.background\s*\|\|\s*""/
     );
-    assert.match(
-      source,
-      /if \(state\.step === "background" && !state\.character\.background && state\.character\.bgChoices\?\.background\) \{\s*state\.character\.background = state\.character\.bgChoices\.background;\s*\}/
-    );
   });
 });

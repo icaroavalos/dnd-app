@@ -19,7 +19,18 @@ import {
   deriveLevelOneMaxHp,
   deriveProficiencyBonus,
   deriveSpellcastingMetrics,
+  getBackgroundSkillProficiencies as getBackgroundSkillProficienciesCore,
+  getClassFeatureCantripBonus,
+  getClassSkillRule,
+  getCurrentLevelRow,
+  getDefaultSaves,
+  getDefaultSubrace,
+  getSubracesFor,
+  hasLoadedRules as hasLoadedRulesCore,
+  isStandardArrayPermutation as isStandardArrayPermutationCore,
+  optionNames,
   signed,
+  skillNameFromSlug as skillNameFromSlugCore,
 } from "./dist/src/core/character/character-engine.js";
 import {
   autoGrantedSpellEntries as typedAutoGrantedSpellEntries,
@@ -325,9 +336,9 @@ const characterRoster = createCharacterRoster({
   standardArray: STANDARD_ARRAY,
   clone: structuredClone,
   randomUUID: () => crypto.randomUUID(),
-  defaultSubrace,
+  defaultSubrace: (raceName) => getDefaultSubrace(raceName, state.api.races),
   maxLevelOneHp,
-  defaultSaves,
+  defaultSaves: getDefaultSaves,
   normalizeCharacterState,
   resolveSelectedSpellName: typedResolveSelectedSpellName,
   knownSheetSpellNames,
@@ -605,7 +616,7 @@ function renderNameField() {
 function renderLineageForm() {
   const c = state.character;
   const locked = creationChoicesLocked();
-  const subraceOptions = subracesFor(c.race);
+  const subraceOptions = getSubracesFor(c.race, state.api.races);
   const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
   const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
   return renderTypedLineageForm({
@@ -659,7 +670,7 @@ function renderAbilityScoreCalculations() {
 }
 
 function renderChoicesForm() {
-  const classSkill = classSkillRule();
+  const classSkill = getClassSkillRule(state.character.class, state.api.classes, SKILLS);
   const backgroundSkills = backgroundSkillProficiencies();
   const selected = state.character.classSkillChoices ?? [];
   const classChoices = classCreationChoiceRules();
@@ -776,7 +787,7 @@ function missingLevelUpChoices() {
 }
 
 function buildCreationFlowState() {
-  const classSkill = classSkillRule();
+  const classSkill = getClassSkillRule(state.character.class, state.api.classes, SKILLS);
   const bgSpellRules = backgroundSpellChoiceRules();
   const currentBackground = state.character.background || state.character.bgChoices?.background || "";
   const activeRules = activeChoiceRulesForValidation().map((rule) => ({
@@ -844,7 +855,7 @@ function buildCreationFlowState() {
     creationChoicesLocked: creationChoicesLocked(),
     pointBuyBudget: POINT_BUY_BUDGET,
     pointBuySpent: pointBuySpent(),
-    subraceRequired: subracesFor(state.character.race).length > 0,
+    subraceRequired: getSubracesFor(state.character.race, state.api.races).length > 0,
     backgroundStepMissing,
     classSkillSelectedCount: (state.character.classSkillChoices ?? []).length,
     classSkillRequiredCount: classSkill.choose,
@@ -1478,8 +1489,7 @@ function recoverShortRestResources() {
 }
 
 function skillNameFromSlug(value) {
-  const normalized = String(value).toLowerCase();
-  return SKILLS.find(([name]) => slugifyName(name) === slugifyName(normalized))?.[0] ?? titleCase(normalized);
+  return skillNameFromSlugCore(value, SKILLS);
 }
 
 function maxHitPoints() {
@@ -1490,43 +1500,12 @@ function spellFromKnownData(name) {
   return typedSpellFromKnownData(name, state.api);
 }
 
-function classSkillRule() {
-  const skillChoice = state.api.classes[state.character.class]?.startingProficiencies?.skills?.find((entry) => entry.choose?.from);
-  if (skillChoice) {
-    return {
-      choose: skillChoice.choose.count ?? 1,
-      options: skillChoice.choose.from.map(skillNameFromSlug),
-    };
-  }
 
-  const apiChoice = state.api.classes[state.character.class]?.proficiency_choices?.find((choice) =>
-    choice.type === "proficiencies" && optionNames(choice).some((name) => name.startsWith("Skill:"))
-  );
-
-  if (apiChoice) {
-    return {
-      choose: apiChoice.choose,
-      options: optionNames(apiChoice).filter((name) => name.startsWith("Skill:")).map((name) => name.replace("Skill: ", "")),
-    };
-  }
-
-  return { choose: 0, options: [] };
-}
-
-function subracesFor(raceName) {
-  const key = slugifyName(raceName);
-  const apiSubraces = state.api.races[key]?.subraces ?? [];
-  return apiSubraces.length ? apiSubraces : [];
-}
-
-function defaultSubrace(raceName) {
-  return subracesFor(raceName)[0] ?? "";
-}
 
 function levelUpCharacter() {
   if (state.character.level >= 20) return;
   state.character.level += 1;
-  const gain = fixedHpGain();
+  const gain = calculateFixedHpGain((state.api.classes[state.character.class]?.hit_die ?? 8), deriveProjectedAbilityModifier(state.character, "con"));
   state.character.hp = (Number(state.character.hp) || 0) + gain;
   state.character.maxHp = state.character.hp;
   normalizeCharacterState();
@@ -1576,9 +1555,6 @@ function setLevelUpHpGain(value) {
   state.character.maxHp = newHp;
 }
 
-function fixedHpGain() {
-  return calculateFixedHpGain((state.api.classes[state.character.class]?.hit_die ?? 8), deriveProjectedAbilityModifier(state.character, "con"));
-}
 
 function maxLevelOneHp(className, abilities = state.character.abilities) {
   const die = state.api.classes?.[className]?.hit_die ?? CLASS_HIT_DIE[className] ?? 8;
@@ -1590,7 +1566,7 @@ function maxLevelOneHp(className, abilities = state.character.abilities) {
 }
 
 function normalizeSubrace() {
-  const options = subracesFor(state.character.race);
+  const options = getSubracesFor(state.character.race, state.api.races);
   if (!options.length) {
     state.character.subrace = "";
     return;
@@ -1600,9 +1576,9 @@ function normalizeSubrace() {
 
 function spellChoiceRule() {
   const className = state.character.class;
-  const levelRow = currentLevelRow();
+  const levelRow = getCurrentLevelRow(state.api.levels, state.character.class, state.character.level);
   const spellcasting = levelRow?.spellcasting;
-  const cantrips = (spellcasting?.cantrips_known ?? 0) + classFeatureCantripBonus() + autoGrantedCantripNames().length;
+  const cantrips = (spellcasting?.cantrips_known ?? 0) + getClassFeatureCantripBonus(state.character.class, state.character.classFeatureChoices ?? {}) + autoGrantedCantripNames().length;
 
   if (!spellcasting || !typedClassHasSpellList(className, state.api) || typedCasterLevel(state.character, state.api) === 0) {
     return {
@@ -1635,18 +1611,11 @@ function spellChoiceRule() {
   };
 }
 
-function classFeatureCantripBonus() {
-  const choices = state.character.classFeatureChoices ?? {};
-  let bonus = 0;
-  if (state.character.class === "druid" && choices["primal-order"] === "magician") bonus += 1;
-  if (state.character.class === "cleric" && choices["divine-order"] === "thaumaturge") bonus += 1;
-  return bonus;
-}
 
 function maxSpellLevelAvailable() {
   const className = state.character.class;
   if (!typedClassHasSpellList(className, state.api) || typedCasterLevel(state.character, state.api) === 0) return 0;
-  const spellcasting = currentLevelRow()?.spellcasting;
+  const spellcasting = getCurrentLevelRow(state.api.levels, state.character.class, state.character.level)?.spellcasting;
   if (spellcasting) {
     for (let level = 9; level >= 1; level -= 1) {
       if ((spellcasting[`spell_slots_level_${level}`] ?? 0) > 0) return level;
@@ -1656,20 +1625,8 @@ function maxSpellLevelAvailable() {
   return 0;
 }
 
-function currentLevelRow() {
-  const levels = state.api.levels[state.character.class];
-  return Array.isArray(levels) ? levels.find((level) => level.level === state.character.level) : undefined;
-}
 
-function optionNames(choice) {
-  const from = choice?.from;
-  if (!from || from.option_set_type !== "options_array") return [];
-  return (from.options ?? []).map((option) => {
-    if (option.option_type === "reference") return option.item?.name;
-    if (option.option_type === "counted_reference") return option.of?.name;
-    return option.item?.name ?? option.choice?.desc ?? option.string;
-  }).filter(Boolean);
-}
+// optionNames importado de character-engine.js
 
 function normalizeCharacterState() {
   state.derived = null;
@@ -1695,7 +1652,7 @@ function normalizeCharacterState() {
   state.character.spellSlots ??= {};
   state.character.resources ??= {};
   state.character.savingThrows = typedGetClassSavingThrows(state.character.class, state.api.classes);
-  if (hasLoadedRules()) {
+  if (hasLoadedRulesCore(state.api)) {
     enforceClassFeatureChoices();
     enforceEquipmentChoices();
   }
@@ -1718,19 +1675,11 @@ function normalizeCharacterState() {
   });
 }
 
-function hasLoadedRules() {
-  return Boolean(state.api.source?.classFeatures?.length && Object.keys(state.api.classes ?? {}).length);
-}
 
 function normalizeAbilityMethodState() {
-  if (state.character.abilityMethod === "standard" && !isStandardArrayPermutation()) {
+  if (state.character.abilityMethod === "standard" && !isStandardArrayPermutationCore(state.character.abilities, STANDARD_ARRAY)) {
     state.character.abilities = Object.fromEntries(ABILITIES.map(([key], index) => [key, STANDARD_ARRAY[index]]));
   }
-}
-
-function isStandardArrayPermutation() {
-  const current = ABILITIES.map(([key]) => Number(state.character.abilities[key])).sort((a, b) => a - b);
-  return current.join(",") === [...STANDARD_ARRAY].sort((a, b) => a - b).join(",");
 }
 
 function enforceClassFeatureChoices() {
@@ -1792,7 +1741,7 @@ function normalizeSourceSelections() {
 }
 
 function deriveClassSkillChoices() {
-  const rule = classSkillRule();
+  const rule = getClassSkillRule(state.character.class, state.api.classes, SKILLS);
   const backgroundSkills = backgroundSkillProficiencies();
   return (state.character.skillProficiencies ?? [])
     .filter((skill) => rule.options.includes(skill) && !backgroundSkills.includes(skill))
@@ -1800,7 +1749,7 @@ function deriveClassSkillChoices() {
 }
 
 function enforceClassSkillLimit() {
-  const rule = classSkillRule();
+  const rule = getClassSkillRule(state.character.class, state.api.classes, SKILLS);
   const backgroundSkills = backgroundSkillProficiencies();
   state.character.classSkillChoices = [...new Set(state.character.classSkillChoices ?? [])]
     .filter((skill) => rule.options.includes(skill) && !backgroundSkills.includes(skill))
@@ -1808,7 +1757,7 @@ function enforceClassSkillLimit() {
 }
 
 function syncSkillProficiencies() {
-  const rule = classSkillRule();
+  const rule = getClassSkillRule(state.character.class, state.api.classes, SKILLS);
   const backgroundSkills = backgroundSkillProficiencies();
   const existingOtherSkills = (state.character.skillProficiencies ?? [])
     .filter((skill) => !rule.options.includes(skill))
@@ -1817,16 +1766,11 @@ function syncSkillProficiencies() {
 }
 
 function backgroundSkillProficiencies(backgroundName = state.character.background) {
-  const name = String(backgroundName || "").toLowerCase();
-  const background = state.api.source?.backgroundDetails?.[name];
-  if (!background) return [];
-
-  return [...new Set((background.skillProficiencies ?? []).flatMap((group) => {
-    if (!group || typeof group !== "object") return [];
-    return Object.entries(group)
-      .filter(([, enabled]) => enabled === true)
-      .map(([slug]) => skillNameFromSlug(slug));
-  }))];
+  return getBackgroundSkillProficienciesCore(
+    backgroundName,
+    state.api.source?.backgroundDetails ?? {},
+    SKILLS
+  );
 }
 
 
@@ -1960,20 +1904,3 @@ function updateChoiceList(listName, value, checked) {
   state.character[listName] = [...new Set(next)];
 }
 
-function defaultSaves(className) {
-  const saves = {
-    barbarian: ["str", "con"],
-    bard: ["dex", "cha"],
-    cleric: ["wis", "cha"],
-    druid: ["int", "wis"],
-    fighter: ["str", "con"],
-    monk: ["str", "dex"],
-    paladin: ["wis", "cha"],
-    ranger: ["str", "dex"],
-    rogue: ["dex", "int"],
-    sorcerer: ["con", "cha"],
-    warlock: ["wis", "cha"],
-    wizard: ["int", "wis"],
-  };
-  return saves[className] ?? ["str", "dex"];
-}

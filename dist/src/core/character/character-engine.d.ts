@@ -56,4 +56,62 @@ export declare function calculateMaxHpGain(hitDie: number, constitutionModifier:
  */
 export declare function deriveSavingThrowBonus(abilityScore: number, proficient: boolean, proficiencyBonus: number): number;
 export declare function signed(value: number): string;
+/**
+ * Verifica se as regras foram carregadas
+ */
+export declare function hasLoadedRulesCore(api: any): boolean;
+/**
+ * Obtém a linha do nível atual
+ */
+export declare function getCurrentLevelRow(levels: Record<string, any[]>, className: string, level: number): any | undefined;
+/**
+ * Obtém o rule de class skill
+ */
+export declare function getClassSkillRule(className: string, api_classes: Record<string, any>, skills: Array<[string, string]>): {
+    choose: number;
+    options: string[];
+};
+/**
+ * Obtém as skill proficiencies de um background
+ */
+export declare function getBackgroundSkillProficiencies(backgroundName: string, backgroundDetails: Record<string, any>, skills: Array<[string, string]>): string[];
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
+export declare function optionNames(choice: any): string[];
+/**
+ * Default saving throws por classe
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
+export declare function getDefaultSaves(className: string): string[];
+/**
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
+export declare function isStandardArrayPermutation(abilities: Record<string, number>, standardArray: number[]): boolean;
+/**
+ * Normaliza nome de skill a partir de slug
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
+export declare function skillNameFromSlug(value: string, skills: Array<[string, string]>): string;
+/**
+ * Verifica se subrace existe para uma race
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
+export interface SubraceData {
+    name: string;
+    subraces?: any[];
+}
+export declare function getSubracesFor(raceName: string, races: Record<string, SubraceData>): string[];
+export declare function getDefaultSubrace(raceName: string, races: Record<string, SubraceData>): string;
+/**
+ * Calcula bônus de cantrip de class features
+ * @deprecated Use backend projection via `projectCharacter()`.
+ * Backend: POST /characters/project
+ */
+export declare function getClassFeatureCantripBonus(className: string, classFeatureChoices: Record<string, string>): number;
 //# sourceMappingURL=character-engine.d.ts.map
