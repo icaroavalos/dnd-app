@@ -6,15 +6,18 @@ export function deriveSpeciesTraits(character: Character, api: ApiState): Charac
   const race = api.races[character.race];
   if (!race) return [];
 
-  return (race.traits || []).map((trait) => {
-    const body = trait.entries?.join('\n') || '';
-    const resource = deriveTraitResource(trait.name, body, `${race.name} • ${race.source}`, api, character);
+  // Handle both normalized format (with traits array) and legacy format
+  const traits = race.traits || [];
+
+  return traits.map((trait) => {
+    const body = Array.isArray(trait.entries) ? trait.entries.join('\n') : String(trait.entries || '');
+    const resource = deriveTraitResource(trait.name, body, `${race.name} • ${race.source ?? 'XPHB'}`, api, character);
 
     return {
       id: `species:${slugify(trait.name)}`,
       kind: 'species' as const,
       name: trait.name,
-      meta: `${race.name} • ${race.source}`,
+      meta: `${race.name} • ${race.source ?? 'XPHB'}`,
       body,
       resource,
     };

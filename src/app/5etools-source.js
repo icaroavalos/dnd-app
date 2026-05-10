@@ -89,9 +89,22 @@ export function build5etoolsApi(
       .map((subrace) => subrace.name)
       .filter(Boolean);
     const ancestryOptions = inferAncestryOptionsFromEntries(race.entries);
+
+    // Extract traits from entries (entries with type "entries" and a name field)
+    const traits = (race.entries ?? [])
+      .filter((entry) => entry.type === 'entries' && entry.name)
+      .map((entry) => ({
+        name: entry.name,
+        entries: entry.entries ?? [],
+      }));
+
     return {
       details: race,
       subraces: explicitSubraces.length ? explicitSubraces : ancestryOptions,
+      traits,
+      // Expose size and movement from top-level fields
+      size: race.size,
+      speed: race.speed,
     };
   }
 
