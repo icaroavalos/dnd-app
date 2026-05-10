@@ -46,6 +46,32 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T15:15-0400 - Task 04: Refatorar frontend para exigir backend (sem fallback)
+
+**Timestamp:** 2026-05-10T15:15-0400
+
+**Objective:** Substituir no frontend o carregamento local de catalogos por cliente backend obrigatoria, sem fallback para JSON local.
+
+**Files modified:**
+- `src/lib/api-catalog-client.ts` - Removido fallback local, nova classe `BackendError`
+- `src/app/api-data.js` - Atualizado para usar cliente sem fallback
+- `tests/api-catalog-client.test.js` - Testes atualizados para validar erro tipado
+
+**Commands run:**
+```bash
+node --import tsx --test tests/api-catalog-client.test.js tests/5etools-source-api-shape.test.js # 16/16 passed
+npm run typecheck # PASS
+npm run build # SUCCESS
+git commit -m "refactor: require backend rules catalog in frontend"
+```
+
+**Mudanças principais:**
+- `BackendError` lançada quando backend está indisponível
+- Sem fallback para `data/5etools/5e-2024`
+- Frontend agora requer backend rodando em `http://localhost:3100`
+
+**Status:** DONE
+
 ## 2026-05-10T14:58-0400 - Task 03: Expor catálogos completos no backend
 
 **Timestamp:** 2026-05-10T14:58-0400
