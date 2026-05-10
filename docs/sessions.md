@@ -1,5 +1,82 @@
 # Sessions
 
+## 2026-05-10T18:30-0400 - Task 02: Padronizar contrato de erro do backend
+
+**Timestamp:** 2026-05-10T18:30-0400
+
+**Objective:** Fixar contrato canonico de erro do backend para todas as rotas consumidas pelo frontend. Testes devem cobrir statusCode, code, message e details para /rules, /characters, /characters/project, /actions/derive, /resources e /inventory.
+
+**Files created:**
+- `backend/test/contract/api-error-contract.spec.ts` - Testes de contrato para erro padrao da API
+
+**Commands run:**
+```bash
+npm --prefix backend run test      # 158 tests passed
+npm --prefix backend run typecheck # PASS
+```
+
+**Endpoints cobertos pelos testes de erro:**
+- `POST /resources/use` - 404 quando recurso invalido, 409 quando sem recursos
+- `POST /inventory/spend-ammo` - 409 quando municao insuficiente
+- `POST /inventory/recover-ammo` - erro para arma invalida
+- `POST /actions/derive` - erro de validacao
+- `POST /characters/project` - erro de validacao
+- `GET /characters/:id` - 404 quando nao existe
+- `PUT /characters/:id` - 404 quando nao existe
+- `DELETE /characters/:id` - erro quando nao existe
+- `GET /rules/:catalog` - 404 para catalogo invalido
+- `GET /characters/:id/resources/projection` - erro quando personagem nao existe
+- `POST /characters/:id/resources/projection/rebuild` - erro quando personagem nao existe
+
+**Contrato de erro padronizado:**
+```json
+{
+  "statusCode": number,
+  "error": {
+    "code": string,
+    "message": string
+  },
+  "path": string,
+  "requestId": string,
+  "timestamp": string
+}
+```
+
+**Result:** ✅ Todos os endpoints consumidos pelo frontend possuem testes de contrato de erro. O shape de erro e padronizado em `backend/src/common/api-exception.filter.ts` e validado em todos os cenarios de falha.
+
+**Status:** DONE
+
+## 2026-05-10T13:30-0400 - QA Senior Runtime Audit
+
+**Objective:** testar o app depois da refatoracao completa, corrigir regressões necessarias e documentar o estado atual.
+
+**Findings corrigidos:**
+- `tests/character-projection-api.test.js` importava `src/*.ts` diretamente, diferente do restante da suite, e quebrava resolução de imports `.js`; ajustado para `dist/src/*.js`.
+- `src/app/api-data.js` e `src/app/labels.js` apontavam para `src/lib/*.js`, arquivos inexistentes no runtime estatico; ajustado para `dist/src/lib/*.js`.
+- `src/app/builder/level-up-renderer.js` continha anotacao TypeScript em arquivo `.js`; removida.
+- `app.js` importava `hasLoadedRules`, mas o export real e `hasLoadedRulesCore`; corrigido.
+- `app.js` inicializava `state` com uma `Promise` e tentava usar `storageFacade` antes da criacao do facade; inicializacao ajustada para carregar estado local sincronamente e sincronizar storage no `init()`.
+
+**Commands run:**
+```bash
+npm test
+npm run typecheck
+npm --prefix backend run test
+npm --prefix backend run typecheck
+node --test tests/character-projection-api.test.js
+node --test tests/*.test.js tests/contract/*.test.js
+for f in src/app/*.js src/app/builder/*.js; do node --check "$f" || exit 1; done
+node -e "import('./app.js').catch(e=>{console.error(e); process.exit(1)})"
+python3 -m http.server 4174
+```
+
+**Browser smoke test:**
+- Render inicial em `http://127.0.0.1:4174` carregou criador, etapas, ficha e dados 5etools 2024.
+- Abas `Magia` e `Features` abriram sem quebrar a UI.
+- Menu de fichas abriu com `Nova ficha`, `Subir nivel`, `Excluir ficha` e ficha ativa.
+
+**Status:** DONE
+
 ## 2026-05-09T17:30-0400 - Task 15: Baseline Read-Only Post-Merge Audit
 
 **Timestamp:** 2026-05-09T17:30-0400
