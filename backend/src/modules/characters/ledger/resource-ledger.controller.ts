@@ -1,5 +1,15 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, Post, Query } from '@nestjs/common';
 import { ResourceLedgerService } from './resource-ledger.service.js';
+import type { UseResourceDto } from './dtos/use-resource.dto.js';
+import type { RestDto } from './dtos/rest.dto.js';
+import type { AmmoDto } from './dtos/ammo.dto.js';
+import type { HpDto } from './dtos/hp.dto.js';
+import type { HitDieDto } from './dtos/hit-die.dto.js';
+import type { SpellSlotDto } from './dtos/spell-slot.dto.js';
+import type { LegacyDamageDto } from './dtos/legacy/damage.dto.js';
+import type { LegacyHealDto } from './dtos/legacy/heal.dto.js';
+import type { LegacyShortRestDto } from './dtos/legacy/short-rest.dto.js';
+import type { LegacyLongRestDto } from './dtos/legacy/long-rest.dto.js';
 
 /**
  * Controller para operações de recursos e descansos via ledger.
@@ -225,68 +235,4 @@ export class ResourceLedgerController {
     );
     return { event: entry };
   }
-}
-
-interface UseResourceDto {
-  resourceType: string;
-  amount: number;
-  source: string;
-  description?: string;
-  metadata?: Record<string, any>;
-}
-
-interface RestDto {
-  restType: 'short' | 'long';
-  hpRegained: number;
-  hitDiceRegained?: number;
-  description?: string;
-}
-
-interface AmmoDto {
-  itemId: string;
-  quantity: number;
-  source: string;
-  description?: string;
-}
-
-interface HpDto {
-  amount: number;
-  currentHp: number;
-  source: 'damage' | 'healing' | 'temp_hp';
-  description?: string;
-}
-
-interface HitDieDto {
-  amount: number;
-  source: 'short_rest' | 'healing';
-  description?: string;
-}
-
-interface SpellSlotDto {
-  slotLevel: number;
-  description?: string;
-}
-
-// Legacy interfaces para compatibilidade
-interface LegacyDamageDto {
-  amount: number;
-  currentHp: number;
-  description?: string;
-}
-
-interface LegacyHealDto {
-  amount: number;
-  currentHp: number;
-  description?: string;
-}
-
-interface LegacyShortRestDto {
-  hitDiceSpent: number;
-  hpRegained: number;
-  description?: string;
-}
-
-interface LegacyLongRestDto {
-  hpRegained: number;
-  description?: string;
 }
