@@ -159,3 +159,341 @@ describe('action engine', () => {
     assert.equal(bless?.disabled, false);
   });
 });
+
+/**
+ * Testes de contrato para derivacao de actions via API.
+ * Valida:
+ * - Sucesso: backend retorna actions derivadas
+ * - Fallback: fallback para derivacao local quando backend falha
+ * - Equivalencia: shape das actions basicas
+ */
+
+const originalFetch = global.fetch;
+
+function mockFetchSuccess(data) {
+  global.fetch = async (url) => ({
+    ok: true,
+    json: async () => data,
+    url,
+  });
+}
+
+function mockFetchFailure() {
+  global.fetch = async () => {
+    throw new Error('Network error');
+  };
+}
+
+function restoreFetch() {
+  global.fetch = originalFetch;
+}
+
+function createBaseCharacter(overrides = {}) {
+  return {
+    id: `char-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    ruleset: '5.5e-2024',
+    name: 'Test Character',
+    lineageId: 'human',
+    backgroundId: 'soldier',
+    alignment: 'Neutral',
+    experience: 0,
+    classes: [{ classId: 'fighter', level: 1 }],
+    abilities: { str: 16, dex: 14, con: 14, int: 10, wis: 10, cha: 10 },
+    skillProficiencies: ['Athletics'],
+    savingThrowProficiencies: ['str', 'con'],
+    inventory: [],
+    spellChoices: [],
+    backgroundChoices: {
+      backgroundId: 'soldier',
+      abilityMode: 'plus1_plus1_plus1',
+      abilityAssignments: { str: 1, dex: 0, con: 1, int: 0, wis: 1, cha: 0 },
+      equipmentSelection: []
+    },
+    resources: {
+      second_wind: { current: 1, max: 1, recovery: 'short_rest' }
+    },
+    state: {
+      hp: 12,
+      maxHpOverride: null,
+      tempHp: 0,
+      hitDiceUsed: 0,
+      spellSlotsUsed: {},
+      activeConditions: []
+    },
+    ...overrides,
+  };
+}
+
+describe('api-actions-client', () => {
+  it('deriveActions returns backend actions on success', async () => {
+    const { deriveActions } = await import('../src/lib/api-actions-client.ts');
+
+    mockFetchSuccess([
+      {
+        id: 'rule:attack',
+        kind: 'action',
+        icon: 'A',
+        name: 'Attack',
+        subtitle: 'Combat Action',
+        range: '--',
+        rangeLabel: 'Varies',
+        hit: '--',
+        damage: [],
+        notes: 'Make one attack.',
+        detail: 'Attack action details.',
+        cost: { economy: 'action' }
+      }
+    ]);
+
+    try {
+      const result = await deriveActions(createBaseCharacter());
+      assert.ok(Array.isArray(result), 'Should return array');
+      assert.equal(result.length, 1);
+      assert.equal(result[0].name, 'Attack');
+      assert.equal(result[0].kind, 'action');
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it('deriveActions throws on backend failure', async () => {
+    const { deriveActions } = await import('../src/lib/api-actions-client.ts');
+
+    mockFetchFailure();
+
+    try {
+      await deriveActions(createBaseCharacter());
+      assert.fail('Should throw on network error');
+    } catch (err) {
+      assert.ok(err.message.includes('Network error') || err.message.includes('Failed'), 'Should throw network error');
+    } finally {
+      restoreFetch();
+    }
+  });
+});
+
+describe('action-engine with backend', () => {
+  it('deriveAvailableActionsAsync uses backend by default', async () => {
+    const { deriveAvailableActionsAsync } = await import('../src/core/engine/action-engine.ts');
+
+    mockFetchSuccess([
+      {
+        id: 'rule:attack',
+        kind: 'action',
+        icon: 'A',
+        name: 'Attack',
+        subtitle: 'Combat Action',
+        range: '--',
+        rangeLabel: 'Varies',
+        hit: '--',
+        damage: [],
+        notes: 'Make one attack.',
+        detail: 'Attack action details.'
+      }
+    ]);
+
+    try {
+      const context = {
+        character: { class: 'fighter' },
+        projection: { abilityModifiers: { str: 3, dex: 2 }, proficiencyBonus: 2 },
+        resourceDefinitions: [],
+        spellDetails: {},
+        loadedSpellDetails: {},
+        compactRange: () => '--',
+        rangeLabel: () => 'Varies',
+        signed: (v) => `${v >= 0 ? '+' : ''}${v}`,
+        slugify: (s) => s.toLowerCase(),
+        itemTypeLabel: () => 'Weapon',
+        itemTags: () => [],
+        entriesToText: () => '',
+        resourceRecoveryLabel: () => 'Short Rest'
+      };
+
+      const result = await deriveAvailableActionsAsync(createBaseCharacter(), context);
+      assert.ok(Array.isArray(result), 'Should return array');
+      assert.equal(result[0].name, 'Attack');
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it('deriveAvailableActionsAsync falls back to local when backend fails', async () => {
+    const { deriveAvailableActionsAsync, enableBackendDerivation } = await import('../src/core/engine/action-engine.ts');
+
+    mockFetchFailure();
+
+    try {
+      const context = {
+        character: { class: 'fighter', attacks: [], inventory: [], spells: [] },
+        projection: { abilityModifiers: { str: 3, dex: 2 }, proficiencyBonus: 2 },
+        resourceDefinitions: [],
+        spellDetails: {},
+        loadedSpellDetails: {},
+        compactRange: () => '--',
+        rangeLabel: () => 'Varies',
+        signed: (v) => `${v >= 0 ? '+' : ''}${v}`,
+        slugify: (s) => s.toLowerCase(),
+        itemTypeLabel: () => 'Weapon',
+        itemTags: () => [],
+        entriesToText: () => '',
+        resourceRecoveryLabel: () => 'Short Rest'
+      };
+
+      const result = await deriveAvailableActionsAsync(createBaseCharacter(), context);
+      assert.ok(Array.isArray(result), 'Should return array from local fallback');
+      assert.ok(result.length > 0, 'Should have basic actions');
+
+      const attack = result.find(a => a.id === 'rule:attack');
+      assert.ok(attack, 'Should have Attack action');
+      assert.equal(attack.name, 'Attack');
+      assert.equal(attack.kind, 'action');
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it('enableBackendDerivation can disable backend', async () => {
+    const { deriveAvailableActionsAsync, enableBackendDerivation } = await import('../src/core/engine/action-engine.ts');
+
+    enableBackendDerivation(false);
+
+    try {
+      mockFetchSuccess([]);
+
+      const context = {
+        character: { class: 'fighter', attacks: [], inventory: [], spells: [] },
+        projection: { abilityModifiers: { str: 3, dex: 2 }, proficiencyBonus: 2 },
+        resourceDefinitions: [],
+        spellDetails: {},
+        loadedSpellDetails: {},
+        compactRange: () => '--',
+        rangeLabel: () => 'Varies',
+        signed: (v) => `${v >= 0 ? '+' : ''}${v}`,
+        slugify: (s) => s.toLowerCase(),
+        itemTypeLabel: () => 'Weapon',
+        itemTags: () => [],
+        entriesToText: () => '',
+        resourceRecoveryLabel: () => 'Short Rest'
+      };
+
+      const result = await deriveAvailableActionsAsync(createBaseCharacter(), context);
+      assert.ok(Array.isArray(result), 'Should return local projection');
+      assert.ok(result.length > 0, 'Should have basic actions');
+
+      const attack = result.find(a => a.id === 'rule:attack');
+      assert.ok(attack, 'Should have Attack action from local');
+
+      enableBackendDerivation(true);
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it('local derivation includes basic actions', async () => {
+    const { deriveAvailableActions } = await import('../src/core/engine/action-engine.ts');
+
+    const context = {
+      character: { class: 'fighter', attacks: [], inventory: [], spells: [] },
+      projection: { abilityModifiers: { str: 3, dex: 2 }, proficiencyBonus: 2 },
+      resourceDefinitions: [],
+      spellDetails: {},
+      loadedSpellDetails: {},
+      compactRange: () => '--',
+      rangeLabel: () => 'Varies',
+      signed: (v) => `${v >= 0 ? '+' : ''}${v}`,
+      slugify: (s) => s.toLowerCase(),
+      itemTypeLabel: () => 'Weapon',
+      itemTags: () => [],
+      entriesToText: () => '',
+      resourceRecoveryLabel: () => 'Short Rest'
+    };
+
+    const result = deriveAvailableActions(context);
+    assert.ok(Array.isArray(result), 'Should return array');
+    assert.ok(result.length > 0, 'Should have actions');
+
+    const attack = result.find(a => a.id === 'rule:attack');
+    const dash = result.find(a => a.id === 'rule:dash');
+    const dodge = result.find(a => a.id === 'rule:dodge');
+
+    assert.ok(attack, 'Should have Attack action');
+    assert.ok(dash, 'Should have Dash action');
+    assert.ok(dodge, 'Should have Dodge action');
+    assert.equal(attack.kind, 'action');
+    assert.equal(dash.kind, 'action');
+    assert.equal(dodge.kind, 'action');
+  });
+
+  it('shape equivalence between backend and local', async () => {
+    const { deriveAvailableActionsAsync, deriveAvailableActions } = await import('../src/core/engine/action-engine.ts');
+
+    const backendResponse = [
+      {
+        id: 'rule:attack',
+        kind: 'action',
+        icon: 'A',
+        name: 'Attack',
+        subtitle: 'Combat Action',
+        range: '--',
+        rangeLabel: 'Varies',
+        hit: '--',
+        damage: [],
+        notes: 'Make one attack.',
+        detail: 'Attack action details.'
+      },
+      {
+        id: 'rule:dash',
+        kind: 'action',
+        icon: 'A',
+        name: 'Dash',
+        subtitle: 'Combat Action',
+        range: 'Self',
+        rangeLabel: 'Move',
+        hit: '--',
+        damage: [],
+        notes: 'Extra movement.',
+        detail: 'Dash details.'
+      }
+    ];
+
+    mockFetchSuccess(backendResponse);
+
+    try {
+      const context = {
+        character: { class: 'fighter', attacks: [], inventory: [], spells: [] },
+        projection: { abilityModifiers: { str: 3, dex: 2 }, proficiencyBonus: 2 },
+        resourceDefinitions: [],
+        spellDetails: {},
+        loadedSpellDetails: {},
+        compactRange: () => '--',
+        rangeLabel: () => 'Varies',
+        signed: (v) => `${v >= 0 ? '+' : ''}${v}`,
+        slugify: (s) => s.toLowerCase(),
+        itemTypeLabel: () => 'Weapon',
+        itemTags: () => [],
+        entriesToText: () => '',
+        resourceRecoveryLabel: () => 'Short Rest'
+      };
+
+      const backendResult = await deriveAvailableActionsAsync(createBaseCharacter(), context);
+      const localResult = deriveAvailableActions(context);
+
+      assert.equal(backendResult.length, backendResponse.length);
+      assert.ok(localResult.length > 0);
+
+      backendResult.forEach(action => {
+        assert.ok(action.id, 'Action should have id');
+        assert.ok(action.kind, 'Action should have kind');
+        assert.ok(action.icon, 'Action should have icon');
+        assert.ok(action.name, 'Action should have name');
+        assert.ok(action.subtitle, 'Action should have subtitle');
+        assert.ok(action.range, 'Action should have range');
+        assert.ok(action.rangeLabel, 'Action should have rangeLabel');
+        assert.ok(action.hit, 'Action should have hit');
+        assert.ok(Array.isArray(action.damage), 'Action should have damage array');
+      });
+    } finally {
+      restoreFetch();
+    }
+  });
+});

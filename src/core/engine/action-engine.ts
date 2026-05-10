@@ -1,6 +1,41 @@
 type ActionKind = 'action' | 'bonus' | 'reaction' | 'other' | 'limited' | 'attack';
 type EconomyKind = 'action' | 'bonus' | 'reaction' | 'other' | 'free' | 'attack';
 
+/**
+ * Flag para habilitar derivacao de actions via backend (se disponível).
+ * Habilitado por default - backend tem fallback local embutido.
+ */
+let useBackendDerivation = true;
+
+export function enableBackendDerivation(enabled: boolean): void {
+  useBackendDerivation = enabled;
+}
+
+export function isBackendDerivationEnabled(): boolean {
+  return useBackendDerivation;
+}
+
+/**
+ * Deriva as acoes disponiveis usando backend se disponível, ou fallback local.
+ * Esta é a função principal para derivar ações da ficha.
+ */
+export async function deriveAvailableActionsAsync(
+  character: ActionEngineCharacter & { id?: string; name?: string },
+  context: ActionEngineContext
+): Promise<DerivedAction[]> {
+  if (useBackendDerivation) {
+    try {
+      const { deriveActions } = await import('../../lib/api-actions-client.js');
+      const actions = await deriveActions(character as any);
+      return actions;
+    } catch (err) {
+      console.warn('Backend action derivation failed, falling back to local:', err);
+    }
+  }
+
+  return deriveAvailableActions(context);
+}
+
 export interface ActionCost {
   economy?: EconomyKind | ActionKind;
   resource?: string;
