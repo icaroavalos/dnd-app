@@ -4,8 +4,7 @@
  */
 import type { RawBackground } from '../../types/background';
 /**
- * Load backgrounds - use hardcoded defaults initially,
- * try to load JSON data in background.
+ * Load backgrounds - fetch JSON data and cache.
  */
 export declare function loadBackgroundData(): Promise<RawBackground[]>;
 /**
@@ -24,4 +23,12 @@ export declare function getBackgroundsBySource(source?: string): RawBackground[]
  * Clear the cache (useful for testing).
  */
 export declare function clearBackgroundCache(): void;
+declare const _default: {
+    loadBackgroundData: typeof loadBackgroundData;
+    getAllBackgrounds: typeof getAllBackgrounds;
+    getBackground: typeof getBackground;
+    getBackgroundsBySource: typeof getBackgroundsBySource;
+    clearBackgroundCache: typeof clearBackgroundCache;
+};
+export default _default;
 //# sourceMappingURL=background-loader.d.ts.map

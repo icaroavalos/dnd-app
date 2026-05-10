@@ -58,6 +58,7 @@ import {
   itemTypeLabel as typedItemTypeLabel,
   normalizeInventoryItem as typedNormalizeInventoryItem,
   parseItemRef as typedParseItemRef,
+  consolidateInventory as typedConsolidateInventory,
 } from "./dist/src/core/character/inventory-engine.js";
 import {
   resourceRecoveryFromBody as typedResourceRecoveryFromBody,
@@ -223,6 +224,7 @@ const {
   itemKey,
   itemTypeLabel,
   itemTags,
+  consolidateInventory,
 } = createInventoryHelpers({
   getState: () => state,
   titleCase,
@@ -234,6 +236,7 @@ const {
   itemTypeLabel: typedItemTypeLabel,
   normalizeInventoryItem: typedNormalizeInventoryItem,
   parseItemRef: typedParseItemRef,
+  consolidateInventory: typedConsolidateInventory,
 });
 const {
   renderSpellChoiceGroups,

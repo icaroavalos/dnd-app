@@ -9,6 +9,7 @@ export function createInventoryHelpers({
   itemTypeLabel: typedItemTypeLabel,
   normalizeInventoryItem: typedNormalizeInventoryItem,
   parseItemRef: typedParseItemRef,
+  consolidateInventory: typedConsolidateInventory,
 }) {
   function equipmentChoiceRules() {
     const state = getState();
@@ -54,17 +55,47 @@ export function createInventoryHelpers({
 
   function rebuildInventoryFromChoices() {
     const state = getState();
-    const inventory = [];
+    const choiceInventory = [];
     equipmentChoiceRules().forEach((rule) => {
       const selected = selectedEquipmentOption(state, rule.id);
       const option = rule.options.find((item) => item.value === selected);
       if (!option) return;
       option.items.forEach((entry, index) => {
-        inventory.push(...inventoryItemsFromEntry(entry, `${rule.id}:${selected}:${index}`));
+        choiceInventory.push(...inventoryItemsFromEntry(entry, `${rule.id}:${selected}:${index}`));
       });
     });
-    state.character.inventory = inventory;
-    state.character.equippedItems = (state.character.equippedItems ?? []).filter((id) => inventory.some((item) => item.id === id));
+
+    const currentInventory = state.character.inventory ?? [];
+    const manualItems = currentInventory.filter(item => item.origin !== 'choice');
+
+    const itemsToMerge = [...choiceInventory, ...manualItems];
+
+    // Map old item IDs to their itemKey for remapping equippedItems
+    const oldIdToKey = new Map();
+    itemsToMerge.forEach(item => {
+      const key = itemKey(item.name, item.source);
+      oldIdToKey.set(item.id, key);
+    });
+
+    // Merge and consolidate
+    const merged = typedConsolidateInventory(itemsToMerge);
+    state.character.inventory = merged;
+
+    // Build mapping from itemKey to new ID
+    const keyToNewId = new Map();
+    merged.forEach(item => {
+      const key = itemKey(item.name, item.source);
+      keyToNewId.set(key, item.id);
+    });
+
+    // Remap equippedItems to new IDs, dropping those with no matching item
+    state.character.equippedItems = (state.character.equippedItems ?? [])
+      .map(oldId => {
+        const key = oldIdToKey.get(oldId);
+        if (!key) return null;
+        return keyToNewId.get(key) || null;
+      })
+      .filter(Boolean);
   }
 
   function selectedEquipmentOption(state, ruleId) {
@@ -81,11 +112,11 @@ export function createInventoryHelpers({
     if (!entry.item) return [];
     const parsed = parseItemRef(entry.item);
     const detail = itemDetail(parsed.name, parsed.source);
-    return [normalizeInventoryItem(detail, parsed, entry.quantity ?? 1, idBase)];
+    return [normalizeInventoryItem(detail, parsed, entry.quantity ?? 1, idBase, { origin: 'choice' })];
   }
 
-  function normalizeInventoryItem(detail, parsed, quantity, id) {
-    return typedNormalizeInventoryItem(detail, parsed, quantity, id);
+  function normalizeInventoryItem(detail, parsed, quantity, id, options) {
+    return typedNormalizeInventoryItem(detail, parsed, quantity, id, options);
   }
 
   function parseItemRef(ref) {
