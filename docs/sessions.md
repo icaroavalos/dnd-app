@@ -46,6 +46,49 @@ npm --prefix backend run typecheck # PASS
 
 **Status:** DONE
 
+## 2026-05-10T18:45-0400 - Task 08: Derivação de actions backend-only no frontend
+
+**Timestamp:** 2026-05-10T18:45-0400
+
+**Objetivo:** Remover fallback local de derivacao de actions no runtime; backend e obrigatorio; testes cobrem API ok, API falha com erro visivel, nenhuma derivacao local escondida.
+
+**Arquivos modificados:**
+- `src/lib/api-actions-client.ts` - Reescrito com ActionDerivationError, sem fallback
+- `src/core/engine/action-engine.ts` - Remove useBackendDerivation e fallback local
+
+**Arquivos criados:**
+- `tests/api-actions-client.test.js` - 4 testes (sucesso, falha de rede, 404, sem fallback)
+
+**Comandos rodados:**
+```bash
+node --import tsx --test tests/api-actions-client.test.js  # 4/4 passed
+npm run typecheck  # exit 0
+npm --prefix backend run test  # 177/177 passed
+```
+
+**Mudancas:**
+1. `api-actions-client.ts`:
+   - Nova classe `ActionDerivationError` extends Error
+   - deriveActions() lanca erro se backend falhar (network ou HTTP 4xx/5xx)
+   - Sem fallback local - backend e obrigatorio
+
+2. `action-engine.ts`:
+   - `deriveAvailableActionsAsync()` chama diretamente `deriveActions()`
+   - Removido `useBackendDerivation` flag
+   - Removida logica de fallback para `deriveAvailableActions()` local
+
+3. Testes:
+   - Sucesso: retorna dados do backend
+   - Falha de rede: lanca ActionDerivationError
+   - HTTP 404: lanca ActionDerivationError
+   - Sem fallback: confirma que erro e lancado, sem fallback local
+
+**Resultado:** ✅ Derivacao de actions agora exige backend. Erro visivel ao usuario se backend indisponivel. Consistente com padrao de catalogs (Tasks 04-05).
+
+**Commit:** `822ca20 refactor: require backend action derivation`
+
+**Status:** DONE
+
 ## 2026-05-10T16:00-0400 - Task 06: Revisão das etapas 02-05
 
 **Timestamp:** 2026-05-10T16:00-0400
