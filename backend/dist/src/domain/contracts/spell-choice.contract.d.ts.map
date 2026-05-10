@@ -1,1 +1,0 @@
-{"version":3,"file":"spell-choice.contract.d.ts","sourceRoot":"","sources":["../../../../src/domain/contracts/spell-choice.contract.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,oBAAoB,CAAC;AAErD,MAAM,WAAW,gBAAgB;IAC/B,QAAQ,EAAE,MAAM,CAAC;IACjB,mBAAmB,EAAE,UAAU,CAAC;IAChC,gBAAgB,EAAE,MAAM,EAAE,CAAC;IAC3B,oBAAoB,EAAE,MAAM,EAAE,CAAC;CAChC"}

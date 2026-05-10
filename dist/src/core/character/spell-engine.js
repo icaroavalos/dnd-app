@@ -1,2 +1,0 @@
-export { currentKnownSpellNames, currentSpellEntries, resolveSelectedSpellName, spellSlotsMaxByLevel, spellAbility, spellAbilityForSpell, spellcastingMetricsForAbility, classHasSpellList, classSpellAbility, casterLevel, currentLevelRow, backgroundSpellChoiceRules, backgroundSpellAbility, backgroundSpellResourceDefinitions, explicitSpellRefsFromText, autoGrantedSpellEntries, spellFromKnownData, } from './spell-engine-composition.js';
-//# sourceMappingURL=spell-engine.js.map
