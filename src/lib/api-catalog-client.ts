@@ -11,7 +11,7 @@
  * - /rules/features
  * - /rules/feats
  *
- * Fallback: Se o backend estiver indisponível, usa dados locais de data/5etools/5e-2024.
+ * Sem fallback: requer backend disponível.
  */
 
 export const getBaseUrl = (): string => {
@@ -34,61 +34,6 @@ export const getBaseUrl = (): string => {
 };
 
 const BASE_URL = getBaseUrl();
-
-// Dados locais em fallback (carregados sob demanda)
-let localDataCache: Record<string, any> | null = null;
-
-async function loadLocalData(): Promise<Record<string, any>> {
-  if (localDataCache) {
-    return localDataCache;
-  }
-
-  try {
-    // Tenta carregar do módulo de dados locais
-    const modules = {
-      backgrounds: () => loadLocalCatalog('../../data/5etools/5e-2024/backgrounds.json'),
-      classes: () => loadLocalCatalog('../../data/5etools/5e-2024/classes.json'),
-      spells: () => loadLocalCatalog('../../data/5etools/5e-2024/spells.json'),
-      'class-spells': () => loadLocalCatalog('../../data/5etools/5e-2024/class-spells.json'),
-      species: () => loadLocalCatalog('../../data/5etools/5e-2024/races.json'),
-      items: () => loadLocalCatalog('../../data/5etools/5e-2024/equipment.json'),
-      features: () => loadLocalCatalog('../../data/5etools/5e-2024/class-features.json'),
-      feats: () => loadLocalCatalog('../../data/5etools/5e-2024/feats.json'),
-    };
-
-    const results: Record<string, any> = {};
-    for (const [key, loader] of Object.entries(modules)) {
-      try {
-        const data = await loader();
-        results[key] = data.default || data;
-      } catch {
-        // Dados locais não disponíveis para este catálogo
-        results[key] = { results: [] };
-      }
-    }
-    localDataCache = results;
-    return results;
-  } catch {
-    return {};
-  }
-}
-
-async function loadLocalCatalog(path: string): Promise<any> {
-  try {
-    const data = await import(path);
-    return data.default || data;
-  } catch (importError) {
-    if (typeof fetch !== 'function') {
-      throw importError;
-    }
-    const url = new URL(path, import.meta.url);
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw importError;
-    }
-    return response.json();
-  }
-}
 
 export interface CatalogEntry {
   id: string;
@@ -115,43 +60,37 @@ export type CatalogType =
   | 'features'
   | 'feats';
 
+export class BackendError extends Error {
+  name = 'BackendError';
+  type: CatalogType;
+  cause?: Error;
+
+  constructor(type: CatalogType, cause?: Error) {
+    super(`Backend indisponível para ${type}. O backend deve estar rodando em ${BASE_URL}`);
+    this.type = type;
+    this.cause = cause;
+  }
+}
+
 /**
- * Busca catálogo pelo tipo com fallback para dados locais.
+ * Busca catálogo pelo tipo. Requer backend disponível.
  */
 export async function getCatalog(type: CatalogType): Promise<CatalogResponse> {
-  // Tenta buscar do backend
+  let response: Response;
   try {
-    const response = await fetch(`${BASE_URL}/rules/${type}`, {
+    response = await fetch(`${BASE_URL}/rules/${type}`, {
       // Timeout de 5 segundos
       signal: AbortSignal.timeout(5000),
     });
-
-    if (response.ok) {
-      return response.json();
-    }
   } catch (error) {
-    // Backend indisponível, usa fallback local
-    console.warn(`Backend indisponível para ${type}, usando fallback local:`, error);
+    throw new BackendError(type, error instanceof Error ? error : undefined);
   }
 
-  // Fallback: dados locais
-  const localData = await loadLocalData();
-  const data = localData[type];
-
-  if (data?.results) {
-    return {
-      results: data.results,
-      total: data.results.length,
-      source: 'local-fallback',
-    };
+  if (!response.ok) {
+    throw new BackendError(type, new Error(`HTTP ${response.status}`));
   }
 
-  // Sem dados locais disponíveis
-  return {
-    results: [],
-    total: 0,
-    source: 'none',
-  };
+  return response.json();
 }
 
 /**

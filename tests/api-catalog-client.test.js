@@ -3,8 +3,8 @@
  *
  * Valida:
  * - Sucesso: backend retorna dados
- * - Falha: fallback para dados locais quando backend falha
- * - Offline: dados locais funcionam sem backend
+ * - Falha: backend indisponível lança BackendError
+ * - Sem fallback local: não carrega dados locais
  */
 
 import assert from 'node:assert/strict';
@@ -25,6 +25,13 @@ function mockFetchFailure() {
   global.fetch = async () => {
     throw new Error('Network error');
   };
+}
+
+function mockFetch404() {
+  global.fetch = async () => ({
+    ok: false,
+    status: 404,
+  });
 }
 
 function restoreFetch() {
@@ -48,16 +55,38 @@ test('api-catalog-client: getCatalog returns backend data on success', async () 
   }
 });
 
-test('api-catalog-client: uses local fallback when backend fails', async () => {
-  const { getCatalog } = await import('../src/lib/api-catalog-client.ts');
+test('api-catalog-client: getCatalog throws BackendError when backend fails', async () => {
+  const { getCatalog, BackendError } = await import('../src/lib/api-catalog-client.ts');
 
   mockFetchFailure();
 
   try {
-    const result = await getCatalog('backgrounds');
-    // Should not throw, should return empty or local data
-    assert.ok(result !== undefined, 'Should return a result');
-    assert.ok('results' in result || 'total' in result || Array.isArray(result), 'Should return catalog response shape');
+    await assert.rejects(
+      async () => getCatalog('backgrounds'),
+      {
+        name: 'BackendError',
+        message: /Backend indisponível para backgrounds/,
+      },
+      'Should throw BackendError when backend is unavailable',
+    );
+  } finally {
+    restoreFetch();
+  }
+});
+
+test('api-catalog-client: getCatalog throws BackendError on 404', async () => {
+  const { getCatalog, BackendError } = await import('../src/lib/api-catalog-client.ts');
+
+  mockFetch404();
+
+  try {
+    await assert.rejects(
+      async () => getCatalog('classes'),
+      {
+        name: 'BackendError',
+      },
+      'Should throw BackendError on HTTP 404',
+    );
   } finally {
     restoreFetch();
   }
@@ -221,4 +250,22 @@ test('api-catalog-client: getCatalogEntry finds entry by id', async () => {
   const entry = getCatalogEntry(catalog, 'spell-1');
   assert.ok(entry, 'Should find entry');
   assert.equal(entry.name, 'Fireball');
+});
+
+test('api-catalog-client: no local fallback - throws on backend failure', async () => {
+  const { getCatalog, BackendError } = await import('../src/lib/api-catalog-client.ts');
+
+  mockFetchFailure();
+
+  try {
+    await assert.rejects(
+      async () => getCatalog('classes'),
+      {
+        name: 'BackendError',
+      },
+      'Should throw BackendError instead of using local fallback',
+    );
+  } finally {
+    restoreFetch();
+  }
 });

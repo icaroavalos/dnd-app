@@ -7,7 +7,7 @@ import {
   getFeatures,
   getFeats,
   getBackgrounds,
-} from '../../dist/src/lib/api-catalog-client.js?v=json-fallback';
+} from '../lib/api-catalog-client.js';
 
 export function createApiData({
   getState,
@@ -29,10 +29,10 @@ export function createApiData({
 }) {
   async function hydrateApiData() {
     const state = getState();
-    state.dataStatus = "carregando 5etools 2024";
+    state.dataStatus = "carregando catálogo do backend";
     renderChrome();
     try {
-      // Tenta buscar do backend primeiro, fallback para arquivos locais
+      // Busca catálogos do backend (obrigatório, sem fallback)
       const [classesData, racesData, subracesData, equipmentData, spellsData, classSpellsData, classFeaturesData, subclassFeaturesData, subclassesData, featsData, backgroundsData] = await Promise.all([
         getClasses().then(r => r.results || []),
         getSpecies().then(r => r.results || []),
@@ -74,8 +74,10 @@ export function createApiData({
       state.dataStatus = dataSourceLabel;
       normalizeCharacterState();
       persist();
-    } catch {
-      state.dataStatus = "erro 5etools 2024";
+    } catch (error) {
+      state.dataStatus = "erro ao carregar do backend";
+      state.apiError = error.message;
+      console.error('Falha ao carregar catálogos do backend:', error);
     }
   }
 
