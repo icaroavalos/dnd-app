@@ -2679,3 +2679,77 @@ h1 {
   background: rgba(68, 181, 172, 0.15);
   border-color: var(--teal);
 }
+
+/* Backend Error Banner */
+.backend-error-banner {
+  background: rgba(246, 164, 164, 0.1);
+  border: 1px solid var(--rose);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem;
+  display: flex;
+  gap: 12px;
+  align-items: start;
+}
+
+.backend-error-banner .icon {
+  width: 24px;
+  height: 24px;
+  color: var(--rose);
+  flex-shrink: 0;
+}
+
+.backend-error-banner .content {
+  flex: 1;
+}
+
+.backend-error-banner strong {
+  display: block;
+  color: var(--rose);
+  margin-bottom: 0.25rem;
+}
+
+.backend-error-banner p {
+  margin: 0.25rem 0;
+  color: var(--muted);
+}
+
+.backend-error-banner .hint {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* Disabled Select Wrapper */
+.select-disabled-wrapper {
+  position: relative;
+}
+
+.select-disabled {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  background: #1a1a1a;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.select-disabled-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(246, 164, 164, 0.1);
+  border-radius: 4px;
+  color: var(--rose);
+  font-size: 0.85rem;
+}
+
+.select-disabled-message .icon-small {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+

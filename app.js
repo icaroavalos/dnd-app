@@ -141,6 +141,7 @@ import { createBuilderRenderers } from "./src/app/builder-renderers.js";
 import { createMainRenderController } from "./src/app/main-render-controller.js";
 import { createCreationEventHandlers } from "./src/app/creation-event-handlers.js";
 import { createCharacterStorageFacade } from "./src/app/character-storage-facade.js";
+import { createBackendStatus } from "./src/app/backend-status.js";
 
 const STEPS = CREATION_STEPS;
 
@@ -384,6 +385,11 @@ const apiData = createApiData({
   persist,
   renderChrome,
 });
+
+const backendStatus = createBackendStatus({
+  getState: () => state,
+  setState: (newState) => { state = newState; },
+});
 const builderRenderers = createBuilderRenderers({
   getState: () => state,
   abilities: ABILITIES,
@@ -623,8 +629,12 @@ function renderLineageForm() {
   const c = state.character;
   const locked = creationChoicesLocked();
   const subraceOptions = getSubracesFor(c.race, state.api.races);
-  const classOptions = state.api.source?.classOptions?.length ? state.api.source.classOptions : CLASSES.map((item) => [item, titleCase(item)]);
-  const raceOptions = state.api.source?.raceOptions?.length ? state.api.source.raceOptions : RACES.map((item) => [item, titleCase(item)]);
+  const apiReady = backendStatus.isApiReady();
+
+  // Use API data when ready, otherwise use empty arrays (show disabled state)
+  const classOptions = apiReady && state.api.source?.classOptions?.length ? state.api.source.classOptions : [];
+  const raceOptions = apiReady && state.api.source?.raceOptions?.length ? state.api.source.raceOptions : [];
+
   return renderTypedLineageForm({
     character: c,
     locked,
@@ -636,6 +646,7 @@ function renderLineageForm() {
     navButtons,
     titleCase,
     escapeHtml,
+    apiReady,
   });
 }
 
