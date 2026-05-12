@@ -126,9 +126,14 @@ export function createCreationEventHandlers({
       input.addEventListener('change', handleListChange.bind(null, input));
     });
 
-    // Bind navigation buttons
-    form.querySelectorAll('[data-move]').forEach((button) => {
-      button.addEventListener('click', handleMoveClick.bind(null, button));
+    // Bind navigation buttons - using event delegation pattern for dynamic content
+    form.addEventListener('click', (event) => {
+      const moveButton = event.target.closest('[data-move]');
+      if (moveButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        handleMoveClick(moveButton);
+      }
     });
 
     // Bind remove attack buttons
@@ -355,12 +360,16 @@ export function createCreationEventHandlers({
     render();
   }
 
-  // Handler for navigation
+  // Handler for navigation - navigates between creation steps
   function handleMoveClick(button) {
     const state = getState();
-    // Handle navigation
-    persist();
-    render();
+    const targetStepIndex = Number(button.dataset.move);
+    const steps = ['lineage', 'background', 'abilities', 'choices', 'leveling'];
+    if (targetStepIndex >= 0 && targetStepIndex < steps.length) {
+      state.step = steps[targetStepIndex];
+      persist();
+      render();
+    }
   }
 
   // Handler for remove attack

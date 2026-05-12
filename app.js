@@ -514,6 +514,7 @@ async function init() {
   normalizeCharacterState();
   state.selectedSpell = typedResolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
   bindGlobalEvents();
+  bindFormEvents();
   await hydrateApiData();
   render();
 }
