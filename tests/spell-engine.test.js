@@ -17,7 +17,7 @@ describe('spell engine', () => {
           spellcastingAbility: 'wis',
         },
         bgSpellChoices: {
-          'bg-bg-magic-initiate-cleric-0': ['Resistance', 'Light', 'Bless'],
+          'bg-magic-initiate-cleric-0': ['Resistance', 'Light', 'Bless'],
         },
       },
       {
@@ -96,7 +96,7 @@ describe('spell engine', () => {
           spellcastingAbility: 'wis',
         },
         bgSpellChoices: {
-          'bg-bg-magic-initiate-cleric-0': ['Resistance', 'Sacred Flame', 'Bless'],
+          'bg-magic-initiate-cleric-0': ['Resistance', 'Sacred Flame', 'Bless'],
         },
       },
       {
@@ -166,7 +166,7 @@ describe('spell engine', () => {
           spellcastingAbility: 'wis',
         },
         bgSpellChoices: {
-          'bg-bg-magic-initiate-cleric-0': ['Resistance', 'Sacred Flame', 'Bless'],
+          'bg-magic-initiate-cleric-0': ['Resistance', 'Sacred Flame', 'Bless'],
         },
       },
       {

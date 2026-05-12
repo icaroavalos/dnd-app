@@ -21,7 +21,8 @@ const SINGLE_FILES_BY_KIND: Partial<Record<RulesCatalogKind, string>> = {
   'class-spells': 'class-spells.json',
   species: 'races.json',
   items: 'equipment.json',
-  feats: 'feats.json'
+  feats: 'feats.json',
+  subraces: 'subraces.json'
 };
 
 @Injectable()

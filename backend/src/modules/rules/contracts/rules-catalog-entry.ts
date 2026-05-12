@@ -6,7 +6,8 @@ export type RulesCatalogKind =
   | 'species'
   | 'items'
   | 'features'
-  | 'feats';
+  | 'feats'
+  | 'subraces';
 
 export interface RulesCatalogEntry {
   name: string;

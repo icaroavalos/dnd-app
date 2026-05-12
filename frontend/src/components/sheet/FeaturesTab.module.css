@@ -1,0 +1,128 @@
+.featuresTabContainer {
+  /* No styles found in index.css */
+}
+
+.featureSection {
+  display: grid;
+  gap: 8px;
+}
+
+.featureSection h3 {
+  margin: 8px 0 0;
+  color: #cf3036;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid #d8d8d8;
+  padding-bottom: 4px;
+}
+
+.featureGroupList {
+  display: grid;
+  gap: 12px;
+}
+
+.featureCard {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.featureCard.expanded {
+  border-color: #cf3036;
+}
+
+.featureCardHeader {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: #f0f0f0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.featureCardHeader:hover,
+.featureCardHeader.active {
+  background: #222;
+}
+
+.featureCardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.featureCardTitle strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  border-right: 2px solid #888;
+  border-bottom: 2px solid #888;
+  transform: rotate(135deg);
+  transition: transform 0.2s;
+}
+
+.featureCardHeader.active .chevron {
+  transform: rotate(-45deg);
+  border-color: #cf3036;
+}
+
+.featureCardBody {
+  padding: 12px;
+  background: #151515;
+  border-top: 1px solid #333;
+  color: #d0d0d0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.featureCardBody p {
+  margin: 0 0 8px;
+}
+
+.resourceUse {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: #6f7a80;
+  font-weight: 850;
+}
+
+.castButton {
+  position: relative;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #cf3036;
+  border: 0;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0 12px;
+}
+
+.emptyState {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  border: 1px dashed #343434;
+  border-radius: 8px;
+  text-align: center;
+  padding: 16px;
+}

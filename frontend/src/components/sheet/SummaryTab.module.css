@@ -1,0 +1,210 @@
+.sheetView {
+  display: grid;
+  gap: 10px;
+}
+
+.pillRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.creamPill {
+  min-width: 0;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 4px 9px;
+  color: #121212;
+  border-radius: 8px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.05;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  background: var(--cream);
+  border: 2px solid #b8914b;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.statCard {
+  background: #f5f5f5;
+  color: #111;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 78px;
+  border: 4px solid var(--green);
+  display: grid;
+  place-items: center;
+  padding: 6px;
+}
+
+.statCard span {
+  display: block;
+  font-weight: 850;
+  font-size: 0.85rem;
+}
+
+.statCard strong {
+  display: block;
+  font-size: 2.6rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.hpOrb {
+  width: 110px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 10px 11px 11px;
+  border-radius: 999px;
+  color: #1288ec;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.98), #eeeeee 54%, #e3e3e3 100%);
+  border: 5px solid #8b2531;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.75),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.35),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  box-sizing: border-box;
+  justify-self: center;
+}
+
+.hpOrb span {
+  color: #111;
+  font-size: 0.8rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hpOrb strong {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  font-size: 2.7rem;
+  line-height: 0.84;
+  font-variant-numeric: tabular-nums;
+}
+
+.hpOrb small,
+.hpOrb em {
+  display: block;
+  color: #111;
+  font-style: normal;
+  font-size: 0.55rem;
+  font-weight: 900;
+  line-height: 1.08;
+}
+
+.hpOrb strong small {
+  display: block;
+  margin: 0;
+  color: #5a616a;
+  font-size: 0.62rem;
+  line-height: 1;
+}
+
+.hpOrb em {
+  margin-top: 6px;
+  padding: 2px 8px;
+  color: #8b2531;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(139, 37, 49, 0.08);
+  border: 1px solid rgba(139, 37, 49, 0.22);
+  border-radius: 999px;
+}
+
+.smallGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 6px;
+  border: 3px solid var(--blue);
+  border-radius: 8px;
+}
+
+.smallCard {
+  background: #f5f5f5;
+  color: #111;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 78px;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border: 3px solid #20205e;
+}
+
+.smallCard span {
+  display: block;
+  font-weight: 850;
+  font-size: 0.85rem;
+}
+
+.smallCard strong {
+  font-size: 2.35rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.abilities {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 7px;
+  border: 3px solid var(--teal);
+  border-radius: 8px;
+}
+
+.abilityCard {
+  background: #f5f5f5;
+  color: #111;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 72px;
+  padding: 6px;
+  border: 2px solid var(--mint);
+}
+
+.abilityCard h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.abilityValues {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.abilityValues span {
+  display: block;
+  font-size: 0.63rem;
+}
+
+.abilityValues strong {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.abilitySave {
+  /* No styles found in index.css */
+}
+
+.proficient {
+  /* No styles found in index.css */
+}

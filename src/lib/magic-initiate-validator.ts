@@ -58,7 +58,7 @@ export function validateMagicInitiateChoices(
   const errors: string[] = [];
 
   for (const rule of rules) {
-    const storageKey = `bg-${rule.id}`;
+    const storageKey = rule.id;
     const selected = bgSpellChoices?.[storageKey] || [];
 
     // Busca lista de magias para esta classe
@@ -160,7 +160,9 @@ export function getBackgroundSpellOptions(
   if (!spellList) return [];
   const key = spellList.toLowerCase();
   const options = classSpells?.[key] ?? [];
-  return [...options].sort((left, right) => left.level - right.level || left.name.localeCompare(right.name));
+  return [...options]
+    .filter((spell) => spell.level <= 1)
+    .sort((left, right) => left.level - right.level || left.name.localeCompare(right.name));
 }
 
 export function getSelectedBackgroundSpellNames(
@@ -170,7 +172,7 @@ export function getSelectedBackgroundSpellNames(
   const selectedNames: string[] = [];
 
   for (const rule of rules) {
-    const storageKey = `bg-${rule.id}`;
+    const storageKey = rule.id;
     const selected = bgSpellChoices?.[storageKey] ?? [];
     selected.forEach((name) => {
       if (name && !selectedNames.includes(name)) selectedNames.push(name);

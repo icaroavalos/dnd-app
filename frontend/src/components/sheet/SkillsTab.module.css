@@ -1,0 +1,38 @@
+.skillColumns {
+  columns: 2 160px;
+  column-gap: 12px;
+}
+
+.skillCard {
+  background: #f5f5f5;
+  color: #111;
+  border-radius: 8px;
+  text-align: center;
+  break-inside: avoid;
+  margin: 0 0 10px;
+  padding: 4px;
+  border: 2px solid var(--teal);
+}
+
+.skillCard h3 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 4px;
+  padding: 2px 7px;
+  font-size: 1.05rem;
+}
+
+.skillRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 3px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #dff4ef;
+  text-align: left;
+}
+
+.proficient {
+  /* No styles found in index.css, but kept for consistency */
+}

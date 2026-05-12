@@ -1,0 +1,205 @@
+.spellTabContent {
+  /* No styles found in index.css */
+}
+
+.metricRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.smallCard {
+  background: #f5f5f5;
+  color: #111;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 78px;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border: 3px solid #20205e;
+}
+
+.smallCard span {
+  display: block;
+  font-weight: 850;
+  font-size: 0.85rem;
+}
+
+.smallCard strong {
+  font-size: 2.35rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.spellSheetGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.spellStrip {
+  min-width: 0;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 4px 9px;
+  color: #121212;
+  border-radius: 8px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.05;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  grid-template-columns: minmax(0, 1fr) auto;
+  justify-content: stretch;
+  place-items: center stretch;
+  color: #111;
+  background: #ffc8ef;
+  border: 2px solid var(--purple);
+  text-align: left;
+}
+
+.spellStrip > span {
+  font-size: 1.02rem;
+  font-weight: 950;
+}
+
+.spellSlots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.spellSlots strong {
+  margin-left: 3px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.slotBox {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #d3d3d3;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.18);
+}
+
+.slotBox.used {
+  background: #5a5a5a;
+  box-shadow: inset 0 0 0 3px #2a2a2a;
+}
+
+.spellItemContainer {
+  /* No styles found in index.css */
+}
+
+.spellRow {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  gap: 7px;
+  align-items: stretch;
+}
+
+.castButton {
+  position: relative;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #cf3036;
+  border: 0;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.castButton:disabled {
+  color: #777;
+  background: #2b2b2b;
+  cursor: not-allowed;
+}
+
+.purpleStrip {
+  min-width: 0;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.05;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  background: #5e558b;
+  color: #0f0f0f;
+  cursor: pointer;
+}
+
+.spellButton {
+  width: 100%;
+  border: 0;
+  font-weight: 800;
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding-inline: 12px;
+}
+
+.spellButton.active,
+.spellButton:hover {
+  background: #7b70b8;
+  color: #fff;
+}
+
+.spellButtonName {
+  color: inherit;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.spellCard {
+  --spell-accent: #c73828;
+  position: relative;
+  display: grid;
+  gap: 10px;
+  color: #111;
+  background: var(--spell-accent);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.spellCardBody {
+  background: #fff;
+  padding: 10px 12px;
+  min-height: 150px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  line-height: 1.28;
+  text-align: left;
+}
+
+.spellCardBody p {
+  margin: 0 0 8px;
+}
+
+.mt2 {
+  margin-top: 0.5rem;
+}
+
+.emptyState {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  border: 1px dashed #343434;
+  border-radius: 8px;
+  text-align: center;
+  padding: 16px;
+}

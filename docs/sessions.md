@@ -1,6 +1,397 @@
+## 2026-05-12 - Refatoração de Magias e Habilidades (Features) para React
+
+**Status:** ✅ CONCLUÍDO — Abas de Magias e Habilidades implementadas.
+
+**Objetivo:** Migrar as visualizações de magias e habilidades de classe/espécie para React, incluindo o controle de uso de Spell Slots.
+
+**Ações realizadas:**
+1. Atualizado \`useDerivedState.ts\`:
+   - Adicionados cálculos de **Spell Attack Bonus** e **Spell Save DC** baseados no atributo de conjuração.
+2. Implementado \`SpellsTab.tsx\`:
+   - Listagem de magias agrupadas por nível.
+   - **Spell Slot Tracker**: Visualização e controle de uso de slots de magia por nível.
+   - Botão "Gastar" que consome slots reativamente no store do Zustand.
+   - Exibição de métricas de conjuração (Ataque e DC) no topo da aba.
+3. Implementado \`FeaturesTab.tsx\`:
+   - Listagem de habilidades (Class Features, Species Traits, Feats).
+   - Agrupamento automático por origem da habilidade.
+   - Sistema de cards expansíveis para visualização de descrições.
+4. Atualizada a \`SheetPage.tsx\`:
+   - Adicionadas as abas "Magias" e "Habilidades" para completar a navegação da ficha.
+
+**Arquivos criados/modificados:**
+- \`frontend/src/hooks/useDerivedState.ts\`
+- \`frontend/src/components/sheet/SpellsTab.tsx\`
+- \`frontend/src/components/sheet/FeaturesTab.tsx\`
+- \`frontend/src/pages/SheetPage.tsx\`
+
+**Verificação:**
+- Uso de Spell Slots refletindo instantaneamente nos "bubbles" de status.
+- Cálculos de Spell DC e Attack seguindo a fórmula oficial (\`8 + mod + prof\` e \`mod + prof\`).
+- Agrupamento de habilidades respeitando a origem (Classe vs Espécie).
+
+---
+## 2026-05-12 - Refatoração de Inventário e Ataques para React
+
+**Status:** ✅ CONCLUÍDO — Abas de Inventário e Ataques/Ações implementadas.
+
+**Objetivo:** Migrar as visualizações de inventário e ações de combate para componentes React, integrando o gerenciamento de equipamentos e filtros de ações.
+
+**Ações realizadas:**
+1. Atualizado \`useDerivedState.ts\`:
+   - Adicionado cálculo de capacidade de carga (\`Ability Score x 15\`).
+   - Preparada estrutura para rastreamento de peso total.
+2. Implementado \`InventoryTab.tsx\`:
+   - Listagem de itens do inventário.
+   - Funcionalidade de equipar/desequipar itens reativa.
+   - Exibição de carga atual vs capacidade máxima.
+3. Implementado \`AttacksTab.tsx\`:
+   - Tabela de ações e ataques com filtros (Tudo, Ataques, Ações, Bônus, Reações).
+   - Sistema de expansão para ver detalhes de cada ação.
+   - Preparado botão para rolagem de dano (funcionalidade a ser integrada na Fase 2).
+4. Atualizada a \`SheetPage.tsx\`:
+   - Adicionadas as abas "Itens" e "Ações" à navegação da ficha.
+
+**Arquivos criados/modificados:**
+- \`frontend/src/hooks/useDerivedState.ts\`
+- \`frontend/src/components/sheet/InventoryTab.tsx\`
+- \`frontend/src/components/sheet/AttacksTab.tsx\`
+- \`frontend/src/pages/SheetPage.tsx\`
+
+**Verificação:**
+- Equipamento de itens refletindo instantaneamente no estado.
+- Filtros de ações filtrando corretamente a lista.
+- Layout de tabela de ataques seguindo o padrão mobile do design original.
+
+---
+## 2026-05-12 - Refatoração das abas Summary e Skills para React
+
+**Status:** ✅ CONCLUÍDO — Visualização da ficha (Resumo e Perícias) implementada.
+
+**Objetivo:** Migrar as abas de visualização da ficha de personagem (Resumo e Perícias) para React, calculando modificadores e bônus dinamicamente.
+
+**Ações realizadas:**
+1. Criado o hook customizado \`useDerivedState.ts\`:
+   - Centraliza cálculos de modificadores de atributo, bônus de proficiência, salvaguardas e bônus de perícias.
+   - Fornece valores calculados em tempo real com base no estado do Zustand.
+2. Implementado \`SummaryTab.tsx\`:
+   - Exibição de HP, CA, Iniciativa e Atributos principais.
+   - Mantém o layout de "HP Orb" e cards de estatísticas originais.
+3. Implementado \`SkillsTab.tsx\`:
+   - Listagem de perícias agrupadas por atributo correspondente.
+   - Destaque visual para perícias com proficiência.
+4. Atualizada a \`SheetPage.tsx\`:
+   - Adicionado sistema de troca de abas para alternar entre Resumo e Perícias.
+
+**Arquivos criados/modificados:**
+- \`frontend/src/hooks/useDerivedState.ts\`
+- \`frontend/src/components/sheet/SummaryTab.tsx\`
+- \`frontend/src/components/sheet/SkillsTab.tsx\`
+- \`frontend/src/pages/SheetPage.tsx\`
+
+**Verificação:**
+- Cálculos de modificadores batendo com as regras do SRD (\`(valor - 10) / 2\`).
+- Bônus de perícias atualizando corretamente ao marcar proficiência no store (em desenvolvimento).
+- Interface responsiva e fiel ao design original.
+
+---
+## 2026-05-12 - Refatoração de Background e Magic Initiate para React
+
+**Status:** ✅ CONCLUÍDO — Seleção de background e magias de Magic Initiate implementadas.
+
+**Objetivo:** Migrar a seleção de background e a lógica complexa de escolha de magias (Magic Initiate) para componentes React.
+
+**Ações realizadas:**
+1. Implementado \`MagicInitiate.tsx\`:
+   - Busca magias de nível 0 e 1 filtradas por classe.
+   - Gerencia limites de escolha (ex: 2 truques e 1 magia de nível 1).
+   - Desabilita dinamicamente opções não selecionadas quando o limite é atingido, usando estado reativo do React/Zustand.
+2. Implementado \`BackgroundSelect.tsx\`:
+   - Seleção de backgrounds via API.
+   - Detecção automática de backgrounds que concedem o talento "Magic Initiate" (como Acolyte).
+   - Renderização condicional do seletor de magias.
+3. Atualizada a \`CreatorPage.tsx\`:
+   - Integrado o fluxo de background entre a seleção de classe e atributos.
+
+**Arquivos criados/modificados:**
+- \`frontend/src/components/builder/MagicInitiate.tsx\`
+- \`frontend/src/components/builder/BackgroundSelect.tsx\`
+- \`frontend/src/pages/CreatorPage.tsx\`
+
+**Verificação:**
+- Travas de limite de magias funcionando (não permite selecionar mais do que o permitido).
+- Estado limpo corretamente ao trocar de background.
+- Integração fluida com o sistema de cards e utilitários UI.
+
+---
+## 2026-05-12 - Refatoração do Construtor de Atributos (Ability Scores) para React
+
+**Status:** ✅ CONCLUÍDO — Construtor de atributos implementado com suporte a múltiplos métodos.
+
+**Objetivo:** Migrar a lógica de geração de atributos (Standard Array, Point Buy e Manual) para um componente React integrado ao Zustand.
+
+**Ações realizadas:**
+1. Implementado \`AbilityScores.tsx\`:
+   - Suporte a **Standard Array**: Seleção de valores fixos (15, 14, 13, 12, 10, 8).
+   - Suporte a **Point Buy**: Sistema de compra por pontos (orçamento de 27) com custos progressivos e limites (8-15).
+   - Suporte a **Manual**: Entrada direta de valores.
+   - Cálculo dinâmico de modificadores.
+   - Painel de resumo visual com os modificadores finais.
+2. Integrado com o \`useCharacterStore\`:
+   - Persistência do método escolhido e dos valores individuais.
+   - Reset inteligente de atributos ao trocar de método para garantir consistência.
+3. Atualizada a \`CreatorPage.tsx\`:
+   - Adicionado o novo componente de atributos ao fluxo de criação.
+
+**Arquivos criados/modificados:**
+- \`frontend/src/components/builder/AbilityScores.tsx\`
+- \`frontend/src/pages/CreatorPage.tsx\`
+
+**Verificação:**
+- Cálculos de custo de Point Buy seguindo as regras do SRD/2024.
+- Interface reativa refletindo mudanças instantaneamente.
+- Validação de limites (mínimos e máximos) funcionando conforme o método.
+
+---
+## 2026-05-12 - Refatoração das Seleções de Espécie e Classe para React
+
+**Status:** ✅ CONCLUÍDO — Componentes de seleção implementados e integrados.
+
+**Objetivo:** Migrar as seleções de Espécie e Classe do sistema legado para componentes React reativos, integrados com a API e o Zustand.
+
+**Ações realizadas:**
+1. Criada a pasta `frontend/src/components/builder/`.
+2. Implementado `SpeciesSelect.tsx`:
+   - Busca a lista de espécies via `getSpecies()`.
+   - Atualiza o estado global (`character.race`) via Zustand.
+   - Exibe a descrição da espécie selecionada dinamicamente.
+3. Implementado `ClassSelect.tsx`:
+   - Busca a lista de classes via `getClasses()`.
+   - Atualiza o estado global (`character.class`) via Zustand.
+   - Exibe a descrição da classe selecionada dinamicamente.
+4. Atualizada a `CreatorPage.tsx`:
+   - Integrados os novos componentes de seleção.
+   - Adicionado campo reativo para o nome do personagem.
+   - Organização em cards seguindo o layout original.
+
+**Arquivos criados/modificados:**
+- `frontend/src/components/builder/SpeciesSelect.tsx`
+- `frontend/src/components/builder/ClassSelect.tsx`
+- `frontend/src/pages/CreatorPage.tsx`
+
+**Verificação:**
+- Seleções carregando dados reais do backend.
+- Estado global sendo atualizado ao trocar opções.
+- Descrições aparecendo conforme a seleção.
+
+---
+## 2026-05-12 - Implementação de Layout e Roteamento em React
+
+**Status:** ✅ CONCLUÍDO — Estrutura de navegação e layout base implementada.
+
+**Objetivo:** Criar o layout da aplicação (`AppLayout`) e configurar o roteamento dinâmico usando `react-router-dom`.
+
+**Ações realizadas:**
+1. Criada a pasta `frontend/src/components/layout/`.
+2. Implementado `Header.tsx`:
+   - Consome o estado do personagem (`name`) do Zustand store.
+   - Preserva a estrutura HTML e CSS do topbar legado.
+3. Implementado `AppLayout.tsx`:
+   - Shell principal contendo o Header e o workspace.
+   - Navegação principal entre "Criador" e "Ficha" usando `NavLink`.
+   - Área de conteúdo dinâmica via `Outlet`.
+4. Configurado o roteamento em `App.tsx`:
+   - Definidas as rotas `/creator` e `/sheet`.
+   - Redirecionamento padrão para `/creator`.
+5. Criadas páginas de placeholder (`CreatorPage.tsx`, `SheetPage.tsx`) para validação.
+
+**Arquivos modificados/criados:**
+- `frontend/src/components/layout/Header.tsx`
+- `frontend/src/components/layout/AppLayout.tsx`
+- `frontend/src/pages/CreatorPage.tsx`
+- `frontend/src/pages/SheetPage.tsx`
+- `frontend/src/App.tsx`
+
+**Verificação:**
+- Navegação entre rotas funcionando corretamente.
+- Layout responsivo respeitando o CSS legado em `index.css`.
+
+---
+
+## 2026-05-12 - Criação de Componentes UI Reutilizáveis em React
+
+**Status:** ✅ CONCLUÍDO — Componentes base criados.
+
+**Objetivo:** Transformar os controles de formulário e containers legados em componentes React reutilizáveis no novo app Vite.
+
+**Ações realizadas:**
+1. Criada a pasta `frontend/src/components/ui/`.
+2. Implementados componentes baseados no CSS legado (`styles.css`):
+   - `NumberInput.tsx`: Input numérico com label e suporte a min/max.
+   - `Select.tsx`: Dropdown com suporte a lista de opções `[value, label]`.
+   - `Checkbox.tsx`: Checkbox com suporte a estados `disabled` e `locked`.
+   - `Card.tsx`: Container baseado na classe `builder-panel` para agrupamento de seções.
+3. Integradas utilidades `clsx` e `tailwind-merge` para manipulação dinâmica de classes CSS.
+4. Garantido o repasse de props nativas (`...props`) para todos os componentes.
+
+**Arquivos criados:**
+- `frontend/src/components/ui/NumberInput.tsx`
+- `frontend/src/components/ui/Select.tsx`
+- `frontend/src/components/ui/Checkbox.tsx`
+- `frontend/src/components/ui/Card.tsx`
+
+**Verificação:**
+- Componentes seguem a estrutura HTML do `form-controls.js` legado.
+- Estilos aplicados corretamente via classes CSS existentes.
+
+---
+
+## 2026-05-12 - Implementação do Gerenciamento de Estado com Zustand
+
+**Status:** ✅ CONCLUÍDO — Store do personagem implementado.
+
+**Objetivo:** Criar o gerenciamento de estado da ficha de personagem usando Zustand no novo app Vite.
+
+**Ações realizadas:**
+1. Criada a pasta `frontend/src/store/` e `frontend/src/types/`.
+2. Definida a interface `Character` e `AbilityScores` em `frontend/src/types/character.ts`.
+3. Implementado `useCharacterStore.ts` com:
+   - Estado para o personagem atual (`character`) e ID ativo (`activeCharacterId`).
+   - Ações de mutação: `setCharacter`, `updateCharacter`, `updateAbility`, `setHp`, `addSpell`, `removeSpell`.
+4. Documentadas as decisões arquiteturais em `docs/learnings.md`.
+
+**Arquivos criados:**
+- `frontend/src/store/useCharacterStore.ts`
+- `frontend/src/types/character.ts`
+- `docs/learnings.md` (atualizado)
+
+**Verificação:**
+- Store seguindo o padrão do Zustand com TypeScript.
+- Tipagem consistente com o modelo de dados legado mas adaptada para React.
+
+---
+
+## 2026-05-12 - Implementação da Camada de API com Axios no Frontend
+
+**Status:** ✅ CONCLUÍDO — Camada de comunicação com o backend implementada.
+
+**Objetivo:** Criar a camada de comunicação com o backend NestJS no novo app Vite, migrando as funções de fetch legado para Axios e tipando as respostas.
+
+**Ações realizadas:**
+1. Criada a pasta `frontend/src/api/`.
+2. Implementado `api-client.ts` para configurar a instância global do Axios:
+   - Base URL dinâmica (Vite env ou localhost:3100).
+   - Timeout de 5s.
+   - Interceptors básicos.
+3. Criado `catalog-api.ts` migrando as funções de `api-catalog-client.ts`:
+   - Tipagem completa das respostas do catálogo.
+   - Funções auxiliares para buscar backgrounds, classes, magias, etc.
+4. Criado `character-api.ts` migrando as funções de `api-character-storage-client.ts`:
+   - Tipagem completa de `CharacterRecord` e `CharacterSummary`.
+   - Implementação de CRUD completo (list, get, create, update, delete).
+
+**Arquivos criados:**
+- `frontend/src/api/api-client.ts`
+- `frontend/src/api/catalog-api.ts`
+- `frontend/src/api/character-api.ts`
+
+**Verificação:**
+- Código TypeScript compilando (sem erros de sintaxe nos novos arquivos).
+- Tipagem consistente com o contrato do backend NestJS.
+
+---
+
+## 2026-05-12 - Início da Refatoração para Vite + React + TypeScript
+
+**Status:** ✅ CONCLUÍDO — Estrutura inicial do frontend configurada.
+
+**Objetivo:** Iniciar a migração do frontend legado para uma stack moderna com Vite, React e TypeScript.
+
+**Ações realizadas:**
+1. Criada a pasta `frontend/` e inicializado projeto Vite com template `react-ts`.
+2. Configurado `vite.config.ts` com porta 3000 e proxy para `/api` apontando para `http://localhost:3100`.
+3. Instaladas dependências: `axios`, `zustand`, `react-router-dom`, `lucide-react`, `clsx`, `tailwind-merge`.
+4. Migrado `styles.css` (legado) para `frontend/src/index.css` e criada pasta `assets/`.
+5. Integrado o CSS no `main.tsx` do React.
+
+**Arquivos modificados/criados:**
+- `frontend/*` (Novo projeto)
+- `docs/learnings.md`
+- `docs/sessions.md`
+
+**Verificação:**
+- `npm run dev` no frontend sobe em http://localhost:3000.
+- Proxy configurado corretamente para o backend.
+
+---
+
 # Sessions
 
-## 2026-05-12 - Correção de testes quebrados e atualização de documentação
+## 2026-05-12 - Migração Completa para CSS Modules
+
+**Status:** ✅ CONCLUÍDO — Todos os componentes do frontend migrados para CSS Modules.
+
+**Objetivo:** Eliminar o uso de CSS global em favor de estilos encapsulados por componente, utilizando a convenção camelCase e preparando para futura adoção de Tailwind.
+
+**Ações realizadas:**
+1. **Refatoração da Camada UI e Layout:**
+   - Criados módulos para `Card`, `Checkbox`, `NumberInput`, `Select`, `Header` e `AppLayout`.
+   - Classes estruturais como `.workspace` e `.appShell` agora são locais ao `AppLayout`.
+2. **Refatoração do Construtor (Builder):**
+   - Migrados `AbilityScores`, `BackgroundSelect`, `ClassSelect`, `MagicInitiate` e `SpeciesSelect`.
+   - Padrões repetitivos (como `.choiceList`) foram modularizados em cada componente para garantir isolamento.
+3. **Refatoração da Ficha (Sheet):**
+   - Migrados `CharacterSheet` e todas as abas: `SummaryTab`, `SkillsTab`, `InventoryTab`, `AttacksTab`, `SpellsTab` e `FeaturesTab`.
+   - Estruturas complexas como o "HP Orb" e "Spell Cards" agora possuem estilos 100% encapsulados.
+4. **Refatoração de Páginas:**
+   - `CreatorPage` e `SheetPage` atualizadas para usar CSS Modules em seus containers e wrappers de navegação.
+5. **Limpeza do index.css:**
+   - O arquivo foi reduzido de ~2700 linhas para apenas ~110 linhas.
+   - Mantidas apenas variáveis `:root`, resets globais e utilitários compartilhados (`.primary-button`, `.field`, etc.).
+6. **Padronização de Nomenclatura:**
+   - Todas as classes convertidas de `kebab-case` para `camelCase`.
+
+**Arquivos criados/modificados:**
+- `frontend/src/components/**/*.module.css` (Múltiplos novos arquivos)
+- `frontend/src/components/**/*.tsx` (Atualizados para importar `styles`)
+- `frontend/src/pages/**/*.module.css` e `frontend/src/pages/**/*.tsx`
+- `frontend/src/index.css` (Limpeza radical)
+- `docs/preferences.md`, `docs/Architecture_memory.md`, `docs/learnings.md`
+
+**Verificação:**
+- Interface visual preservada sem quebras.
+- Zero conflitos de CSS global.
+- Build e Typecheck validados.
+
+---
+
+## 2026-05-12 - Correção da Seleção de Magias de Background (Magic Initiate)
+
+**Status:** ✅ CONCLUÍDO — Filtro de nível e gravação de escolhas corrigidos.
+
+**Problema:** Ao selecionar o background Acolyte (que concede o talento Magic Initiate), o select mostrava todas as magias do nível 0 ao 9 em vez de apenas Cantrips e Nível 1. Além disso, ao selecionar uma magia, a escolha não era salva.
+
+**Causa Raiz:**
+1. **Filtro de Magias:** `getBackgroundSpellOptions()` em `src/lib/magic-initiate-validator.ts` retornava todas as magias da lista de classe sem aplicar o filtro de `spell.level <= 1`.
+2. **Chave de Armazenamento:** Havia redundância na criação do ID da regra. O validator criava a regra como `bg-magic-initiate-cleric-0` e outros locais tentavam acessar com a chave prefixada novamente (`bg-bg-magic-initiate-cleric-0`). Além disso, o handler do evento click (`handleBgSpellChange` em `creation-event-handlers.js`) usava o nome da magia (`input.dataset.bgSpell`) em vez do ID da regra (`input.dataset.ruleId`) para salvar no state.
+
+**Solução Aplicada:**
+- Alterada `getBackgroundSpellOptions()` para aplicar `.filter((spell) => spell.level <= 1)`.
+- Removido o prefixo `bg-` redundante nas funções de geração e acesso da chave de storage (`background-spell-renderer.js`, `spell-engine-background.ts` e `magic-initiate-validator.ts`).
+- Alterado `handleBgSpellChange()` para usar `input.dataset.ruleId` como chave do mapa `state.character.bgSpellChoices`.
+- **(Nova Correção)** Corrigida a lógica da tag HTML `disabled` no `background-spell-renderer.js`. Antes, o código desabilitava *todos* os checkboxes de cantrips quando o limite era alcançado (inclusive os já selecionados). Inputs marcados com `disabled` não emitem evento de "click" ou "change", o que impedia o usuário de remover seleções antigas ou fazer seleções após carregar dados cacheados. A regra foi atualizada para apenas aplicar `disabled` aos checkboxes **não selecionados** (`!isSelected && ...`).
+- **(Nova Correção 2 - Causa Raiz)** O renderizador recebia a propriedade `creationChoicesLocked` como referência de função. No Javascript Vanilla, se não for chamada como função (`creationChoicesLocked()`), ela é avaliada como "truthy", o que mantinha **todas** as opções perpetuamente desabilitadas (`disabled="disabled"`) desde o carregamento da página. A avaliação foi ajustada usando `typeof === 'function'` em `background-spell-renderer.js`.
+
+**Arquivos Modificados:**
+- `src/lib/magic-initiate-validator.ts`
+- `src/core/character/spell-engine-background.ts`
+- `src/app/builder/background-spell-renderer.js`
+- `src/app/creation-event-handlers.js`
+- `docs/learnings.md`
+
+**Verificação:** Frontend rodando sem erros (303 testes passados, 0 falhas). Magias de Magic Initiate no Background agora filtram corretamente, persistem no clique e podem ser selecionadas/deselecionadas normalmente (bug do `<input disabled>` resolvido).
+
+---## 2026-05-12 - Correção de testes quebrados e atualização de documentação
 
 **Status:** ✅ CONCLUÍDO — 4 testes corrigidos, 3 docs atualizados, resíduo removido.
 

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build --prefix frontend",
     "backend:build": "npm --prefix backend run build",
     "backend:dev": "npm --prefix backend run dev",
     "backend:start": "npm --prefix backend run start",
@@ -11,8 +11,8 @@
     "backend:typecheck": "npm --prefix backend run typecheck",
     "test": "node --test --import tsx tests/*.test.js tests/*.test.ts tests/contract/*.test.js",
     "test:watch": "node --watch tests/test-recovery.js",
-    "typecheck": "tsc --noEmit",
-    "dev": "npx serve ."
+    "typecheck": "npm run typecheck --prefix frontend",
+    "dev": "npm run dev --prefix frontend"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
@@ -28,6 +28,7 @@
     "@nestjs/platform-fastify": "^11.1.19",
     "@nestjs/testing": "^11.1.19",
     "fastify": "^5.8.5",
+    "jsdom": "^29.1.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   }

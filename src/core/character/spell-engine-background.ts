@@ -34,7 +34,7 @@ export function selectedBackgroundSpells(character: Character, api: ApiState): B
   if (!rules.length) return [];
 
   return rules.flatMap((rule) => {
-    const selected = character.bgSpellChoices?.[`bg-${rule.id}`] ?? [];
+    const selected = character.bgSpellChoices?.[rule.id] ?? [];
     const options = getBackgroundSpellOptions(rule.spellList, api.classSpells ?? {});
     const optionByName = new Map(options.map((spell) => [spell.name.toLowerCase(), spell]));
     const spellDetails = api.source?.spellDetails ?? {};

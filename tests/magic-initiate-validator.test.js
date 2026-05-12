@@ -65,7 +65,7 @@ describe('magic initiate validator', () => {
     }];
 
     const selectedSpellNames = magicInitiateModule.getSelectedBackgroundSpellNames({
-      'bg-bg-magic-initiate-cleric-0': ['Guidance', 'Sacred Flame', 'Bless'],
+      'bg-magic-initiate-cleric-0': ['Guidance', 'Sacred Flame', 'Bless'],
     }, rules);
 
     assert.deepEqual(selectedSpellNames, ['Guidance', 'Sacred Flame', 'Bless']);

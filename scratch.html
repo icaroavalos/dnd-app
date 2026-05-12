@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div id="app"></div>
+  <script>
+    let state = { character: { bgSpellChoices: {} } };
+    function handleBgSpellChange(input) {
+      const key = input.dataset.ruleId;
+      const value = input.value;
+      const checked = input.checked;
+      if (!state.character.bgSpellChoices[key]) {
+        state.character.bgSpellChoices[key] = [];
+      }
+      if (checked) {
+        if (!state.character.bgSpellChoices[key].includes(value)) {
+          state.character.bgSpellChoices[key].push(value);
+        }
+      } else {
+        state.character.bgSpellChoices[key] = state.character.bgSpellChoices[key].filter(v => v !== value);
+      }
+      render();
+    }
+
+    document.body.addEventListener('change', (e) => {
+      if (e.target.matches('[data-bg-spell]')) {
+        handleBgSpellChange(e.target);
+      }
+    });
+
+    function render() {
+      const selected = state.character.bgSpellChoices['bg-1'] || [];
+      const cantripCount = selected.length;
+      // THE BUGGY DISABLED LOGIC:
+      const disabled = (cantripCount >= 2);
+      
+      const spells = ['Guidance', 'Light', 'Resistance'];
+      document.getElementById('app').innerHTML = spells.map(spell => {
+        const isSelected = selected.includes(spell);
+        return `
+          <label class="${isSelected ? 'selected' : ''}">
+            <input type="checkbox" value="${spell}" data-bg-spell="${spell}" data-rule-id="bg-1"
+                   ${isSelected ? 'checked' : ''} ${disabled ? 'disabled' : ''} />
+            ${spell}
+          </label>
+        `;
+      }).join('<br>');
+    }
+    render();
+  </script>
+</body>
+</html>

@@ -37,10 +37,11 @@ Ultima revisao: 2026-05-11.
 
 ## Frontend
 
-- `app.js` deve continuar como shell de UI enquanto a migracao avanca.
-- Nova regra de negocio deve nascer em modulo TypeScript ou no backend, nao no shell.
-- O frontend pode ter fallback local durante migracao, mas fallback nao deve virar segunda fonte permanente.
-- **Atualizacao 2026-05-11:** Fallback local removido para dados canonicos. Erro visivel quando backend falha.
+- **Arquitetura de Estilos:** Uso obrigatório de **CSS Modules** para componentes.
+- **Nomenclatura:** Adotar **camelCase** para classes CSS (ex: `styles.builderPanel`).
+- **Migração:** O arquivo `index.css` deve conter apenas variáveis globais, resets e estilos estruturais fundamentais.
+- O frontend deve consumir dados exclusivamente via API, sem fallbacks locais permanentes para dados canônicos.
+- Erros de rede ou backend devem ser tratados visualmente para o usuário.
 
 ## D&D 2024
 

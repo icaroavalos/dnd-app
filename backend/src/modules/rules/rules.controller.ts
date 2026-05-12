@@ -49,4 +49,9 @@ export class RulesController {
   getFeats(): Promise<RulesCatalogResponse> {
     return this.rulesService.getCatalog('feats');
   }
+
+  @Get('subraces')
+  getSubraces(): Promise<RulesCatalogResponse> {
+    return this.rulesService.getCatalog('subraces');
+  }
 }

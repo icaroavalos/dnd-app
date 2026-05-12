@@ -1,6 +1,26 @@
 # Learnings
 
-Ultima revisao: 2026-05-11.
+Ultima revisao: 2026-05-12.
+
+## Refatoração para Vite + React + TypeScript (2026-05-12)
+
+**Status:** 🏗️ EM ANDAMENTO - Estrutura básica criada e configurada.
+
+**O que foi feito:**
+1. Criação da pasta `frontend/` na raiz.
+2. Inicialização do projeto via `npm create vite@latest frontend -- --template react-ts`.
+3. Configuração do `vite.config.ts`:
+   - Porta fixada em `3000`.
+   - Proxy de `/api` para `http://localhost:3100`.
+4. Instalação de stack base: `axios`, `zustand`, `react-router-dom`, `lucide-react`, `clsx`, `tailwind-merge`.
+5. Migração do `styles.css` (legado) para `frontend/src/index.css`.
+6. Criação de pasta `frontend/src/assets/`.
+
+**Licao aprendida:**
+- A estrutura do Vite em subpasta isola o frontend do restante da lógica legada, facilitando uma migração incremental.
+- O uso de proxy no Vite resolve problemas de CORS durante o desenvolvimento sem precisar de configurações complexas no backend para cada ambiente.
+- Manter o CSS original como `index.css` no novo projeto permite preservar a identidade visual enquanto a lógica é reescrita em React.
+
 
 ## Select de classe/raça não reflete seleção - Slugify comparison (2026-05-11)
 
@@ -33,6 +53,13 @@ ${slugify(optionValue) === normalizedValue ? "selected" : ""}
 - Dados de catálogo usam keys slugificadas ("fighter"), state usa valores formatados ("Fighter")
 - Comparações devem sempre normalizar ambos os lados com a mesma função
 - `slugify()` difere de `toLowerCase()` - remove acentos, substitui espaços por `-`
+
+## Event Delegation e Estados Desabilitados (Disabled) no DOM
+
+- **O Problema:** Durante a implementação do seletor de magias Magic Initiate, foi relatado que não era possível selecionar as magias, apesar dos eventos estarem corretos. Inicialmente, pensei que o erro estava no mapeamento do armazenamento (chaves redundantes ou erradas no localStorage) ou na reatividade.
+- **A Causa do Bloqueio Total:** Todos os checkboxes nasciam com o atributo `disabled="disabled"`. A propriedade `locked` verificava uma variável `creationChoicesLocked` vinda do sistema principal. Ocorre que o sistema estava injetando a *referência da função* (sem invocar com `()`) e não o seu resultado (Booleano). No Javascript, avaliar uma função em um contexto condicional (`disabled = locked || ...`) resulta sempre em `true`, pois objetos e funções são avaliados como valores "truthy". Consequentemente, o renderizador considerava a ficha permanentemente "travada".
+- **A Causa do Bloqueio Progressivo:** Quando o problema principal foi resolvido, outro bug foi desmascarado. O código verificava o número máximo de escolhas (ex: 2 cantrips) e, se o limite fosse alcançado, marcava as opções restantes como `disabled`. O problema é que a lógica desabilitava *todas* as opções, inclusive as *já selecionadas*, impedindo que fossem desmarcadas para corrigir escolhas.
+- **As Soluções:** (1) Ajustado o uso da variável `creationChoicesLocked` checando se é função antes de usá-la `typeof fn === 'function' ? fn() : fn`. (2) Ajustada a lógica de desabilitação para usar `(!isSelected && maxReached)` em vez de apenas `(maxReached)`. Isso garante que opções selecionadas permaneçam ativas para permitir que o usuário as desmarque.
 
 **Como testar:**
 ```bash
@@ -230,3 +257,20 @@ O frontend consome os seguintes endpoints do backend. Todos sao **obrigatorios**
 ### Diagnostico de falha de backend
 
 Quando o backend esta indisponivel:
+
+## Migração para CSS Modules (2026-05-12)
+
+**Status:** ✅ CONCLUÍDO - Todos os componentes do frontend migrados para CSS Modules.
+
+**O que foi feito:**
+1. Conversão do arquivo global `index.css` (~2700 linhas) em múltiplos arquivos `.module.css`.
+2. Adoção da convenção **camelCase** para classes CSS (ex: `.builderPanel` em vez de `.builder-panel`).
+3. Refatoração de todos os componentes em `src/components` (UI, Layout, Builder, Sheet) e `src/pages`.
+4. Utilização da biblioteca `clsx` para gerenciamento de classes condicionais integradas aos módulos.
+5. Limpeza do `index.css`, mantendo apenas variáveis `:root`, resets globais e utilitários compartilhados (`.primary-button`, `.field`, etc.).
+
+**Lição aprendida:**
+- **Encapsulamento:** CSS Modules eliminam conflitos de nomes de classes entre componentes, permitindo usar nomes genéricos como `.container` ou `.wrapper` sem medo de efeitos colaterais.
+- **CamelCase no JS:** Usar camelCase nas classes CSS torna o acesso no React muito mais natural (`styles.myClass`) e limpo do que a sintaxe de colchetes (`styles['my-class']`).
+- **Migração em Massa:** O uso de subagentes para processar grandes volumes de CSS e componentes é extremamente eficiente, mas exige uma revisão cuidadosa em componentes que compartilham classes globais intencionalmente.
+- **Preparação para Tailwind:** Organizar o CSS em módulos facilita uma futura migração para Tailwind ou outras ferramentas de utilitários, pois o escopo de cada componente já está bem definido.
