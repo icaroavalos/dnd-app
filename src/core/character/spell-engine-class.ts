@@ -11,7 +11,7 @@ export function spellcastingMetricsForAbility(
   const proficiencyBonus = derivedSheet?.proficiencyBonus ?? deriveProficiencyBonus(character.level);
   const bonuses = calculateCharacterAbilityBonuses(character);
   const scores = deriveAbilityScores(character.abilities ?? {}, bonuses);
-  const normalizedAbility = (ability.toLowerCase() || 'int') as keyof typeof scores;
+  const normalizedAbility = ((ability || 'int').toLowerCase() || 'int') as keyof typeof scores;
   const score = scores[normalizedAbility] || 10;
   const modifier = deriveAbilityModifier(score);
 
@@ -24,16 +24,19 @@ export function spellcastingMetricsForAbility(
 }
 
 export function currentLevelRow(character: Character, api: ApiState) {
+  if (!character.class || !api?.levels) return undefined;
   const levels = api.levels[character.class];
   return Array.isArray(levels) ? levels.find((l: any) => l.level === character.level) : undefined;
 }
 
 export function classHasSpellList(className: string, api: ApiState): boolean {
-  return (api.classSpells?.[className] ?? []).length > 0;
+  if (!className || !api?.classSpells) return false;
+  return (api.classSpells[className] ?? []).length > 0;
 }
 
 export function casterLevel(character: Character, api: ApiState): number {
   const className = character.class;
+  if (!className || !api?.classes) return 0;
   const progression = api.classes[className]?.casterProgression;
   if (!classHasSpellList(className, api)) return 0;
   if (progression === "artificer") return Math.max(0, Math.ceil(character.level / 2));
@@ -44,6 +47,7 @@ export function casterLevel(character: Character, api: ApiState): number {
 }
 
 export function classSpellAbility(className: string, api: ApiState): string {
+  if (!className || !api?.classes) return "int";
   const apiAbility = api.classes[className]?.spellcastingAbility;
   if (apiAbility) return apiAbility.toLowerCase();
   const ability: Record<string, string> = {

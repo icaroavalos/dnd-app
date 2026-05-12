@@ -8,8 +8,7 @@ import {
   getCharacter,
   listCharacters,
   deleteCharacter,
-  enableBackendStorage,
-  isBackendStorageEnabled,
+  CharacterStorageError,
 } from '../dist/src/lib/api-character-storage-client.js';
 
 // Test data - CharacterRecord completo
@@ -68,29 +67,19 @@ const testCharacter = {
 async function runTests() {
   console.log('=== Character Persistence Tests ===\n');
 
-  // Testa backend storage toggle
-  console.log('1. Backend storage toggle');
-  enableBackendStorage(true);
-  console.log(`   Backend enabled: ${isBackendStorageEnabled()} (expected: true)`);
-  enableBackendStorage(false);
-  console.log(`   Backend disabled: ${!isBackendStorageEnabled()} (expected: true)`);
-  console.log('   PASS\n');
-
-  // Testa fallback quando backend está desabilitado
-  console.log('2. Fallback when backend disabled');
-  enableBackendStorage(false);
+  // Testa erro explicito quando backend esta indisponivel
+  console.log('1. Backend unavailable');
 
   try {
-    const list = await listCharacters();
-    console.log(`   List returned: ${Array.isArray(list) ? 'array' : 'not array'} (expected: array)`);
-    console.log(`   List length: ${list.length} (expected: 0 - fallback)`);
-    console.log('   PASS\n');
+    await listCharacters();
+    console.log('   FAIL: expected CharacterStorageError');
   } catch (error) {
-    console.log('   FAIL:', error.message);
+    console.log(`   Error type: ${error instanceof CharacterStorageError ? 'CharacterStorageError' : error.name}`);
+    console.log('   PASS\n');
   }
 
   // Testa que CharacterRecord preserva todos os campos
-  console.log('3. CharacterRecord field preservation');
+  console.log('2. CharacterRecord field preservation');
   const requiredFields = [
     'id', 'name', 'ruleset', 'lineageId', 'backgroundId', 'alignment',
     'experience', 'classes', 'abilities', 'skillProficiencies',
@@ -108,7 +97,7 @@ async function runTests() {
   }
 
   // Testa estrutura de abilities
-  console.log('4. Abilities structure');
+  console.log('3. Abilities structure');
   const abilityKeys = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
   const missingAbilities = abilityKeys.filter(key => !(key in testCharacter.abilities));
   if (missingAbilities.length === 0) {

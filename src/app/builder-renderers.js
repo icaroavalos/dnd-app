@@ -93,5 +93,6 @@ export function createBuilderRenderers({
     renderLevelUpHpControl: levelUpRenderer.renderLevelUpHpControl,
     renderLevelUpNavButtons: levelUpRenderer.renderLevelUpNavButtons,
     renderBgSpellChoice: backgroundSpellRenderer.renderBgSpellChoice,
+renderBgSpellChoices: backgroundSpellRenderer.renderBgSpellChoices,
   };
 }

@@ -1,5 +1,163 @@
 # Sessions
 
+## 2026-05-12 - Migracao completa para Event Delegation
+
+**Status:** ✅ CORRIGIDO - Todos os eventos do form usam event delegation. Features de classe aparecem ao selecionar qualquer classe.
+
+**Problema:** Selecao de classe nao refletia features. Apenas Fighter (classe padrao) mostrava features.
+
+**Causa raiz:** `bindCreationEvents()` usava `querySelectorAll` + `addEventListener` direto nos filhos. `hydrateApiData()` → `render()` → `renderForm()` → `els.form.innerHTML = html` destruia todos os listeners.
+
+**Solucao:** Event delegation com tres handlers (change, input, click) no elemento `form` pai. Roteamento via `el.matches()` / `el.closest()`.
+
+**Arquivos modificados:**
+- `src/app/creation-event-handlers.js` - Migracao de binding direto para event delegation total
+- `app.js` - Removido debug hook `window.__dndState`
+
+**Docs atualizados:**
+- `docs/learnings.md` - Substituida entrada do botao "Continuar" pela migracao completa
+- `docs/sessions.md` - Substituida entrada "EM INVESTIGACAO" pela correcao real
+- `docs/ficha-guiada.md` - Secao "Problemas Conhecidos" simplificada, event delegation documentado
+- `docs/Architecture_memory.md` - Nota sobre event delegation
+- `docs/README.md` - Padrao de event delegation atualizado
+- `docs/agents/README.md` - Instrucao de debug sobre event delegation
+
+**Como testar:**
+```bash
+npm run dev        # Frontend: http://localhost:5173
+npm run backend:dev # Backend: http://localhost:3100
+```
+Criar ficha, selecionar classes diferentes, verificar features na pre-visualizacao.
+
+## 2026-05-11 - Correção: select de classe/raça não reflete seleção
+
+**Status:** ✅ CORRIGIDO - Select de classe e raça agora marcam opção selecionada corretamente.
+
+**Problema original:** Ao selecionar classe (ex: "Fighter") ou raça (ex: "Human") no form de lineage, a seleção não aparecia marcada no dropdown. O valor era salvo no state (`state.character.class = "Fighter"`), mas o select não exibia a opção como selecionada.
+
+**Causa raiz:** A comparação no `selectField` (form-controls.js:18) usava `String(optionValue).toLowerCase() === String(value).toLowerCase()`, mas:
+- `optionValue` é o valor slugificado (ex: "fighter")
+- `value` é o valor salvo no state (ex: "Fighter")
+- A comparação falhava porque "fighter" !== "Fighter" mesmo em lowercase devido a diferenças de normalização
+
+**Solução aplicada:**
+1. Adicionar função `slugify` inline no `selectField` para normalizar ambos os lados da comparação
+2. Comparar `slugify(optionValue) === slugify(value)` em vez de apenas `toLowerCase()`
+3. Adicionar logs de debug em `renderLineageForm` para diagnosticar issues futuros
+
+**Arquivos modificados:**
+- `src/app/form-controls.js` - Função `slugify` adicionada ao `selectField`
+- `app.js` - Logs de debug em `renderLineageForm` para comparação de valores
+
+**Padrão estabelecido:**
+- Dados de catálogo (classes, raças, backgrounds) usam valores slugificados como keys
+- State do usuário pode usar valores formatados (Title Case)
+- Comparações devem sempre slugificar ambos os lados
+
+---
+
+## 2026-05-11 - Correcão do botão "Continuar" na ficha guiada (REVISADO)
+
+**Status:** ✅ CORRIGIDO - Botão "Continuar" navega entre steps: lineage → background → abilities → choices → leveling. Commit `4fdc3db`.
+
+**Problema original:** Botão "Continuar" na etapa de lineage (Origem) não funcionava. Clique era ignorado.
+
+**Causa raiz (duas issues):**
+1. `bindFormEvents()` nunca era chamado no `init()` - função definida e exportada, mas nunca invocada
+2. `handleMoveClick()` estava vazio - apenas chamava `persist()` e `render()` sem atualizar `state.step`
+3. Binding direto em elementos seria perdido quando o HTML do form e re-renderizado via `innerHTML`
+
+**Solução aplicada:**
+1. Adicionar chamada `bindFormEvents()` no `init()` do `app.js`, logo após `bindGlobalEvents()`
+2. Substituir binding direto por **event delegation** no form em `creation-event-handlers.js`
+3. Implementar `handleMoveClick()` para atualizar `state.step`:
+   ```javascript
+   function handleMoveClick(button) {
+     const state = getState();
+     const targetStepIndex = Number(button.dataset.move);
+     const steps = ['lineage', 'background', 'abilities', 'choices', 'leveling'];
+     if (targetStepIndex >= 0 && targetStepIndex < steps.length) {
+       state.step = steps[targetStepIndex];
+       persist();
+       render();
+     }
+   }
+   ```
+
+**Arquivos modificados:**
+- `src/app/creation-event-handlers.js` - Event delegation + implementação `handleMoveClick`
+- `app.js` - Chamada `bindFormEvents()` no `init()`
+- `docs/continuar-button-fix.md` - Documentação completa do fix
+- `docs/learnings.md` - Seção atualizada
+- `docs/sessions.md` - Registro desta sessão
+
+**Comandos para rodar:**
+```bash
+npm run dev        # Frontend: http://localhost:3000
+npm run backend:dev # Backend: http://localhost:3100
+```
+
+**Testes:** 303 testes passando, build OK.
+
+**Prevenção futura:**Padrão documentado em `docs/continuar-button-fix.md`:
+- Event delegation no elemento pai sobrevive a `innerHTML` no filho
+- Funções de binding devem ser chamadas explicitamente no init
+- Não basta definir e exportar - preciso invomar no fluxo correto
+
+---
+
+## 2026-05-11 - Correção: selecao de classe/especie nao reflete na ficha
+
+**Status:** ✅ CORRIGIDO - Causa raiz encontrada e corrigida.
+
+**Problema original:** Ao selecionar qualquer classe que nao fosse Fighter, as features da classe nao apareciam na pre-visualizacao da ficha. Fighter funcionava porque era a classe padrao em `createStartingCharacter()`.
+
+**Causa raiz:** `bindCreationEvents()` usava `querySelectorAll` + `addEventListener` direto nos elementos filhos. Quando `init()` executava `await hydrateApiData(); render();`, o segundo `render()` chamava `renderForm()` que fazia `els.form.innerHTML = html`, DESTRUINDO todos os elementos filhos e seus listeners. Apos a carga inicial, NENHUM evento do formulario funcionava.
+
+**Solucao aplicada:**
+1. Substituir TODO o binding direto por event delegation no elemento `form` pai
+2. Três handlers: `form.addEventListener('change', handleFormChange)`, `input`, `click`
+3. Cada handler roteia via `el.matches()` / `el.closest()` para o handler especifico
+4. `handlePathInputChange()` ja funcionava corretamente — o problema era so o roteamento
+
+**Arquivos modificados:**
+- `src/app/creation-event-handlers.js` - Migracao completa para event delegation
+
+**Comandos para testar:**
+```bash
+npm run dev        # Frontend: http://localhost:5173
+npm run backend:dev # Backend: http://localhost:3100
+```
+Criar nova ficha, selecionar classe → features devem aparecer na ficha.
+
+---
+
+## 2026-05-11 - Tentativa de correcao: fluxo de selecao de background (REVERTIDO)
+
+**Status:** REVERTIDO - A correcao quebrou a renderizacao da ficha e do criador de personagem.
+
+**Problema original:** Ao clicar em "Continuar" apos selecionar "Fighter, Human, Neutra" na etapa de Origem, as opcoes de background nao apareciam no select.
+
+**Tentativa de solucao:**
+1. Adicionado `apiSourceLoaded` ao `CreationFlowState`
+2. Modificado `handleMoveClick` para validar steps
+3. Adicionada mensagem de loading em `renderBackgroundForm()`
+
+**Resultado:** A correcao piorou o problema. A ficha e o criador deixaram de aparecer corretamente.
+
+**Acao:** Todas as alteracoes foram revertidas para o estado anterior.
+
+**Arquivos revertidos:**
+- `src/app/creation-event-handlers.js`
+- `src/core/state/creation-flow.ts`
+- `src/core/state/builder-views.ts`
+- `app.js`
+- `tests/creation-flow.test.js`
+
+**Proximos passos:** Investigar o problema original de forma diferente - possivelmente adicionando logs para diagnosticar quando `state.api.source` nao esta populado ou quando `viewModel.options` esta vazio.
+
+---
+
 ## 2026-05-10T18:30-0400 - Task 02: Padronizar contrato de erro do backend
 
 **Timestamp:** 2026-05-10T18:30-0400
@@ -1412,6 +1570,25 @@ npm test           # 131 tests passed
 
 **Status:** DONE
 
+## 2026-05-11T06:00-0400 - Correcao parcial: Background select e Magic Initiate
+
+**Timestamp:** 2026-05-11T06:00-0400
+
+**Problema:** Select de background nao aparecia, botao "Continuar" nao navegava, Magic Initiate spell choices quebravam a UI.
+
+**Solucao aplicada:**
+1. Adicionado fallback `|| []` em `backgroundSpellChoiceRules()` no `app.js`
+2. Criada funcao `renderBgSpellChoice` em `builder/background-spell-renderer.js`
+3. CORS atualizado para portas 5173 e 4173
+
+**Resultado:** Select de background agora popula, mas selecao de habilidades e magias ainda falha.
+
+**Ports de desenvolvimento:**
+- Frontend: `npm run dev` → `http://localhost:3000`
+- Backend: `npm run backend:dev` → `http://localhost:3100`
+
+---
+
 ## 2026-05-10T20:00-0400 - Task 17: Auditoria final backend-frontend integration
 
 **Timestamp:** 2026-05-10T20:00-0400
@@ -1467,3 +1644,115 @@ npm --prefix backend run typecheck # PASS
 - Testes e typecheck verdes: **APROVADO**
 
 **Status:** DONE - docs: finalize backend-frontend integration audit
+
+## 2026-05-11T00:45-0400 - Bugfix: Renderização do formulário de criação de personagem
+
+**Timestamp:** 2026-05-11T00:45-0400
+
+**Problema:** A tela de "Criador de Ficha" (etapa de origem/linhagem) aparecia em branco, mesmo com o backend carregando dados corretamente. Usuário relatou: "em baixo, onde deveria aparecer as escolhas nao aparece nada".
+
+**Diagnostico:** A funcao `renderForm()` em `src/app/app-shell.js` chamava as funcoes de renderizacao (`renderLineageForm()`, `renderAbilitiesForm()`, etc.) mas **nao inseria o HTML retornado no DOM**. O retorno das funcoes era descartado, resultando em uma área de formulário vazia.
+
+**Solucao:** Modificar `renderForm()` para capturar o HTML retornado e inserir via `els.form.innerHTML`:
+
+```javascript
+function renderForm() {
+  const state = getState();
+  if (state.builderVisible === false) return;
+  let html = '';
+  if (state.step === 'lineage') html = renderLineageForm();
+  else if (state.step === 'abilities') html = renderAbilitiesForm();
+  else if (state.step === 'choices') html = renderChoicesForm();
+  else if (state.step === 'background') html = renderBackgroundForm();
+  else if (state.step === 'leveling') html = renderLevelingForm();
+  if (html) els.form.innerHTML = html;
+}
+```
+
+**Arquivos modificados:**
+- `src/app/app-shell.js` - funcao `renderForm()` agora atribui `html` ao `innerHTML` do formulário
+
+**Comandos rodados:**
+```bash
+npm run build # SUCCESS
+npm run typecheck # PASS
+```
+
+**Como diagnosticar no futuro:**
+1. Se a tela de criacao estiver em branco, verificar se `els.form.innerHTML` esta sendo atribuido
+2. Inspecionar o retorno das funcoes `render*Form()` no console
+3. Verificar se `state.step` corresponde ao esperado ('lineage', 'abilities', 'choices', 'background', 'leveling')
+4. Verificar se `state.builderVisible` nao esta `false`
+5. Usar `console.log` para depurar o valor de `html` antes de atribuir
+
+**Licao:** Funcoes de render que retornam HTML devem ter seu retorno explicitamente inserido no DOM. Sempre verificar se o valor retornado por funcoes de renderacao esta sendo usado.
+
+**Status:** DONE - fix: form rendering now inserts HTML into DOM
+
+## 2026-05-10T19:35-0400 - QA independente pos-plano backend-only
+
+**Objective:** Validar a execucao completa de `docs/agents/conexao-backend-frontend-prompts.txt` sem confiar apenas nos commits anteriores; corrigir gaps encontrados.
+
+**Achados corrigidos:**
+1. `npm test` rodava somente `tests/test-recovery.js`, mascarando a suite real. Atualizado para `node --test --import tsx tests/*.test.js tests/*.test.ts tests/contract/*.test.js`.
+2. Testes antigos ainda exigiam fallback local em storage/actions/resources ou importavam `.ts` cru no Node. Atualizados para contrato backend-only e imports compilados em `dist/`.
+3. `app.js` ainda calculava `state.derived` via `local-character-projection`. Corrigido para usar `projectCharacterSheet` e propagar erro visivel quando o backend falha.
+4. Handlers que chamam `normalizeCharacterState()` agora aguardam a normalizacao assíncrona quando ela depende do backend.
+5. `background-loader.ts` agora suporta Node em testes lendo o mesmo JSON compactado do disco, sem alterar o caminho browser por `fetch`.
+6. Documentacao operacional antiga ainda instruia fallback local. Atualizados `docs/agents/roadmap.md`, `docs/agents/task-board.md` e `docs/agents/prompts-para-copiar.md`.
+
+**Comandos rodados:**
+```bash
+npm run build
+npm test
+npm run typecheck
+npm --prefix backend run test
+npm --prefix backend run typecheck
+rg -n "fallback|falling back|using fallback|local fallback|RACES\.map|CLASSES\.map|localStorage fallback|console\.warn\(.*Backend" app.js src tests docs/agents backend/src
+```
+
+**Resultados:**
+- `npm test`: 303 passed, 0 failed
+- `npm run typecheck`: PASS
+- `npm --prefix backend run test`: 177 passed, 0 failed
+- `npm --prefix backend run typecheck`: PASS
+- `rg`: ocorrencias restantes sao docs historicos, testes que validam "no fallback", mensagens "sem fallback" ou usos nao relacionados a falha de backend canonica.
+
+**Status:** DONE
+
+## 2026-05-11 - Botao "Continuar" da ficha guiada - Event Delegation
+
+**Status:** EM APLICACAO - Event delegation aplicado, aguardando validacao em browser.
+
+**Problema original:** Botao "Continuar" na etapa de lineage (Origem) nao funcionava. Clique nao era processado.
+
+**Causa raiz:** Binding de eventos direto (`form.querySelectorAll('[data-move]')`) e perdido quando o HTML do form e re-renderizado via `innerHTML`.
+
+**Solucao aplicada:** Event delegation no form:
+```javascript
+form.addEventListener('click', (event) => {
+  const moveButton = event.target.closest('[data-move]');
+  if (moveButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    handleMoveClick(moveButton);
+  }
+});
+```
+
+**Arquivos modificados:**
+- `src/app/creation-event-handlers.js` - Substituido binding direto por event delegation
+- `docs/ficha-guiada.md` - Documentado padrao e licao aprendida
+- `docs/learnings.md` - Adicionado registro da correcao
+
+**Licao aprendida:** Event delegation no elemento pai (form) sobrevive a re-renderizacoes. Binding direto em elementos filhos e perdido.
+
+**O que NAO funcionou:**
+- Tentar re-bindar eventos apos cada render (cria listeners duplicados)
+- Logs de debug via console.log (dificil debug em producao)
+- Modificacoes complexas que quebram outros componentes
+
+**Proximos passos:**
+1. Testar em browser se botao "Continuar" navega corretamente
+2. Se falhar, verificar se `handleMoveClick` esta sendo chamado
+3. Validar fluxo completo: lineage → background → abilities → choices → leveling

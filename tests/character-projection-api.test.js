@@ -3,8 +3,8 @@
  *
  * Valida:
  * - Sucesso: backend retorna projeção correta
- * - Fallback: fallback para projeção local quando backend falha
- * - Equivalência: shape da backend é equivalente ao local
+ * - Falha: backend indisponivel propaga erro explicito
+ * - Equivalência: shape do backend é compatível com a UI
  */
 
 import assert from 'node:assert/strict';

@@ -26,7 +26,7 @@ Atualizado em 2026-05-10.
 
 ## Frontend/Core
 
-- [x] F0. Ligar cliente de catalogos ao backend com fallback local.
+- [x] F0. Ligar cliente de catalogos ao backend obrigatorio, sem fallback local canonico.
 - [x] F1. Ligar projection client ao `POST /characters/project` por default.
 - [x] F2. Ligar actions client ao `POST /actions/derive`.
 - [x] F3. Ligar mutations de resources/inventory ao backend.

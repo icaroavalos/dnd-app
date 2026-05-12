@@ -164,7 +164,7 @@ describe('action engine', () => {
  * Testes de contrato para derivacao de actions via API.
  * Valida:
  * - Sucesso: backend retorna actions derivadas
- * - Fallback: fallback para derivacao local quando backend falha
+ * - Falha: erro explicito quando backend falha
  * - Equivalencia: shape das actions basicas
  */
 
@@ -265,7 +265,8 @@ describe('api-actions-client', () => {
       await deriveActions(createBaseCharacter());
       assert.fail('Should throw on network error');
     } catch (err) {
-      assert.ok(err.message.includes('Network error') || err.message.includes('Failed'), 'Should throw network error');
+      assert.equal(err.name, 'ActionDerivationError');
+      assert.match(err.message, /Backend indisponível|Falha/i);
     } finally {
       restoreFetch();
     }
@@ -317,8 +318,8 @@ describe('action-engine with backend', () => {
     }
   });
 
-  it('deriveAvailableActionsAsync falls back to local when backend fails', async () => {
-    const { deriveAvailableActionsAsync, enableBackendDerivation } = await import('../src/core/engine/action-engine.ts');
+  it('deriveAvailableActionsAsync throws when backend fails', async () => {
+    const { deriveAvailableActionsAsync } = await import('../dist/src/core/engine/action-engine.js');
 
     mockFetchFailure();
 
@@ -339,58 +340,17 @@ describe('action-engine with backend', () => {
         resourceRecoveryLabel: () => 'Short Rest'
       };
 
-      const result = await deriveAvailableActionsAsync(createBaseCharacter(), context);
-      assert.ok(Array.isArray(result), 'Should return array from local fallback');
-      assert.ok(result.length > 0, 'Should have basic actions');
-
-      const attack = result.find(a => a.id === 'rule:attack');
-      assert.ok(attack, 'Should have Attack action');
-      assert.equal(attack.name, 'Attack');
-      assert.equal(attack.kind, 'action');
-    } finally {
-      restoreFetch();
-    }
-  });
-
-  it('enableBackendDerivation can disable backend', async () => {
-    const { deriveAvailableActionsAsync, enableBackendDerivation } = await import('../src/core/engine/action-engine.ts');
-
-    enableBackendDerivation(false);
-
-    try {
-      mockFetchSuccess([]);
-
-      const context = {
-        character: { class: 'fighter', attacks: [], inventory: [], spells: [] },
-        projection: { abilityModifiers: { str: 3, dex: 2 }, proficiencyBonus: 2 },
-        resourceDefinitions: [],
-        spellDetails: {},
-        loadedSpellDetails: {},
-        compactRange: () => '--',
-        rangeLabel: () => 'Varies',
-        signed: (v) => `${v >= 0 ? '+' : ''}${v}`,
-        slugify: (s) => s.toLowerCase(),
-        itemTypeLabel: () => 'Weapon',
-        itemTags: () => [],
-        entriesToText: () => '',
-        resourceRecoveryLabel: () => 'Short Rest'
-      };
-
-      const result = await deriveAvailableActionsAsync(createBaseCharacter(), context);
-      assert.ok(Array.isArray(result), 'Should return local projection');
-      assert.ok(result.length > 0, 'Should have basic actions');
-
-      const attack = result.find(a => a.id === 'rule:attack');
-      assert.ok(attack, 'Should have Attack action from local');
-
-      enableBackendDerivation(true);
+      await assert.rejects(
+        () => deriveAvailableActionsAsync(createBaseCharacter(), context),
+        { name: 'ActionDerivationError' }
+      );
     } finally {
       restoreFetch();
     }
   });
 
   it('local derivation includes basic actions', async () => {
-    const { deriveAvailableActions } = await import('../src/core/engine/action-engine.ts');
+    const { deriveAvailableActions } = await import('../dist/src/core/engine/action-engine.js');
 
     const context = {
       character: { class: 'fighter', attacks: [], inventory: [], spells: [] },

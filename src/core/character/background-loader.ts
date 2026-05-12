@@ -1,6 +1,6 @@
 /**
  * Background Loader - load and cache compacted 5etools background data.
- * Browser-only version using fetch.
+ * Browser runtime uses fetch; Node tests read the same compacted file from disk.
  */
 
 import type { RawBackground, BackgroundData } from '../../types/background';
@@ -35,11 +35,25 @@ function parseRawBackground(raw: any): RawBackground {
  * Load backgrounds from JSON file
  */
 async function fetchBackgrounds(): Promise<RawBackground[]> {
-  const response = await fetch(BACKGROUND_DATA_PATH);
-  if (!response.ok) {
-    throw new Error(`Failed to load backgrounds: ${response.statusText}`);
+  let data: any;
+
+  try {
+    const response = await fetch(BACKGROUND_DATA_PATH);
+    if (!response.ok) {
+      throw new Error(`Failed to load backgrounds: ${response.statusText}`);
+    }
+    data = await response.json();
+  } catch (error) {
+    if (typeof window !== 'undefined') throw error;
+
+    const [{ readFile }, { fileURLToPath }] = await Promise.all([
+      import('node:fs/promises'),
+      import('node:url'),
+    ]);
+    const path = fileURLToPath(new URL('../../../data/5etools/5e-2024/backgrounds.json', import.meta.url));
+    data = JSON.parse(await readFile(path, 'utf8'));
   }
-  const data = await response.json();
+
   const backgrounds: any[] = data.results ?? data.background ?? [];
   return backgrounds.map(parseRawBackground);
 }

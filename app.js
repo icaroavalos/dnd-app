@@ -215,6 +215,7 @@ const defaultState = {
 };
 
 let state = typedLoadState(defaultState);
+
 let ruleRepository = new RuleRepository();
 const { field, numberField, selectField, checkbox } = createFormControls({ escapeHtml });
 const {

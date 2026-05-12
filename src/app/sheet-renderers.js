@@ -23,6 +23,7 @@ export function createSheetRenderers({
 }) {
   function summary() {
     const state = getState();
+    if (!state.derived) return '<div class="card"><p>Carregando ficha...</p></div>';
     return renderSummarySheet(state.character, state.derived);
   }
 

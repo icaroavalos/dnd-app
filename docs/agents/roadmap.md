@@ -28,11 +28,11 @@ Objetivo: backend ser a fonte de verdade minima para ficha D&D 2024.
 
 Objetivo: frontend consumir backend sem reescrita grande.
 
-- Catalogos read-only primeiro. Concluido com backend default e fallback local.
-- Projecao de ficha depois.
-- Actions e recursos em seguida.
-- Persistencia por ultimo.
-- Fallback local so enquanto a API estiver estabilizando.
+- Catalogos read-only concluidos com backend obrigatorio.
+- Projecao de ficha concluida via `POST /characters/project` sem fallback local canonico.
+- Actions e recursos concluidos via backend sem mutacao local silenciosa.
+- Persistencia concluida via CRUD `/characters`.
+- Falha de backend deve aparecer claramente na UI; o frontend nao deve inventar dados canonicos.
 
 ## Fase 3: Completar fluxos do app
 

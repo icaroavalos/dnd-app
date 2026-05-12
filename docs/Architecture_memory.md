@@ -1,6 +1,6 @@
 # Architecture Memory
 
-Ultima revisao: 2026-05-08.
+Ultima revisao: 2026-05-11.
 
 ## Resumo executivo
 
@@ -8,7 +8,16 @@ O projeto esta no meio da migracao de um app estatico de ficha D&D 5e 2024 para 
 
 **Atualizacao 2026-05-10:** Frontend agora e backend-only para dados canonicos. Nao ha mais fallback local para personagens, recursos, inventario ou actions. O backend e obrigatorio para operacao.
 
+**Atualizacao 2026-05-11:** Ports de desenvolvimento:
+- Frontend: `npm run dev` sobe em `http://localhost:3000`
+- Backend: `npm run backend:dev` sobe em `http://localhost:3100`
+- Vite disponivel como dev dependency, mas `serve` e usado para production build
+
 O ponto critico do MVP backend nao e adicionar outro modulo. O ponto critico agora e estabilizar contratos e persistencia: os testes de runtime passam, mas `npm run typecheck` falha. Enquanto o typecheck estiver vermelho, o backend ainda nao deve ser tratado como MVP pronto.
+
+**Status atual 2026-05-12:** Event delegation implementado para TODOS os eventos do formulario de criacao (change, input, click). `creation-event-handlers.js` usa tres handlers com roteamento via `el.matches()`/`el.closest()` em vez de `querySelectorAll` + `addEventListener`. Selecao de classe agora reflete features corretamente. Debug hook `window.__dndState` removido de `app.js`.
+
+**Atualizacao 2026-05-11:** Ports de desenvolvimento:
 
 ## Decisoes de arquitetura atuais
 

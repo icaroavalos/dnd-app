@@ -1,6 +1,13 @@
 # Preferences
 
-Ultima revisao: 2026-05-08.
+Ultima revisao: 2026-05-11.
+
+## Ambiente de desenvolvimento
+
+- Frontend: `npm run dev` → `http://localhost:3000`
+- Backend: `npm run backend:dev` → `http://localhost:3100`
+- Vite: disponivel como dev dependency, production build usa `serve`
+- CORS habilitado para: `localhost:3000`, `localhost:4173`, `localhost:5173`
 
 ## Estilo de codigo
 
@@ -33,6 +40,7 @@ Ultima revisao: 2026-05-08.
 - `app.js` deve continuar como shell de UI enquanto a migracao avanca.
 - Nova regra de negocio deve nascer em modulo TypeScript ou no backend, nao no shell.
 - O frontend pode ter fallback local durante migracao, mas fallback nao deve virar segunda fonte permanente.
+- **Atualizacao 2026-05-11:** Fallback local removido para dados canonicos. Erro visivel quando backend falha.
 
 ## D&D 2024
 

@@ -17,6 +17,7 @@ export function clean5etoolsText(value: string): string {
 }
 
 export function autoGrantedSpellEntries(character: Character, api: ApiState, activeFeatures: any[]) {
+  if (!api) return [];
   const grants = new Map();
   const choicePattern = /(choose|choice|of your choice|of your choosing)/i;
 
@@ -43,6 +44,7 @@ export function autoGrantedSpellEntries(character: Character, api: ApiState, act
 }
 
 export function spellFromKnownData(name: string, api: ApiState) {
+  if (!api) return { name, level: 0 };
   const detail = api.spellDetails?.[name];
   if (detail && Number.isFinite(detail.level)) return { name, level: detail.level };
 

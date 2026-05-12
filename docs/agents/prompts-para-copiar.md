@@ -483,7 +483,7 @@ Nome da tarefa:
 Catalog API Client Default
 
 Objetivo:
-O frontend deve conseguir buscar catalogos no backend NestJS, mantendo fallback local em data/5etools/5e-2024 quando o backend estiver desligado.
+O frontend deve conseguir buscar catalogos no backend NestJS como fonte obrigatoria; quando o backend estiver desligado, a UI deve exibir erro claro em vez de carregar fallback local.
 
 Escopo permitido:
 - src/lib/api-catalog-client.ts
@@ -493,8 +493,8 @@ Escopo permitido:
 
 Passos:
 1. Garanta que api-catalog-client use http://localhost:3100 como backend local default.
-2. Garanta fallback local se fetch do backend falhar.
-3. Nao remova o carregamento local ainda.
+2. Garanta erro tipado e visivel se fetch do backend falhar.
+3. Remova carregamento local do caminho canonico de runtime.
 4. Teste backgrounds, classes, species/races, spells, class-spells, items, features e feats.
 5. Rode:
    npm run build
@@ -522,7 +522,7 @@ Nome da tarefa:
 Projection, Actions, Resources, Inventory Clients
 
 Objetivo:
-O frontend deve aproveitar os endpoints backend ja implementados para projecao de ficha, derivacao de acoes, uso/recuperacao de recursos e gasto/recuperacao de municao, mantendo fallback local.
+O frontend deve aproveitar os endpoints backend ja implementados para projecao de ficha, derivacao de acoes, uso/recuperacao de recursos e gasto/recuperacao de municao, sem fallback local canonico.
 
 Escopo permitido:
 - src/lib/api-character-project-client.ts
@@ -535,10 +535,10 @@ Escopo permitido:
 - docs/sessions.md
 
 Passos:
-1. character-projection.ts deve usar POST /characters/project quando backend projection estiver habilitado.
-2. Resource mutations devem usar POST /resources/use e POST /resources/recover quando backend mutations estiver habilitado.
-3. Inventory ammo deve usar POST /inventory/spend-ammo e POST /inventory/recover-ammo quando habilitado.
-4. Se backend falhar ou estiver desabilitado, manter fallback local.
+1. character-projection.ts deve usar POST /characters/project no caminho canonico.
+2. Resource mutations devem usar POST /resources/use e POST /resources/recover no caminho canonico.
+3. Inventory ammo deve usar POST /inventory/spend-ammo e POST /inventory/recover-ammo no caminho canonico.
+4. Se backend falhar, propague erro tipado e mostre falha clara na UI.
 5. Rode:
    npm run build
    npm run typecheck
@@ -568,7 +568,7 @@ Pre-requisitos:
 - GET/POST/PUT/DELETE /characters funcionam.
 
 Objetivo:
-O usuario deve conseguir criar, salvar, listar, abrir, atualizar e deletar fichas usando backend, com fallback local apenas se backend estiver desligado.
+O usuario deve conseguir criar, salvar, listar, abrir, atualizar e deletar fichas usando backend; se o backend estiver desligado, a UI deve mostrar erro claro sem salvar dados canonicos no localStorage.
 
 Escopo permitido:
 - src/core/state/persistence.ts
@@ -587,7 +587,7 @@ Passos:
    POST /characters
    PUT /characters/:id
    DELETE /characters/:id
-2. Mantenha fallback local temporario.
+2. Nao mantenha fallback local para dados canonicos de personagem.
 3. Garanta que salvar ficha nao perca resources, spellChoices, backgroundChoices, inventory, attacks, spells e state.
 4. Adicione teste para roundtrip de uma ficha completa.
 5. Rode:

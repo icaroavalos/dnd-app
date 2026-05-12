@@ -20,12 +20,12 @@ export class RuleRepository {
         uuid: `feature:${slugify(item.className)}:${slugify(item.name)}:${item.level ?? 1}:${String(item.source ?? "local").toLowerCase()}`,
         metadata: { version: "5.5e", tags: ["class-feature", slugify(item.className)], source: item.source ?? "local" },
       })),
-      ...Object.values(source.spellDetails ?? {}).map((item: any) => normalizeRuleAtom(item, "spell", {
+      ...(Object.values(source.spellDetails ?? {}) || []).map((item: any) => normalizeRuleAtom(item, "spell", {
         uuid: `spell:${slugify(item.name)}:${String(item.source ?? "local").toLowerCase()}`,
         activation: { type: actionActivationFromCastingTime(item.castingTime), resource_cost: item.level > 0 ? "spell_slot" : null },
         metadata: { version: "5.5e", tags: ["spell", `level-${item.level ?? 0}`], source: item.source ?? "local" },
       })),
-      ...Object.values(source.itemDetails ?? {}).map((item: any) => normalizeRuleAtom(item, "item", {
+      ...(Object.values(source.itemDetails ?? {}) || []).map((item: any) => normalizeRuleAtom(item, "item", {
         uuid: `item:${slugify(item.name)}:${String(item.source ?? "local").toLowerCase()}`,
         activation: { type: "on_equip", resource_cost: null },
         metadata: { version: "5.5e", tags: ["item"], source: item.source ?? "local" },

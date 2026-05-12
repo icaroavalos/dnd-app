@@ -91,7 +91,7 @@ export function createCharacterRoster({
     render();
   }
 
-  function switchCharacter(characterId) {
+  async function switchCharacter(characterId) {
     const state = getState();
     syncActiveCharacter();
     const character = state.characters.find((item) => item.id === characterId);
@@ -101,13 +101,13 @@ export function createCharacterRoster({
     state.levelUpMode = false;
     state.creationComplete = Boolean(state.character.creationComplete);
     if (state.creationComplete) state.builderVisible = false;
-    normalizeCharacterState();
+    await normalizeCharacterState();
     state.selectedSpell = resolveSelectedSpellName(state.selectedSpell, knownSheetSpellNames());
-    persist();
+    await persist();
     render();
   }
 
-  function deleteCharacter(characterId) {
+  async function deleteCharacter(characterId) {
     const state = getState();
     syncActiveCharacter();
     state.characters = state.characters.filter((character) => character.id !== characterId);
@@ -121,8 +121,8 @@ export function createCharacterRoster({
       state.character = clone(state.characters[0]);
     }
     state.deleteConfirmId = null;
-    normalizeCharacterState();
-    persist();
+    await normalizeCharacterState();
+    await persist();
     render();
   }
 

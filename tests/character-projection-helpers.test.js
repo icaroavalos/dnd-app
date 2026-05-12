@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const module = await import('../dist/src/core/character/character-projection.js');
+const module = await import('../dist/src/core/character/local-character-projection.js');
 
 describe('character projection helpers', () => {
   it('derives typed helper values for ability scores, saves, skills, and proficiency', () => {

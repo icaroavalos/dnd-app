@@ -13,12 +13,13 @@ export function build5etoolsApi(
   const subclassFeatureResults = resultsOf(subclassFeatures);
   const subclassResults = resultsOf(subclasses);
   const featResults = resultsOf(feats);
-  const spellByKey = new Map(spellResults.map((spell) => [`${spell.name.toLowerCase()}|${spell.source.toLowerCase()}`, spell]));
+  const spellByKey = new Map(spellResults.filter(s => s?.name && s?.source).map((spell) => [`${String(spell.name).toLowerCase()}|${String(spell.source).toLowerCase()}`, spell]));
 
   const normalizedClassSpells = Object.fromEntries(Object.values(classSpellResults).map((list) => {
     const classKey = slugifyName(list.className);
     const options = (list.spells ?? [])
-      .map((ref) => spellByKey.get(`${ref.name.toLowerCase()}|${ref.source.toLowerCase()}`))
+      .filter(ref => ref?.name && ref?.source)
+      .map((ref) => spellByKey.get(`${String(ref.name).toLowerCase()}|${String(ref.source).toLowerCase()}`))
       .filter(Boolean)
       .map((spell) => ({ name: spell.name, level: spell.level, source: spell.source }))
       .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
@@ -122,14 +123,14 @@ export function build5etoolsApi(
         .filter((background) => background.source === "XPHB")
         .map((background) => [background.name, background.name])
         .sort((a, b) => a[1].localeCompare(b[1])),
-      backgroundDetails: Object.fromEntries(backgroundResults.map((background) => [background.name.toLowerCase(), background])),
+      backgroundDetails: Object.fromEntries(backgroundResults.filter(b => b?.name).map((background) => [String(background.name).toLowerCase(), background])),
       subraceDetails: Object.fromEntries(subraceResults.map((subrace) => [slugifyName(subrace.name), subrace])),
       itemDetails: Object.fromEntries(equipmentResults.map((item) => [itemKey(item.name, item.source), item])),
       classFeatures: classFeatureResults.map(normalize5etoolsFeature),
       subclassFeatures: subclassFeatureResults.map(normalize5etoolsFeature),
       subclasses: subclassResults,
       featDetails: Object.fromEntries(featResults.map((feat) => [slugifyName(feat.name), normalize5etoolsFeature({ ...feat, type: "feat" })])),
-      spellDetails: Object.fromEntries(spellResults.map((spell) => [spell.name.toLowerCase(), normalize5etoolsSpell(spell, spellClassIndex)])),
+      spellDetails: Object.fromEntries(spellResults.filter(s => s?.name).map((spell) => [String(spell.name).toLowerCase(), normalize5etoolsSpell(spell, spellClassIndex)])),
     },
   };
 }

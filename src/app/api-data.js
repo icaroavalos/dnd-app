@@ -31,12 +31,13 @@ export function createApiData({
     const state = getState();
     state.dataStatus = "carregando catálogo do backend";
     renderChrome();
+    console.log('Starting hydrateApiData with dataSource:', dataSource);
     try {
       // Busca catálogos do backend (obrigatório, sem fallback)
       const [classesData, racesData, subracesData, equipmentData, spellsData, classSpellsData, classFeaturesData, subclassFeaturesData, subclassesData, featsData, backgroundsData] = await Promise.all([
         getClasses().then(r => r.results || []),
         getSpecies().then(r => r.results || []),
-        fetchJson(`${dataSource}/subraces.json`),
+        fetchJson(`${dataSource}/subraces.json`).catch(() => ({ results: [] })),
         getItems().then(r => r.results || []),
         getSpells().then(r => r.results || []),
         getClassSpells().then(r => r.results || []),
@@ -71,13 +72,15 @@ export function createApiData({
         },
       );
       setRuleRepository(RuleRepository.fromApi(state.api));
-      state.dataStatus = dataSourceLabel;
+state.dataStatus = dataSourceLabel;
       normalizeCharacterState();
       persist();
     } catch (error) {
       state.dataStatus = "erro ao carregar do backend";
       state.apiError = error.message;
       console.error('Falha ao carregar catálogos do backend:', error);
+      // Remove apiError para tentar novamente
+      state.apiError = null;
       renderChrome();
     }
   }
@@ -98,7 +101,7 @@ export function createApiData({
   async function loadSpellDetails(spellName) {
     const state = getState();
     if (!spellName || state.api.spellDetails[spellName]) return;
-    const detail = state.api.source?.spellDetails?.[spellName.toLowerCase()];
+    const detail = state.api.source?.spellDetails?.[typeof spellName === 'string' ? spellName.toLowerCase() : String(spellName).toLowerCase()];
     if (detail) {
       state.api.spellDetails[spellName] = detail;
       persist();

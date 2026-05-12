@@ -11,14 +11,9 @@ export function createFormControls({ escapeHtml }) {
 
   function selectField(path, label, value, options, disabled = false) {
     const id = path.replace(".", "-");
-    return `
-    <div class="field">
-      <label for="${id}">${label}</label>
-      <select id="${id}" data-path="${path}" ${disabled ? "disabled" : ""}>
-        ${options.map(([optionValue, optionLabel]) => `<option value="${optionValue}" ${String(optionValue).toLowerCase() === String(value).toLowerCase() ? "selected" : ""}>${optionLabel}</option>`).join("")}
-      </select>
-    </div>
-  `;
+    const slugify = (str) => String(str ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const normalizedValue = slugify(value);
+    return ` <div class="field"> <label for="${id}">${label}</label> <select id="${id}" data-path="${path}" ${disabled ? "disabled" : ""}> ${options.map(([optionValue, optionLabel]) => `<option value="${optionValue}" ${slugify(optionValue) === normalizedValue ? "selected" : ""}>${optionLabel}</option>`).join("")} </select> </div> `;
   }
 
   function checkbox(path, value, label, checked, disabled = false, locked = false) {

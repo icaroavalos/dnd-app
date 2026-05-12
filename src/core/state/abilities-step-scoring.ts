@@ -15,6 +15,7 @@ export function getClassSavingThrows(
   characterClass: string,
   apiClasses: Record<string, any>
 ): AbilityName[] {
+  if (!apiClasses) return [];
   const apiSaves = apiClasses[characterClass]?.saving_throws;
   if (Array.isArray(apiSaves) && apiSaves.length) {
     return apiSaves.map((save: any) => (save.index || save) as AbilityName).filter(Boolean);

@@ -58,26 +58,30 @@ export class CharactersService {
     ]);
     const totalLevel = Math.max(
       1,
-      character.classes.reduce((sum, current) => sum + Math.max(0, Number(current.level) || 0), 0)
+      (character.classes ?? []).reduce((sum, current) => sum + Math.max(0, Number(current.level) || 0), 0)
     );
     const proficiencyBonus = Math.ceil(totalLevel / 4) + 1;
     const abilityScores = deriveAbilityScores(character);
     const abilityModifiers = deriveAbilityModifiers(abilityScores);
     const savingThrows = deriveSavingThrows(
       abilityScores,
-      character.savingThrowProficiencies,
+      character.savingThrowProficiencies ?? [],
       proficiencyBonus
     );
     const skillBonuses = deriveSkillBonuses(
       abilityModifiers,
-      character.skillProficiencies,
+      character.skillProficiencies ?? [],
       proficiencyBonus
     );
 
-    const primaryClass = resolvePrimaryClass(character, classesCatalog.results as ClassCatalogEntry[]);
+    const classResults = (classesCatalog as any)?.results ?? [];
+    const itemResults = (itemsCatalog as any)?.results ?? [];
+
+    const primaryClass = resolvePrimaryClass(character, classResults as ClassCatalogEntry[]);
     const hitDie = normalizeHitDie(primaryClass?.hitDie);
+    const state = character.state ?? { hp: 10, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] };
     const maxHp =
-      character.state.maxHpOverride ??
+      state.maxHpOverride ??
       Math.max(1, hitDie + abilityModifiers.con) +
         Math.max(0, totalLevel - 1) * Math.max(1, Math.floor(hitDie / 2) + 1 + abilityModifiers.con);
     const spellcasting = deriveSpellcasting(
@@ -89,7 +93,7 @@ export class CharactersService {
     const armorClass = deriveArmorClass(
       character,
       abilityModifiers,
-      itemsCatalog.results as ItemCatalogEntry[]
+      itemResults as ItemCatalogEntry[]
     );
 
     return {
@@ -104,12 +108,12 @@ export class CharactersService {
       initiative: abilityModifiers.dex,
       speed: 30,
       maxHp,
-      currentHp: character.state.hp,
-      tempHp: character.state.tempHp,
+      currentHp: state.hp,
+      tempHp: state.tempHp,
       passivePerception: 10 + (skillBonuses.Perception ?? abilityModifiers.wis),
       spellcasting,
       spellSlotsMax: deriveSpellSlotsMax(primaryClass, totalLevel),
-      resources: character.resources
+      resources: character.resources ?? {}
     };
   }
 }
@@ -119,12 +123,14 @@ function deriveArmorClass(
   abilityModifiers: AbilityScoreMap,
   itemEntries: ItemCatalogEntry[]
 ): number {
-  const itemLookup = new Map(itemEntries.map((entry) => [slugify(entry.name), entry]));
-  const equippedArmor = character.inventory
+  const items = itemEntries ?? [];
+  const inventory = character.inventory ?? [];
+  const itemLookup = new Map(items.map((entry) => [slugify(entry.name), entry]));
+  const equippedArmor = inventory
     .filter((item) => item.status === 'equipped_armor')
     .map((item) => itemLookup.get(slugify(item.baseItemId)))
     .find((entry): entry is ItemCatalogEntry => Boolean(entry));
-  const equippedShield = character.inventory
+  const equippedShield = inventory
     .filter((item) => item.status === 'equipped_shield')
     .map((item) => itemLookup.get(slugify(item.baseItemId)))
     .find((entry): entry is ItemCatalogEntry => Boolean(entry));
@@ -160,14 +166,15 @@ function resolveBaseArmorClass(
 
 function deriveAbilityScores(character: CharacterRecord): AbilityScoreMap {
   const assignments = character.backgroundChoices?.abilityAssignments;
+  const abilities = character.abilities ?? { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
 
   return {
-    str: clamp(character.abilities.str + (assignments?.str ?? 0)),
-    dex: clamp(character.abilities.dex + (assignments?.dex ?? 0)),
-    con: clamp(character.abilities.con + (assignments?.con ?? 0)),
-    int: clamp(character.abilities.int + (assignments?.int ?? 0)),
-    wis: clamp(character.abilities.wis + (assignments?.wis ?? 0)),
-    cha: clamp(character.abilities.cha + (assignments?.cha ?? 0))
+    str: clamp(abilities.str + (assignments?.str ?? 0)),
+    dex: clamp(abilities.dex + (assignments?.dex ?? 0)),
+    con: clamp(abilities.con + (assignments?.con ?? 0)),
+    int: clamp(abilities.int + (assignments?.int ?? 0)),
+    wis: clamp(abilities.wis + (assignments?.wis ?? 0)),
+    cha: clamp(abilities.cha + (assignments?.cha ?? 0))
   };
 }
 
@@ -219,7 +226,7 @@ function resolvePrimaryClass(
   character: CharacterRecord,
   classEntries: ClassCatalogEntry[]
 ): ClassCatalogEntry | undefined {
-  const primary = character.classes[0];
+  const primary = character.classes?.[0];
   if (!primary) return undefined;
 
   const classId = slugify(primary.classId);
@@ -233,7 +240,7 @@ function deriveSpellcasting(
   proficiencyBonus: number,
   abilityModifiers: AbilityScoreMap
 ): DerivedSpellcasting | null {
-  const spellChoiceAbility = character.spellChoices[0]?.spellcastingAbility;
+  const spellChoiceAbility = character.spellChoices?.[0]?.spellcastingAbility;
   const ability = spellChoiceAbility ?? primaryClass?.spellcastingAbility ?? null;
 
   if (!ability) {

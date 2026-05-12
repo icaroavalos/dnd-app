@@ -16,17 +16,20 @@ interface BackgroundSelectedSpell {
 }
 
 export function backgroundSpellChoiceRules(character: Character, api: ApiState) {
+  if (!api) return [];
   const background = character.background || character.bgChoices?.background;
   const grants = getBackgroundGrantedSpells(background || undefined, api.source?.backgroundDetails);
   return createBackgroundSpellRules(grants);
 }
 
 export function backgroundSpellAbility(character: Character, api: ApiState): string | null {
+  if (!api) return null;
   const rules = backgroundSpellChoiceRules(character, api);
   return resolveBackgroundSpellcastingAbility(character.bgChoices, rules);
 }
 
 export function selectedBackgroundSpells(character: Character, api: ApiState): BackgroundSelectedSpell[] {
+  if (!api) return [];
   const rules = backgroundSpellChoiceRules(character, api);
   if (!rules.length) return [];
 

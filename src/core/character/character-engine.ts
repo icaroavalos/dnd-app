@@ -274,6 +274,7 @@ export interface SubraceData {
 }
 
 export function getSubracesFor(raceName: string, races: Record<string, SubraceData>): string[] {
+  if (!races) return [];
   const key = slugifyName(raceName);
   const raceData = races[key];
   if (!raceData) return [];

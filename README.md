@@ -40,23 +40,41 @@ npm run build
 
 ### Servidor local
 
-Você pode subir um servidor estático de duas formas:
+**Frontend:**
 
 ```bash
 npm run dev
 ```
 
-ou
-
-```bash
-python3 -m http.server 5173
-```
-
-Abra em:
+O servidor sobe em:
 
 ```text
-http://localhost:5173
+http://localhost:3000
 ```
+
+**Backend:**
+
+```bash
+npm run backend:dev
+```
+
+O servidor sobe em:
+
+```text
+http://localhost:3100
+```
+
+Ambos os servidores devem estar rodando para o app funcionar corretamente.
+
+### Observacao sobre Vite
+
+O projeto possui Vite como dev dependency, mas o comando `npm run dev` usa `serve` para production build. O Vite pode ser usado alternativamente com:
+
+```bash
+npx vite
+```
+
+Isso sobe o dev server do Vite em `http://localhost:5173` (padrao).
 
 ## Backend NestJS + Fastify
 

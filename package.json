@@ -9,12 +9,13 @@
     "backend:start": "npm --prefix backend run start",
     "backend:test": "npm --prefix backend run test",
     "backend:typecheck": "npm --prefix backend run typecheck",
-    "test": "node tests/test-recovery.js",
+    "test": "node --test --import tsx tests/*.test.js tests/*.test.ts tests/contract/*.test.js",
     "test:watch": "node --watch tests/test-recovery.js",
     "typecheck": "tsc --noEmit",
     "dev": "npx serve ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.6.2",
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",

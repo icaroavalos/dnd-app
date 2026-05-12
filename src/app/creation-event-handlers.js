@@ -38,119 +38,117 @@ export function createCreationEventHandlers({
   escapeHtml,
 }) {
   /**
-   * Bind all creation form events
+   * Bind all creation form events via event delegation.
+   *
+   * Usa delegacao no form em vez de bind direto em filhos,
+   * porque `els.form.innerHTML = html` na renderizacao destroi
+   * os elementos antigos e seus listeners.
    */
   function bindCreationEvents(form, els) {
-    // Bind data-path inputs
-    form.querySelectorAll('[data-path]').forEach((input) => {
-      input.addEventListener('input', handlePathInputChange.bind(null, input));
-      if (input.tagName === 'SELECT') {
-        input.addEventListener('change', handlePathInputChange.bind(null, input));
-      }
-    });
+    form.addEventListener('change', handleFormChange);
+    form.addEventListener('input', handleFormInput);
+    // click delegation: [data-move] + botoes estaticos
+    form.addEventListener('click', handleFormClick);
+  }
 
-    // Bind ability adjustments
-    form.querySelectorAll('[data-ability-adjust]').forEach((button) => {
-      button.addEventListener('click', handleAbilityAdjustClick.bind(null, button));
-    });
+  function handleFormChange(event) {
+    const el = event.target;
 
-    // Bind class feature choices
-    form.querySelectorAll('[data-class-feature-choice]').forEach((input) => {
-      input.addEventListener('change', handleClassFeatureChoiceChange.bind(null, input));
-    });
+    if (el.matches('[data-path]')) {
+      handlePathInputChange(el);
+      return;
+    }
+    if (el.matches('[data-class-feature-choice]')) {
+      handleClassFeatureChoiceChange(el);
+      return;
+    }
+    if (el.matches('[data-asi-mode]')) {
+      handleAsiModeChange(el);
+      return;
+    }
+    if (el.matches('[data-equipment-choice]')) {
+      handleEquipmentChoiceChange(el);
+      return;
+    }
+    if (el.matches('[data-bg-spell]')) {
+      handleBgSpellChange(el);
+      return;
+    }
+    if (el.matches('[data-bg-select]')) {
+      handleBgSelectChange(el);
+      return;
+    }
+    if (el.matches('[data-bg-increment]')) {
+      handleBgIncrementChange(el);
+      return;
+    }
+    if (el.matches('[data-bg-ability]')) {
+      handleBgAbilityChange(el);
+      return;
+    }
+    if (el.matches('[data-bg-equipment]')) {
+      handleBgEquipmentChange(el);
+      return;
+    }
+    if (el.matches('[name="spellcasting-ability"]')) {
+      handleSpellcastingAbilityChange(el);
+      return;
+    }
+    if (el.matches('[data-list]')) {
+      handleListChange(el);
+    }
+  }
 
-    // Bind ASI choices
-    form.querySelectorAll('[data-asi-mode]').forEach((input) => {
-      input.addEventListener('change', handleAsiModeChange.bind(null, input));
-    });
+  function handleFormInput(event) {
+    const el = event.target;
 
-    // Bind equipment choices
-    form.querySelectorAll('[data-equipment-choice]').forEach((input) => {
-      input.addEventListener('change', handleEquipmentChoiceChange.bind(null, input));
-    });
+    if (el.matches('[data-path]')) {
+      handlePathInputChange(el);
+      return;
+    }
+    if (el.matches('[data-level-hp-gain]')) {
+      handleLevelUpHpGainInput(el);
+    }
+  }
 
-    // Bind background spell choices
-    form.querySelectorAll('[data-bg-spell]').forEach((input) => {
-      input.addEventListener('change', handleBgSpellChange.bind(null, input));
-    });
+  function handleFormClick(event) {
+    const el = event.target;
 
-    // Bind background select
-    form.querySelectorAll('[data-bg-select]').forEach((select) => {
-      select.addEventListener('change', handleBgSelectChange.bind(null, select));
-    });
-
-    // Bind background increment
-    form.querySelectorAll('[data-bg-increment]').forEach((input) => {
-      input.addEventListener('change', handleBgIncrementChange.bind(null, input));
-    });
-
-    // Bind background ability
-    form.querySelectorAll('[data-bg-ability]').forEach((input) => {
-      input.addEventListener('change', handleBgAbilityChange.bind(null, input));
-    });
-
-    // Bind background equipment
-    form.querySelectorAll('[data-bg-equipment]').forEach((input) => {
-      input.addEventListener('change', handleBgEquipmentChange.bind(null, input));
-    });
-
-    // Bind spellcasting ability
-    form.querySelectorAll('[name="spellcasting-ability"]').forEach((input) => {
-      input.addEventListener('change', handleSpellcastingAbilityChange.bind(null, input));
-    });
-
-    // Bind level up HP gain
-    form.querySelectorAll('[data-level-hp-gain]').forEach((input) => {
-      input.addEventListener('input', handleLevelUpHpGainInput.bind(null, input));
-    });
-
-    // Bind HP preset buttons
-    form.querySelectorAll('[data-hp-preset]').forEach((button) => {
-      button.addEventListener('click', handleHpPresetClick.bind(null, button));
-    });
-
-    // Bind cancel level up
-    const cancelLevelUpBtn = form.querySelector('[data-cancel-level-up]');
-    if (cancelLevelUpBtn) {
-      cancelLevelUpBtn.addEventListener('click', handleCancelLevelUp);
+    // data-move navigation (closest because button may have nested elements)
+    const moveButton = el.closest('[data-move]');
+    if (moveButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      handleMoveClick(moveButton);
+      return;
     }
 
-    // Bind apply level up
-    const applyLevelUpBtn = form.querySelector('[data-apply-level-up]');
-    if (applyLevelUpBtn) {
-      applyLevelUpBtn.addEventListener('click', handleApplyLevelUp);
+    if (el.matches('[data-ability-adjust]')) {
+      handleAbilityAdjustClick(el);
+      return;
     }
-
-    // Bind list choices
-    form.querySelectorAll('[data-list]').forEach((input) => {
-      input.addEventListener('change', handleListChange.bind(null, input));
-    });
-
-    // Bind navigation buttons - using event delegation pattern for dynamic content
-    form.addEventListener('click', (event) => {
-      const moveButton = event.target.closest('[data-move]');
-      if (moveButton) {
-        event.preventDefault();
-        event.stopPropagation();
-        handleMoveClick(moveButton);
-      }
-    });
-
-    // Bind remove attack buttons
-    form.querySelectorAll('[data-remove-attack]').forEach((button) => {
-      button.addEventListener('click', handleRemoveAttackClick.bind(null, button));
-    });
-
-    // Bind add attack button
-    const addAttackBtn = form.querySelector('#addAttackButton');
-    if (addAttackBtn) {
-      addAttackBtn.addEventListener('click', handleAddAttackClick);
+    if (el.matches('[data-hp-preset]')) {
+      handleHpPresetClick(el);
+      return;
     }
-
-    // Bind suggest attacks button
-    const suggestAttacksBtn = form.querySelector('#suggestAttacksButton');
-    if (suggestAttacksBtn) {
-      suggestAttacksBtn.addEventListener('click', handleSuggestAttacksClick);
+    if (el.matches('[data-cancel-level-up]')) {
+      handleCancelLevelUp(el);
+      return;
+    }
+    if (el.matches('[data-apply-level-up]')) {
+      handleApplyLevelUp(el);
+      return;
+    }
+    if (el.matches('[data-remove-attack]')) {
+      handleRemoveAttackClick(el);
+      return;
+    }
+    if (el.matches('#addAttackButton')) {
+      handleAddAttackClick(el);
+      return;
+    }
+    if (el.matches('#suggestAttacksButton')) {
+      handleSuggestAttacksClick(el);
     }
   }
 

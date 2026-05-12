@@ -69,9 +69,9 @@ export function createCharacterMenu({
       createNewCharacter();
       closeCharacterMenu();
     });
-    els.characterMenu.querySelector("[data-menu-level-up]")?.addEventListener("click", () => {
-      startLevelUpAssistant();
-      persist();
+    els.characterMenu.querySelector("[data-menu-level-up]")?.addEventListener("click", async () => {
+      await startLevelUpAssistant();
+      await persist();
       render();
       closeCharacterMenu();
     });
@@ -85,8 +85,8 @@ export function createCharacterMenu({
       requestDeleteCharacter(state.activeCharacterId);
     });
     els.characterMenu.querySelectorAll("[data-menu-roster-id]").forEach((button) => {
-      button.addEventListener("click", () => {
-        switchCharacter(button.dataset.menuRosterId);
+      button.addEventListener("click", async () => {
+        await switchCharacter(button.dataset.menuRosterId);
         closeCharacterMenu();
       });
     });
@@ -98,9 +98,9 @@ export function createCharacterMenu({
     });
     const confirmBtn = els.characterMenu.querySelector("[data-confirm-delete]");
     const cancelBtn = els.characterMenu.querySelector("[data-cancel-delete]");
-    confirmBtn?.addEventListener("click", () => {
+    confirmBtn?.addEventListener("click", async () => {
       if (state.deleteConfirmId) {
-        deleteCharacter(state.deleteConfirmId);
+        await deleteCharacter(state.deleteConfirmId);
       }
     });
     cancelBtn?.addEventListener("click", () => {

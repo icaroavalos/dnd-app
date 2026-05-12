@@ -19,7 +19,7 @@ const ABILITY_LABELS: Record<AbilityKey, string> = {
 
 export function renderSummarySheet(character: Character, derived: DerivedCharacterSheet): string {
   const level = Number(character.level) || 1;
-  const tempHp = Number(derived.tempHp) || 0;
+  const tempHp = Number(derived?.tempHp) || 0;
   const hitDiceUsed = Number(character.hitDiceUsed) || 0;
   const hitDiceRemaining = Math.max(0, (Number(derived.hitDiceTotal) || 0) - hitDiceUsed);
   const languages = character.notes?.match(/Languages:\s*([^\n]+)/)?.[1] || 'Common';

@@ -37,6 +37,36 @@ Uma tarefa so esta pronta quando:
 - `docs/sessions.md` contem timestamp, comandos e resultado.
 - Nenhum arquivo gerado localmente foi adicionado sem necessidade.
 
+## Debug de problemas de renderizacao
+
+Se o formulario de criacao de personagem estiver em branco:
+
+1. Verificar se `renderForm()` em `src/app/app-shell.js` esta inserindo HTML no DOM:
+   ```javascript
+   function renderForm() {
+     const state = getState();
+     if (state.builderVisible === false) return;
+     let html = '';
+     if (state.step === 'lineage') html = renderLineageForm();
+     // ... outros steps
+     if (html) els.form.innerHTML = html; // <-- Esta linha e crucial
+   }
+   ```
+
+2. Verificar se `state.api.source` esta populado (backend carregado)
+3. Verificar se `state.step` corresponde a uma etapa valida
+4. Usar console.log para depurar o valor de `html` antes de atribuir
+
+Se eventos do formulario (select de classe, botoes) nao funcionarem:
+
+1. Verificar se os handlers em `creation-event-handlers.js` usam event delegation no `form` pai
+2. Nao use `querySelectorAll` + `addEventListener` em elementos filhos — o `innerHTML` do form os destroi
+3. Os tres handlers devem estar ligados ao `form`: `change`, `input`, `click`
+4. Use `el.matches()` para inputs/selects, `el.closest()` para botoes com filhos aninhados
+5. Verificar se `bindCreationEvents()` e chamado no init com o elemento `form` correto
+
+Para mais detalhes, ver `docs/learnings.md`.
+
 ## Comandos comuns
 
 Backend:

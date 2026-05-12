@@ -10,6 +10,7 @@ export function currentKnownSpellNames(
   api: ApiState,
   activeFeatures: any[] = []
 ): string[] {
+  if (!api) return [];
   return currentSpellEntries(character, api, activeFeatures).map((spell) => spell.name);
 }
 
@@ -18,6 +19,7 @@ export function currentSpellEntries(
   api: ApiState,
   activeFeatures: any[] = []
 ): SpellEntry[] {
+  if (!api) return [];
   const entries = new Map<string, SpellEntry>();
   const explicit = [...new Set(character.spells ?? [])];
   const autoGranted = autoGrantedSpellEntries(character, api, activeFeatures);
@@ -67,6 +69,7 @@ export function currentSpellEntries(
 }
 
 export function spellAbility(character: Character, api: ApiState): string {
+  if (!api) return "int";
   if (classHasSpellList(character.class, api)) {
     return classSpellAbility(character.class, api);
   }
@@ -79,6 +82,7 @@ export function spellAbilityForSpell(
   api: ApiState,
   bgSpellNames: string[]
 ): string {
+  if (!api) return "int";
   const bgAbility = backgroundSpellAbility(character, api);
   if (bgAbility && bgSpellNames.includes(spellName)) return bgAbility;
   return classHasSpellList(character.class, api)

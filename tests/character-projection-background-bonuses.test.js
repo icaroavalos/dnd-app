@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { deriveCharacterSheet } from '../dist/src/core/character/character-projection.js';
+import { deriveCharacterSheet } from '../dist/src/core/character/local-character-projection.js';
 
 describe('character projection background bonuses', () => {
   it('applies Acolyte background ability choices to derived scores', () => {

@@ -39,7 +39,7 @@ function restoreFetch() {
 }
 
 test('api-actions-client: deriveActions returns backend data on success', async () => {
-  const { deriveActions } = await import('../src/lib/api-actions-client.ts');
+  const { deriveActions } = await import('../dist/src/lib/api-actions-client.js');
 
   mockFetchSuccess({
     actions: [
@@ -67,7 +67,7 @@ test('api-actions-client: deriveActions returns backend data on success', async 
 });
 
 test('api-actions-client: deriveActions throws ActionDerivationError when backend fails', async () => {
-  const { deriveActions, ActionDerivationError } = await import('../src/lib/api-actions-client.ts');
+  const { deriveActions } = await import('../dist/src/lib/api-actions-client.js');
 
   mockFetchFailure();
 
@@ -92,7 +92,7 @@ test('api-actions-client: deriveActions throws ActionDerivationError when backen
 });
 
 test('api-actions-client: deriveActions throws ActionDerivationError on 404', async () => {
-  const { deriveActions, ActionDerivationError } = await import('../src/lib/api-actions-client.ts');
+  const { deriveActions } = await import('../dist/src/lib/api-actions-client.js');
 
   mockFetch404();
 
@@ -117,7 +117,7 @@ test('api-actions-client: deriveActions throws ActionDerivationError on 404', as
 });
 
 test('api-actions-client: no local fallback - throws on backend failure', async () => {
-  const { deriveActions, ActionDerivationError } = await import('../src/lib/api-actions-client.ts');
+  const { deriveActions } = await import('../dist/src/lib/api-actions-client.js');
 
   mockFetchFailure();
 

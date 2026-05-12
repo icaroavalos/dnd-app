@@ -39,7 +39,7 @@ function restoreFetch() {
 }
 
 test('resource-mutations: useResource returns backend result on success', async () => {
-  const { useResource } = await import('../src/lib/api-resource-mutations.ts');
+  const { useResource } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchSuccess({
     event: { type: 'use_resource', resourceType: 'ki', amount: 1 },
@@ -56,7 +56,7 @@ test('resource-mutations: useResource returns backend result on success', async 
 });
 
 test('resource-mutations: useResource throws ResourceMutationError when backend fails', async () => {
-  const { useResource, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { useResource } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchFailure();
 
@@ -74,7 +74,7 @@ test('resource-mutations: useResource throws ResourceMutationError when backend 
 });
 
 test('resource-mutations: spendAmmo throws ResourceMutationError on backend failure', async () => {
-  const { spendAmmo, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { spendAmmo } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchFailure();
 
@@ -92,7 +92,7 @@ test('resource-mutations: spendAmmo throws ResourceMutationError on backend fail
 });
 
 test('resource-mutations: recoverAmmo throws ResourceMutationError on backend failure', async () => {
-  const { recoverAmmo, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { recoverAmmo } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchFailure();
 
@@ -110,7 +110,7 @@ test('resource-mutations: recoverAmmo throws ResourceMutationError on backend fa
 });
 
 test('resource-mutations: shortRest throws ResourceMutationError on backend failure', async () => {
-  const { shortRest, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { shortRest } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchFailure();
 
@@ -128,7 +128,7 @@ test('resource-mutations: shortRest throws ResourceMutationError on backend fail
 });
 
 test('resource-mutations: longRest throws ResourceMutationError on backend failure', async () => {
-  const { longRest, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { longRest } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchFailure();
 
@@ -146,7 +146,7 @@ test('resource-mutations: longRest throws ResourceMutationError on backend failu
 });
 
 test('resource-mutations: useResource throws ResourceMutationError on 404', async () => {
-  const { useResource, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { useResource } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetch404();
 
@@ -164,7 +164,7 @@ test('resource-mutations: useResource throws ResourceMutationError on 404', asyn
 });
 
 test('resource-mutations: no local fallback - throws on backend failure', async () => {
-  const { useResource, ResourceMutationError } = await import('../src/lib/api-resource-mutations.ts');
+  const { useResource } = await import('../dist/src/lib/api-resource-mutations.js');
 
   mockFetchFailure();
 

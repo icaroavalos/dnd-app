@@ -18,7 +18,8 @@ export function createInventoryHelpers({
     if (classEquipment?.defaultData?.length) {
       rules.push(equipmentRuleFromData("class-starting-equipment", `${titleCase(state.character.class)} Equipment`, classEquipment));
     }
-    const background = state.api.source?.backgroundDetails?.[String(state.character.background).toLowerCase()];
+    const backgroundName = state.character.background ? String(state.character.background).toLowerCase() : null;
+const background = backgroundName ? state.api.source?.backgroundDetails?.[backgroundName] : null;
     if (background?.startingEquipment?.length) {
       rules.push(equipmentRuleFromData("background-starting-equipment", `${state.character.background} Equipment`, { defaultData: background.startingEquipment, entries: background.entries }));
     }
