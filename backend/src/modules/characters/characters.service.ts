@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
 import type {
   AbilityKey,
@@ -52,6 +52,10 @@ export class CharactersService {
   ) {}
 
   async projectCharacter(character: CharacterRecord): Promise<DerivedCharacterSheet> {
+    if (!character || !Array.isArray(character.classes) || character.classes.length === 0) {
+      throw new BadRequestException('Character must have at least one class entry');
+    }
+
     const [classesCatalog, itemsCatalog] = await Promise.all([
       this.rulesService.getCatalog('classes'),
       this.rulesService.getCatalog('items')

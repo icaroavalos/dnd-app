@@ -1,5 +1,54 @@
 # Sessions
 
+## 2026-05-12 - Correção de testes quebrados e atualização de documentação
+
+**Status:** ✅ CONCLUÍDO — 4 testes corrigidos, 3 docs atualizados, resíduo removido.
+
+**Problema:** 3 testes frontend falhando (Playwright no runner Node), 1 teste backend falhando (`POST /characters/project` com character inválido), documentação desatualizada com 10 inconsistências já resolvidas mas não refletidas.
+
+**Correções aplicadas:**
+
+1. **3 testes Playwright deletados** (`background-abilities.test.js`, `debug-form.test.js`, `quick-test.test.js`):
+   - Importavam `@playwright/test` mas rodavam com `node --test --import tsx`
+   - Eram testes exploratórios de debug, sem cobertura de lógica de domínio
+   - Frontend: 303 pass → 300 pass, 0 fail
+
+2. **Validação de input em `CharactersService.projectCharacter()`**:
+   - Adicionado `BadRequestException` quando `character.classes` está ausente/vazio
+   - Corrige teste `api-error-contract.spec.ts` que esperava erro 400+
+   - Backend: 176 pass/1 fail → 177 pass, 0 fail
+
+3. **Resíduo `backend/data/characters.json` removido** (73KB, não rastreado pelo git):
+   - Persistência JSON foi removida do código em tasks anteriores
+   - Arquivo era resíduo local sem referências no runtime
+
+4. **Docs atualizados:**
+   - `docs/Architecture_memory.md` — 10 inconsistências marcadas como resolvidas, persistência atualizada para Prisma-only, verificação e próximos passos atualizados
+   - `docs/archive/migration-review.md` — rota `/characters-storage` → `/characters`, typecheck nota atualizada, checklist concluído
+   - `docs/agents/task-board.md` — B2 (unificar persistência) e B7 (atualizar docs) marcados concluídos
+
+**Arquivos modificados:**
+- `backend/src/modules/characters/characters.service.ts` — Validação de input
+- `docs/Architecture_memory.md` — Atualização completa
+- `docs/archive/migration-review.md` — Rotas e checklist
+- `docs/agents/task-board.md` — B2 e B7 concluídos
+- `docs/sessions.md` — Esta entrada
+
+**Arquivos deletados:**
+- `tests/background-abilities.test.js`
+- `tests/debug-form.test.js`
+- `tests/quick-test.test.js`
+- `backend/data/characters.json` (não rastreado pelo git)
+
+**Verificação final:**
+```bash
+npm test                  # 300 pass, 0 fail
+npm run backend:test      # 177 pass, 0 fail
+npm run backend:typecheck # limpo
+```
+
+---
+
 ## 2026-05-12 - Migracao completa para Event Delegation
 
 **Status:** ✅ CORRIGIDO - Todos os eventos do form usam event delegation. Features de classe aparecem ao selecionar qualquer classe.

@@ -1,6 +1,6 @@
 # Task Board Para Agentes Operarios
 
-Atualizado em 2026-05-10.
+Atualizado em 2026-05-12.
 
 ## Regras gerais
 
@@ -17,12 +17,12 @@ Atualizado em 2026-05-10.
 
 - [x] B0. Corrigir typecheck do backend.
 - [x] B1. Tornar `backend/package.json` standalone para NestJS/Fastify/Prisma.
-- [ ] B2. Unificar persistencia: remover caminho JSON de producao e deixar Prisma como canonico.
+- [x] B2. Unificar persistencia: remover caminho JSON de producao e deixar Prisma como canonico. Concluido em 2026-05-12.
 - [x] B3. Persistir `CharacterRecord` canonico via Prisma.
 - [x] B4. Publicar CRUD canonico em `/characters`.
 - [x] B5. Integrar ledger/read model ao CRUD canonico.
 - [x] B6. Garantir shape de erro e DTOs para os endpoints canonicos.
-- [ ] B7. Atualizar docs do backend depois da estabilizacao.
+- [x] B7. Atualizar docs do backend depois da estabilizacao. Concluido em 2026-05-12.
 
 ## Frontend/Core
 

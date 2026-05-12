@@ -4,7 +4,7 @@
 
 Este documento identifica lógica duplicada entre frontend local e backend, e define o plano para remover duplicação quando slices backend estiverem estáveis.
 
-> Atualizacao de 2026-05-08: esta revisao historica marcou alguns slices como "estaveis", mas a auditoria atual encontrou `npm run typecheck` falhando no backend. Enquanto typecheck estiver vermelho, leia "estavel" abaixo como "runtime coberto por testes, ainda pendente de estabilizacao TypeScript".
+> Atualizacao de 2026-05-12: typecheck do backend passa limpo. Persistencia unificada em Prisma (caminho JSON removido). Rota de CRUD canonico renomeada de `/characters-storage` para `/characters`.
 
 ## Status dos Slices
 
@@ -16,7 +16,7 @@ Este documento identifica lógica duplicada entre frontend local e backend, e de
 | Catálogo (backgrounds, classes, etc.) | `GET /rules/*` | ✅ Estável | Frontend deve usar backend |
 | Resource Ledger (HP, descansos) | `POST /characters/:id/resources/*` | ✅ Estável | Frontend deve usar backend |
 | Resource Projection | `GET /characters/:id/resources/projection` | ✅ Estável | Frontend deve usar backend |
-| Character Persistence (CRUD) | `POST/GET/PUT/DELETE /characters-storage` | ✅ Estável | Frontend deve usar backend |
+| Character Persistence (CRUD) | `POST/GET/PUT/DELETE /characters` | ✅ Estável | Frontend deve usar backend |
 
 ### ⚠️ Parciais (alguma duplicação)
 
@@ -143,10 +143,10 @@ await shortRestBackend(characterId, hitDiceSpent, hpRegained);
 
 ### ✅ Character Storage
 
-- [x] Backend CRUD: `/characters-storage`
+- [x] Backend CRUD: `/characters` (renomeado de `/characters-storage`)
 - [x] Frontend client: `api-catalog-client.ts`
-- [ ] Migrar persistência local
-- [ ] Remover JSON file persistence
+- [x] Migrar persistência local
+- [x] Remover JSON file persistence (removido em 2026-05-12)
 
 ## Como Contribuir
 

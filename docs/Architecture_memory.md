@@ -1,6 +1,6 @@
 # Architecture Memory
 
-Ultima revisao: 2026-05-11.
+Ultima revisao: 2026-05-12.
 
 ## Resumo executivo
 
@@ -13,11 +13,7 @@ O projeto esta no meio da migracao de um app estatico de ficha D&D 5e 2024 para 
 - Backend: `npm run backend:dev` sobe em `http://localhost:3100`
 - Vite disponivel como dev dependency, mas `serve` e usado para production build
 
-O ponto critico do MVP backend nao e adicionar outro modulo. O ponto critico agora e estabilizar contratos e persistencia: os testes de runtime passam, mas `npm run typecheck` falha. Enquanto o typecheck estiver vermelho, o backend ainda nao deve ser tratado como MVP pronto.
-
-**Status atual 2026-05-12:** Event delegation implementado para TODOS os eventos do formulario de criacao (change, input, click). `creation-event-handlers.js` usa tres handlers com roteamento via `el.matches()`/`el.closest()` em vez de `querySelectorAll` + `addEventListener`. Selecao de classe agora reflete features corretamente. Debug hook `window.__dndState` removido de `app.js`.
-
-**Atualizacao 2026-05-11:** Ports de desenvolvimento:
+**Status atual 2026-05-12:** Event delegation implementado para TODOS os eventos do formulario de criacao (change, input, click). `creation-event-handlers.js` usa tres handlers com roteamento via `el.matches()`/`el.closest()` em vez de `querySelectorAll` + `addEventListener`. Selecao de classe agora reflete features corretamente. Debug hook `window.__dndState` removido de `app.js`. Backend typecheck e testes passando. Persistencia unificada em Prisma (caminho JSON removido).
 
 ## Decisoes de arquitetura atuais
 
@@ -121,54 +117,44 @@ Implementado em `backend/src/modules/health/`, `backend/src/config/` e `backend/
 
 ### Persistencia e ledger
 
-Implementado parcialmente.
+Implementado.
 
 - Prisma schema, migrations e seed existem.
-- `characters-storage` usa Prisma para CRUD simples.
-- `characters-persistence` usa arquivo JSON em `backend/data/characters.json`.
+- CRUD canonico de personagens em `/characters` via `CharactersStorageController` (Prisma).
+- Persistencia JSON legada (`characters-persistence`) foi removida do codigo e o arquivo residuo `backend/data/characters.json` foi deletado em 2026-05-12.
 - Resource ledger registra eventos para HP, hit dice, spell slots, rests, resources e ammo.
 - Resource projection cria read model consolidado.
+- Validacao de input em `POST /characters/project` rejeita characters sem `classes` com 400.
 
-Estes slices ainda nao devem ser considerados MVP-estaveis porque ha duplicacao de persistencia, divergencia de contrato e falha de typecheck.
+## Inconsistencias entre plano e codigo (resolvidas)
 
-## Inconsistencias entre plano e codigo
+Todas as inconsistencias originalmente listadas em 2026-05-08 foram corrigidas entre Tasks 1-6 e a limpeza de 2026-05-12:
 
-1. Documentos antigos dizem que contratos canonicos estao em `backend/src/domain/contracts/`, mas o codigo atual usa `backend/src/shared/contracts/`.
-2. O roadmap dizia para adicionar persistencia com PostgreSQL/Prisma depois da API read-only; o codigo ja adicionou Prisma, mas usando SQLite e antes de estabilizar typecheck.
-3. Existem duas APIs de persistencia concorrentes: `/characters-persistence` com arquivo JSON e `/characters-storage` com Prisma.
-4. O Prisma repository usa um shape antigo (`runtimeState`, `spellChoices[].spellId`, `backgroundChoices[]`) que nao bate com `CharacterRecord` atual (`state`, `spellChoices.selectedCantrips`, `backgroundChoices` como objeto, `resources`, `skillProficiencies`, `savingThrowProficiencies`, `attacks`, `spells`).
-5. `docs/archive/migration-review.md` declarou slices estaveis, mas os criterios do proprio arquivo ainda nao estao satisfeitos porque o typecheck falha.
-6. `docs/agents/roadmap.md` e `docs/agents/task-board.md` substituem os antigos `melhoria.txt` e `etapas-agente-restantes.txt`, que ficavam soltos na raiz.
-7. `ResourceProjectionService.getResources()` consulta `where: { id: characterId }`; pelo schema, o lookup correto deveria ser por `characterId`.
-8. `ResourceProjectionController.rebuildProjection()` retorna `{ projected: true, characterId, ...result }`, duplicando `characterId` e causando erro TS2783.
-9. O `backend/package.json` nao e standalone para NestJS: ele lista Prisma, mas as dependencias Nest/Fastify ficam no `package.json` raiz.
-10. Os testes passam com `tsx`, mas isso nao substitui `tsc --noEmit`.
+1. ~~`domain/contracts/` vs `shared/contracts/`~~ — Resolvido: `domain/contracts/` removido, `@shared/contracts` e o alias canonico.
+2. ~~Prisma adicionado antes do typecheck~~ — Resolvido: `npm run typecheck` passa limpo.
+3. ~~Duas APIs de persistencia concorrentes~~ — Resolvido: persistencia JSON removida, Prisma e o unico caminho.
+4. ~~Prisma repo com shape antigo~~ — Resolvido: storage usa `CharacterRecord` canonico.
+5. ~~migration-review declara estaveis sem typecheck~~ — Resolvido: typecheck passa.
+6. ~~roadmap/task-board substituem arquivos antigos~~ — Resolvido: arquivos antigos removidos da raiz.
+7. ~~`getResources()` com `where: { id: characterId }`~~ — Resolvido: `getResources()` agora usa `where: { characterId }`.
+8. ~~`rebuildProjection()` duplicando characterId~~ — Resolvido: spread `{ ...result, projected: true }` nao duplica.
+9. ~~`backend/package.json` nao standalone~~ — Resolvido: lista Nest, Fastify, Prisma como dependencias proprias.
+10. ~~Testes com tsx nao substituem tsc~~ — Resolvido: `npm run typecheck` roda `tsc --noEmit` e passa.
 
-## Verificacao de 2026-05-08
+## Verificacao de 2026-05-12
 
-Comandos executados em `backend/`:
+Comandos executados:
 
-- `npm test`: passou, `136` testes.
-- `npm run typecheck`: falhou.
+- `npm test` (frontend): 300 testes, 0 falhas. (3 testes Playwright no runner errado foram removidos.)
+- `npm run typecheck` (frontend): passa.
+- `npm run backend:test`: 177 testes, 0 falhas.
+- `npm run backend:typecheck`: passa limpo.
 
-Falhas de typecheck observadas:
+## Proximos passos do MVP backend
 
-- `resource-projection.controller.ts`: `characterId` especificado duas vezes no retorno.
-- `characters.spec.ts`: fixtures de `backgroundChoices` sem `equipmentSelection`.
-- `resources.spec.ts`: `@ts-expect-error` sem erro correspondente.
+Typecheck e testes estao verdes. Persistencia esta unificada em Prisma. Proximas acoes:
 
-## Next Action do MVP backend
+1. Continuar extracao de `app.js` (~1950 linhas) para modulos menores em `src/app/*`.
+2. Modularizar `styles.css` (~2750 linhas).
+3. Implementar features de app pendentes (level up, exclusao com confirmacao, spell cards, etc.).
 
-Proxima acao imediata:
-
-Corrigir o typecheck do backend sem adicionar feature nova.
-
-Escopo recomendado:
-
-1. Ajustar `ResourceProjectionController.rebuildProjection()` para nao duplicar `characterId`.
-2. Corrigir `ResourceProjectionService.getResources()` para buscar por `characterId`.
-3. Atualizar fixtures de `BackgroundChoiceState` com `equipmentSelection`.
-4. Remover ou substituir o `@ts-expect-error` inutil em `resources.spec.ts`.
-5. Rodar `npm run typecheck` e `npm test`.
-
-Depois disso, decidir a fronteira de persistencia: manter apenas Prisma como caminho canonico ou marcar explicitamente a persistencia JSON como legado temporario.
