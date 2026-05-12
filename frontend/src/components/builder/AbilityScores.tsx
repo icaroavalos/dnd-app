@@ -1,8 +1,10 @@
 import React from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
+import { useDerivedState, signed } from '../../hooks/useDerivedState';
 import { Card } from '../ui/Card';
 import { Select } from '../ui/Select';
 import type { AbilityScores as AbilityScoresType } from '../../types/character';
+import { cn } from '@/lib/utils';
 
 const ABILITY_LABELS: Record<keyof AbilityScoresType, string> = {
   str: 'Força',
@@ -21,6 +23,7 @@ const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8];
 
 export const AbilityScores: React.FC = () => {
   const { character, updateCharacter, updateAbility } = useCharacterStore();
+  const derived = useDerivedState();
 
   const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const method = e.target.value as any;
@@ -32,31 +35,55 @@ export const AbilityScores: React.FC = () => {
     });
   };
 
-  const calculateModifier = (score: number) => Math.floor((score - 10) / 2);
-  const formatModifier = (mod: number) => (mod >= 0 ? `+${mod}` : mod);
-
   const calculatePointBuySpent = () => {
     return Object.values(character.abilities).reduce((acc, score) => acc + (POINT_BUY_COSTS[score] || 0), 0);
   };
 
-  const renderManual = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-      {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => (
-        <div key={key} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 min-w-0 p-2.5 bg-[#080808] border border-[#303030] rounded-lg">
-          <div className="flex flex-col">
-            <strong className="block">{ABILITY_LABELS[key]}</strong>
-            <span className="block text-muted text-[0.78rem]">Mod: {formatModifier(calculateModifier(character.abilities[key]))}</span>
-          </div>
-          <div className="grid grid-cols-[30px_36px_30px] items-center gap-1.5">
-            <input 
-              type="number" 
-              value={character.abilities[key]} 
-              onChange={(e) => updateAbility(key, parseInt(e.target.value) || 0)}
-              className="w-16 text-center col-span-3 bg-black border border-gray-700 rounded p-1"
-            />
+  const renderAbilityControl = (key: keyof AbilityScoresType, control: React.ReactNode) => {
+    const baseScore = character.abilities[key];
+    const bonus = character.backgroundChoices?.abilityAssignments?.[key] || 0;
+    const total = baseScore + bonus;
+    const modifier = Math.floor((total - 10) / 2);
+
+    return (
+      <div key={key} className="flex flex-col gap-2 p-3 bg-[#080808] border border-[#303030] rounded-xl transition-all hover:border-gold/30 group">
+        <div className="flex items-center justify-between">
+          <strong className="text-sm font-bold uppercase tracking-wider text-muted group-hover:text-gold transition-colors">{ABILITY_LABELS[key]}</strong>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[0.65rem] font-black bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">MOD</span>
+            <strong className="text-lg font-black text-white leading-none">{signed(modifier)}</strong>
           </div>
         </div>
-      ))}
+        
+        <div className="grid grid-cols-[1fr_auto] gap-3 items-center mt-1">
+          {control}
+          
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-1 text-[0.6rem] font-bold text-muted uppercase">
+              Base {baseScore}
+              {bonus > 0 && <span className="text-teal">+{bonus} BG</span>}
+            </div>
+            <div className="text-xl font-black text-gold leading-none mt-0.5">
+              {total}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderManual = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => 
+        renderAbilityControl(key, (
+          <input 
+            type="number" 
+            value={character.abilities[key]} 
+            onChange={(e) => updateAbility(key, parseInt(e.target.value) || 0)}
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-center font-bold focus:border-gold outline-none"
+          />
+        ))
+      )}
     </div>
   );
 
@@ -66,37 +93,33 @@ export const AbilityScores: React.FC = () => {
     
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2.5 text-panel bg-cream border-2 border-gold rounded-lg font-[900]">
-          <span className="text-[0.82rem]">Pontos: {spent} / {budget}</span>
-          <span className="text-[0.82rem]">{budget - spent} restantes</span>
+        <div className="flex items-center justify-between p-3 bg-gold/10 border border-gold/30 rounded-xl">
+          <span className="text-xs font-black uppercase tracking-widest text-gold">Pontos Restantes</span>
+          <strong className={cn("text-2xl font-black", budget - spent < 0 ? "text-rose" : "text-white")}>
+            {budget - spent}
+          </strong>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => {
             const score = character.abilities[key];
             const cost = POINT_BUY_COSTS[score];
-            const nextCost = POINT_BUY_COSTS[score + 1] - cost;
+            const nextCost = (POINT_BUY_COSTS[score + 1] || 999) - cost;
             
-            return (
-              <div key={key} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 min-w-0 p-2.5 bg-[#080808] border border-[#303030] rounded-lg">
-                <div className="flex flex-col">
-                  <strong className="block">{ABILITY_LABELS[key]}</strong>
-                  <span className="block text-muted text-[0.78rem]">Mod: {formatModifier(calculateModifier(score))}</span>
-                </div>
-                <div className="grid grid-cols-[30px_36px_30px] items-center gap-1.5">
-                  <button 
-                    onClick={() => updateAbility(key, score - 1)} 
-                    disabled={score <= 8}
-                    className="mini-button"
-                  >-</button>
-                  <output className="grid place-items-center min-h-[30px] text-panel bg-[#e7e7e7] rounded-lg font-[950]">{score}</output>
-                  <button 
-                    onClick={() => updateAbility(key, score + 1)} 
-                    disabled={score >= 15 || (spent + nextCost > budget)}
-                    className="mini-button"
-                  >+</button>
-                </div>
+            return renderAbilityControl(key, (
+              <div className="flex items-center gap-1 bg-zinc-900 rounded-lg p-1 border border-zinc-800">
+                <button 
+                  onClick={() => updateAbility(key, score - 1)} 
+                  disabled={score <= 8}
+                  className="w-8 h-8 grid place-items-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 rounded-md font-bold transition-colors"
+                >-</button>
+                <div className="flex-1 text-center font-black text-white">{score}</div>
+                <button 
+                  onClick={() => updateAbility(key, score + 1)} 
+                  disabled={score >= 15 || (spent + nextCost > budget)}
+                  className="w-8 h-8 grid place-items-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 rounded-md font-bold transition-colors"
+                >+</button>
               </div>
-            );
+            ));
           })}
         </div>
       </div>
@@ -105,27 +128,23 @@ export const AbilityScores: React.FC = () => {
 
   const renderStandardArray = () => (
     <div className="flex flex-col gap-4">
-      <p className="hint">Valores disponíveis: {STANDARD_ARRAY.join(', ')}</p>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <div className="p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl italic text-xs text-muted">
+        Distribua os valores: {STANDARD_ARRAY.join(', ')}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => (
-          <div key={key} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 min-w-0 p-2.5 bg-[#080808] border border-[#303030] rounded-lg">
-            <div className="flex flex-col">
-              <strong className="block">{ABILITY_LABELS[key]}</strong>
-              <span className="block text-muted text-[0.78rem]">Mod: {formatModifier(calculateModifier(character.abilities[key]))}</span>
-            </div>
-            <div className="grid grid-cols-[30px_36px_30px] items-center gap-1.5">
-              <select 
-                value={character.abilities[key]} 
-                onChange={(e) => updateAbility(key, parseInt(e.target.value))}
-                className="col-span-3 bg-black text-white border border-gray-700 rounded p-1"
-              >
-                <option value="0">--</option>
-                {STANDARD_ARRAY.map(val => (
-                  <option key={val} value={val}>{val}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+          renderAbilityControl(key, (
+            <select 
+              value={character.abilities[key]} 
+              onChange={(e) => updateAbility(key, parseInt(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 font-bold focus:border-gold outline-none text-sm appearance-none"
+            >
+              <option value="0">Escolher...</option>
+              {STANDARD_ARRAY.map(val => (
+                <option key={val} value={val}>{val}</option>
+              ))}
+            </select>
+          ))
         ))}
       </div>
     </div>
@@ -135,7 +154,7 @@ export const AbilityScores: React.FC = () => {
     <Card title="Atributos (Ability Scores)">
       <div className="mb-6">
         <Select
-          label="Método de geração"
+          label="Método de Geração"
           value={character.abilityMethod}
           options={[
             ['standard', 'Standard Array'],
@@ -150,15 +169,26 @@ export const AbilityScores: React.FC = () => {
       {character.abilityMethod === 'pointBuy' && renderPointBuy()}
       {character.abilityMethod === 'manual' && renderManual()}
 
-      <div className="mt-6 p-4 bg-gold/10 border border-gold/30 rounded-lg">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-gold mb-3">Resumo dos Modificadores</h3>
-        <div className="grid grid-cols-3 gap-4">
-          {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => (
-            <div key={key} className="text-center">
-              <div className="text-xs text-muted uppercase">{key}</div>
-              <div className="text-xl font-black">{formatModifier(calculateModifier(character.abilities[key]))}</div>
-            </div>
-          ))}
+      <div className="mt-8 pt-6 border-t border-line">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-1.5 h-4 bg-gold rounded-full" />
+          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gold">Visão Geral da Ficha</h3>
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => {
+            const base = character.abilities[key];
+            const bonus = character.backgroundChoices?.abilityAssignments?.[key] || 0;
+            const total = base + bonus;
+            const mod = Math.floor((total - 10) / 2);
+            
+            return (
+              <div key={key} className="text-center p-2 bg-[#111] border border-line rounded-lg flex flex-col gap-1">
+                <div className="text-[10px] text-muted font-bold uppercase">{key}</div>
+                <div className="text-lg font-black text-white leading-none">{total}</div>
+                <div className="text-[10px] font-black text-gold">{signed(mod)}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </Card>

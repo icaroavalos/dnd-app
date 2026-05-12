@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { listCharacters, deleteCharacter, getCharacter, saveCharacter, type CharacterSummary } from '../../api/character-api';
-import { Plus, Trash2, User, X, Save, Loader2, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, User, X, Save, Loader2, ChevronRight, Check } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 interface CharacterMenuProps {
@@ -16,7 +16,17 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [showNewConfirm, setShowNewConfirm] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const navigate = useNavigate();
+
+  // Auto-hide toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const fetchCharacters = useCallback(async () => {
     setLoading(true);
@@ -42,11 +52,10 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
   }, [isOpen, fetchCharacters]);
 
   const handleNew = () => {
-    if (confirm('Deseja criar uma nova ficha? Alterações não salvas serão perdidas.')) {
-      resetCharacter();
-      navigate('/creator');
-      onClose();
-    }
+    resetCharacter();
+    setShowNewConfirm(false);
+    navigate('/creator');
+    onClose();
   };
 
   const handleSelect = async (id: string) => {
@@ -67,7 +76,7 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
       }
     } catch (err) {
       console.error('Failed to load character:', err);
-      alert('Erro ao carregar personagem.');
+      setToast({ message: 'Erro ao carregar personagem.', type: 'error' });
     } finally {
       setActionLoading(null);
     }
@@ -88,9 +97,10 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
         resetCharacter();
       }
       setDeleteConfirmId(null);
+      setToast({ message: 'Personagem excluído.', type: 'success' });
     } catch (err) {
       console.error('Failed to delete character:', err);
-      alert('Erro ao deletar personagem.');
+      setToast({ message: 'Erro ao deletar personagem.', type: 'error' });
     } finally {
       setActionLoading(null);
     }
@@ -104,11 +114,10 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
         setActiveCharacterId(saved.id);
         await fetchCharacters();
       }
-      // Visual feedback could be improved, but for now alert is safe
-      alert('Ficha salva com sucesso!');
+      setToast({ message: 'Ficha salva com sucesso!', type: 'success' });
     } catch (err) {
       console.error('Failed to save character:', err);
-      alert('Erro ao salvar ficha.');
+      setToast({ message: 'Erro ao salvar ficha.', type: 'error' });
     } finally {
       setActionLoading(null);
     }
@@ -116,6 +125,17 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
 
   return (
     <>
+      {/* Toast Notification */}
+      {toast && (
+        <div className={twMerge(
+          "fixed bottom-6 left-6 z-[100] px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-left-4",
+          toast.type === 'success' ? "bg-teal/20 border-teal/40 text-teal" : "bg-rose/20 border-rose/40 text-rose"
+        )}>
+          <div className={twMerge("w-2 h-2 rounded-full", toast.type === 'success' ? "bg-teal" : "bg-rose")} />
+          <span className="font-bold text-sm">{toast.message}</span>
+        </div>
+      )}
+
       {/* Backdrop */}
       <div 
         className={twMerge(
@@ -150,13 +170,31 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
 
         {/* Action Buttons */}
         <div className="p-4 grid grid-cols-1 gap-3 border-b border-line bg-bg/30">
-          <button 
-            onClick={handleNew}
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-gold hover:bg-gold/90 text-bg font-black rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-gold/10 group"
-          >
-            <Plus size={20} className="transition-transform group-hover:rotate-90" />
-            NOVA FICHA
-          </button>
+          {showNewConfirm ? (
+            <div className="flex gap-2 animate-in fade-in zoom-in-95 duration-200">
+              <button 
+                onClick={() => setShowNewConfirm(false)}
+                className="flex-1 py-3 px-4 bg-bg border border-line text-muted font-bold rounded-xl hover:bg-line transition-all"
+              >
+                CANCELAR
+              </button>
+              <button 
+                onClick={handleNew}
+                className="flex-[2] py-3 px-4 bg-rose text-bg font-black rounded-xl hover:bg-rose/90 transition-all shadow-lg shadow-rose/10 flex items-center justify-center gap-2"
+              >
+                <Check size={18} />
+                CONFIRMAR
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setShowNewConfirm(true)}
+              className="flex items-center justify-center gap-2 py-3 px-4 bg-gold hover:bg-gold/90 text-bg font-black rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-gold/10 group"
+            >
+              <Plus size={20} className="transition-transform group-hover:rotate-90" />
+              NOVA FICHA
+            </button>
+          )}
           
           <button 
             onClick={handleSave}

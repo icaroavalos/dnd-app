@@ -1,24 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
-import { getSpells } from '../../api/catalog-api';
+import { getSpells, getClassSpells } from '../../api/catalog-api';
 import type { CatalogEntry } from '../../api/catalog-api';
 import { Card } from '../ui/Card';
 import { Checkbox } from '../ui/Checkbox';
 import { cn } from '@/lib/utils';
+import { parse5eEntry } from '../../lib/data-parser';
 
-export const MagicInitiate: React.FC = () => {
-  const { character, updateCharacter } = useCharacterStore();
+interface MagicInitiateProps {
+  constraintClass?: string | null;
+}
+
+export const MagicInitiate: React.FC<MagicInitiateProps> = ({ constraintClass }) => {
+  const { character, updateCharacter, addSpell, removeSpell } = useCharacterStore();
   const [allSpells, setAllSpells] = useState<CatalogEntry[]>([]);
+  const [classSpellsMap, setClassSpellsMap] = useState<Record<string, Set<string>>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getSpells()
-      .then((data) => {
-        setAllSpells(data.results);
+    Promise.all([getSpells(), getClassSpells()])
+      .then(([spellsData, classSpellsData]) => {
+        setAllSpells(spellsData.results || []);
+        
+        const map: Record<string, Set<string>> = {};
+        (classSpellsData.results || []).forEach((cs: any) => {
+          const className = cs.className.toLowerCase();
+          const spellSet = new Set(
+            cs.spells.map((s: any) => s.name.toLowerCase())
+          );
+          map[className] = spellSet;
+        });
+        setClassSpellsMap(map);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Failed to load spells:', err);
+        console.error('Failed to load spells data:', err);
         setLoading(false);
       });
   }, []);
@@ -27,36 +43,64 @@ export const MagicInitiate: React.FC = () => {
   const selectedCantrips = choices.cantrips || [];
   const selectedLevel1 = choices.level1 || [];
 
+  const filteredSpells = useMemo(() => {
+    if (!constraintClass) return allSpells;
+    const lowerConstraint = constraintClass.toLowerCase();
+    const allowedSet = classSpellsMap[lowerConstraint];
+    
+    if (!allowedSet) return [];
+
+    return allSpells.filter(spell => {
+      return allowedSet.has(spell.name.toLowerCase());
+    });
+  }, [allSpells, classSpellsMap, constraintClass]);
+
   const handleToggle = (spellId: string, level: number) => {
     const key = level === 0 ? 'cantrips' : 'level1';
     const limit = level === 0 ? 2 : 1;
-    const current = choices[key] || [];
+    const currentIds = choices[key] || [];
 
-    let next: string[];
-    if (current.includes(spellId)) {
-      next = current.filter(id => id !== spellId);
-    } else if (current.length < limit) {
-      next = [...current, spellId];
-    } else {
-      return; // Limit reached
-    }
-
-    updateCharacter({
-      bgSpellChoices: {
-        ...choices,
-        [key]: next
+    const isSelected = currentIds.includes(spellId);
+    
+    if (isSelected) {
+      const nextIds = currentIds.filter(id => id !== spellId);
+      updateCharacter({
+        bgSpellChoices: {
+          ...choices,
+          [key]: nextIds
+        }
+      });
+      removeSpell(spellId);
+    } else if (currentIds.length < limit) {
+      const spell = filteredSpells.find(s => s.id === spellId);
+      if (spell) {
+        updateCharacter({
+          bgSpellChoices: {
+            ...choices,
+            [key]: [...currentIds, spellId]
+          }
+        });
+        addSpell({
+          ...spell,
+          description: parse5eEntry(spell),
+          source: 'bg-feat'
+        });
       }
-    });
+    }
   };
 
-  const cantrips = allSpells.filter(s => s.level === 0);
-  const level1 = allSpells.filter(s => s.level === 1);
+  const cantrips = filteredSpells.filter(s => s.level === 0);
+  const level1 = filteredSpells.filter(s => s.level === 1);
 
   if (loading) return <Card title="Magic Initiate">Carregando magias...</Card>;
 
   return (
-    <Card title="Talento: Magic Initiate">
+    <Card title={`Talento: Magic Initiate ${constraintClass ? `(${constraintClass})` : ''}`}>
       <div className="flex flex-col gap-6">
+        {filteredSpells.length === 0 && !loading && (
+          <p className="text-rose text-sm italic">Nenhuma magia encontrada para a lista de {constraintClass}.</p>
+        )}
+        
         <div>
           <h3 className="text-[0.875rem] font-bold uppercase text-gold mb-3">
             Truques (Escolha 2) - {selectedCantrips.length}/2

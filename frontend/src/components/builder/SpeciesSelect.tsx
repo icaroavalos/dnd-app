@@ -5,10 +5,20 @@ import type { CatalogEntry } from '../../api/catalog-api';
 import { Select } from '../ui/Select';
 
 export const SpeciesSelect: React.FC = () => {
-  const { character, updateCharacter } = useCharacterStore();
+  const { character, updateCharacter, setFeaturesByKind } = useCharacterStore();
   const [speciesList, setSpeciesList] = useState<CatalogEntry[]>([]);
   const [subraceList, setSubraceList] = useState<CatalogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const mapTraitsToFeatures = (traits: any[], kind: 'species' | 'subspecies', source: string) => {
+    return traits.map((t: any) => ({
+      id: t.id || `${t.name}-${kind}-${source}`.toLowerCase().replace(/\s+/g, '-'),
+      name: t.name,
+      kind,
+      description: Array.isArray(t.entries) ? t.entries.map((e: any) => typeof e === 'string' ? e : JSON.stringify(e)).join('\n') : (t.description || ''),
+      meta: source
+    }));
+  };
 
   useEffect(() => {
     // We use individual then/catch to ensure that if subraces fail, species still load
@@ -45,13 +55,11 @@ export const SpeciesSelect: React.FC = () => {
       updateCharacter({ 
         race: species.name,
         subrace: '',
-        features: (species.traits || []).map((t: any) => ({
-          id: t.id || Math.random().toString(),
-          name: t.name,
-          kind: 'species',
-          description: t.description || ''
-        }))
       });
+      // Traits are in 'entries' for species in 5etools
+      const traits = (species.entries || []).filter((e: any) => e.type === 'entries' || e.name);
+      setFeaturesByKind('species', mapTraitsToFeatures(traits, 'species', species.source));
+      setFeaturesByKind('subspecies', []);
     }
   };
 
@@ -61,16 +69,9 @@ export const SpeciesSelect: React.FC = () => {
     if (sub) {
       updateCharacter({ 
         subrace: sub.name,
-        features: [
-          ...character.features.filter(f => (f.kind as string) !== 'subspecies'),
-          ...(sub.traits || []).map((t: any) => ({
-            id: t.id || Math.random().toString(),
-            name: t.name,
-            kind: 'subspecies',
-            description: t.description || ''
-          }))
-        ]
       });
+      const traits = (sub.entries || []).filter((e: any) => e.type === 'entries' || e.name);
+      setFeaturesByKind('subspecies', mapTraitsToFeatures(traits, 'subspecies', sub.source));
     }
   };
 

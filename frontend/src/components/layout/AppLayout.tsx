@@ -2,20 +2,22 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { CharacterSheet } from '../sheet/CharacterSheet';
+import { LevelUpModal } from '../builder/LevelUpModal';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { cn } from '../../lib/utils';
 
 export const AppLayout: React.FC = () => {
-  const { character } = useCharacterStore();
+  const { character, pendingLevelUp } = useCharacterStore();
   const location = useLocation();
   
   // A ficha deve ser centralizada se a criação estiver completa OU se estivermos na rota /sheet
   const isSheetView = location.pathname === '/sheet' || character.creationComplete;
-  const isCreatorView = location.pathname === '/creator' && !character.creationComplete;
 
   return (
     <div className="min-h-screen bg-bg text-ink">
       <Header />
+      
+      {pendingLevelUp && <LevelUpModal />}
       
       <main className={cn(
         "w-full mx-auto p-4 sm:p-6 transition-all duration-500 ease-in-out",
@@ -47,9 +49,6 @@ export const AppLayout: React.FC = () => {
             <CharacterSheet isWide={isSheetView} />
           </div>
         </section>
-
-        {/* Se estiver na sheet view, mas quisermos mostrar o Outlet (dashboard) abaixo ou em algum lugar, poderíamos. 
-            Mas o usuário quer a ficha centralizada, então focamos nela. */}
       </main>
     </div>
   );

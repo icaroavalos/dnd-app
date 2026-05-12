@@ -8,78 +8,73 @@ O projeto concluiu a migração integral do frontend de uma arquitetura Vanilla 
 
 **Atualização 2026-05-12:** 
 - **Frontend React concluído**: O código legado em Vanilla JS (`app.js`, `index.html`, `src/app/`) foi removido.
-- **Vite + TS**: O novo frontend reside em `frontend/` e é iniciado nativamente via root `npm run dev`.
 - **Zustand**: Gerenciamento de estado global implementado para o personagem e UI.
-- **Axios**: Camada de API tipada e centralizada.
+- **Tailwind CSS**: Migração integral concluída para estilos utilitários.
+- **D&D 2024 (XPHB)**: O sistema agora suporta nativamente as novas regras de criação de personagens, incluindo escolhas de nível 1 dinâmicas.
 
 ## Decisoes de arquitetura atuais
 
 - **Frontend**: Vite + React + TypeScript + Zustand.
 - **Backend**: NestJS + Fastify + Prisma (SQLite).
-- **Contratos**: Shared contracts em `backend/src/shared/contracts/`.
-- **Estilos**: Migração integral para **Tailwind CSS** concluída.
-    - Todos os componentes utilizam classes utilitárias e o helper `cn` para gerenciamento de estilos.
-    - `index.css` configurado com diretivas Tailwind e componentes globais via `@layer components`.
-    - CSS Modules removidos completamente para unificar o sistema de design.
-- **Build**: Unificado no root `package.json` usando `--prefix frontend`.
-- **Datasets**: A fonte canonica de regras e `data/5etools/5e-2024/`.
+- **Estilos**: Tailwind CSS com helper `cn` (clsx + tailwind-merge).
+- **Datasets**: A fonte canonica de regras é `data/5etools/5e-2024/` via backend.
+- **Design System**: Padrão de cartas de magia 2024 em `docs/design_system_spells.md`.
 
-## Modulos D&D 2024 implementados com sucesso
+## Melhores Práticas e Lógica de Negócio (D&D 2024)
 
-Status baseado em migração concluída em 2026-05-12.
+### 1. Sistema de Escolhas Genéricas (Generic Choice System)
+Para lidar com habilidades de nível 1 que exigem escolhas (ex: *Weapon Mastery*), implementamos um motor de detecção baseado em padrões:
+- **Funcionamento**: O sistema analisa o texto bruto da habilidade em busca de padrões como "choose X kinds of Y" e gera a UI dinamicamente.
+- **Persistência**: As escolhas são armazenadas no `character.classFeatureChoices`, mapeadas pelo ID da habilidade.
 
-### Frontend Moderno
+### 2. Tratamento Unificado de Dados (Data Parsing)
+Criamos a utilidade `frontend/src/lib/data-parser.ts` para resolver o problema de artefatos JSON (`{@item...}`, `{@spell...}`) do 5etools.
+- **`clean5eText`**: Remove tags técnicas e mantém apenas o texto legível.
+- **`parse5eEntry`**: Processa recursivamente estruturas complexas (listas, tabelas) para garantir descrições amigáveis.
 
-Implementado em `frontend/src/`.
+### 3. Atributos de Background e Reatividade
+Refatoramos o sistema de bônus de Background para ser explícito:
+- **Ordem de Seleção**: No padrão +2/+1, a primeira habilidade clicada recebe +2 e a segunda +1, com badges visuais.
+- **Cálculo Derivado**: O hook `useDerivedState.ts` soma em tempo real os bônus de background aos atributos base.
 
-- **UI Components**: `Card`, `Select`, `NumberInput`, `Checkbox` reutilizáveis.
-- **Builder**: 
-    - Seleção de Classe e Espécie.
-    - Atributos via Point Buy, Standard Array ou Manual.
-    - **Backgrounds (2024)**: Sistema completo de escolhas originárias, incluindo padrões de ASI (+2/+1 ou +1/+1/+1), identificação de Talentos de Origem (ex: Magic Initiate) e escolha de atributo de conjuração.
-- **Sheet**: Abas de Resumo, Perícias, Inventário, Ações, Magias e Habilidades reativas.
-- **State**: Gerenciamento via Zustand com persistência em backend.
+### 4. Interface de Equipamento e Magias
+- **Comparação Lado a Lado**: Cartões comparativos para escolha de equipamento inicial A ou B.
+- **Restrições de Magia**: O componente `MagicInitiate.tsx` suporta `constraintClass` (ex: Acolyte filtra apenas magias de Cleric).
 
-### Rules catalog (Backend)
+### 5. Gestão de Vitalidade e Descansos (D&D 2024)
+Implementamos o sistema de combate e recuperação baseado nas regras do PHB 2024:
+- **Dano e Cura**: Sistema reativo que consome Temporary HP antes do HP real.
+- **Temporary HP**: Segue a regra de 2024 (não acumula, mantém-se o maior valor).
+- **Bloodied State**: Novo marcador formal para criaturas com 50% ou menos de HP.
+- **Hit Dice (2024)**: Recuperação total de todos os dados de vida gastos ao finalizar um Descanso Longo.
+- **Descanso Curto**: Permite gastar Hit Dice individualmente para cura.
 
-Implementado em `backend/src/modules/rules/`.
+### 6. Sistema de Level Up e Escolhas Pendentes
+Implementamos um fluxo dinâmico para evolução de personagens:
+- **Botão Level Up**: Localizado no resumo da ficha, automatiza o incremento de nível e HP.
+- **Fila de Decisões (Pending Choices)**: Ao subir de nível, o sistema varre novas habilidades. Se uma habilidade exigir escolhas (Subclasse, ASI, Feats), ela entra em uma fila de decisões.
+- **Resolução de Escolhas**: As decisões pendentes aparecem em destaque na aba de Habilidades, permitindo que o jogador resolva cada uma antes de continuar sua jornada.
+- **Integração reativa**: Escolhas feitas (como um aumento de atributo ou nova proficiência) são aplicadas instantaneamente em toda a ficha.
 
-- `GET /rules/backgrounds`
-- `GET /rules/classes`
-- `GET /rules/spells`
-- `GET /rules/class-spells`
-- `GET /rules/species`
-- `GET /rules/items`
-- `GET /rules/features`
-- `GET /rules/feats`
+## Modulos Implementados
 
-### Character projection (Backend)
+### Frontend Moderno (`frontend/src/`)
+- **UI Components**: `Card`, `Select`, `NumberInput`, `Checkbox`.
+- **Sheet**: Abas de Resumo, Perícias, Inventário, Ações, Magias e Habilidades.
 
-Implementado em `backend/src/modules/characters/characters.service.ts`.
+### Backend Services (`backend/src/modules/`)
+- **Rules Catalog**: Endpoints para backgrounds, classes, spells, species, items e features.
+- **Character Projection**: Cálculo de nível, proficiency, HP, AC e spellcasting metrics.
 
-- Nivel total e proficiency bonus.
-- Ability scores com bonus de background 2024.
-- Ability modifiers, Saving throws, Skills.
-- Armor Class e HP maximo.
-- Spellcasting ability, spell attack e spell save DC.
-- Spell slots maximos.
+## Futuro Projeto: Otimização da Pipeline de Dados (ETL)
 
-### Actions & Resources (Backend)
+Para evolução profissional do sistema:
 
-- Ataques derivados de armas e magias.
-- Consumo de munição e recursos limitados.
-- Recuperação via Short/Long Rest.
+1.  **Banco de Dados Relacional**: Migrar a leitura de JSONs gigantes em memória para tabelas PostgreSQL/SQLite indexadas.
+2.  **Server-side Pre-processing**: Mover a limpeza de texto (`data-parser`) para o momento da ingestão no banco de dados.
+3.  **Data Pruning**: Deletar assets irrelevantes do repositório completo do 5etools (~1GB), mantendo apenas os dados do core 2024.
 
-## Verificacao de 2026-05-12
+## Verificacao
 
-Comandos executados:
-
-- `npm run dev` (root): Inicia o frontend Vite na porta 3000.
-- `npm run backend:dev` (root): Inicia o backend na porta 3100.
-- `npm run typecheck` (frontend): Passa limpo via Vite/TSC.
-- `npm run backend:typecheck`: Passa limpo.
-
-## Proximos passos
-
-1. Implementar sistema de "Level Up" reativo no frontend.
-2. Adicionar validações de regras complexas (Multiclassing) no backend.
+- `npm run dev`: Inicia o frontend na porta 3000.
+- `npm run backend:dev`: Inicia o backend na porta 3100.

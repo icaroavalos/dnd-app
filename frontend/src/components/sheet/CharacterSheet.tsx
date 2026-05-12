@@ -17,16 +17,16 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({ isWide = false }
   const [activeTab, setActiveTab] = useState<TabId>('summary');
 
   const tabClass = (id: TabId) => cn(
-    "min-w-0 min-h-[34px] grid place-items-center py-1 px-0.5 text-[#111] border-2 border-gold rounded-lg bg-cream font-black leading-none text-center overflow-wrap-anywhere whitespace-normal transition-all",
-    isWide ? "text-[0.7rem] px-2" : "text-[0.58rem]",
+    "min-w-0 min-h-[36px] grid place-items-center py-1 px-0.5 text-[#111] border-2 border-gold rounded-lg bg-cream font-black leading-none text-center transition-all",
+    isWide ? "text-[0.7rem] px-2" : "text-[0.62rem] tracking-tight truncate",
     activeTab === id && "text-white bg-[#323264] border-blue scale-[1.02]"
   );
 
   return (
     <div className="w-full">
       <div className={cn(
-        "grid gap-1 mb-4",
-        isWide ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-6"
+        "grid gap-1.5 mb-4",
+        isWide ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-3"
       )}>
         <button 
           onClick={() => setActiveTab('summary')}

@@ -6,13 +6,23 @@ export const useDerivedState = () => {
 
   const proficiencyBonus = Math.ceil((character.level || 1) / 4) + 1;
 
+  // Final ability scores including background increments
+  const finalAbilities: AbilityScores = { ...character.abilities };
+  const assignments = character.backgroundChoices?.abilityAssignments || {};
+  
+  (Object.keys(character.abilities) as Array<keyof AbilityScores>).forEach(ability => {
+    const base = Number(character.abilities[ability] || 10);
+    const bonus = Number(assignments[ability] || 0);
+    finalAbilities[ability] = base + bonus;
+  });
+
   const modifiers: AbilityScores = {
-    str: Math.floor((character.abilities.str - 10) / 2),
-    dex: Math.floor((character.abilities.dex - 10) / 2),
-    con: Math.floor((character.abilities.con - 10) / 2),
-    int: Math.floor((character.abilities.int - 10) / 2),
-    wis: Math.floor((character.abilities.wis - 10) / 2),
-    cha: Math.floor((character.abilities.cha - 10) / 2),
+    str: Math.floor((finalAbilities.str - 10) / 2),
+    dex: Math.floor((finalAbilities.dex - 10) / 2),
+    con: Math.floor((finalAbilities.con - 10) / 2),
+    int: Math.floor((finalAbilities.int - 10) / 2),
+    wis: Math.floor((finalAbilities.wis - 10) / 2),
+    cha: Math.floor((finalAbilities.cha - 10) / 2),
   };
 
   const savingThrows: Record<string, number> = {
@@ -52,16 +62,18 @@ export const useDerivedState = () => {
     skillBonuses[skill] = modifiers[ability] + (isProficient ? proficiencyBonus : 0);
   });
 
-  const carryingCapacity = character.abilities.str * 15;
+  const carryingCapacity = (finalAbilities.str || 10) * 15;
   const carriedWeight = 0;
 
-  // Spellcasting metrics (Assuming Charisma for now, should be dynamic based on class)
-  const spellcastingAbility: keyof AbilityScores = 'cha'; 
+  // Spellcasting metrics
+  // Check background spellcasting choice or default to class
+  const spellcastingAbility: keyof AbilityScores = character.bgChoices?.spellcastingAbility || 'cha'; 
   const spellAttack = modifiers[spellcastingAbility] + proficiencyBonus;
   const spellSaveDc = 8 + modifiers[spellcastingAbility] + proficiencyBonus;
 
   return {
     proficiencyBonus,
+    finalAbilities,
     modifiers,
     savingThrows,
     skillBonuses,

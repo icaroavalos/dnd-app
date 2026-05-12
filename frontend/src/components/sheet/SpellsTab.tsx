@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
+import { SpellCard } from './SpellCard';
 import { cn } from '../../lib/utils';
 
 export const SpellsTab: React.FC = () => {
@@ -89,11 +90,9 @@ export const SpellsTab: React.FC = () => {
                   </button>
                 </div>
                 {isOpen && (
-                  <article className="relative grid gap-2.5 text-[#111] bg-[#c73828] rounded-lg p-3 shadow-[inset_0_0_0_2px_rgba(255,255,255,0.08)] mt-2">
-                    <div className="bg-white p-2.5 px-3 min-h-[150px] rounded-lg text-[0.78rem] leading-[1.28] text-left">
-                      <p className="mb-2">{spell.description || 'Descrição não disponível.'}</p>
-                    </div>
-                  </article>
+                  <div className="mt-2 flex justify-center">
+                    <SpellCard spell={spell} />
+                  </div>
                 )}
               </div>
             );

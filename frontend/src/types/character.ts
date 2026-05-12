@@ -17,15 +17,25 @@ export interface Attack {
 export interface Feature {
   id: string;
   name: string;
-  kind: 'class' | 'species' | 'feat' | 'background';
+  kind: 'class' | 'subclass' | 'species' | 'feat' | 'background' | 'other';
   description: string;
   meta?: string;
+  level?: number;
   resource?: {
     id: string;
     remaining: number;
     max: number;
     recoveryLabel: string;
   };
+}
+
+export interface Choice {
+  id: string;
+  featureId: string;
+  name: string;
+  count: number;
+  options: string[];
+  type: 'weapon' | 'subclass' | 'feat' | 'asi' | 'generic';
 }
 
 export interface Character {
@@ -39,10 +49,10 @@ export interface Character {
   alignment: string;
   experience: number;
   abilityMethod: 'standard' | 'pointBuy' | 'manual';
-  classFeatureChoices: Record<string, string>;
+  classFeatureChoices: Record<string, string[]>; // Changed to string[] for multiple choices
   asiChoices: Record<string, any>;
   equipmentChoices: Record<string, string>;
-  inventory: string[];
+  inventory: any[]; // Changed to any[] for object support
   equippedItems: string[];
   hitDiceUsed: number;
   spellSlots: Record<string, { max: number; used: number }>;
@@ -50,7 +60,7 @@ export interface Character {
   tempHp: number;
   creationComplete: boolean;
   hp: number;
-  maxHp?: number;
+  maxHp: number;
   armorClass: number;
   speed: number;
   abilities: AbilityScores;
@@ -58,9 +68,11 @@ export interface Character {
   classSkillChoices: string[];
   skillProficiencies: string[];
   attacks: Attack[];
-  spells: any[]; // Changed to any[] to support spell objects
+  spells: any[];
   features: Feature[];
+  pendingChoices: Choice[];
   notes: string;
   bgSpellChoices?: Record<string, string[]>;
   bgChoices?: any;
+  backgroundChoices?: any;
 }

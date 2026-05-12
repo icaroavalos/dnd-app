@@ -2,6 +2,27 @@
 
 Ultima revisao: 2026-05-12.
 
+## Falhas na Refatoração do Construtor e Tratamento de Dados (2026-05-12)
+
+**Status:** ❌ REGRESSÕES DETECTADAS - Corrigindo múltiplos problemas de integridade de dados e UX.
+
+**Problemas detectados:**
+1. **Filtro de Magias Quebrado:** A filtragem por classe no talento *Magic Initiate* falhou porque a API de `/rules/spells` não contém o campo `classes`. É necessário cruzar com `/rules/class-spells`.
+2. **Equipamento sem Detalhes:** A interface comparativa de equipamentos mostrou "Equipamento padrão" em vez do conteúdo real, devido a falhas no parser de strings complexas do 5etools (ex: split por `;` falhando em formatos aninhados).
+3. **Atributos de Background não somados:** Os bônus de background (+2/+1) foram salvos mas não refletidos no cálculo de modificadores da ficha lateral devido a caminhos de estado inconsistentes no store.
+4. **Habilidades sem Descrição:** Algumas habilidades exibiram "No description available" porque o parser não lidou corretamente com o campo `entries` em todos os níveis de aninhamento.
+5. **Weapon Mastery não detectado:** A lógica de detecção automática de escolhas via regex foi muito frágil para capturar variações no texto das habilidades de nível 1.
+6. **Overflow de Texto:** Descrições longas na aba de Habilidades "estouraram" o container visual.
+
+**Soluções planejadas:**
+- Implementar cruzamento de dados para filtros de classe.
+- Refinar `parse5eEntry` para lidar com fallbacks e recursão profunda.
+- Unificar o estado de atributos no store para garantir reatividade total.
+- Adicionar `break-words` e scrollbars em containers de texto longo.
+- Tornar a detecção de escolhas mais robusta (fallback para keywords).
+
+---
+
 ## Refatoração para Vite + React + TypeScript (2026-05-12)
 
 **Status:** 🏗️ EM ANDAMENTO - Estrutura básica criada e configurada.
