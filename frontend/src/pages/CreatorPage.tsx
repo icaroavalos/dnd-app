@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { SpeciesSelect } from '../components/builder/SpeciesSelect';
 import { ClassSelect } from '../components/builder/ClassSelect';
 import { AbilityScores } from '../components/builder/AbilityScores';
 import { BackgroundSelect } from '../components/builder/BackgroundSelect';
 import { useCharacterStore } from '../store/useCharacterStore';
+import { saveCharacter } from '../api/character-api';
 import { cn } from '../lib/utils';
 
 const STEPS = [
@@ -15,11 +17,69 @@ const STEPS = [
 ];
 
 export const CreatorPage: React.FC = () => {
-  const { character, updateCharacter } = useCharacterStore();
+  const { character, updateCharacter, setActiveCharacterId } = useCharacterStore();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateCharacter({ name: e.target.value });
+  };
+
+  const slugify = (str: string) => 
+    String(str ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  const handleFinalize = async () => {
+    if (!character.name) {
+      alert('Por favor, dê um nome ao seu personagem.');
+      setCurrentStep(1);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Mapeia para o formato esperado pelo backend (CharacterRecord)
+      const record = {
+        name: character.name,
+        ruleset: '5e-2024',
+        lineageId: slugify(character.race),
+        backgroundId: slugify(character.background),
+        alignment: character.alignment,
+        experience: character.experience,
+        classes: [{ classId: slugify(character.class), level: character.level }],
+        abilities: character.abilities,
+        skillProficiencies: character.skillProficiencies,
+        savingThrowProficiencies: character.savingThrows,
+        inventory: character.inventory.map(item => typeof item === 'string' ? { baseItemId: item, quantity: 1, status: 'carried' } : item),
+        spellChoices: character.spells.map(s => ({ spellId: s.id || s.name, spellcastingAbility: character.bgChoices?.spellcastingAbility })),
+        backgroundChoices: {
+          backgroundId: slugify(character.background),
+          abilityAssignments: character.bgChoices?.abilityScores?.reduce((acc: any, ability: string, idx: number) => {
+            // Lógica simples de atribuição: +2 para o primeiro, +1 para os demais
+            acc[ability] = (idx === 0 && character.bgChoices.abilityIncrement === '2_1') ? 2 : 1;
+            return acc;
+          }, {})
+        },
+        state: {
+          hp: character.hp || 10,
+          maxHpOverride: null,
+          tempHp: 0,
+          hitDiceUsed: 0,
+          spellSlotsUsed: {},
+          activeConditions: []
+        }
+      };
+
+      const saved = await saveCharacter(record as any);
+      updateCharacter({ creationComplete: true, id: saved.id });
+      setActiveCharacterId(saved.id || null);
+      navigate('/sheet');
+    } catch (error) {
+      console.error('Erro ao salvar personagem:', error);
+      alert('Ocorreu um erro ao salvar o personagem. Verifique se o backend está rodando.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const renderStep = () => {
@@ -36,6 +96,7 @@ export const CreatorPage: React.FC = () => {
                   value={character.name}
                   onChange={handleNameChange}
                   placeholder="Digite o nome..."
+                  className="w-full min-h-[42px] text-ink bg-bg border border-[#373737] rounded-lg px-2.5 py-[9px]"
                 />
               </div>
             </Card>
@@ -88,18 +149,27 @@ export const CreatorPage: React.FC = () => {
       <div className="flex justify-between mt-6">
         <button 
           className="secondary-button" 
-          disabled={currentStep === 1}
+          disabled={currentStep === 1 || isSaving}
           onClick={() => setCurrentStep(prev => prev - 1)}
         >
           Anterior
         </button>
-        <button 
-          className="primary-button"
-          disabled={currentStep === STEPS.length}
-          onClick={() => setCurrentStep(prev => prev + 1)}
-        >
-          Próximo
-        </button>
+        {currentStep === STEPS.length ? (
+          <button 
+            className="primary-button"
+            onClick={handleFinalize}
+            disabled={isSaving}
+          >
+            {isSaving ? 'Salvando...' : 'Finalizar'}
+          </button>
+        ) : (
+          <button 
+            className="primary-button"
+            onClick={() => setCurrentStep(prev => prev + 1)}
+          >
+            Próximo
+          </button>
+        )}
       </div>
     </div>
   );

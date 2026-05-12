@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { listCharacters, deleteCharacter, getCharacter, saveCharacter, type CharacterSummary } from '../../api/character-api';
 import { Plus, Trash2, User, X, Save, Loader2, ChevronRight } from 'lucide-react';
@@ -15,6 +16,7 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const fetchCharacters = useCallback(async () => {
     setLoading(true);
@@ -42,12 +44,14 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
   const handleNew = () => {
     if (confirm('Deseja criar uma nova ficha? Alterações não salvas serão perdidas.')) {
       resetCharacter();
+      navigate('/creator');
       onClose();
     }
   };
 
   const handleSelect = async (id: string) => {
     if (character.id === id) {
+      navigate('/sheet');
       onClose();
       return;
     }
@@ -58,6 +62,7 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
       if (fullChar) {
         setCharacter(fullChar as any);
         setActiveCharacterId(id);
+        navigate('/sheet');
         onClose();
       }
     } catch (err) {

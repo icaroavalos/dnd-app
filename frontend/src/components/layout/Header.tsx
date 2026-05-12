@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { CharacterMenu } from './CharacterMenu';
 import { Menu } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 export const Header: React.FC = () => {
   const { character } = useCharacterStore();

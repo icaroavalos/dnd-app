@@ -3,7 +3,6 @@ import { useCharacterStore } from '../../store/useCharacterStore';
 import { Card } from '../ui/Card';
 import { Select } from '../ui/Select';
 import type { AbilityScores as AbilityScoresType } from '../../types/character';
-import { cn } from '@/lib/utils';
 
 const ABILITY_LABELS: Record<keyof AbilityScoresType, string> = {
   str: 'Força',

@@ -34,7 +34,7 @@
   input,
   select,
   textarea {
-    @apply font-inherit;
+    font-family: inherit;
   }
 
   button {
