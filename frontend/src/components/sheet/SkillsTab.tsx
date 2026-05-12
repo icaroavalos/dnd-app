@@ -1,8 +1,7 @@
 import React from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
-import styles from './SkillsTab.module.css';
-import { clsx } from 'clsx';
+import { cn } from '../../lib/utils';
 
 const SKILL_GROUPS = [
   { ability: 'str', label: 'Força', skills: ['Athletics'] },
@@ -17,10 +16,10 @@ export const SkillsTab: React.FC = () => {
   const derived = useDerivedState();
 
   return (
-    <section className={styles.skillColumns}>
+    <section className="columns-2 gap-3">
       {SKILL_GROUPS.map((group) => (
-        <article key={group.ability} className={styles.skillCard}>
-          <h3>
+        <article key={group.ability} className="bg-[#f5f5f5] text-[#111] rounded-lg text-center break-inside-avoid mb-2.5 p-1 border-2 border-teal">
+          <h3 className="flex justify-between mb-1 py-0.5 px-[7px] text-[1.05rem]">
             <span>{group.label}</span>
             <strong>{signed(derived.modifiers[group.ability as keyof typeof derived.modifiers])}</strong>
           </h3>
@@ -29,7 +28,7 @@ export const SkillsTab: React.FC = () => {
             const isProficient = character.skillProficiencies.includes(skill);
             
             return (
-              <div key={skill} className={clsx(styles.skillRow, isProficient && styles.proficient)}>
+              <div key={skill} className={cn("flex justify-between gap-2 mt-[3px] py-0.5 px-1.25 rounded bg-[#dff4ef] text-left", isProficient && "font-bold")}>
                 <span>{skill}</span>
                 <strong>{signed(bonus)}</strong>
               </div>

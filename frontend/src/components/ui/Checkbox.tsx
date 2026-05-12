@@ -1,11 +1,5 @@
 import React from 'react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import styles from './Checkbox.module.css';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../../lib/utils';
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -15,9 +9,9 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Checkbox: React.FC<CheckboxProps> = ({ label, locked, className, disabled, ...props }) => {
   return (
     <label className={cn(
-      styles.container, 
-      disabled && styles.disabled,
-      locked && styles.locked,
+      "flex gap-2 items-center min-w-0 min-h-[36px] px-[9px] py-[7px] rounded-lg bg-[#080808] border border-[#2c2c2c]",
+      disabled && "text-[#777] bg-panel",
+      locked && "text-[#d8d8d8] bg-[#171717]",
       className
     )}>
       <input 
@@ -25,7 +19,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({ label, locked, className, di
         disabled={disabled || locked} 
         {...props} 
       />
-      <span className={styles.checkboxLabel}>{label}</span>
+      <span className="min-w-0 flex gap-2 items-center flex-wrap leading-tight overflow-hidden">{label}</span>
     </label>
   );
 };

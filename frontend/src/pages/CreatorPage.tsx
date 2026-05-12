@@ -5,8 +5,7 @@ import { ClassSelect } from '../components/builder/ClassSelect';
 import { AbilityScores } from '../components/builder/AbilityScores';
 import { BackgroundSelect } from '../components/builder/BackgroundSelect';
 import { useCharacterStore } from '../store/useCharacterStore';
-import { clsx } from 'clsx';
-import styles from './CreatorPage.module.css';
+import { cn } from '../lib/utils';
 
 const STEPS = [
   { id: 1, label: 'Linhagem' },
@@ -65,13 +64,16 @@ export const CreatorPage: React.FC = () => {
   };
 
   return (
-    <div className={styles.builderContainer}>
-      <nav className={styles.steps}>
+    <div className="">
+      <nav className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-[18px]">
         {STEPS.map((step) => (
           <button
             key={step.id}
             type="button"
-            className={clsx(styles.stepButton, currentStep === step.id && styles.active)}
+            className={cn(
+              "min-h-[42px] border border-[#343434] rounded-lg bg-[#1c1c1c] text-muted font-bold",
+              currentStep === step.id && "text-bg border-gold bg-cream"
+            )}
             onClick={() => setCurrentStep(step.id)}
           >
             {step.id}. {step.label}
@@ -79,11 +81,11 @@ export const CreatorPage: React.FC = () => {
         ))}
       </nav>
 
-      <div className={styles.builderForm}>
+      <div className="grid gap-[14px]">
         {renderStep()}
       </div>
 
-      <div className={styles.builderNavFooter}>
+      <div className="flex justify-between mt-6">
         <button 
           className="secondary-button" 
           disabled={currentStep === 1}

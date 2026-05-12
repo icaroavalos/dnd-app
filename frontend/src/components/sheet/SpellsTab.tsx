@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
-import styles from './SpellsTab.module.css';
-import { clsx } from 'clsx';
+import { cn } from '../../lib/utils';
 
 export const SpellsTab: React.FC = () => {
   const { character, updateCharacter } = useCharacterStore();
@@ -30,31 +29,34 @@ export const SpellsTab: React.FC = () => {
   })).filter(group => group.spells.length > 0 || (group.level > 0 && (character.spellSlots[group.level]?.max || 0) > 0));
 
   return (
-    <div className={styles.spellTabContent}>
-      <div className={styles.metricRow}>
-        <div className={styles.smallCard}>
-          <span>Spell Attack</span>
-          <strong>{signed(derived.spellAttack)}</strong>
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e]">
+          <span className="block font-[850] text-[0.85rem]">Spell Attack</span>
+          <strong className="text-[2.35rem] font-medium leading-none">{signed(derived.spellAttack)}</strong>
         </div>
-        <div className={styles.smallCard}>
-          <span>Spell DC</span>
-          <strong>{derived.spellSaveDc}</strong>
+        <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e]">
+          <span className="block font-[850] text-[0.85rem]">Spell DC</span>
+          <strong className="text-[2.35rem] font-medium leading-none">{derived.spellSaveDc}</strong>
         </div>
       </div>
 
       {spellsByLevel.map((group) => (
-        <section key={group.level} className={styles.spellSheetGroup}>
-          <div className={styles.spellStrip}>
-            <span>{group.level === 0 ? 'Truques' : `${group.level}º Nível`}</span>
+        <section key={group.level} className="grid gap-2">
+          <div className="min-h-[28px] grid grid-cols-[minmax(0,1fr)_auto] items-center py-1 px-[9px] rounded-lg bg-[#ffc8ef] border-2 border-purple text-left">
+            <span className="text-[1.02rem] font-[950] text-[#111]">{group.level === 0 ? 'Truques' : `${group.level}º Nível`}</span>
             {group.level > 0 && character.spellSlots[group.level] && character.spellSlots[group.level].max > 0 && (
-              <span className={styles.spellSlots}>
+              <span className="inline-flex items-center justify-end gap-1 min-w-0">
                 {Array.from({ length: character.spellSlots[group.level].max }).map((_, i) => (
                   <span 
                     key={i} 
-                    className={clsx(styles.slotBox, i < character.spellSlots[group.level].used && styles.used)}
+                    className={cn(
+                      "w-4 h-4 inline-block bg-white border border-[#d3d3d3] shadow-[inset_0_0_5px_rgba(0,0,0,0.18)]",
+                      i < character.spellSlots[group.level].used && "bg-[#5a5a5a] shadow-[inset_0_0_0_3px_#2a2a2a]"
+                    )}
                   ></span>
                 ))}
-                <strong>{group.level}º Slots</strong>
+                <strong className="ml-[3px] text-[0.72rem] uppercase text-[#111]">{group.level}º Slots</strong>
               </span>
             )}
           </div>
@@ -64,11 +66,11 @@ export const SpellsTab: React.FC = () => {
             const canCast = group.level === 0 || (character.spellSlots[group.level]?.used < character.spellSlots[group.level]?.max);
 
             return (
-              <div key={idx} className={styles.spellItemContainer}>
-                <div className={styles.spellRow}>
+              <div key={idx} className="">
+                <div className="grid grid-cols-[54px_minmax(0,1fr)_auto] gap-[7px] items-stretch">
                   <button 
                     type="button" 
-                    className={styles.castButton}
+                    className="relative min-h-[28px] grid place-items-center text-white bg-[#cf3036] border-0 rounded-[6px] text-[0.62rem] font-[950] uppercase cursor-pointer disabled:bg-[#2b2b2b] disabled:text-[#777] disabled:cursor-not-allowed"
                     disabled={!canCast}
                     onClick={() => castSpell(group.level)}
                   >
@@ -76,16 +78,20 @@ export const SpellsTab: React.FC = () => {
                   </button>
                   <button 
                     type="button" 
-                    className={clsx(styles.purpleStrip, styles.spellButton, isOpen && styles.active)}
+                    className={cn(
+                      "min-w-0 min-h-[28px] grid place-items-center px-3 rounded-lg font-extrabold text-left leading-[1.05] overflow-hidden break-anywhere bg-[#5e558b] text-[#0f0f0f] cursor-pointer w-full border-0 justify-items-start gap-0.5",
+                      isOpen && "bg-[#7b70b8] text-white",
+                      "hover:bg-[#7b70b8] hover:text-white"
+                    )}
                     onClick={() => setSelectedSpell(isOpen ? null : spell.name)}
                   >
-                    <span className={styles.spellButtonName}>{spell.name}</span>
+                    <span className="text-[0.92rem] font-[900]">{spell.name}</span>
                   </button>
                 </div>
                 {isOpen && (
-                  <article className={clsx(styles.spellCard, styles.mt2)}>
-                    <div className={styles.spellCardBody}>
-                      <p>{spell.description || 'Descrição não disponível.'}</p>
+                  <article className="relative grid gap-2.5 text-[#111] bg-[#c73828] rounded-lg p-3 shadow-[inset_0_0_0_2px_rgba(255,255,255,0.08)] mt-2">
+                    <div className="bg-white p-2.5 px-3 min-h-[150px] rounded-lg text-[0.78rem] leading-[1.28] text-left">
+                      <p className="mb-2">{spell.description || 'Descrição não disponível.'}</p>
                     </div>
                   </article>
                 )}
@@ -96,7 +102,7 @@ export const SpellsTab: React.FC = () => {
       ))}
 
       {spellsByLevel.length === 0 && (
-        <div className={styles.emptyState}>Nenhuma magia preparada.</div>
+        <div className="min-h-[120px] grid place-items-center text-muted border border-dashed border-[#343434] rounded-lg text-center p-4">Nenhuma magia preparada.</div>
       )}
     </div>
   );

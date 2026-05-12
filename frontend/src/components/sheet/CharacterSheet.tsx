@@ -5,56 +5,60 @@ import { InventoryTab } from './InventoryTab';
 import { AttacksTab } from './AttacksTab';
 import { SpellsTab } from './SpellsTab';
 import { FeaturesTab } from './FeaturesTab';
-import { clsx } from 'clsx';
-import styles from './CharacterSheet.module.css';
+import { cn } from '../../lib/utils';
 
 type TabId = 'summary' | 'skills' | 'inventory' | 'attacks' | 'spells' | 'features';
 
 export const CharacterSheet: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('summary');
 
+  const tabClass = (id: TabId) => cn(
+    "min-w-0 min-h-[34px] grid place-items-center py-1 px-0.5 text-[#111] border-2 border-gold rounded-lg bg-cream text-[0.58rem] font-black leading-none text-center overflow-wrap-anywhere whitespace-normal",
+    activeTab === id && "text-white bg-[#323264] border-blue"
+  );
+
   return (
-    <div className={styles.sheetInner}>
-      <div className={styles.sheetTabs}>
+    <div>
+      <div className="grid grid-cols-6 gap-1 mb-2.5">
         <button 
           onClick={() => setActiveTab('summary')}
-          className={clsx(styles.tabButton, activeTab === 'summary' && styles.active)}
+          className={tabClass('summary')}
         >
           Resumo
         </button>
         <button 
           onClick={() => setActiveTab('skills')}
-          className={clsx(styles.tabButton, activeTab === 'skills' && styles.active)}
+          className={tabClass('skills')}
         >
           Perícias
         </button>
         <button 
           onClick={() => setActiveTab('inventory')}
-          className={clsx(styles.tabButton, activeTab === 'inventory' && styles.active)}
+          className={tabClass('inventory')}
         >
           Itens
         </button>
         <button 
           onClick={() => setActiveTab('attacks')}
-          className={clsx(styles.tabButton, activeTab === 'attacks' && styles.active)}
+          className={tabClass('attacks')}
         >
           Ações
         </button>
         <button 
           onClick={() => setActiveTab('spells')}
-          className={clsx(styles.tabButton, activeTab === 'spells' && styles.active)}
+          className={tabClass('spells')}
         >
           Magias
         </button>
         <button 
           onClick={() => setActiveTab('features')}
-          className={clsx(styles.tabButton, activeTab === 'features' && styles.active)}
+          className={tabClass('features')}
         >
           Habilidades
         </button>
       </div>
 
-      <div className={styles.sheetContent}>
+      <div>
         {activeTab === 'summary' && <SummaryTab />}
         {activeTab === 'skills' && <SkillsTab />}
         {activeTab === 'inventory' && <InventoryTab />}

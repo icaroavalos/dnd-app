@@ -1,11 +1,5 @@
 import React from 'react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import styles from './NumberInput.module.css';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../../lib/utils';
 
 interface NumberInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -15,12 +9,15 @@ export const NumberInput: React.FC<NumberInputProps> = ({ label, id, className, 
   const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
   
   return (
-    <div className={styles.field}>
-      {label && <label htmlFor={inputId}>{label}</label>}
+    <div className="grid gap-1.5">
+      {label && <label htmlFor={inputId} className="text-[#e8e8e8] font-extrabold text-[0.88rem]">{label}</label>}
       <input
         id={inputId}
         type="number"
-        className={cn(styles.input, className)}
+        className={cn(
+          "w-full min-h-[42px] text-ink bg-bg border border-[#373737] rounded-lg px-2.5 py-[9px]",
+          className
+        )}
         {...props}
       />
     </div>

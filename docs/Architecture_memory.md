@@ -17,10 +17,10 @@ O projeto concluiu a migração integral do frontend de uma arquitetura Vanilla 
 - **Frontend**: Vite + React + TypeScript + Zustand.
 - **Backend**: NestJS + Fastify + Prisma (SQLite).
 - **Contratos**: Shared contracts em `backend/src/shared/contracts/`.
-- **Estilos**: Migração para **CSS Modules** concluída.
-    - Escopo local para componentes utilizando padrão `camelCase`.
-    - `index.css` reduzido a variáveis globais, resets e utilitários básicos.
-    - Facilita futura adoção de TailwindCSS.
+- **Estilos**: Migração integral para **Tailwind CSS** concluída.
+    - Todos os componentes utilizam classes utilitárias e o helper `cn` para gerenciamento de estilos.
+    - `index.css` configurado com diretivas Tailwind e componentes globais via `@layer components`.
+    - CSS Modules removidos completamente para unificar o sistema de design.
 - **Build**: Unificado no root `package.json` usando `--prefix frontend`.
 - **Datasets**: A fonte canonica de regras e `data/5etools/5e-2024/`.
 
@@ -33,9 +33,12 @@ Status baseado em migração concluída em 2026-05-12.
 Implementado em `frontend/src/`.
 
 - **UI Components**: `Card`, `Select`, `NumberInput`, `Checkbox` reutilizáveis.
-- **Builder**: Seleção de Classe, Espécie, Atributos (Point Buy/Standard Array) e Background (Magic Initiate).
+- **Builder**: 
+    - Seleção de Classe e Espécie.
+    - Atributos via Point Buy, Standard Array ou Manual.
+    - **Backgrounds (2024)**: Sistema completo de escolhas originárias, incluindo padrões de ASI (+2/+1 ou +1/+1/+1), identificação de Talentos de Origem (ex: Magic Initiate) e escolha de atributo de conjuração.
 - **Sheet**: Abas de Resumo, Perícias, Inventário, Ações, Magias e Habilidades reativas.
-- **State**: Mutadores granulares no Zustand para evitar inconsistências.
+- **State**: Gerenciamento via Zustand com persistência em backend.
 
 ### Rules catalog (Backend)
 

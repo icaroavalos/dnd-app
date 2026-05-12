@@ -3,8 +3,7 @@ import { useCharacterStore } from '../../store/useCharacterStore';
 import { Card } from '../ui/Card';
 import { Select } from '../ui/Select';
 import type { AbilityScores as AbilityScoresType } from '../../types/character';
-import styles from './AbilityScores.module.css';
-import { clsx } from 'clsx';
+import { cn } from '@/lib/utils';
 
 const ABILITY_LABELS: Record<keyof AbilityScoresType, string> = {
   str: 'Força',
@@ -42,19 +41,19 @@ export const AbilityScores: React.FC = () => {
   };
 
   const renderManual = () => (
-    <div className={styles.abilityGrid}>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
       {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => (
-        <div key={key} className={styles.pointBuyRow}>
+        <div key={key} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 min-w-0 p-2.5 bg-[#080808] border border-[#303030] rounded-lg">
           <div className="flex flex-col">
-            <strong>{ABILITY_LABELS[key]}</strong>
-            <span>Mod: {formatModifier(calculateModifier(character.abilities[key]))}</span>
+            <strong className="block">{ABILITY_LABELS[key]}</strong>
+            <span className="block text-muted text-[0.78rem]">Mod: {formatModifier(calculateModifier(character.abilities[key]))}</span>
           </div>
-          <div className={styles.scoreStepper}>
+          <div className="grid grid-cols-[30px_36px_30px] items-center gap-1.5">
             <input 
               type="number" 
               value={character.abilities[key]} 
               onChange={(e) => updateAbility(key, parseInt(e.target.value) || 0)}
-              className="w-16 text-center"
+              className="w-16 text-center col-span-3 bg-black border border-gray-700 rounded p-1"
             />
           </div>
         </div>
@@ -68,29 +67,29 @@ export const AbilityScores: React.FC = () => {
     
     return (
       <div className="flex flex-col gap-4">
-        <div className={styles.pointBuyHead}>
-          <span>Pontos: {spent} / {budget}</span>
-          <span>{budget - spent} restantes</span>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2.5 text-panel bg-cream border-2 border-gold rounded-lg font-[900]">
+          <span className="text-[0.82rem]">Pontos: {spent} / {budget}</span>
+          <span className="text-[0.82rem]">{budget - spent} restantes</span>
         </div>
-        <div className={styles.pointBuyGrid}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => {
             const score = character.abilities[key];
             const cost = POINT_BUY_COSTS[score];
             const nextCost = POINT_BUY_COSTS[score + 1] - cost;
             
             return (
-              <div key={key} className={styles.pointBuyRow}>
+              <div key={key} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 min-w-0 p-2.5 bg-[#080808] border border-[#303030] rounded-lg">
                 <div className="flex flex-col">
-                  <strong>{ABILITY_LABELS[key]}</strong>
-                  <span>Mod: {formatModifier(calculateModifier(score))}</span>
+                  <strong className="block">{ABILITY_LABELS[key]}</strong>
+                  <span className="block text-muted text-[0.78rem]">Mod: {formatModifier(calculateModifier(score))}</span>
                 </div>
-                <div className={styles.scoreStepper}>
+                <div className="grid grid-cols-[30px_36px_30px] items-center gap-1.5">
                   <button 
                     onClick={() => updateAbility(key, score - 1)} 
                     disabled={score <= 8}
                     className="mini-button"
                   >-</button>
-                  <output>{score}</output>
+                  <output className="grid place-items-center min-h-[30px] text-panel bg-[#e7e7e7] rounded-lg font-[950]">{score}</output>
                   <button 
                     onClick={() => updateAbility(key, score + 1)} 
                     disabled={score >= 15 || (spent + nextCost > budget)}
@@ -108,18 +107,18 @@ export const AbilityScores: React.FC = () => {
   const renderStandardArray = () => (
     <div className="flex flex-col gap-4">
       <p className="hint">Valores disponíveis: {STANDARD_ARRAY.join(', ')}</p>
-      <div className={styles.abilityGrid}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => (
-          <div key={key} className={styles.pointBuyRow}>
+          <div key={key} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 min-w-0 p-2.5 bg-[#080808] border border-[#303030] rounded-lg">
             <div className="flex flex-col">
-              <strong>{ABILITY_LABELS[key]}</strong>
-              <span>Mod: {formatModifier(calculateModifier(character.abilities[key]))}</span>
+              <strong className="block">{ABILITY_LABELS[key]}</strong>
+              <span className="block text-muted text-[0.78rem]">Mod: {formatModifier(calculateModifier(character.abilities[key]))}</span>
             </div>
-            <div className={styles.scoreStepper}>
+            <div className="grid grid-cols-[30px_36px_30px] items-center gap-1.5">
               <select 
                 value={character.abilities[key]} 
                 onChange={(e) => updateAbility(key, parseInt(e.target.value))}
-                className="bg-black text-white border border-gray-700 rounded p-1"
+                className="col-span-3 bg-black text-white border border-gray-700 rounded p-1"
               >
                 <option value="0">--</option>
                 {STANDARD_ARRAY.map(val => (

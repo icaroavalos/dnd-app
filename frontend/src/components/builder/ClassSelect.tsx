@@ -5,7 +5,7 @@ import type { CatalogEntry } from '../../api/catalog-api';
 import { Select } from '../ui/Select';
 import { Checkbox } from '../ui/Checkbox';
 import { Card } from '../ui/Card';
-import styles from './ClassSelect.module.css';
+import { cn } from '@/lib/utils';
 
 export const ClassSelect: React.FC = () => {
   const { character, updateCharacter, toggleSkillProficiency } = useCharacterStore();
@@ -56,7 +56,7 @@ export const ClassSelect: React.FC = () => {
   const currentSkillChoices = character.skillProficiencies.filter(s => skillOptions.includes(s));
 
   return (
-    <div className={styles.container}>
+    <div className="flex flex-col gap-4">
       <Select
         label="Classe"
         value={selectedClassId}
@@ -68,7 +68,7 @@ export const ClassSelect: React.FC = () => {
 
       {selectedClass && skillOptions.length > 0 && (
         <Card title={`Perícias de Classe (Escolha ${skillCount})`} className="mt-4">
-          <div className={styles.choiceList}>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2 mt-2.5">
             {skillOptions.map((skill: string) => {
               const isSelected = character.skillProficiencies.includes(skill);
               const isDisabled = !isSelected && currentSkillChoices.length >= skillCount;
@@ -79,11 +79,15 @@ export const ClassSelect: React.FC = () => {
                   checked={isSelected}
                   onChange={() => toggleSkillProficiency(skill)}
                   disabled={isDisabled}
+                  className={cn(
+                    "flex gap-2 items-center min-w-0 min-h-[36px] px-[9px] py-[7px] rounded-lg bg-[#080808] border border-[#2c2c2c]",
+                    isDisabled && "text-[#777] bg-[#111]"
+                  )}
                 />
               );
             })}
           </div>
-          <p className={`${styles.hint} mt-2`}>
+          <p className="m-0 text-muted leading-[1.45] mt-2">
             Selecionadas: {currentSkillChoices.length} / {skillCount}
           </p>
         </Card>
@@ -104,7 +108,7 @@ export const ClassSelect: React.FC = () => {
                 equipmentChoices: { ...character.equipmentChoices, starting: e.target.value } 
               })}
             />
-            <p className={`${styles.hint} mt-1`}>
+            <p className="m-0 text-muted leading-[1.45] mt-1">
               {selectedClass.startingEquipment?.entries?.[0] || 'Escolha entre o pacote de equipamentos ou ouro inicial.'}
             </p>
           </div>

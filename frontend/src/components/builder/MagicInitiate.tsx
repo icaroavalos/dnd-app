@@ -4,7 +4,7 @@ import { getSpells } from '../../api/catalog-api';
 import type { CatalogEntry } from '../../api/catalog-api';
 import { Card } from '../ui/Card';
 import { Checkbox } from '../ui/Checkbox';
-import styles from './MagicInitiate.module.css';
+import { cn } from '@/lib/utils';
 
 export const MagicInitiate: React.FC = () => {
   const { character, updateCharacter } = useCharacterStore();
@@ -56,38 +56,54 @@ export const MagicInitiate: React.FC = () => {
 
   return (
     <Card title="Talento: Magic Initiate">
-      <div className={styles.container}>
+      <div className="flex flex-col gap-6">
         <div>
-          <h3 className={styles.sectionTitle}>
+          <h3 className="text-[0.875rem] font-bold uppercase text-gold mb-3">
             Truques (Escolha 2) - {selectedCantrips.length}/2
           </h3>
-          <div className={styles.choiceList}>
-            {cantrips.map(spell => (
-              <Checkbox
-                key={spell.id}
-                label={spell.name}
-                checked={selectedCantrips.includes(spell.id)}
-                onChange={() => handleToggle(spell.id, 0)}
-                disabled={!selectedCantrips.includes(spell.id) && selectedCantrips.length >= 2}
-              />
-            ))}
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2 mt-2.5">
+            {cantrips.map(spell => {
+              const isSelected = selectedCantrips.includes(spell.id);
+              const isDisabled = !isSelected && selectedCantrips.length >= 2;
+              return (
+                <Checkbox
+                  key={spell.id}
+                  label={spell.name}
+                  checked={isSelected}
+                  onChange={() => handleToggle(spell.id, 0)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "flex gap-2 items-center min-w-0 min-h-[36px] px-[9px] py-[7px] rounded-lg bg-[#080808] border border-[#2c2c2c]",
+                    isDisabled && "text-[#777] bg-[#111]"
+                  )}
+                />
+              );
+            })}
           </div>
         </div>
 
         <div>
-          <h3 className={styles.sectionTitle}>
+          <h3 className="text-[0.875rem] font-bold uppercase text-gold mb-3">
             1º Nível (Escolha 1) - {selectedLevel1.length}/1
           </h3>
-          <div className={styles.choiceList}>
-            {level1.map(spell => (
-              <Checkbox
-                key={spell.id}
-                label={spell.name}
-                checked={selectedLevel1.includes(spell.id)}
-                onChange={() => handleToggle(spell.id, 1)}
-                disabled={!selectedLevel1.includes(spell.id) && selectedLevel1.length >= 1}
-              />
-            ))}
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2 mt-2.5">
+            {level1.map(spell => {
+              const isSelected = selectedLevel1.includes(spell.id);
+              const isDisabled = !isSelected && selectedLevel1.length >= 1;
+              return (
+                <Checkbox
+                  key={spell.id}
+                  label={spell.name}
+                  checked={isSelected}
+                  onChange={() => handleToggle(spell.id, 1)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "flex gap-2 items-center min-w-0 min-h-[36px] px-[9px] py-[7px] rounded-lg bg-[#080808] border border-[#2c2c2c]",
+                    isDisabled && "text-[#777] bg-[#111]"
+                  )}
+                />
+              );
+            })}
           </div>
         </div>
       </div>

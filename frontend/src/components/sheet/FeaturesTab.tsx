@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
-import styles from './FeaturesTab.module.css';
-import { clsx } from 'clsx';
+import { cn } from '../../lib/utils';
 
 export const FeaturesTab: React.FC = () => {
   const { character } = useCharacterStore();
@@ -26,35 +25,35 @@ export const FeaturesTab: React.FC = () => {
   };
 
   return (
-    <div className={styles.featuresTabContainer}>
+    <div className="">
       {Object.entries(grouped).map(([kind, items]) => (
-        <section key={kind} className={styles.featureSection}>
-          <h3>{kindLabels[kind] || kind.toUpperCase()}</h3>
-          <div className={styles.featureGroupList}>
+        <section key={kind} className="grid gap-2 mb-4">
+          <h3 className="mt-2 text-[#cf3036] text-[0.9rem] uppercase border-b border-[#d8d8d8] pb-1">{kindLabels[kind] || kind.toUpperCase()}</h3>
+          <div className="grid gap-3">
             {items.map((feat, idx) => {
               const id = feat.id || `${kind}-${idx}`;
               const isOpen = selectedId === id;
               return (
-                <article key={id} className={clsx(styles.featureCard, isOpen && styles.expanded)}>
+                <article key={id} className={cn("bg-[#1a1a1a] border border-[#333] rounded-lg overflow-hidden", isOpen && "border-[#cf3036]")}>
                   <button 
                     type="button" 
-                    className={clsx(styles.featureCardHeader, isOpen && styles.active)}
+                    className={cn("grid grid-cols-[1fr_auto_auto] gap-2 items-center w-full py-2.5 px-3 bg-transparent border-none text-[#f0f0f0] text-left cursor-pointer hover:bg-[#222]", isOpen && "bg-[#222]")}
                     onClick={() => setSelectedId(isOpen ? null : id)}
                   >
-                    <div className={styles.featureCardTitle}>
-                      <strong>{feat.name}</strong>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <strong className="text-[0.95rem] font-bold text-[#f0f0f0]">{feat.name}</strong>
                     </div>
-                    <span className={styles.chevron}></span>
+                    <span className={cn("w-4 h-4 border-r-2 border-b-2 border-[#888] rotate-[135deg] transition-transform duration-200", isOpen && "-rotate-45 border-[#cf3036]")}></span>
                   </button>
                   {isOpen && (
-                    <div className={styles.featureCardBody}>
+                    <div className="p-3 bg-[#151515] border-t border-[#333] text-[#d0d0d0] text-[0.88rem] leading-normal">
                       {feat.resource && (
-                        <div className={styles.resourceUse}>
-                          <button type="button" className={styles.castButton}>Usar</button>
+                        <div className="flex items-center gap-2 mt-2.5 mb-2.5 text-[#6f7a80] font-[850]">
+                          <button type="button" className="relative min-h-[28px] grid place-items-center text-white bg-[#cf3036] border-0 rounded-[6px] text-[0.62rem] font-[950] uppercase cursor-pointer px-3">Usar</button>
                           <span>{feat.resource.remaining}/{feat.resource.max} usos - recupera em {feat.resource.recoveryLabel}</span>
                         </div>
                       )}
-                      <p>{feat.description || 'Nenhuma descrição disponível.'}</p>
+                      <p className="mb-2">{feat.description || 'Nenhuma descrição disponível.'}</p>
                     </div>
                   )}
                 </article>
@@ -65,7 +64,7 @@ export const FeaturesTab: React.FC = () => {
       ))}
 
       {features.length === 0 && (
-        <div className={styles.emptyState}>Nenhuma habilidade listada para esta ficha.</div>
+        <div className="min-h-[120px] grid place-items-center text-muted border border-dashed border-[#343434] rounded-lg text-center p-4">Nenhuma habilidade listada para esta ficha.</div>
       )}
     </div>
   );

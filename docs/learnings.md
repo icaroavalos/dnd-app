@@ -258,6 +258,50 @@ O frontend consome os seguintes endpoints do backend. Todos sao **obrigatorios**
 
 Quando o backend esta indisponivel:
 
+## Unificação Total para Tailwind CSS (2026-05-12)
+
+**Status:** ✅ CONCLUÍDO - 100% do app migrado para Tailwind.
+
+**O que foi feito:**
+1. Refatoração de todos os componentes (UI, Layout, Builder, Sheet) e Páginas, removendo o uso de CSS Modules.
+2. Exclusão definitiva de todos os arquivos `.module.css`.
+3. Implementação do helper `cn` (utilizando `clsx` e `tailwind-merge`) em `src/lib/utils.ts` para gerenciamento robusto de classes dinâmicas.
+4. Refatoração do `index.css` utilizando `@layer base` para resets e `@layer components` para componentes globais reutilizáveis (`.primary-button`, `.field`, etc.).
+
+**Lição aprendida:**
+- **Single Source of Truth:** Ter um único sistema de estilos (Tailwind) elimina o overhead mental de decidir onde colocar um estilo e evita conflitos entre diferentes metodologias (CSS Modules vs Global).
+- **Manutenibilidade:** A unificação permite mudanças visuais globais muito mais rápidas e garante que novos desenvolvedores (ou agentes) tenham um padrão claro a seguir.
+- **Desenvolvimento Component-First:** Tailwind incentiva a criação de componentes pequenos e bem definidos, o que combina perfeitamente com a filosofia do React.
+- **Helper `cn`:** O uso do helper `cn` é indispensável em projetos React com Tailwind para evitar problemas de especificidade ao sobrescrever classes utilitárias.
+
+## Integração de Tailwind CSS (2026-05-12)
+
+**Status:** ✅ CONCLUÍDO - Tailwind configurado e validado no CharacterMenu.
+
+**O que foi feito:**
+1. Configuração do ecossistema Tailwind no frontend (`postcss`, `autoprefixer`).
+2. Implementação do `CharacterMenu` utilizando exclusivamente classes utilitárias.
+3. Integração das diretivas Tailwind no `index.css` existente.
+
+**Lição aprendida:**
+- **Coexistência:** Tailwind pode coexistir perfeitamente com CSS Modules. Para componentes estruturais ou de layout global (como menus), o Tailwind oferece uma agilidade muito superior para prototipação e design responsivo.
+- **Transição Suave:** Iniciar o uso do Tailwind em novos componentes enquanto se mantém CSS Modules para componentes estáveis é uma estratégia de migração segura que evita o custo de refatoração massiva imediata.
+
+## Implementação de Backgrounds D&D 2024 (2026-05-12)
+
+**Status:** ✅ CONCLUÍDO - Lógica de escolhas originárias integrada ao Builder.
+
+**O que foi feito:**
+1. Mapeamento das regras de Aumento de Atributo (ASI) dos novos backgrounds (padrões +2/+1 e +1/+1/+1).
+2. Renderização dinâmica de bônus permitidos baseada nos dados do `5etools` (ex: Acolyte permite apenas INT, SAB, CAR).
+3. Detecção de Talentos de Origem (Feats) e vinculação com a escolha de atributo de conjuração (*Spellcasting Ability*).
+4. Persistência de escolhas complexas no store do Zustand (`bgChoices`).
+
+**Lição aprendida:**
+- **Flexibilidade de Dados:** O formato de dados de 2024 é mais granular que o anterior. Ter um tipo de dado `bgChoices` genérico no início facilitou a expansão para incluir o padrão de incremento (`abilityIncrement`) sem quebrar a interface do store.
+- **UX em Etapas:** Bloquear a seleção de magias do talento *Magic Initiate* até que o atributo de conjuração seja escolhido evita estados inválidos na ficha e melhora a clareza para o usuário.
+- **Isolamento de Estilos:** O uso de CSS Modules permitiu criar uma interface de seleção de atributos ("badges" clicáveis) específica para o background sem afetar outros seletores de atributos no app.
+
 ## Migração para CSS Modules (2026-05-12)
 
 **Status:** ✅ CONCLUÍDO - Todos os componentes do frontend migrados para CSS Modules.

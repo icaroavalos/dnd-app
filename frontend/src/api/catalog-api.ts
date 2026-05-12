@@ -23,6 +23,7 @@ export type CatalogType =
   | 'species'
   | 'items'
   | 'features'
+  | 'subraces'
   | 'feats';
 
 export class CatalogError extends Error {

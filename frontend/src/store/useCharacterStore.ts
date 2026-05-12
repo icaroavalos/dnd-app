@@ -14,6 +14,7 @@ interface CharacterState {
   addSpell: (spell: any) => void;
   removeSpell: (spellId: string) => void;
   toggleSkillProficiency: (skill: string) => void;
+  resetCharacter: () => void;
 }
 
 const createDefaultCharacter = (): Character => ({
@@ -116,4 +117,9 @@ export const useCharacterStore = create<CharacterState>((set) => ({
         character: { ...state.character, skillProficiencies: next }
       };
     }),
+
+  resetCharacter: () => set({ 
+    character: createDefaultCharacter(),
+    activeCharacterId: null 
+  }),
 }));

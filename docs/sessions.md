@@ -327,6 +327,110 @@
 
 # Sessions
 
+## 2026-05-12 - Unificação Total do Frontend para Tailwind CSS
+
+**Status:** ✅ CONCLUÍDO — 100% da estilização convertida para Tailwind.
+
+**Objetivo:** Eliminar o sistema híbrido de estilos (Tailwind + CSS Modules) para unificar a stack visual, reduzir o tamanho do bundle e facilitar a manutenção e implementação de novas features.
+
+**Ações realizadas:**
+1. **Migração em Massa**:
+   - Refatorados componentes de UI (`Card`, `Select`, `NumberInput`, `Checkbox`).
+   - Refatorados componentes de Layout (`AppLayout`, `Header`).
+   - Refatorados componentes do Builder (`AbilityScores`, `BackgroundSelect`, `ClassSelect`, `MagicInitiate`, `SpeciesSelect`).
+   - Refatorados componentes da Ficha (Sheet) e todas as abas (`SummaryTab`, `SkillsTab`, `InventoryTab`, `AttacksTab`, `SpellsTab`, `FeaturesTab`).
+   - Refatoradas as páginas `CreatorPage` e `SheetPage`.
+2. **Remoção de Legado**:
+   - Excluídos todos os arquivos `.module.css` do projeto.
+   - Refatorado `frontend/src/index.css` para utilizar `@layer base` e `@layer components`.
+3. **Padrões de Código**:
+   - Implementado o utilitário `cn` em `src/lib/utils.ts` para merging de classes Tailwind.
+   - Substituídos todos os imports de `styles` por classes utilitárias no JSX.
+
+**Verificação:**
+- Zero erros de tipagem no frontend.
+- `npm run build --prefix frontend` gera o bundle com sucesso.
+- Interface visual preservada com o novo sistema de design system centralizado no `tailwind.config.js`.
+
+---
+
+## 2026-05-12 - Correção de Renderização do Tailwind e Polimento do Menu
+
+**Status:** ✅ CONCLUÍDO — Menu visualmente corrigido e integrado com Tailwind.
+
+**Problema:** O menu lateral (CharacterMenu) estava aparecendo transparente e sem estilos utilitários, indicando que o Tailwind CSS não estava sendo processado corretamente pelo Vite em tempo de execução.
+
+**Ações realizadas:**
+1. **Configuração Robusta do Vite**:
+   - Adicionada configuração explícita de `postcss` no `vite.config.ts` para garantir que `tailwindcss` e `autoprefixer` sejam carregados independentemente da detecção automática.
+2. **Correção de Erros de Build e Tipagem**:
+   - Atualizada a interface `Character` para incluir o campo opcional `id`.
+   - Ajustadas as configurações do `tsconfig.app.json` (`erasableSyntaxOnly: false`) para permitir sintaxe moderna de classes TypeScript.
+   - Corrigidos erros de comparação de tipos e imports não utilizados em `SpeciesSelect`, `AbilityScores` e `CharacterMenu`.
+3. **Polimento Visual do Menu**:
+   - Redesenhado o `CharacterMenu.tsx` com animações suaves, indicadores de carregamento (spinners) e uma confirmação de exclusão integrada na própria lista.
+   - Adicionada paleta de cores customizada ao `tailwind.config.js` para consistência com o tema do app.
+   - Melhorado o espaçamento e alinhamento do `Header` da aplicação.
+
+**Verificação:**
+- `npm run build --prefix frontend` agora passa com sucesso (Zero erros de TS e CSS).
+- Interface do menu agora possui fundo sólido, bordas definidas e comportamento de drawer moderno.
+
+---
+
+## 2026-05-12 - Implementação do Menu de Fichas e Setup do Tailwind
+
+**Status:** ✅ CONCLUÍDO — Menu de gerenciamento de fichas (CharacterMenu) implementado com Tailwind.
+
+**Objetivo:** Recriar o menu de gerenciamento de fichas (Nova Ficha, Salvar, Deletar, Listar) que foi perdido na migração, utilizando a nova stack e iniciando a transição para Tailwind CSS.
+
+**Ações realizadas:**
+1. **Setup do Tailwind**:
+   - Instalado e configurado `tailwindcss`, `postcss` e `autoprefixer` no frontend.
+   - Configurado `tailwind.config.js` e diretivas no `index.css`.
+2. **Implementação do `CharacterMenu.tsx`**:
+   - Criado componente lateral (drawer) usando Tailwind para estilização.
+   - Integração com `character-api.ts` para listar, buscar e deletar personagens.
+   - Funcionalidade de "Nova Ficha" com reset de estado.
+   - Funcionalidade de "Salvar Ficha Atual" persistindo no backend.
+   - Confirmação de deleção em dois passos.
+3. **Atualização do `Header.tsx`**:
+   - Botão de hambúrguer funcional para abrir o menu.
+   - Exibição dinâmica do nome da ficha e status de sincronização.
+4. **Atualização da Store**:
+   - Adicionada ação `resetCharacter` no Zustand para facilitar a criação de novas fichas.
+
+**Verificação:**
+- Menu abre e fecha corretamente com animação.
+- Listagem de fichas recuperada do backend.
+- Persistência e deleção funcionando com feedback visual.
+
+---
+
+## 2026-05-12 - Implementação de Escolhas Originárias de Background (D&D 2024)
+
+**Status:** ✅ CONCLUÍDO — BackgroundSelect agora suporta ASI e Feats de origem.
+
+**Objetivo:** Permitir que o usuário escolha os bônus de atributo (+2/+1 ou +1/+1/+1) e o atributo de conjuração para o talento de background, conforme as regras de 2024.
+
+**Ações realizadas:**
+1. **Atualização do `BackgroundSelect.tsx`**:
+   - Implementada interface para seleção de padrão de incremento de atributo.
+   - Adicionada lógica de filtragem de atributos permitidos por background.
+   - Implementada detecção automática de Talentos de Origem (ex: Acolyte -> Magic Initiate: Cleric).
+   - Adicionado seletor de Atributo de Conjuração reativo.
+2. **Estilização com CSS Modules**:
+   - Criados estilos para os "badges" de atributos e cards de talentos no `BackgroundSelect.module.css`.
+3. **Persistência de Dados**:
+   - Garantido que `bgChoices` no store do Zustand capture todas as seleções necessárias para a projeção da ficha no backend.
+
+**Verificação:**
+- Seleção de background exibe corretamente as opções de ASI.
+- Bloqueio de atributos não permitidos (ex: Acolyte bloqueia FOR, DES, CON).
+- Seletor de magias aparece apenas após escolher o atributo de conjuração.
+
+---
+
 ## 2026-05-12 - Migração Completa para CSS Modules
 
 **Status:** ✅ CONCLUÍDO — Todos os componentes do frontend migrados para CSS Modules.

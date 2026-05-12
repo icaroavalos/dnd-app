@@ -3,7 +3,6 @@ import { useCharacterStore } from '../../store/useCharacterStore';
 import { getSpecies, getSubraces } from '../../api/catalog-api';
 import type { CatalogEntry } from '../../api/catalog-api';
 import { Select } from '../ui/Select';
-import styles from './SpeciesSelect.module.css';
 
 export const SpeciesSelect: React.FC = () => {
   const { character, updateCharacter } = useCharacterStore();
@@ -63,7 +62,7 @@ export const SpeciesSelect: React.FC = () => {
       updateCharacter({ 
         subrace: sub.name,
         features: [
-          ...character.features.filter(f => f.kind !== 'subspecies'),
+          ...character.features.filter(f => (f.kind as string) !== 'subspecies'),
           ...(sub.traits || []).map((t: any) => ({
             id: t.id || Math.random().toString(),
             name: t.name,
@@ -81,7 +80,7 @@ export const SpeciesSelect: React.FC = () => {
   const availableSubraces = subraceList.filter(s => s.raceName === character.race);
 
   return (
-    <div className={styles.container}>
+    <div className="flex flex-col gap-4">
       <Select
         label="Espécie (Species)"
         value={selectedSpeciesId}

@@ -1,6 +1,5 @@
 import React from 'react';
-import { clsx } from 'clsx';
-import styles from './Select.module.css';
+import { cn } from '../../lib/utils';
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
@@ -10,9 +9,15 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select: React.FC<SelectProps> = ({ label, options, helperText, className, ...props }) => {
   return (
-    <div className={styles.field}>
-      <label>{label}</label>
-      <select className={clsx(styles.selectField, className)} {...props}>
+    <div className="grid gap-1.5">
+      <label className="text-[#e8e8e8] font-extrabold text-[0.88rem]">{label}</label>
+      <select 
+        className={cn(
+          "w-full min-h-[42px] text-ink bg-bg border border-[#373737] rounded-lg px-2.5 py-[9px]", 
+          className
+        )} 
+        {...props}
+      >
         <option value="">Selecione...</option>
         {options.map(([val, name]) => (
           <option key={val} value={val}>
@@ -20,7 +25,7 @@ export const Select: React.FC<SelectProps> = ({ label, options, helperText, clas
           </option>
         ))}
       </select>
-      {helperText && <p className={styles.hint}>{helperText}</p>}
+      {helperText && <p className="m-0 text-muted leading-[1.45]">{helperText}</p>}
     </div>
   );
 };
