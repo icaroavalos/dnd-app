@@ -17,17 +17,14 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({ isWide = false }
   const [activeTab, setActiveTab] = useState<TabId>('summary');
 
   const tabClass = (id: TabId) => cn(
-    "min-w-0 min-h-[36px] grid place-items-center py-1 px-0.5 text-[#111] border-2 border-gold rounded-lg bg-cream font-black leading-none text-center transition-all",
-    isWide ? "text-[0.7rem] px-2" : "text-[0.62rem] tracking-tight truncate",
-    activeTab === id && "text-white bg-[#323264] border-blue scale-[1.02]"
+    "flex-1 min-w-[70px] min-h-[40px] grid place-items-center py-2 px-1 text-[#111] border-2 border-gold rounded-lg bg-cream font-black leading-none text-center transition-all",
+    isWide ? "text-[0.65rem] sm:text-[0.7rem] px-2" : "text-[0.65rem] tracking-tight",
+    activeTab === id && "text-white bg-[#323264] border-blue scale-[1.02] z-10"
   );
 
   return (
     <div className="w-full">
-      <div className={cn(
-        "grid gap-1.5 mb-4",
-        isWide ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-3"
-      )}>
+      <div className="flex flex-wrap gap-1.5 mb-4">
         <button 
           onClick={() => setActiveTab('summary')}
           className={tabClass('summary')}
@@ -58,17 +55,17 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({ isWide = false }
         >
           Magias
         </button>
-        <button 
-          onClick={() => setActiveTab('features')}
-          className={tabClass('features')}
+        <button
+         onClick={() => setActiveTab('features')}
+         className={tabClass('features')}
         >
-          Habilidades
+         Habilidades
         </button>
       </div>
 
-      <div>
+      <div className="mt-2">
         {activeTab === 'summary' && <SummaryTab />}
-        {activeTab === 'skills' && <SkillsTab />}
+        {activeTab === 'skills' && <SkillsTab isWide={isWide} />}
         {activeTab === 'inventory' && <InventoryTab />}
         {activeTab === 'attacks' && <AttacksTab />}
         {activeTab === 'spells' && <SpellsTab />}
