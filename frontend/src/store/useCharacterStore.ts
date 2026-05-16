@@ -18,8 +18,10 @@ interface CharacterState {
   pendingLevelUp: PendingLevelUp | null;
   itemsCatalog: any[];
   spellsCatalog: any[];
+  isSaving: boolean;
 
   // Actions
+  setIsSaving: (saving: boolean) => void;
   fetchItemsCatalog: () => Promise<void>;
   fetchSpellsCatalog: () => Promise<void>;
   setCharacter: (character: Character) => void;
@@ -119,6 +121,9 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
   pendingLevelUp: null,
   itemsCatalog: [],
   spellsCatalog: [],
+  isSaving: false,
+
+  setIsSaving: (saving) => set({ isSaving: saving }),
 
   fetchItemsCatalog: async () => {
     try {

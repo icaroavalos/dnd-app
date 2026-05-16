@@ -129,23 +129,6 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
     }
   };
 
-  const handleSave = async () => {
-    setActionLoading('save');
-    try {
-      const saved = await saveCharacter(character as any);
-      if (saved.id) {
-        setActiveCharacterId(saved.id);
-        await fetchCharacters();
-      }
-      setToast({ message: 'Ficha salva com sucesso!', type: 'success' });
-    } catch (err) {
-      console.error('Failed to save character:', err);
-      setToast({ message: 'Erro ao salvar ficha.', type: 'error' });
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
   return (
     <>
       {/* Toast Notification */}
@@ -193,19 +176,6 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
 
         {/* Action Buttons */}
         <div className="p-4 grid grid-cols-1 gap-3 border-b border-line bg-bg/30">
-          <button 
-            onClick={handleSave}
-            disabled={actionLoading === 'save'}
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-teal hover:bg-teal/90 text-bg font-black rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-teal/10 group disabled:opacity-50"
-          >
-            {actionLoading === 'save' ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : (
-              <Save size={20} className="transition-transform group-hover:scale-110" />
-            )}
-            SALVAR FICHA ATUAL
-          </button>
-
           {showNewConfirm ? (
             <div className="flex gap-2 animate-in fade-in zoom-in-95 duration-200">
               <button 

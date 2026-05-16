@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { CharacterMenu } from './CharacterMenu';
 import { Menu } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export const Header: React.FC = () => {
-  const { character } = useCharacterStore();
+  const { character, isSaving } = useCharacterStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   return (
@@ -20,8 +21,13 @@ export const Header: React.FC = () => {
       </button>
       <strong id="topbarName" className="truncate flex-1 px-6 text-lg tracking-tight font-black">{character.name || 'Nova Ficha'}</strong>
       <div className="flex items-center gap-2">
-        <span id="syncState" className="text-muted text-[0.75rem] font-semibold uppercase tracking-[0.5px]">online</span>
-        <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+        <span id="syncState" className="text-muted text-[0.75rem] font-semibold uppercase tracking-[0.5px]">
+          {isSaving ? 'sincronizando...' : 'salvo'}
+        </span>
+        <div className={cn(
+          "w-2 h-2 rounded-full transition-all duration-500 shadow-[0_0_8px]",
+          isSaving ? "bg-amber-500 animate-pulse shadow-amber-500/60" : "bg-green-500 shadow-green-500/60"
+        )}></div>
       </div>
 
       <CharacterMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
