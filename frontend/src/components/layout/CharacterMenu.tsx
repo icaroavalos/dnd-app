@@ -16,6 +16,7 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
   const [showNewConfirm, setShowNewConfirm] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const navigate = useNavigate();
@@ -69,7 +70,11 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
     try {
       const fullChar = await getCharacter(id);
       if (fullChar) {
-        setCharacter(fullChar as any);
+        // First reset, then set the new character
+        resetCharacter();
+        // Give a tiny tick for the store to clear before hydration if needed, 
+        // but setCharacter now handles mapping internally
+        setCharacter(fullChar);
         setActiveCharacterId(id);
         navigate('/sheet');
         onClose();
@@ -101,6 +106,24 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
     } catch (err) {
       console.error('Failed to delete character:', err);
       setToast({ message: 'Erro ao deletar personagem.', type: 'error' });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    setActionLoading('delete-all');
+    try {
+      for (const s of summaries) {
+        await deleteCharacter(s.id);
+      }
+      setSummaries([]);
+      resetCharacter();
+      setShowDeleteAllConfirm(false);
+      setToast({ message: 'Todas as fichas foram apagadas.', type: 'success' });
+    } catch (err) {
+      console.error('Failed to delete all characters:', err);
+      setToast({ message: 'Erro ao limpar baú.', type: 'error' });
     } finally {
       setActionLoading(null);
     }
@@ -170,6 +193,19 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
 
         {/* Action Buttons */}
         <div className="p-4 grid grid-cols-1 gap-3 border-b border-line bg-bg/30">
+          <button 
+            onClick={handleSave}
+            disabled={actionLoading === 'save'}
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-teal hover:bg-teal/90 text-bg font-black rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-teal/10 group disabled:opacity-50"
+          >
+            {actionLoading === 'save' ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              <Save size={20} className="transition-transform group-hover:scale-110" />
+            )}
+            SALVAR FICHA ATUAL
+          </button>
+
           {showNewConfirm ? (
             <div className="flex gap-2 animate-in fade-in zoom-in-95 duration-200">
               <button 
@@ -195,26 +231,43 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
               NOVA FICHA
             </button>
           )}
-          
-          <button 
-            onClick={handleSave}
-            disabled={!!actionLoading}
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-teal/10 hover:bg-teal/20 text-teal border border-teal/30 font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
-          >
-            {actionLoading === 'save' ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : (
-              <Save size={20} />
-            )}
-            SALVAR ATUAL
-          </button>
         </div>
 
         {/* Character List */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 custom-scrollbar">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-[10px] font-black text-muted uppercase tracking-[0.2em]">Personagens Salvos</h3>
-            {loading && <Loader2 size={12} className="text-teal animate-spin" />}
+            
+            <div className="flex items-center gap-3">
+              {summaries.length > 0 && (
+                showDeleteAllConfirm ? (
+                  <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
+                    <span className="text-[9px] font-black text-rose uppercase">Apagar tudo?</span>
+                    <button 
+                      onClick={() => setShowDeleteAllConfirm(false)}
+                      className="p-1.5 hover:bg-line rounded-md text-muted transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                    <button 
+                      onClick={handleDeleteAll}
+                      disabled={actionLoading === 'delete-all'}
+                      className="bg-rose text-bg text-[9px] font-black px-2 py-1 rounded-md hover:bg-rose/90 transition-all active:scale-95"
+                    >
+                      {actionLoading === 'delete-all' ? <Loader2 size={10} className="animate-spin" /> : 'SIM, LIMPAR'}
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setShowDeleteAllConfirm(true)}
+                    className="text-[9px] font-black text-muted hover:text-rose transition-colors uppercase tracking-wider"
+                  >
+                    LIMPAR TUDO
+                  </button>
+                )
+              )}
+              {loading && <Loader2 size={12} className="text-teal animate-spin" />}
+            </div>
           </div>
           
           {summaries.length === 0 && !loading && (
@@ -263,7 +316,7 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
                         {s.name || 'Sem Nome'}
                       </div>
                       <div className="text-[11px] text-muted flex items-center gap-1.5 uppercase tracking-wide font-medium">
-                        <span className="text-gold/80">{s.primaryClass}</span>
+                        <span className="text-gold/80">{s.primaryClass.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}</span>
                         <span className="opacity-30">•</span>
                         <span>Nível {s.level}</span>
                       </div>
