@@ -3,6 +3,7 @@ import { getItems, type CatalogEntry } from '../../api/catalog-api';
 import { useDerivedState } from '../../hooks/useDerivedState';
 import { cn } from '../../lib/utils';
 import { useCharacterStore } from '../../store/useCharacterStore';
+import { parseItemValue } from '../../lib/data-parser';
 
 type InventoryFilter = 'all' | 'equipped' | 'attunement' | 'other';
 
@@ -66,7 +67,13 @@ export const InventoryTab: React.FC = () => {
       const name = raw?.customName || raw?.name || catalogItem?.name || baseItemId || `Item ${idx + 1}`;
       const quantity = Number(raw?.quantity || 1);
       const weight = Number(raw?.weight ?? catalogItem?.weight ?? 0);
-      const value = Number(raw?.value ?? raw?.price ?? catalogItem?.value ?? catalogItem?.price ?? raw?.gp ?? 0);
+      let value = parseItemValue(raw?.value ?? raw?.price ?? catalogItem?.value ?? catalogItem?.price ?? raw?.gp ?? 0);
+      
+      // Special case for 'gp' (currency items added during creation)
+      if (baseItemId.toLowerCase() === 'gp') {
+        value = 1;
+      }
+
       const status = normalizeStatus(raw, character.equippedItems);
       const type = raw?.type || catalogItem?.type || '';
       const ac = Number(raw?.ac || raw?.armorClass || catalogItem?.ac || 0);

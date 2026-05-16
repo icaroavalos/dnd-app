@@ -470,3 +470,35 @@ Traços raciais que só são desbloqueados em níveis superiores (ex: 'Celestial
 **Lição aprendida:**
 - **Feedback Visual Imediato:** Mover o cálculo de CA para o frontend (replicando a lógica do backend) proporciona uma experiência muito melhor para o usuário, que vê sua CA mudar instantaneamente ao clicar em equipar.
 - **Heurística de Equipamento:** Implementar uma lógica inteligente para o botão "EQUIPAR" (detectando se é arma, armadura ou escudo pelo tipo do item) reduz cliques e torna a ficha mais intuitiva.
+
+## Correção de Falha no Carregamento de Ações (2026-05-15)
+
+**Status:** ✅ CORRIGIDO - A aba de ações agora carrega corretamente sem erros do backend.
+
+**Problema:**
+Ao abrir a aba 'Ações', a mensagem "Falha ao carregar ações derivadas do backend" aparecia. A causa era um mismatch na estrutura de dados enviada pelo frontend. O backend esperava que `spellChoices` contivesse objetos com arrays de strings (`selectedCantrips`, `selectedLevel1Spells`), mas o frontend estava enviando um mapeamento incorreto baseado apenas em IDs de magias, o que causava uma exceção de ponteiro nulo (TypeError) no motor de derivação de ações do backend.
+
+**O que foi feito:**
+1. Corrigida a função `toActionsCharacterRecord` em `actions-api.ts` no frontend para mapear corretamente as escolhas de magias de background (`bgSpellChoices`) para o formato esperado pelo backend.
+2. Adicionada uma camada de proteção defensiva no backend (`spell-actions.ts`) utilizando o operador de coalescência nula (`?? []`) para garantir que o sistema não trave caso algum campo de escolhas esteja ausente.
+3. Normalizada a lista de magias (`spells`) para garantir que sejam enviadas apenas strings (nomes) e não objetos complexos.
+
+**Lição aprendida:**
+- **Contratos Estritos:** Mudanças na estrutura de dados do store do frontend (como a adição de `bgSpellChoices`) devem sempre ser sincronizadas com as funções de transformação que preparam dados para o backend.
+- **Programação Defensiva:** Lógicas de iteração (`for...of`) em dados dinâmicos devem sempre ter fallbacks para arrays vazios para evitar que erros em campos secundários quebrem funcionalidades principais.
+
+## Correção de Valores de Itens no Inventário (2026-05-15)
+
+**Status:** ✅ CORRIGIDO - Preços de itens agora são exibidos corretamente em GP.
+
+**Problema:**
+Alguns itens exibiam valores astronômicos (ex: Greataxe a 3000 GP). A causa era que o JSON do 5etools armazena valores numéricos no campo `value` em **Peças de Cobre (CP)**, mas o frontend estava interpretando esses números diretamente como Peças de Ouro (GP).
+
+**O que foi feito:**
+1. Implementada a função utilitária `parseItemValue` em `data-parser.ts` que converte valores numéricos de CP para GP (dividindo por 100).
+2. A função também suporta strings como "5 gp" ou "10 sp", realizando a conversão correta para a unidade base de exibição (GP).
+3. Atualizado o `InventoryTab.tsx` para utilizar esta função ao mapear os itens do inventário.
+
+**Lição aprendida:**
+- **Unidades de Medida:** Sempre verifique a unidade de medida dos dados brutos. No 5etools, `value` numérico é CP, enquanto em outros lugares pode ser uma string formatada. Nunca assuma que um número representa a unidade final de exibição.
+- **Centralização de Parsing:** Funções que interpretam dados do catálogo devem ser centralizadas em utilitários de parsing para garantir consistência em toda a aplicação.
