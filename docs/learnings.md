@@ -1,6 +1,23 @@
 # Learnings
 
-Ultima revisao: 2026-05-12.
+Ultima revisao: 2026-05-13.
+
+## Correção de Estabilidade no Level Up e Magias de Background (2026-05-13)
+
+**Status:** ✅ CORRIGIDO - Sistema de evolução e talentos de origem estabilizados.
+
+**Problemas corrigidos:**
+1. **Crash (Tela Preta) no Level Up:** O `LevelUpModal` estava falhando ao renderizar porque o componente `RuleText` não estava importado e não havia verificações de segurança (`null checks`) para as listas de escolhas e features.
+2. **Perda de Magias no Magic Initiate:** O componente `MagicInitiate` estava falhando ao adicionar a magia de nível 1 à ficha porque o filtro de tipos (0 vs '0') era inconsistente com os dados da API e faltavam IDs estáveis para as magias selecionadas.
+3. **Mapeamento de Subclasses:** Refinado o sistema de extração de nomes curtos de subclasses (ex: "Path of the Berserker" -> "Berserker") para garantir que apenas as habilidades da subclasse escolhida apareçam na lista de evolução.
+
+**Lições aprendidas:**
+- **Import Vigilance:** Sempre verifique se componentes utilitários (como `RuleText`) estão importados ao refatorar telas complexas.
+- **Defensive Rendering:** Use valores default (`choices = []`, `selections = {}`) ao desestruturar objetos vindos de stores assíncronos para evitar crashes de "undefined".
+- **Data Type Consistency:** APIs de dados externos (como 5etools) podem misturar números e strings para níveis (ex: `0` e `"0"`). Os filtros devem tratar ambos os casos.
+- **Stable IDs:** Use sempre IDs únicos ou normalize nomes para gerar chaves estáveis ao adicionar itens dinâmicos (como magias de talentos) para evitar problemas de reconciliação no React.
+
+---
 
 ## Falhas na Refatoração do Construtor e Tratamento de Dados (2026-05-12)
 
@@ -278,9 +295,44 @@ O frontend consome os seguintes endpoints do backend. Todos sao **obrigatorios**
 ### Diagnostico de falha de backend
 
 Quando o backend esta indisponivel:
+---
+
+## Integridade de HP e Regras de Atributos (2026-05-12)
+
+**Status:** ✅ CORRIGIDO - Lógica de HP e unicidade de atributos estabilizada.
+
+**Problemas corrigidos:**
+1. **Bug do HP "5/5":** Ao tomar dano, a vida máxima da ficha lateral "encolhia" junto com a vida atual. Isso ocorria porque o hook `useDerivedState.ts` estava derivando `maxHp` a partir de `character.hp` (atual) em vez de `character.maxHp`.
+2. **Standard Array Duplicado:** O sistema permitia selecionar o mesmo valor (ex: 15) para múltiplos atributos, violando a regra de "um valor por atributo".
+3. **Hit Dice Inconsistente:** Algumas classes não inicializavam com o dado de vida correto ou falhavam no lookup por diferença de maiúsculas/minúsculas (ex: "barbarian" vs "Barbarian").
+
+**Lições aprendidas:**
+- **Estado Derivado vs Persistido:** Nunca use um estado volátil (como HP atual) para derivar um limite máximo. Mantenha `hp` e `maxHp` como campos distintos e independentes no store.
+- **Normalização de Chaves:** Ao fazer lookups em mapas (ex: `CLASS_HIT_DIE`), sempre normalize a chave para lowercase para evitar falhas silenciosas de dados vindos da API ou input do usuário.
+- **Unicidade na UI:** Para seleções exclusivas (Standard Array), a UI deve refletir o estado global. Desabilitar opções `isUsed` nos dropdowns é mais claro para o usuário do que validações de erro após a escolha.
+- **Cálculo de HP de Nível 1:** O HP inicial deve ser explicitamente calculado na finalização (`CreatorPage.tsx`) somando o valor máximo do dado da classe + modificador de CON (incluindo bônus de background).
+
+### Escalabilidade de Regras e Level Up (2026-05-12)
+
+**Problemas corrigidos:**
+1. **Falha na Subclasse de Guerreiro:** O sistema não oferecia escolha de subclasse para Fighter no Nível 3, pois o parser dependia de nomes específicos (ex: "Path") e ignorou o nome genérico "Fighter Subclass".
+2. **Expertise e Fighting Styles:** Habilidades que exigem seleções complexas (como Expertise de Ladino ou Estilos de Luta) estavam sendo tratadas como habilidades passivas simples.
+
+**Lições aprendidas:**
+- **Generalização Total:** Nunca confie apenas em strings de nomes para decisões de regras. Use o nível (`level === 3`) e categorias estruturais do catálogo como gatilhos primários para escolhas universais (como Subclasse).
+- **Mapeamento de Metadados via Backend:** Em sistemas "Data-Driven", o backend deve traduzir as inconsistências do dataset (ex: "Fighter Subclass" vs "Martial Archetype") em tipos de escolhas padronizados (`subclass`, `expertise`, `feat`) para o frontend.
+- **Validação Cruzada:** Ao implementar uma feature "universal", valide-a em classes com nomenclaturas e progressões diferentes (ex: Fighter vs Rogue vs Wizard) para garantir que o parser cubra todas as variações semânticas.
+- **Tratamento de Já Possuídos:** Perícias ganhas via Level Up devem ser validadas contra o estado atual da ficha para evitar duplicidade, marcando-as como "Já possui" na UI.
+
+**Mapeamento de Dados de Vida (Hit Die):**
+- **D12:** Barbarian
+- **D10:** Fighter, Paladin, Ranger
+- **D8:** Bard, Cleric, Druid, Monk, Rogue, Warlock
+- **D6:** Sorcerer, Wizard
+
+---
 
 ## Unificação Total para Tailwind CSS (2026-05-12)
-
 **Status:** ✅ CONCLUÍDO - 100% do app migrado para Tailwind.
 
 **O que foi feito:**
@@ -339,3 +391,68 @@ Quando o backend esta indisponivel:
 - **CamelCase no JS:** Usar camelCase nas classes CSS torna o acesso no React muito mais natural (`styles.myClass`) e limpo do que a sintaxe de colchetes (`styles['my-class']`).
 - **Migração em Massa:** O uso de subagentes para processar grandes volumes de CSS e componentes é extremamente eficiente, mas exige uma revisão cuidadosa em componentes que compartilham classes globais intencionalmente.
 - **Preparação para Tailwind:** Organizar o CSS em módulos facilita uma futura migração para Tailwind ou outras ferramentas de utilitários, pois o escopo de cada componente já está bem definido.
+
+## Persistência de Dados ao Trocar de Personagem (2026-05-15)
+
+**Status:** ✅ CONCLUÍDO - Corrigida a perda de magias e escolhas de background ao carregar fichas.
+
+**Problema:**
+Ao trocar de personagem através do `CharacterMenu`, campos específicos como `bgSpellChoices` (escolhas de magias do background) e `spellSlots` (estado atual dos slots) eram perdidos. Isso ocorria porque a ação `setCharacter` no store do Zustand não mapeava explicitamente esses campos do registro vindo do backend para o estado local, resultando em valores resetados para o padrão vazio.
+
+**O que foi feito:**
+1. Atualizada a ação `setCharacter` em `useCharacterStore.ts` para incluir o mapeamento de `bgSpellChoices` e `spellSlots`.
+2. **Correção Crítica no Backend:** Refatorado o método `update` (e `create`) em `CharactersStorageService.service.ts` para utilizar o operador *spread* (`...dto`), garantindo que campos como `spells`, `features` e outros dados dinâmicos não sejam descartados durante o salvamento.
+3. Adicionado um botão "SALVAR FICHA ATUAL" no `CharacterMenu.tsx` para permitir que o usuário persista mudanças feitas na ficha antes de trocar de personagem.
+4. Validada a persistência total através de testes automatizados E2E com Playwright.
+
+**Lição aprendida:**
+- **Mapeamento Explícito:** Ao trabalhar com uma estrutura de dados complexa como a ficha de personagem, qualquer novo campo adicionado ao tipo `Character` deve ser revisado em três lugares: tipagem (`character.ts`), mapeamento de carga (`setCharacter`) e mapeamento de salvamento (`CreatorPage.tsx` ou similar).
+- **Feedback de Sincronização:** Prover um botão de salvamento explícito no menu de navegação melhora a confiança do usuário de que suas alterações não serão perdidas ao navegar entre múltiplas fichas.
+
+## Detecção de Recursos e Multiplicadores (2026-05-15)
+
+**Status:** ✅ CORRIGIDO - Sistema de detecção de usos de habilidades refinado.
+
+**Problema:**
+Habilidades como 'Healing Hands' do Aasimar exibiam 2 usos em vez de 1. A causa era um falso positivo na detecção de 'proficiency' no texto descritivo. O parser identificava a palavra 'proficiency' (usada para descrever o efeito, ex: 'd4s iguais ao bônus de proficiência') e assumia que o *número de usos* era igual à proficiência, em vez de respeitar a cláusula 'Once you use this trait' (uma vez).
+
+**O que foi feito:**
+1. Atualizada a lógica em `data-parser.ts` (`parseResourceInfo`) para priorizar a detecção de 'once' (uma vez) e 'twice' (duas vezes) antes de checar por escalonamento de proficiência.
+2. Invertida a ordem de precedência: se o texto contém 'once you use this', o limite é fixado em 1 uso, mesmo que o termo 'proficiency' apareça no restante da descrição.
+
+**Lição aprendida:**
+- **Precedência de Regras:** No D&D 2024, palavras de efeito (como proficiência) aparecem frequentemente em descrições de dano ou cura. A detecção de recursos deve sempre priorizar frases que definem a *quantidade de ativações* (Once, Twice, Proficiency times) de forma hierárquica, do mais específico para o mais genérico.
+- **Falsos Positivos:** Evite regex gananciosas. Se uma habilidade diz 'uma vez por descanso longo', esse é o limite canônico, independentemente de qualquer escalonamento numérico mencionado no efeito da habilidade.
+
+## Sincronização de Magias concedidas por Habilidades (2026-05-15)
+
+**Status:** ✅ CONCLUÍDO - Magias de raça e talentos agora aparecem automaticamente na ficha.
+
+**Problema:**
+Habilidades como 'Light Bearer' do Aasimar concedem magias (ex: `Light`), mas estas não apareciam na aba de magias da ficha. O sistema esperava que magias fossem adicionadas manualmente ou via seletor de classe/talento.
+
+**O que foi feito:**
+1. Implementada a função `extractSpells` em `data-parser.ts` que identifica magias em textos descritivos usando tags do 5etools (`{@spell Name}`).
+2. Atualizada a ação `setFeaturesByKind` no store para realizar o "auto-discovery" de magias sempre que novas habilidades são adicionadas à raça ou classe.
+3. Adicionado suporte para detectar limites de uso nestas magias (ex: "cast once without a spell slot") usando o parser de recursos existente.
+4. Integrado o catálogo completo de magias no store para permitir a hidratação correta dos dados da magia descoberta.
+
+**Lição aprendida:**
+- **Dados Relacionados:** Em sistemas de RPG, uma entidade (Habilidade) frequentemente aponta para outra (Magia). O sistema deve ser capaz de seguir essas referências automaticamente para garantir a completude da ficha.
+- **Centralização de Sync:** Realizar a sincronização no momento em que as habilidades são definidas (`setFeaturesByKind`) garante que a aba de magias esteja sempre atualizada, independentemente de como a habilidade foi adquirida (Builder ou Level Up).
+
+## Filtro de Habilidades por Nível (2026-05-15)
+
+**Status:** ✅ CONCLUÍDO - Habilidades de raça agora respeitam o nível do personagem.
+
+**Problema:**
+Traços raciais que só são desbloqueados em níveis superiores (ex: 'Celestial Revelation' do Aasimar no nível 3) apareciam na ficha desde o nível 1. Como o JSON do 5etools embutia essa restrição no texto e não em metadados, o sistema não conseguia filtrar automaticamente.
+
+**O que foi feito:**
+1. Implementada detecção inteligente via Regex na ação `setFeaturesByKind` do store.
+2. O sistema agora varre a descrição das habilidades em busca de padrões como 'reach character level X' ou 'At level X'.
+3. Se uma habilidade exige um nível superior ao atual do personagem, ela é ocultada da ficha.
+
+**Lição aprendida:**
+- **Parsing de Texto como Regra:** Quando a estrutura de dados não é granular o suficiente, o texto descritivo torna-se a 'fonte da verdade'. Regex robustas são essenciais para extrair mecânicas de jogo de descrições narrativas.
+- **Progressão Natural:** Ocultar recursos futuros evita confusão na UI e mantém o foco do jogador no que ele pode realmente usar no momento.

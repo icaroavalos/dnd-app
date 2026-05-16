@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Character, AbilityScores as AbilityScoresType, Feature, Choice, BackgroundChoices } from '../types/character';
-import { getLevelUpOptions, getItems } from '../api/catalog-api';
-import { parse5eEntry, parseResourceInfo } from '../lib/data-parser';
+import { getLevelUpOptions, getItems, getSpells } from '../api/catalog-api';
+import { parse5eEntry, parseResourceInfo, extractSpells } from '../lib/data-parser';
 import { deriveResourcesFromFeatures } from '../lib/feature-resources';
 
 interface PendingLevelUp {
@@ -17,9 +17,11 @@ interface CharacterState {
   activeCharacterId: string | null;
   pendingLevelUp: PendingLevelUp | null;
   itemsCatalog: any[];
+  spellsCatalog: any[];
 
   // Actions
   fetchItemsCatalog: () => Promise<void>;
+  fetchSpellsCatalog: () => Promise<void>;
   setCharacter: (character: Character) => void;
   setActiveCharacterId: (id: string | null) => void;
   updateCharacter: (updates: Partial<Character>) => void;
@@ -116,6 +118,7 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
   activeCharacterId: null,
   pendingLevelUp: null,
   itemsCatalog: [],
+  spellsCatalog: [],
 
   fetchItemsCatalog: async () => {
     try {
@@ -123,6 +126,15 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
       set({ itemsCatalog: res.results || [] });
     } catch (err) {
       console.error('Failed to load items catalog in store:', err);
+    }
+  },
+
+  fetchSpellsCatalog: async () => {
+    try {
+      const res = await getSpells();
+      set({ spellsCatalog: res.results || [] });
+    } catch (err) {
+      console.error('Failed to load spells catalog in store:', err);
     }
   },
 
@@ -193,7 +205,9 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
             hitDiceUsed: canonical.state?.hitDiceUsed || canonical.hitDiceUsed || 0,
             creationComplete: canonical.creationComplete !== undefined ? canonical.creationComplete : true,
             backgroundChoices: backgroundChoices,
-            bgChoices: bgChoices
+            bgChoices: bgChoices,
+            bgSpellChoices: canonical.bgSpellChoices || {},
+            spellSlots: canonical.spellSlots || {}
           }
         };
       }
@@ -344,10 +358,59 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
   setFeaturesByKind: (kind, features) =>
     set((state) => {
       const otherFeatures = state.character.features.filter(f => f.kind !== kind);
+      
+      // Filter features based on character level requirements in description
+      const charLevel = state.character.level || 1;
+      const levelFilteredFeatures = features.filter(feat => {
+        if (!feat.description) return true;
+        
+        // Match patterns like "At level 3", "When you reach 3rd level", "reach character level 3"
+        const levelMatch = feat.description.match(/(?:at|reach(?:\s+character)?)\s+level\s+(\d+)|(\d+)(?:st|nd|rd|th)\s+level/i);
+        if (levelMatch) {
+          const requiredLevel = parseInt(levelMatch[1] || levelMatch[2]);
+          return charLevel >= requiredLevel;
+        }
+        return true;
+      });
+
+      const allFeatures = [...otherFeatures, ...levelFilteredFeatures];
+      
+      // Auto-discover spells from descriptions (e.g. Aasimar's Light Bearer)
+      const spellsCatalog = state.spellsCatalog || [];
+      const currentSpellNames = new Set(state.character.spells.map(s => s.name.toLowerCase()));
+      const newSpells: any[] = [];
+      const profBonus = Math.ceil((state.character.level || 1) / 4) + 1;
+
+      for (const feat of allFeatures) {
+        if (!feat.description) continue;
+        const foundSpellNames = extractSpells(feat.description);
+        
+        for (const name of foundSpellNames) {
+          if (!currentSpellNames.has(name.toLowerCase())) {
+             const spell = spellsCatalog.find(s => s.name.toLowerCase() === name.toLowerCase());
+             if (spell) {
+               const isCantrip = spell.level === 0 || spell.level === '0';
+               // Try to detect if this specific spell cast has a limit mentioned in the feature
+               const resource = isCantrip ? undefined : parseResourceInfo(feat.description, state.character, { proficiencyBonus: profBonus, modifiers: {} });
+
+               newSpells.push({
+                 ...spell,
+                 id: spell.id || spell.name.toLowerCase().replace(/\s+/g, '-'),
+                 description: parse5eEntry(spell),
+                 source: 'feat-auto',
+                 resource: resource ? { ...resource, id: `spell-res-${spell.name.toLowerCase()}` } : undefined
+               });
+               currentSpellNames.add(name.toLowerCase());
+             }
+          }
+        }
+      }
+
       return {
         character: {
           ...state.character,
-          features: [...otherFeatures, ...features]
+          features: allFeatures,
+          spells: [...state.character.spells, ...newSpells]
         }
       };
     }),
@@ -567,7 +630,19 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
             return { ...f, resource: { ...f.resource, remaining: f.resource.max } };
           }
           return f;
-        })
+        }),
+        spells: state.character.spells.map(s => {
+          if (s.resource) {
+            return { ...s, resource: { ...s.resource, remaining: s.resource.max } };
+          }
+          return s;
+        }),
+        spellSlots: Object.fromEntries(
+          Object.entries(state.character.spellSlots || {}).map(([level, slots]) => [
+            level,
+            { ...slots, used: 0 }
+          ])
+        )
       }
     })),
 
