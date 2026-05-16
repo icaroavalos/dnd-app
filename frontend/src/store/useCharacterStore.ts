@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import type { Character, AbilityScores as AbilityScoresType, Feature, Choice } from '../types/character';
-import { getFeatures, getItems } from '../api/catalog-api';
-import { parse5eEntry } from '../lib/data-parser';
+import type { Character, AbilityScores as AbilityScoresType, Feature, Choice, BackgroundChoices } from '../types/character';
+import { getLevelUpOptions, getItems } from '../api/catalog-api';
+import { parse5eEntry, parseResourceInfo } from '../lib/data-parser';
+import { deriveResourcesFromFeatures } from '../lib/feature-resources';
 
 interface PendingLevelUp {
   nextLevel: number;
@@ -12,11 +13,13 @@ interface PendingLevelUp {
 }
 
 interface CharacterState {
-  character: Character;
+  character: Character & { classes?: Array<{ classId: string; level: number }> };
   activeCharacterId: string | null;
   pendingLevelUp: PendingLevelUp | null;
-  
+  itemsCatalog: any[];
+
   // Actions
+  fetchItemsCatalog: () => Promise<void>;
   setCharacter: (character: Character) => void;
   setActiveCharacterId: (id: string | null) => void;
   updateCharacter: (updates: Partial<Character>) => void;
@@ -28,16 +31,16 @@ interface CharacterState {
   spendHitDie: (roll: number) => void;
   addSpell: (spell: any) => void;
   removeSpell: (spellId: string) => void;
-  toggleSkillProficiency: (skill: string) => void;
-  useFeatureResource: (featureId: string) => void;
+  toggleSkillProficiency: (skill: string, isClassChoice?: boolean) => void;
+  consumeFeatureResource: (featureId: string) => void;
   setFeaturesByKind: (kind: Feature['kind'], features: Feature[]) => void;
-  
+
   // Level Up Actions
   initiateLevelUp: () => Promise<void>;
   cancelLevelUp: () => void;
   updateLevelUpSelection: (choiceId: string, selection: string[]) => void;
   finalizeLevelUp: () => void;
-  
+
   levelUp: () => Promise<void>; // Legacy/internal
   resetLevel: () => void;
   resolveChoice: (choiceId: string, selection: string[]) => void;
@@ -61,26 +64,16 @@ const createDefaultCharacter = (): Character => ({
   equipmentChoices: {},
   inventory: [],
   equippedItems: [],
-  hitDiceUsed: 0,
-  spellSlots: {
-    1: { max: 0, used: 0 },
-    2: { max: 0, used: 0 },
-    3: { max: 0, used: 0 },
-    4: { max: 0, used: 0 },
-    5: { max: 0, used: 0 },
-    6: { max: 0, used: 0 },
-    7: { max: 0, used: 0 },
-    8: { max: 0, used: 0 },
-    9: { max: 0, used: 0 },
-  },
+  spellSlots: {},
   resources: {},
-  tempHp: 0,
   creationComplete: false,
   hp: 0,
   maxHp: 0,
+  tempHp: 0,
+  hitDiceUsed: 0,
   armorClass: 10,
   speed: 30,
-  abilities: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+  abilities: { str: null, dex: null, con: null, int: null, wis: null, cha: null },
   savingThrows: [],
   classSkillChoices: [],
   skillProficiencies: [],
@@ -92,33 +85,164 @@ const createDefaultCharacter = (): Character => ({
   backgroundChoices: {
     backgroundId: '',
     abilityAssignments: {}
+  },
+  bgChoices: {
+    abilityIncrement: null as '2_1' | '1_1_1' | null,
+    abilityScores: [] as string[],
+    spellcastingAbility: null as string | null,
+    equipmentChoice: null as 'A' | 'B' | null,
+    skillChoices: [] as string[],
+    skillCollisions: [] as string[]
   }
 });
+
+export const CLASS_HIT_DIE: Record<string, number> = {
+  'barbarian': 12,
+  'fighter': 10,
+  'paladin': 10,
+  'ranger': 10,
+  'bard': 8,
+  'cleric': 8,
+  'druid': 8,
+  'monk': 8,
+  'rogue': 8,
+  'warlock': 8,
+  'sorcerer': 6,
+  'wizard': 6
+};
 
 export const useCharacterStore = create<CharacterState>((set, get) => ({
   character: createDefaultCharacter(),
   activeCharacterId: null,
   pendingLevelUp: null,
+  itemsCatalog: [],
 
-  setCharacter: (character) => set({ character }),
-  
+  fetchItemsCatalog: async () => {
+    try {
+      const res = await getItems();
+      set({ itemsCatalog: res.results || [] });
+    } catch (err) {
+      console.error('Failed to load items catalog in store:', err);
+    }
+  },
+
+  setCharacter: (record: any) =>
+    set((state) => {
+      // Deeply extract the canonical record if available
+      let canonical = record;
+      if (record.recordJson && record.recordJson !== '{}') {
+        try {
+          canonical = JSON.parse(record.recordJson);
+        } catch (e) {
+          console.error('Failed to parse recordJson:', e);
+        }
+      }
+
+      // If it's a backend record, map it to the frontend Character type
+      if (canonical.ruleset || canonical.classes) {
+        const primaryClass = canonical.classes?.[0];
+        const backgroundChoices = canonical.backgroundChoices || {
+          backgroundId: canonical.backgroundId || '',
+          abilityAssignments: {}
+        };
+
+        const bgChoices: BackgroundChoices = canonical.bgChoices || {
+          abilityIncrement: null,
+          abilityScores: [],
+          spellcastingAbility: null,
+          equipmentChoice: null,
+          skillChoices: [],
+          skillCollisions: []
+        };
+
+        const rawClass = primaryClass?.name || primaryClass?.classId || canonical.primaryClass || '';
+        const normalizedClass = rawClass.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+        return {
+          character: {
+            ...createDefaultCharacter(),
+            ...canonical,
+            id: canonical.id || record.id,
+            name: canonical.name,
+            class: normalizedClass,
+            level: primaryClass?.level || canonical.level || 1,
+            classes: canonical.classes || [{ classId: rawClass, level: canonical.level || 1 }],
+            race: canonical.race || canonical.lineageName || canonical.lineageId || '',
+            subrace: canonical.subrace || '',
+            background: canonical.background || canonical.backgroundName || canonical.backgroundId || '',
+            alignment: canonical.alignment || 'Neutral',
+            abilities: canonical.abilities || { str: null, dex: null, con: null, int: null, wis: null, cha: null },
+            skillProficiencies: (canonical.skillProficiencies || []).map((s: string) =>
+              s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+            ),
+            savingThrows: canonical.savingThrowProficiencies || canonical.savingThrows || [],
+            inventory: canonical.inventory || [],
+            resources: Object.keys(canonical.resources || {}).length > 0
+              ? canonical.resources
+              : deriveResourcesFromFeatures(canonical.features || []),
+            spells: canonical.spells || [],
+            features: canonical.features || [],
+            attacks: canonical.attacks || [],
+            equippedItems: canonical.equippedItems || [],
+            classFeatureChoices: canonical.classFeatureChoices || {},
+            asiChoices: canonical.asiChoices || {},
+            equipmentChoices: canonical.equipmentChoices || {},
+            hp: canonical.state?.hp || canonical.hp || 10,
+            maxHp: canonical.state?.maxHpOverride || canonical.maxHp || 10,
+            tempHp: canonical.state?.tempHp || canonical.tempHp || 0,
+            hitDiceUsed: canonical.state?.hitDiceUsed || canonical.hitDiceUsed || 0,
+            creationComplete: canonical.creationComplete !== undefined ? canonical.creationComplete : true,
+            backgroundChoices: backgroundChoices,
+            bgChoices: bgChoices
+          }
+        };
+      }
+
+      return { character: { ...state.character, ...canonical } };
+    }),
+
   setActiveCharacterId: (id) => set({ activeCharacterId: id }),
 
-  updateCharacter: (updates) => 
+  updateCharacter: (updates) =>
     set((state) => ({
       character: { ...state.character, ...updates }
     })),
 
   updateAbility: (ability, value) =>
-    set((state) => ({
-      character: {
-        ...state.character,
-        abilities: {
-          ...state.character.abilities,
-          [ability]: value
+    set((state) => {
+      const nextAbilities = {
+        ...state.character.abilities,
+        [ability]: value
+      };
+
+      // Retroactive HP calculation for Constitution changes
+      let nextMaxHp = state.character.maxHp;
+      let nextHp = state.character.hp;
+
+      if (ability === 'con') {
+        const oldBase = state.character.abilities.con || 10;
+        const bonus = state.character.backgroundChoices?.abilityAssignments?.con || 0;
+        const oldMod = Math.floor((oldBase + bonus - 10) / 2);
+
+        const newMod = Math.floor(((value || 10) + bonus - 10) / 2);
+        const modDiff = newMod - oldMod;
+
+        if (modDiff !== 0) {
+          const hpAdjustment = modDiff * state.character.level;
+          nextMaxHp = state.character.maxHp + hpAdjustment;
+          nextHp = state.character.hp + hpAdjustment;
         }
       }
-    })),
+
+      return {
+        character: {
+          ...state.character,
+          abilities: nextAbilities,
+          maxHp: nextMaxHp,
+          hp: nextHp
+        }
+      };
+    }),
 
   setHp: (hp) =>
     set((state) => ({
@@ -126,64 +250,43 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
     })),
 
   applyDamage: (amount) =>
-    set((state) => {
-      let remainingDamage = amount;
-      let currentTempHp = state.character.tempHp || 0;
-      let currentHp = state.character.hp || 0;
-
-      if (currentTempHp > 0) {
-        const absorbed = Math.min(currentTempHp, remainingDamage);
-        currentTempHp -= absorbed;
-        remainingDamage -= absorbed;
+    set((state) => ({
+      character: {
+        ...state.character,
+        hp: Math.max(0, state.character.hp - amount)
       }
-
-      currentHp = Math.max(0, currentHp - remainingDamage);
-
-      return {
-        character: { ...state.character, hp: currentHp, tempHp: currentTempHp }
-      };
-    }),
+    })),
 
   applyHealing: (amount) =>
-    set((state) => {
-      const max = state.character.maxHp || 10;
-      const nextHp = Math.min(max, (state.character.hp || 0) + amount);
-      return {
-        character: { ...state.character, hp: nextHp }
-      };
-    }),
+    set((state) => ({
+      character: {
+        ...state.character,
+        hp: Math.min(state.character.maxHp, state.character.hp + amount)
+      }
+    })),
 
   applyTempHp: (amount) =>
-    set((state) => {
-      const nextTempHp = Math.max(state.character.tempHp || 0, amount);
-      return {
-        character: { ...state.character, tempHp: nextTempHp }
-      };
-    }),
+    set((state) => ({
+      character: {
+        ...state.character,
+        tempHp: Math.max(state.character.tempHp, amount)
+      }
+    })),
 
   spendHitDie: (roll) =>
-    set((state) => {
-      if (state.character.hitDiceUsed >= state.character.level) return state;
-      
-      const max = state.character.maxHp || 10;
-      const nextHp = Math.min(max, (state.character.hp || 0) + roll);
-      
-      return {
-        character: { 
-          ...state.character, 
-          hp: nextHp, 
-          hitDiceUsed: state.character.hitDiceUsed + 1 
-        }
-      };
-    }),
+    set((state) => ({
+      character: {
+        ...state.character,
+        hitDiceUsed: state.character.hitDiceUsed + 1,
+        hp: Math.min(state.character.maxHp, state.character.hp + roll)
+      }
+    })),
 
   addSpell: (spell) =>
     set((state) => ({
       character: {
         ...state.character,
-        spells: state.character.spells.some(s => s.id === (spell.id || spell.name)) 
-          ? state.character.spells 
-          : [...state.character.spells, spell]
+        spells: [...state.character.spells, spell]
       }
     })),
 
@@ -191,142 +294,114 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
     set((state) => ({
       character: {
         ...state.character,
-        spells: state.character.spells.filter((s) => (s.id || s.name) !== spellId)
+        spells: state.character.spells.filter(s => (s.id || s.name) !== spellId)
       }
     })),
 
-  toggleSkillProficiency: (skill) =>
+  toggleSkillProficiency: (skill, isClassChoice) =>
     set((state) => {
       const current = state.character.skillProficiencies;
-      const next = current.includes(skill)
-        ? current.filter((s) => s !== skill)
+      const isProficient = current.includes(skill);
+      let next = isProficient
+        ? current.filter(s => s !== skill)
         : [...current, skill];
+
+      let nextClassChoices = state.character.classSkillChoices || [];
+      if (isClassChoice) {
+        if (isProficient) {
+           nextClassChoices = nextClassChoices.filter(s => s !== skill);
+        } else {
+           nextClassChoices = [...nextClassChoices, skill];
+        }
+      }
+
       return {
-        character: { ...state.character, skillProficiencies: next }
+        character: {
+          ...state.character,
+          skillProficiencies: next,
+          classSkillChoices: nextClassChoices
+        }
       };
     }),
 
-  useFeatureResource: (featureId) =>
-    set((state) => ({
-      character: {
-        ...state.character,
-        features: state.character.features.map(f => {
-          if (f.id === featureId && f.resource && f.resource.remaining > 0) {
-            return {
-              ...f,
-              resource: { ...f.resource, remaining: f.resource.remaining - 1 }
-            };
-          }
-          return f;
-        })
-      }
-    })),
+  consumeFeatureResource: (featureId) =>
+    set((state) => {
+      const features = state.character.features.map(f => {
+        if (f.id === featureId && f.resource) {
+          return {
+            ...f,
+            resource: {
+              ...f.resource,
+              remaining: Math.max(0, f.resource.remaining - 1)
+            }
+          };
+        }
+        return f;
+      });
+      return { character: { ...state.character, features } };
+    }),
 
   setFeaturesByKind: (kind, features) =>
-    set((state) => ({
-      character: {
-        ...state.character,
-        features: [
-          ...state.character.features.filter(f => f.kind !== kind),
-          ...features
-        ]
-      }
-    })),
+    set((state) => {
+      const otherFeatures = state.character.features.filter(f => f.kind !== kind);
+      return {
+        character: {
+          ...state.character,
+          features: [...otherFeatures, ...features]
+        }
+      };
+    }),
 
   initiateLevelUp: async () => {
     const { character } = get();
-    if (character.level >= 20) return;
-
+    const primaryClass = character.class;
     const nextLevel = character.level + 1;
-    const assignments = character.backgroundChoices?.abilityAssignments || {};
-    const effectiveCon = (character.abilities.con || 10) + (assignments.con || 0);
-    const conMod = Math.floor((effectiveCon - 10) / 2);
-    
-    const dieSize = character.class.toLowerCase().includes('barbarian') ? 12 : 8;
-    const hpGain = Math.floor(dieSize / 2) + 1 + conMod;
 
     try {
-      const featuresData = await getFeatures();
-      const itemsData = await getItems();
-      
-      const newFeaturesRaw = (featuresData.results || []).filter(f => 
-        f.className?.toLowerCase() === character.class.toLowerCase() && 
-        Number(f.level) === nextLevel
-      );
+      const options = await getLevelUpOptions(primaryClass, nextLevel);
 
-      const newFeatures: Feature[] = newFeaturesRaw.map(f => ({
+      // Calculate HP gain including Constitution modifier
+      const conBase = character.abilities.con || 10;
+      const conBonus = character.backgroundChoices?.abilityAssignments?.con || 0;
+      const conMod = Math.floor((conBase + conBonus - 10) / 2);
+
+      const dieSize = CLASS_HIT_DIE[primaryClass.toLowerCase()] || 8;
+      const hpGain = Math.floor(dieSize / 2) + 1 + conMod;
+
+      const newFeatures = (options.features || []).map((f: any) => ({
         id: f.id || `${f.name}-${nextLevel}`.toLowerCase().replace(/\s+/g, '-'),
         name: f.name,
         kind: 'class',
-        level: nextLevel,
         description: parse5eEntry(f.entries || f.description),
-        meta: f.source
+        meta: f.source,
+        subclassShortName: f.subclassShortName
       }));
 
-      const newChoices: Choice[] = [];
-      newFeatures.forEach(feat => {
-        const nameLower = feat.name.toLowerCase();
-        if (nameLower === "weapon mastery") {
-           const options = itemsData.results.filter(i => {
-             const type = i.type?.split('|')[0] || '';
-             return type === 'M' || type === 'R';
-           }).map(i => i.name);
-           
-           newChoices.push({
-             id: `choice-${feat.id}-${Date.now()}`,
-             featureId: feat.id,
-             name: feat.name,
-             count: 1, 
-             options: Array.from(new Set(options)).sort(),
-             type: 'weapon'
-           });
-        }
-        
-        if (nameLower === "primal knowledge") {
-           newChoices.push({
-             id: `choice-${feat.id}-${Date.now()}`,
-             featureId: feat.id,
-             name: "Primal Knowledge: Additional Skill",
-             count: 1,
-             options: ["Animal Handling", "Athletics", "Intimidation", "Nature", "Perception", "Survival"],
-             type: 'generic'
-           });
-        }
+      const choices = (options.choices || []).map((c: any) => {
+        if (c.type === 'expertise') {
+          // Double expertise: remove existing expertise from options
+          const existingExpertise = character.features
+            .filter(f => f.name === 'Expertise')
+            .flatMap(f => f.description.match(/[A-Z][a-z]+/g) || []);
 
-        if (nextLevel === 3 && (nameLower.includes("subclass") || nameLower.includes("path") || nameLower.includes("circle"))) {
-           newChoices.push({
-             id: `choice-${feat.id}-${Date.now()}`,
-             featureId: feat.id,
-             name: `Choose your ${character.class} Subclass`,
-             count: 1,
-             options: ["Path of the Berserker", "Path of the Wild Heart", "Path of the World Tree", "Path of the Zealot"],
-             type: 'subclass'
-           });
+          const available = character.skillProficiencies.filter(s => !existingExpertise.includes(s));
+
+          return { ...c, options: available.sort() };
         }
-        
-        if (nameLower.includes("ability score improvement")) {
-          newChoices.push({
-            id: `choice-${feat.id}-${Date.now()}`,
-            featureId: feat.id,
-            name: "Ability Score Improvement / Feat",
-            count: 2,
-            options: ['str', 'dex', 'con', 'int', 'wis', 'cha'],
-            type: 'asi'
-          });
-        }
+        return c;
       });
 
-      set({ 
+      set({
         pendingLevelUp: {
           nextLevel,
           hpGain,
           newFeatures,
-          choices: newChoices,
+          choices,
           selections: {}
         }
       });
     } catch (err) {
-      console.error('Failed to initiate level up:', err);
+      console.error('Level up failed:', err);
     }
   },
 
@@ -349,122 +424,132 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
   finalizeLevelUp: () =>
     set((state) => {
       if (!state.pendingLevelUp) return state;
-      const { nextLevel, hpGain, newFeatures, selections, choices } = state.pendingLevelUp;
-      
-      const nextFeatureChoices = { ...state.character.classFeatureChoices };
-      const nextAbilities = { ...state.character.abilities };
-      let nextSkillProficiencies = [...state.character.skillProficiencies];
 
-      // Apply all selections made in the modal
-      Object.entries(selections).forEach(([choiceId, selection]) => {
-        const choice = choices.find(c => c.id === choiceId);
-        if (!choice) return;
+      const { nextLevel, hpGain, newFeatures, selections } = state.pendingLevelUp;
 
-        nextFeatureChoices[choice.featureId] = [
-          ...(nextFeatureChoices[choice.featureId] || []),
-          ...selection
-        ];
+      // Filter features by subclass choice if applicable
+      const selectedSubclassChoice = Object.entries(selections).find(([id]) => id.startsWith('subclass-'));
+      const selectedSubclassLabel = selectedSubclassChoice?.[1]?.[0];
 
-        if (choice.type === 'asi') {
-          selection.forEach(abil => {
-            const key = abil.toLowerCase() as keyof AbilityScoresType;
-            nextAbilities[key] = (nextAbilities[key] || 10) + 1;
-          });
+      // Expanded subclass map
+      const SUBCLASS_MAP: Record<string, string> = {
+        'Path of the Berserker': 'Berserker',
+        'Path of the Wild Heart': 'Wild Heart',
+        'Path of the World Tree': 'World Tree',
+        'Path of the Zealot': 'Zealot',
+        'College of Lore': 'Lore',
+        'College of Valor': 'Valor',
+        'College of Glamour': 'Glamour',
+        'Oath of Devotion': 'Devotion',
+        'Oath of Ancients': 'Ancients',
+        'Oath of Vengeance': 'Vengeance',
+        'Life Domain': 'Life',
+        'Light Domain': 'Light',
+        'Trickery Domain': 'Light'
+      };
+
+      const selectedSubclassShort = selectedSubclassLabel ? SUBCLASS_MAP[selectedSubclassLabel] : null;
+
+      const profBonus = Math.ceil(nextLevel / 4) + 1;
+
+      // Refresh resource limits for existing features
+      const updatedExistingFeatures = state.character.features.map(f => {
+        const resource = parseResourceInfo(f.description, { ...state.character, level: nextLevel }, { proficiencyBonus: profBonus, modifiers: {} });
+        if (resource) {
+           resource.id = f.resource?.id || f.id;
+           const maxDiff = resource.max - (f.resource?.max || 0);
+           resource.remaining = (f.resource?.remaining || 0) + maxDiff;
+           return { ...f, resource };
         }
+        return f;
+      });
 
-        if (choice.type === 'generic' && choice.name.includes("Skill")) {
-          nextSkillProficiencies = Array.from(new Set([...nextSkillProficiencies, ...selection]));
-        }
+      const filteredFeatures = newFeatures.filter(f => {
+        if (!f.subclassShortName) return true;
+        return f.subclassShortName === selectedSubclassShort;
+      }).map(f => {
+        // Auto-detect resources for new features
+        const resource = parseResourceInfo(f.description, { ...state.character, level: nextLevel }, { proficiencyBonus: profBonus, modifiers: {} });
+        if (resource) resource.id = f.id;
+        return { ...f, resource };
       });
 
       return {
         character: {
           ...state.character,
           level: nextLevel,
-          maxHp: (state.character.maxHp || 10) + hpGain,
-          hp: (state.character.hp || 0) + hpGain,
-          features: [...state.character.features, ...newFeatures],
-          classFeatureChoices: nextFeatureChoices,
-          abilities: nextAbilities,
-          skillProficiencies: nextSkillProficiencies
+          maxHp: state.character.maxHp + hpGain,
+          hp: state.character.hp + hpGain,
+          features: [...updatedExistingFeatures, ...filteredFeatures],
+          classFeatureChoices: {
+            ...state.character.classFeatureChoices,
+            ...selections
+          }
         },
         pendingLevelUp: null
       };
     }),
 
   levelUp: async () => {
-    // Keep for potential internal use or simple leveling
-    const { initiateLevelUp } = get();
-    await initiateLevelUp();
+    // Legacy implementation - just increment level and HP
+    const { character } = get();
+    const hpGain = Math.floor(CLASS_HIT_DIE[character.class.toLowerCase()] / 2) + 1;
+
+    set((state) => ({
+      character: {
+        ...state.character,
+        level: state.character.level + 1,
+        maxHp: state.character.maxHp + hpGain,
+        hp: state.character.hp + hpGain
+      }
+    }));
   },
 
   resetLevel: () =>
-    set((state) => {
-      const baseFeatures = state.character.features.filter(f => !f.level || f.level === 1);
-      return {
-        character: {
-          ...state.character,
-          level: 1,
-          hp: state.character.maxHp || 10,
-          features: baseFeatures,
-          pendingChoices: [],
-          classFeatureChoices: {},
-          spells: state.character.spells.filter(s => s.source !== 'class-level')
-        }
-      };
-    }),
-
-  resolveChoice: (choiceId, selection) =>
-    set((state) => {
-      const choice = state.character.pendingChoices.find(c => c.id === choiceId);
-      if (!choice) return state;
-
-      const nextFeatureChoices = { ...state.character.classFeatureChoices };
-      nextFeatureChoices[choice.featureId] = [
-        ...(nextFeatureChoices[choice.featureId] || []),
-        ...selection
-      ];
-
-      let nextCharacter = {
+    set((state) => ({
+      character: {
         ...state.character,
-        classFeatureChoices: nextFeatureChoices,
+        level: 1,
+        hp: state.character.maxHp, // Simplified
+        features: state.character.features.filter(f => f.kind !== 'class')
+      }
+    })),
+
+  resolveChoice: (choiceId) =>
+    set((state) => ({
+      character: {
+        ...state.character,
         pendingChoices: state.character.pendingChoices.filter(c => c.id !== choiceId)
-      };
-
-      if (choice.type === 'asi') {
-        const nextAbilities = { ...nextCharacter.abilities };
-        selection.forEach(abil => {
-          const key = abil.toLowerCase() as keyof AbilityScoresType;
-          nextAbilities[key] = (nextAbilities[key] || 10) + 1;
-        });
-        nextCharacter.abilities = nextAbilities;
       }
-
-      if (choice.type === 'generic' && choice.name.includes("Skill")) {
-        nextCharacter.skillProficiencies = Array.from(new Set([...nextCharacter.skillProficiencies, ...selection]));
-      }
-
-      return { character: nextCharacter };
-    }),
+    })),
 
   applyShortRest: () =>
     set((state) => ({
       character: {
         ...state.character,
+        hitDiceUsed: Math.max(0, state.character.hitDiceUsed - Math.floor(state.character.level / 2)),
         features: state.character.features.map(f => {
-          if (f.resource) {
-            const label = f.resource.recoveryLabel?.toLowerCase() || '';
-            if (label.includes('short')) {
-              return { ...f, resource: { ...f.resource, remaining: f.resource.max } };
-            }
-            if (f.name.toLowerCase() === 'rage') {
-              return { 
-                ...f, 
-                resource: { ...f.resource, remaining: Math.min(f.resource.max, f.resource.remaining + 1) } 
-              };
-            }
-            return f;
+          if (!f.resource) return f;
+
+          const label = f.resource.recoveryLabel.toLowerCase();
+          const isShortRestFeature = label.includes('short') || label.includes('curto');
+
+          // Strategy: Increment (like 2024 Rage: +1 on Short Rest)
+          if (f.resource.recovery === 'inc') {
+            return {
+              ...f,
+              resource: {
+                ...f.resource,
+                remaining: Math.min(f.resource.max, f.resource.remaining + (f.resource.recoveryAmount || 1))
+              }
+            };
           }
+
+          // Strategy: Full (Default for most Short Rest features)
+          if (isShortRestFeature) {
+            return { ...f, resource: { ...f.resource, remaining: f.resource.max } };
+          }
+
           return f;
         })
       }
@@ -477,17 +562,17 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
         hp: maxHp,
         tempHp: 0,
         hitDiceUsed: 0,
-        features: state.character.features.map(f => 
-          f.resource ? { ...f, resource: { ...f.resource, remaining: f.resource.max } } : f
-        ),
-        spellSlots: Object.fromEntries(
-          Object.entries(state.character.spellSlots).map(([lvl, data]) => [lvl, { ...data, used: 0 }])
-        )
+        features: state.character.features.map(f => {
+          if (f.resource) {
+            return { ...f, resource: { ...f.resource, remaining: f.resource.max } };
+          }
+          return f;
+        })
       }
     })),
 
-  resetCharacter: () => set({ 
+  resetCharacter: () => set({
     character: createDefaultCharacter(),
-    activeCharacterId: null 
+    activeCharacterId: null
   }),
 }));

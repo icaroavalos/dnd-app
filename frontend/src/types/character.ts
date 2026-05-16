@@ -1,10 +1,10 @@
 export interface AbilityScores {
-  str: number;
-  dex: number;
-  con: number;
-  int: number;
-  wis: number;
-  cha: number;
+  str: number | null;
+  dex: number | null;
+  con: number | null;
+  int: number | null;
+  wis: number | null;
+  cha: number | null;
 }
 
 export interface Attack {
@@ -21,11 +21,14 @@ export interface Feature {
   description: string;
   meta?: string;
   level?: number;
+  subclassShortName?: string;
   resource?: {
     id: string;
     remaining: number;
     max: number;
     recoveryLabel: string;
+    recovery?: 'full' | 'inc'; // 'full' (default) resets to max, 'inc' adds recoveryAmount
+    recoveryAmount?: number;
   };
 }
 
@@ -36,6 +39,18 @@ export interface Choice {
   count: number;
   options: string[];
   type: 'weapon' | 'subclass' | 'feat' | 'asi' | 'generic';
+}
+
+export interface BackgroundChoices {
+  background?: string;
+  source?: string;
+  abilityIncrement: '2_1' | '1_1_1' | null;
+  abilityScores: string[];
+  spellcastingAbility: string | null;
+  equipmentChoice: 'A' | 'B' | null;
+  skillChoices: string[];
+  toolChoices?: string[];
+  skillCollisions: string[];
 }
 
 export interface Character {
@@ -73,6 +88,6 @@ export interface Character {
   pendingChoices: Choice[];
   notes: string;
   bgSpellChoices?: Record<string, string[]>;
-  bgChoices?: any;
+  bgChoices: BackgroundChoices;
   backgroundChoices?: any;
 }

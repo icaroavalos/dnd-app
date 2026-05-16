@@ -77,6 +77,14 @@ function recoverResourceState(
     return resourceState;
   }
 
+  const recoveryAmount = Number((resourceState as CharacterResourceState & { recoveryAmount?: number }).recoveryAmount);
+  if (recovery === 'short_rest' && recoveryAmount > 0) {
+    return {
+      ...resourceState,
+      current: Math.min(resourceState.max, resourceState.current + recoveryAmount)
+    };
+  }
+
   return {
     ...resourceState,
     current: resourceState.max

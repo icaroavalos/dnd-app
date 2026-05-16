@@ -23,6 +23,20 @@ const CANONICAL_RESOURCE_META: Record<string, Omit<ResourceActionMeta, 'recovery
     subtitle: 'Fighter Feature',
     actionKind: 'other',
     detail: 'You can push yourself beyond your normal limits for a moment.'
+  },
+  adrenaline_rush: {
+    id: 'adrenaline_rush',
+    name: 'Adrenaline Rush',
+    subtitle: 'Orc Trait',
+    actionKind: 'bonus',
+    detail: 'You can take the Dash action as a Bonus Action and gain Temporary Hit Points.'
+  },
+  relentless_endurance: {
+    id: 'relentless_endurance',
+    name: 'Relentless Endurance',
+    subtitle: 'Orc Trait',
+    actionKind: 'other',
+    detail: 'When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead.'
   }
 };
 
@@ -109,6 +123,7 @@ export function resolveResourceMeta(resourceId: string): ResourceActionMeta {
 export function resourceRecoveryLabel(resourceId: string): string {
   if (resourceId.startsWith('bgSpell:')) return 'Long Rest Resource';
   if (resourceId === 'second_wind') return 'Short Rest Resource';
+  if (resourceId === 'adrenaline_rush') return 'Short Rest Resource';
   return 'Limited Use Resource';
 }
 

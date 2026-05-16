@@ -43,6 +43,7 @@ export interface CharacterResourceState {
   current: number;
   max: number;
   recovery: RecoveryType;
+  recoveryAmount?: number;
 }
 
 export interface CharacterRuntimeState {
@@ -71,6 +72,7 @@ export interface CharacterRecord {
   spells?: string[];
   spellChoices: SpellChoiceState[];
   backgroundChoices?: BackgroundChoiceState | null;
+  features?: any[];
   resources: Record<string, CharacterResourceState>;
   state: CharacterRuntimeState;
 }
