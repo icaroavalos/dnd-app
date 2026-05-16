@@ -456,3 +456,17 @@ Traços raciais que só são desbloqueados em níveis superiores (ex: 'Celestial
 **Lição aprendida:**
 - **Parsing de Texto como Regra:** Quando a estrutura de dados não é granular o suficiente, o texto descritivo torna-se a 'fonte da verdade'. Regex robustas são essenciais para extrair mecânicas de jogo de descrições narrativas.
 - **Progressão Natural:** Ocultar recursos futuros evita confusão na UI e mantém o foco do jogador no que ele pode realmente usar no momento.
+
+## Sistema de Equipamento e Cálculo de CA (2026-05-15)
+
+**Status:** ✅ CONCLUÍDO - Itens agora podem ser equipados e influenciam a ficha.
+
+**O que foi feito:**
+1. **Botão Equipar Direto:** Adicionado um botão "EQUIPAR" visível diretamente na linha do item no inventário para armaduras, escudos e armas.
+2. **Cálculo de Classe de Armadura (CA):** Atualizado o hook `useDerivedState.ts` para calcular dinamicamente a CA baseada na armadura e escudo equipados, seguindo as regras de D&D 2024 (ex: Limite de bônus de Destreza para armaduras médias).
+3. **Integração com Ações:** Itens marcados como equipados em "Mão Principal" ou "Mão Secundária" são enviados ao backend, que agora gera automaticamente as ações de ataque correspondentes na aba de Ações.
+4. **Persistência de Status:** O campo `status` de cada item no inventário é preservado, garantindo que a ficha mantenha o estado de equipamento entre sessões.
+
+**Lição aprendida:**
+- **Feedback Visual Imediato:** Mover o cálculo de CA para o frontend (replicando a lógica do backend) proporciona uma experiência muito melhor para o usuário, que vê sua CA mudar instantaneamente ao clicar em equipar.
+- **Heurística de Equipamento:** Implementar uma lógica inteligente para o botão "EQUIPAR" (detectando se é arma, armadura ou escudo pelo tipo do item) reduz cliques e torna a ficha mais intuitiva.

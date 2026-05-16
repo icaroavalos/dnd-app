@@ -68,6 +68,8 @@ export const InventoryTab: React.FC = () => {
       const weight = Number(raw?.weight ?? catalogItem?.weight ?? 0);
       const value = Number(raw?.value ?? raw?.price ?? catalogItem?.value ?? catalogItem?.price ?? raw?.gp ?? 0);
       const status = normalizeStatus(raw, character.equippedItems);
+      const type = raw?.type || catalogItem?.type || '';
+      const ac = Number(raw?.ac || raw?.armorClass || catalogItem?.ac || 0);
 
       return {
         ...raw,
@@ -79,6 +81,8 @@ export const InventoryTab: React.FC = () => {
         weight,
         value,
         status,
+        type,
+        ac,
         source: raw?.source || catalogItem?.source || 'Manual',
         properties: raw?.properties || raw?.property || catalogItem?.properties || catalogItem?.property || [],
         notes: raw?.notes || raw?.description || catalogItem?.description || '',
@@ -117,6 +121,23 @@ export const InventoryTab: React.FC = () => {
       .filter(Boolean);
 
     updateCharacter({ inventory: nextInventory, equippedItems });
+  };
+
+  const toggleEquip = (item: any) => {
+    if (item.status.startsWith('equipped')) {
+      setItemStatus(item.instanceId, 'backpack');
+    } else {
+      const type = String(item.type || '').split('|')[0];
+      if (type === 'S') { // Shield
+        setItemStatus(item.instanceId, 'equipped_shield');
+      } else if (['LA', 'MA', 'HA'].includes(type)) { // Armor
+        setItemStatus(item.instanceId, 'equipped_armor');
+      } else if (item.dmg1 || type === 'M' || type === 'R') { // Weapon
+        setItemStatus(item.instanceId, 'equipped_main_hand');
+      } else {
+        setItemStatus(item.instanceId, 'equipped');
+      }
+    }
   };
 
   const attuneItem = (instanceId: string) => {
@@ -169,28 +190,45 @@ export const InventoryTab: React.FC = () => {
           <div className="grid gap-0">
             {visibleItems.map((item) => {
               const isOpen = selectedId === item.instanceId;
+              const isEquippable = isItemEquippable(item);
+              const isEquipped = item.status.startsWith('equipped');
 
               return (
                 <article key={item.instanceId} className="border-b border-dotted border-[#d4d4d4] last:border-0">
-                  <button
-                    type="button"
-                    className="grid w-full grid-cols-[1fr_72px_70px] gap-3 items-center min-h-[58px] py-2 text-left hover:bg-zinc-50 transition-colors group"
-                    onClick={() => setSelectedId(isOpen ? null : item.instanceId)}
-                  >
-                    <span className="min-w-0">
+                  <div className="flex items-center gap-3 min-h-[58px] py-2 hover:bg-zinc-50 transition-colors group">
+                    <button
+                      type="button"
+                      className="flex-1 text-left min-w-0"
+                      onClick={() => setSelectedId(isOpen ? null : item.instanceId)}
+                    >
                       <strong className="block text-[0.85rem] leading-tight font-black truncate text-zinc-800 group-hover:text-[#cf3036] transition-colors">
                         {item.name}
                       </strong>
                       <span className="block text-[#6f7a80] text-[0.6rem] font-black uppercase tracking-tighter opacity-80">
                         {STATUS_LABELS[item.status] || item.status} {item.quantity > 1 ? `(x${item.quantity})` : ''}
                       </span>
-                    </span>
-                    <span className="text-[#111] text-[0.7rem] font-bold text-center opacity-70">{(item.weight * item.quantity).toFixed(1)} lb.</span>
-                    <span className="text-[#111] text-[0.7rem] font-bold text-right pr-1 opacity-70">{formatNumber(item.value)} gp</span>
-                  </button>
+                    </button>
+
+                    <span className="text-[#111] text-[0.7rem] font-bold text-center opacity-70 w-16">{(item.weight * item.quantity).toFixed(1)} lb.</span>
+                    <span className="text-[#111] text-[0.7rem] font-bold text-right opacity-70 w-16">{formatNumber(item.value)} gp</span>
+                    
+                    {isEquippable && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleEquip(item); }}
+                        className={cn(
+                          "ml-2 min-h-[28px] px-2.5 rounded-[5px] text-[0.6rem] font-black uppercase tracking-wider border-2 transition-all",
+                          isEquipped 
+                            ? "bg-[#323264] border-[#323264] text-white" 
+                            : "bg-white border-zinc-200 text-zinc-400 hover:border-teal hover:text-teal"
+                        )}
+                      >
+                        {isEquipped ? 'VESTIDO' : 'EQUIPAR'}
+                      </button>
+                    )}
+                  </div>
 
                   {isOpen && (
-                    <div className="grid gap-3 pb-3 text-[0.75rem] leading-snug">
+                    <div className="grid gap-3 pb-3 text-[0.75rem] leading-snug px-1">
                       <div className="flex flex-wrap gap-1.5">
                         <StatusButton label="Backpack" onClick={() => setItemStatus(item.instanceId, 'backpack')} active={item.status === 'backpack'} />
                         <StatusButton label="Mão principal" onClick={() => setItemStatus(item.instanceId, 'equipped_main_hand')} active={item.status === 'equipped_main_hand'} />
@@ -259,6 +297,11 @@ function Detail({ label, value }: { label: string; value: string }) {
       <span>{value}</span>
     </div>
   );
+}
+
+function isItemEquippable(item: any): boolean {
+  const type = String(item.type || '').split('|')[0];
+  return ['LA', 'MA', 'HA', 'S', 'M', 'R'].includes(type) || !!item.dmg1;
 }
 
 function normalizeStatus(item: any, equippedItems: string[] = []): string {

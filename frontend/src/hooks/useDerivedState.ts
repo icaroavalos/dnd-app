@@ -11,7 +11,7 @@ export const useDerivedState = () => {
   const assignments = character.backgroundChoices?.abilityAssignments || {};
   
   (Object.keys(character.abilities) as Array<keyof AbilityScores>).forEach(ability => {
-    const base = Number(character.abilities[ability] || 10);
+    const base = Number(character.abilities[ability] ?? 10);
     const bonus = Number(assignments[ability] || 0);
     finalAbilities[ability] = base + bonus;
   });
@@ -63,13 +63,59 @@ export const useDerivedState = () => {
   });
 
   const carryingCapacity = (finalAbilities.str || 10) * 15;
-  const carriedWeight = 0;
+  
+  const itemsCatalog = useCharacterStore.getState().itemsCatalog || [];
+  const itemMap: Record<string, any> = {};
+  itemsCatalog.forEach(item => {
+    if (item.id) itemMap[item.id.toLowerCase()] = item;
+    itemMap[item.name.toLowerCase()] = item;
+  });
+
+  const carriedWeight = (character.inventory || []).reduce((total, item) => {
+    const itemId = typeof item === 'string' ? item : (item.baseItemId || '');
+    const catalogItem = itemMap[itemId.toLowerCase()];
+    
+    const weight = Number(item.weight || catalogItem?.weight || 0);
+    const qty = Number(item.quantity || 1);
+    return total + (weight * qty);
+  }, 0);
 
   // Spellcasting metrics
   // Check background spellcasting choice or default to class
   const spellcastingAbility: keyof AbilityScores = character.bgChoices?.spellcastingAbility || 'cha'; 
   const spellAttack = modifiers[spellcastingAbility] + proficiencyBonus;
   const spellSaveDc = 8 + modifiers[spellcastingAbility] + proficiencyBonus;
+
+  // Armor Class Calculation
+  const getArmorClass = () => {
+    const inv = character.inventory || [];
+    const equippedArmor = inv.find(i => i.status === 'equipped_armor');
+    const equippedShield = inv.find(i => i.status === 'equipped_shield');
+
+    let baseAc = 10 + modifiers.dex;
+    let shieldBonus = 0;
+
+    if (equippedArmor) {
+      const ac = Number(equippedArmor.ac || equippedArmor.armorClass || 10);
+      const type = String(equippedArmor.type || '').split('|')[0];
+      
+      if (type === 'LA') { // Light Armor
+        baseAc = ac + modifiers.dex;
+      } else if (type === 'MA') { // Medium Armor
+        baseAc = ac + Math.min(modifiers.dex, 2);
+      } else if (type === 'HA') { // Heavy Armor
+        baseAc = ac;
+      } else {
+        baseAc = ac + modifiers.dex;
+      }
+    }
+
+    if (equippedShield) {
+      shieldBonus = Number(equippedShield.ac || equippedShield.armorClass || 2);
+    }
+
+    return baseAc + shieldBonus;
+  };
 
   return {
     proficiencyBonus,
@@ -78,8 +124,8 @@ export const useDerivedState = () => {
     savingThrows,
     skillBonuses,
     initiative: modifiers.dex,
-    armorClass: 10 + modifiers.dex,
-    maxHp: character.hp || 10,
+    armorClass: getArmorClass(),
+    maxHp: character.maxHp || 10,
     spellAttack,
     spellSaveDc,
     encumbrance: {
