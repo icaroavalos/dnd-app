@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useCharacterStore, CLASS_HIT_DIE } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
 import { cn } from '../../lib/utils';
-import { Heart, Zap, Plus, Minus, CheckCircle2, ArrowUp } from 'lucide-react';
+import { Heart, Zap, Plus, Minus, CheckCircle2, ArrowUp, Check, X } from 'lucide-react';
 
 export const SummaryTab: React.FC = () => {
   const { character, applyShortRest, applyLongRest, applyDamage, applyHealing, applyTempHp, spendHitDie, initiateLevelUp } = useCharacterStore();
@@ -97,62 +97,73 @@ export const SummaryTab: React.FC = () => {
           </button>
         )}
 
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {restConfirm === 'short' ? (
-            <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex gap-1 animate-in zoom-in-95 duration-200 h-[46px]">
               <button 
                 onClick={() => setRestConfirm(null)}
-                className="flex-1 py-2.5 bg-zinc-800 border border-line text-muted font-bold rounded-xl hover:bg-zinc-700 transition-all text-[0.7rem] uppercase"
+                className="flex-1 bg-zinc-800 border border-line text-muted rounded-xl hover:bg-zinc-700 flex items-center justify-center transition-all"
+                title="Cancelar"
               >
-                CANCELAR
+                <X size={18} />
               </button>
               <button 
                 onClick={handleShortRest}
-                className="flex-[2] py-2.5 bg-teal text-bg font-black rounded-xl hover:bg-teal/90 transition-all shadow-lg shadow-teal/10 flex items-center justify-center gap-2 text-[0.7rem] uppercase"
+                className="flex-[2] bg-teal text-bg rounded-xl hover:bg-teal/90 flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-teal/10"
+                title="Confirmar Descanso Curto"
               >
-                <Zap size={14} />
-                CONFIRMAR CURTO
-              </button>
-            </div>
-          ) : restConfirm === 'long' ? (
-            <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
-              <button 
-                onClick={() => setRestConfirm(null)}
-                className="flex-1 py-2.5 bg-zinc-800 border border-line text-muted font-bold rounded-xl hover:bg-zinc-700 transition-all text-[0.7rem] uppercase"
-              >
-                CANCELAR
-              </button>
-              <button 
-                onClick={handleLongRest}
-                className="flex-[2] py-2.5 bg-rose text-bg font-black rounded-xl hover:bg-rose/90 transition-all shadow-lg shadow-rose/10 flex items-center justify-center gap-2 text-[0.7rem] uppercase"
-              >
-                <Heart size={14} />
-                CONFIRMAR LONGO
+                <Check size={20} className="stroke-[3]" />
+                <span className="text-[0.65rem] font-black uppercase">CURTO</span>
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => {
-                  setRestConfirm('short');
-                  setShowConfirmLevel(false);
-                }}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 bg-teal/10 hover:bg-teal/20 text-teal border border-teal/30 rounded-xl text-[0.7rem] font-black uppercase tracking-wider transition-all active:scale-95"
+            <button
+              onClick={() => {
+                setRestConfirm('short');
+                setShowConfirmLevel(false);
+              }}
+              className={cn(
+                "flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-[0.7rem] font-black uppercase tracking-wider transition-all active:scale-95 border",
+                "bg-teal/10 hover:bg-teal/20 text-teal border-teal/30"
+              )}
+            >
+              <Zap size={14} />
+              Short Rest
+            </button>
+          )}
+
+          {restConfirm === 'long' ? (
+            <div className="flex gap-1 animate-in zoom-in-95 duration-200 h-[46px]">
+              <button 
+                onClick={() => setRestConfirm(null)}
+                className="flex-1 bg-zinc-800 border border-line text-muted rounded-xl hover:bg-zinc-700 flex items-center justify-center transition-all"
+                title="Cancelar"
               >
-                <Zap size={14} />
-                Short Rest
+                <X size={18} />
               </button>
-              <button
-                onClick={() => {
-                  setRestConfirm('long');
-                  setShowConfirmLevel(false);
-                }}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 bg-rose/10 hover:bg-rose/20 text-rose border border-rose/30 rounded-xl text-[0.7rem] font-black uppercase tracking-wider transition-all active:scale-95"
+              <button 
+                onClick={handleLongRest}
+                className="flex-[2] bg-rose text-bg rounded-xl hover:bg-rose/90 flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-rose/10"
+                title="Confirmar Descanso Longo"
               >
-                <Heart size={14} />
-                Long Rest
+                <Check size={20} className="stroke-[3]" />
+                <span className="text-[0.65rem] font-black uppercase">LONGO</span>
               </button>
             </div>
+          ) : (
+            <button
+              onClick={() => {
+                setRestConfirm('long');
+                setShowConfirmLevel(false);
+              }}
+              className={cn(
+                "flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-[0.7rem] font-black uppercase tracking-wider transition-all active:scale-95 border",
+                "bg-rose/10 hover:bg-rose/20 text-rose border-rose/30"
+              )}
+            >
+              <Heart size={14} />
+              Long Rest
+            </button>
           )}
         </div>
       </div>
