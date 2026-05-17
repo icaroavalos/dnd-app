@@ -36,6 +36,7 @@ export class CharactersStorageService {
     const id = dto.id || `char-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     const characterRecord: CharacterRecord = {
+      ...dto,
       id,
       ruleset: dto.ruleset || '5e',
       name: dto.name || 'Unnamed',
@@ -50,6 +51,7 @@ export class CharactersStorageService {
       inventory: dto.inventory || [],
       spellChoices: dto.spellChoices || [],
       backgroundChoices: dto.backgroundChoices ?? null,
+      features: dto.features || [],
       attacks: dto.attacks || [],
       resources: dto.resources || {},
       state: dto.state || {
@@ -73,22 +75,7 @@ export class CharactersStorageService {
 
     const updatedRecord: CharacterRecord = {
       ...existing,
-      name: dto.name ?? existing.name,
-      ruleset: dto.ruleset ?? existing.ruleset,
-      lineageId: dto.lineageId ?? existing.lineageId,
-      backgroundId: dto.backgroundId ?? existing.backgroundId,
-      alignment: dto.alignment ?? existing.alignment,
-      experience: dto.experience ?? existing.experience,
-      classes: dto.classes ?? existing.classes,
-      abilities: dto.abilities ?? existing.abilities,
-      skillProficiencies: dto.skillProficiencies ?? existing.skillProficiencies,
-      savingThrowProficiencies: dto.savingThrowProficiencies ?? existing.savingThrowProficiencies,
-      inventory: dto.inventory ?? existing.inventory,
-      spellChoices: dto.spellChoices ?? existing.spellChoices,
-      backgroundChoices: dto.backgroundChoices ?? existing.backgroundChoices,
-      attacks: dto.attacks ?? existing.attacks,
-      resources: dto.resources ?? existing.resources,
-      state: dto.state ?? existing.state,
+      ...dto,
     };
 
     return this.repository.update(id, updatedRecord);

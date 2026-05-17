@@ -1,9 +1,19 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { CreatorPage } from './pages/CreatorPage';
 import { SheetPage } from './pages/SheetPage';
+import { useCharacterStore } from './store/useCharacterStore';
 
 function App() {
+  const fetchItems = useCharacterStore(state => state.fetchItemsCatalog);
+  const fetchSpells = useCharacterStore(state => state.fetchSpellsCatalog);
+
+  useEffect(() => {
+    fetchItems();
+    fetchSpells();
+  }, [fetchItems, fetchSpells]);
+
   return (
     <BrowserRouter>
       <Routes>

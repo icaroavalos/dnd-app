@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { RuleText } from '../ui/RuleText';
 
 interface SpellCardProps {
   spell: any;
@@ -46,26 +47,9 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
   const hasConcentration = spell.duration?.[0]?.concentration || spell.concentration;
   const isRitual = spell.meta?.ritual || spell.ritual;
 
-  const renderText = (text: string) => {
-    if (typeof text !== 'string') return '';
-    
-    // Limpeza de tags 5etools e negrito em dados
-    return text
-      .replace(/{@(damage|dice|scaledamage|scaledice) ([^}|]+)(?:\|[^}]*)?}/g, '**$2**')
-      .replace(/{@(spell|item|class|creature|feat|condition|filter) ([^}|]+)(?:\|[^}]*)?}/g, '$2')
-      .replace(/{@variantrule ([^}|]+)(?:\|[^}]*)?}/g, '$1')
-      .replace(/{@i ([^}]+)}/g, '*$1*')
-      .replace(/{@b ([^}]+)}/g, '**$1**')
-      .replace(/{@atk ([^}]+)}/g, '$1')
-      .replace(/{@h}/g, 'Hit: ')
-      .replace(/{@dc ([^}]+)}/g, 'DC $1')
-      .replace(/{@note ([^}]+)}/g, '($1)')
-      .replace(/{@(link|url) ([^}|]+)(?:\|[^}]*)?}/g, '$2');
-  };
-
   const renderEntry = (entry: any): React.ReactNode => {
     if (typeof entry === 'string') {
-      return <p className="mb-2 last:mb-0">{renderText(entry)}</p>;
+      return <div className="mb-2 last:mb-0"><RuleText text={entry} /></div>;
     }
 
     if (!entry) return null;
@@ -87,7 +71,7 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
       return (
         <ul className="list-disc pl-5 mb-3 space-y-1">
           {entry.items?.map((item: any, i: number) => (
-            <li key={i}>{typeof item === 'string' ? renderText(item) : renderEntry(item)}</li>
+            <li key={i}>{typeof item === 'string' ? <RuleText text={item} /> : renderEntry(item)}</li>
           ))}
         </ul>
       );
@@ -101,7 +85,7 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
             <thead>
               <tr className="bg-[#8b2531]/5">
                 {entry.colLabels?.map((label: string, i: number) => (
-                  <th key={i} className="p-1 border-b border-line/10 font-black">{renderText(label)}</th>
+                  <th key={i} className="p-1 border-b border-line/10 font-black"><RuleText text={label} /></th>
                 ))}
               </tr>
             </thead>
@@ -109,7 +93,7 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
               {entry.rows?.map((row: any[], i: number) => (
                 <tr key={i} className="border-b border-line/5 last:border-0">
                   {row.map((cell: any, j: number) => (
-                    <td key={j} className="p-1">{typeof cell === 'string' ? renderText(cell) : renderEntry(cell)}</td>
+                    <td key={j} className="p-1">{typeof cell === 'string' ? <RuleText text={cell} /> : renderEntry(cell)}</td>
                   ))}
                 </tr>
               ))}
@@ -206,7 +190,7 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
               <React.Fragment key={i}>{renderEntry(entry)}</React.Fragment>
             ))
           ) : (
-            <p>{renderText(spell.description)}</p>
+            <RuleText text={spell.description} />
           )}
         </div>
 

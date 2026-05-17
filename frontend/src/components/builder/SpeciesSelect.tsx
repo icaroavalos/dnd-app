@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { getSpecies, getSubraces } from '../../api/catalog-api';
 import type { CatalogEntry } from '../../api/catalog-api';
 import { Select } from '../ui/Select';
+import { parse5eEntry, parseResourceInfo } from '../../lib/data-parser';
 
 export const SpeciesSelect: React.FC = () => {
   const { character, updateCharacter, setFeaturesByKind } = useCharacterStore();
@@ -11,21 +12,26 @@ export const SpeciesSelect: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const mapTraitsToFeatures = (traits: any[], kind: 'species' | 'subspecies', source: string) => {
-    return traits.map((t: any) => ({
-      id: t.id || `${t.name}-${kind}-${source}`.toLowerCase().replace(/\s+/g, '-'),
-      name: t.name,
-      kind,
-      description: Array.isArray(t.entries) ? t.entries.map((e: any) => typeof e === 'string' ? e : JSON.stringify(e)).join('\n') : (t.description || ''),
-      meta: source
-    }));
+    return traits.map((t: any) => {
+      const desc = parse5eEntry(t);
+      const resource = parseResourceInfo(desc, character, { proficiencyBonus: 2, modifiers: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 } });
+      if (resource) resource.id = t.id || `${t.name}-${kind}-${source}`.toLowerCase().replace(/\s+/g, '-');
+
+      return {
+        id: t.id || `${t.name}-${kind}-${source}`.toLowerCase().replace(/\s+/g, '-'),
+        name: t.name,
+        kind,
+        description: desc,
+        meta: source,
+        resource
+      };
+    });
   };
 
   useEffect(() => {
-    // We use individual then/catch to ensure that if subraces fail, species still load
     getSpecies()
       .then((speciesData) => {
         const results = speciesData.results || [];
-        // Filter out old versions if new ones exist (prioritize XPHB)
         const uniqueSpecies = results.reduce((acc: CatalogEntry[], curr: CatalogEntry) => {
           const existing = acc.find(s => s.name === curr.name);
           if (!existing || (curr.source === 'XPHB' || curr.edition === 'one')) {
@@ -38,7 +44,6 @@ export const SpeciesSelect: React.FC = () => {
       })
       .catch((err) => console.error('Failed to load species:', err))
       .finally(() => {
-        // Try loading subraces separately
         getSubraces()
           .then((subraceData) => {
             setSubraceList(subraceData.results || []);
@@ -48,15 +53,86 @@ export const SpeciesSelect: React.FC = () => {
       });
   }, []);
 
+  const selectedSpecies = useMemo(() => 
+    speciesList.find(s => s.name === character.race),
+    [speciesList, character.race]
+  );
+
+  const derivedSubraces = useMemo(() => {
+    if (!selectedSpecies) return [];
+    
+    // 1. Dynamic parsing for D&D 2024 "Lineages", "Ancestors", "Legacies" which are in tables
+    const tables: any[] = [];
+    const findTables = (entries: any[]) => {
+      entries.forEach(e => {
+        if (e.type === 'table') tables.push(e);
+        if (e.entries && Array.isArray(e.entries)) findTables(e.entries);
+      });
+    };
+    findTables(selectedSpecies.entries || []);
+
+    const lineageTable = tables.find((t: any) => 
+      t.caption && (
+        t.caption.toLowerCase().includes('lineage') || 
+        t.caption.toLowerCase().includes('ancestor') || 
+        t.caption.toLowerCase().includes('legacy') ||
+        t.caption.toLowerCase().includes('origin')
+      )
+    );
+
+    if (lineageTable && lineageTable.rows) {
+      return lineageTable.rows.map((row: any[]) => {
+        const name = typeof row[0] === 'string' ? row[0] : (row[0].roll?.exact || 'Unknown');
+        // Handle complex row cells
+        const desc = parse5eEntry(row[1]);
+        return {
+          id: `${selectedSpecies.id}-${name}`.toLowerCase().replace(/\s+/g, '-'),
+          name,
+          raceName: selectedSpecies.name,
+          description: desc,
+          source: selectedSpecies.source,
+          entries: [{ type: 'entries', name, entries: [desc] }]
+        };
+      });
+    }
+
+    // 2. Fallback to standard subraces.json catalog
+    return subraceList.filter(s => 
+      s.raceName?.toLowerCase() === character.race?.toLowerCase()
+    );
+  }, [selectedSpecies, subraceList, character.race]);
+
   const handleSpeciesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const speciesId = e.target.value;
     const species = speciesList.find(s => s.id === speciesId);
     if (species) {
+      // Extract skills from species data if available
+      const normalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      
+      let speciesSkills: string[] = [];
+      const skillData = species.skillProficiencies?.[0] || (species as any).skillProficiencies;
+      
+      if (skillData) {
+        if (Array.isArray(skillData)) {
+          speciesSkills = skillData.flatMap(obj => Object.keys(obj)).map(normalize);
+        } else if (skillData.choose) {
+          // 2024 style: { choose: { from: [...] } }
+          // For now, we take the recommended or first ones to automate
+          speciesSkills = (skillData.choose.from || []).slice(0, skillData.choose.count || 1).map(normalize);
+        } else if (typeof skillData === 'object') {
+          speciesSkills = Object.keys(skillData).map(normalize);
+        }
+      }
+
       updateCharacter({ 
         race: species.name,
         subrace: '',
+        skillProficiencies: [
+          ...character.skillProficiencies.filter(s => !character.classSkillChoices.includes(s)),
+          ...speciesSkills
+        ]
       });
-      // Traits are in 'entries' for species in 5etools
+
       const traits = (species.entries || []).filter((e: any) => e.type === 'entries' || e.name);
       setFeaturesByKind('species', mapTraitsToFeatures(traits, 'species', species.source));
       setFeaturesByKind('subspecies', []);
@@ -65,7 +141,7 @@ export const SpeciesSelect: React.FC = () => {
 
   const handleSubraceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const subId = e.target.value;
-    const sub = subraceList.find(s => s.id === subId);
+    const sub = derivedSubraces.find((s: any) => s.id === subId);
     if (sub) {
       updateCharacter({ 
         subrace: sub.name,
@@ -75,10 +151,7 @@ export const SpeciesSelect: React.FC = () => {
     }
   };
 
-  const selectedSpecies = speciesList.find(s => s.name === character.race);
   const selectedSpeciesId = selectedSpecies?.id || '';
-
-  const availableSubraces = subraceList.filter(s => s.raceName === character.race);
 
   return (
     <div className="flex flex-col gap-4">
@@ -91,11 +164,11 @@ export const SpeciesSelect: React.FC = () => {
         helperText={selectedSpecies?.description}
       />
 
-      {availableSubraces.length > 0 && (
+      {derivedSubraces.length > 0 && (
         <Select
           label="Linhagem / Subespécie"
-          value={subraceList.find(s => s.name === character.subrace)?.id || ''}
-          options={availableSubraces.map(s => [s.id || s.name, s.name])}
+          value={derivedSubraces.find((s: any) => s.name === character.subrace)?.id || ''}
+          options={derivedSubraces.map((s: any) => [s.id || s.name, s.name])}
           onChange={handleSubraceChange}
           helperText={`A espécie ${character.race} possui sub-divisões disponíveis.`}
         />

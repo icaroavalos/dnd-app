@@ -1,12 +1,12 @@
 # Preferences
 
-Ultima revisao: 2026-05-11.
+Ultima revisao: 2026-05-16.
 
 ## Ambiente de desenvolvimento
 
 - Frontend: `npm run dev` → `http://localhost:3000`
 - Backend: `npm run backend:dev` → `http://localhost:3100`
-- Vite: disponivel como dev dependency, production build usa `serve`
+- Vite: disponivel como dev dependency, production build usa `vite build`
 - CORS habilitado para: `localhost:3000`, `localhost:4173`, `localhost:5173`
 
 ## Estilo de codigo
@@ -37,9 +37,10 @@ Ultima revisao: 2026-05-11.
 
 ## Frontend
 
-- **Arquitetura de Estilos:** Uso obrigatório de **CSS Modules** para componentes.
-- **Nomenclatura:** Adotar **camelCase** para classes CSS (ex: `styles.builderPanel`).
-- **Migração:** O arquivo `index.css` deve conter apenas variáveis globais, resets e estilos estruturais fundamentais.
+- **Não usar emojis**: O uso de emojis é estritamente proibido tanto no código quanto na interface do usuário. Utilize ícones de bibliotecas (como Lucide) ou texto claro em seu lugar.
+- **Arquitetura de Estilos:** Uso obrigatório de **Tailwind CSS** (v3). Classes utilitárias diretamente no JSX. CSS Modules **não são mais utilizados**.
+- **Helper `cn()`:** Usar o utilitário `cn()` de `src/lib/utils.ts` (clsx + tailwind-merge) para classes condicionais.
+- **`index.css`:** Deve conter apenas variáveis CSS globais (`:root`), resets e componentes reutilizáveis via `@layer components` (ex: `.primary-button`, `.field`).
 - O frontend deve consumir dados exclusivamente via API, sem fallbacks locais permanentes para dados canônicos.
 - Erros de rede ou backend devem ser tratados visualmente para o usuário.
 

@@ -1,7 +1,8 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 
 import type { RulesCatalogResponse } from './contracts/rules-catalog-entry.js';
 import { RulesService } from './rules.service.js';
+import type { LevelUpOptionsPayload } from './contracts/level-up-options.js';
 
 @Controller('rules')
 export class RulesController {
@@ -9,6 +10,14 @@ export class RulesController {
     @Inject(RulesService)
     private readonly rulesService: RulesService
   ) {}
+
+  @Get('level-up-options')
+  getLevelUpOptions(
+    @Query('className') className: string,
+    @Query('level') level: string
+  ): Promise<LevelUpOptionsPayload> {
+    return this.rulesService.getLevelUpOptions(className, parseInt(level));
+  }
 
   @Get('backgrounds')
   getBackgrounds(): Promise<RulesCatalogResponse> {
@@ -53,5 +62,15 @@ export class RulesController {
   @Get('subraces')
   getSubraces(): Promise<RulesCatalogResponse> {
     return this.rulesService.getCatalog('subraces');
+  }
+
+  @Get('actions')
+  getActions(): Promise<RulesCatalogResponse> {
+    return this.rulesService.getCatalog('actions');
+  }
+
+  @Get('conditions')
+  getConditions(): Promise<RulesCatalogResponse> {
+    return this.rulesService.getCatalog('conditions');
   }
 }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { cn } from '../../lib/utils';
-import { clean5eText, parse5eEntry } from '../../lib/data-parser';
+import { clean5eText } from '../../lib/data-parser';
+import { RuleText } from '../ui/RuleText';
 
 export const FeaturesTab: React.FC = () => {
-  const { character, useFeatureResource } = useCharacterStore();
+  const { character, consumeFeatureResource } = useCharacterStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const features = character.features || [];
@@ -56,7 +57,7 @@ export const FeaturesTab: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            useFeatureResource(id);
+                            consumeFeatureResource(id);
                           }}
                           disabled={feat.resource.remaining <= 0}
                           className={cn(
@@ -96,9 +97,7 @@ export const FeaturesTab: React.FC = () => {
                       <div className="p-4 bg-black/40 border-t border-[#1d1d1d] animate-in fade-in slide-in-from-top-2 duration-300 text-left overflow-hidden">
                         <div className="text-[#d0d0d0] text-[0.82rem] leading-relaxed space-y-2 break-words">
                           {feat.description ? (
-                            feat.description.split('\n').map((line: string, i: number) => (
-                              <p key={i}>{clean5eText(line)}</p>
-                            ))
+                            <RuleText text={feat.description} />
                           ) : (
                             <p className="italic opacity-50 font-medium">No description provided by source data.</p>
                           )}

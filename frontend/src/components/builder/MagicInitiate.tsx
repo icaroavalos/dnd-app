@@ -80,17 +80,26 @@ export const MagicInitiate: React.FC<MagicInitiateProps> = ({ constraintClass })
             [key]: [...currentIds, spellId]
           }
         });
+        // We ensure the spell is added to the character spells list regardless of level
         addSpell({
           ...spell,
+          id: spell.id || spell.name.toLowerCase().replace(/\s+/g, '-'),
           description: parse5eEntry(spell),
-          source: 'bg-feat'
+          source: 'bg-feat',
+          ...(level === 1 ? {
+            resource: {
+              remaining: 1,
+              max: 1,
+              recoveryLabel: 'Long Rest'
+            }
+          } : {})
         });
       }
     }
   };
 
-  const cantrips = filteredSpells.filter(s => s.level === 0);
-  const level1 = filteredSpells.filter(s => s.level === 1);
+  const cantrips = filteredSpells.filter(s => s.level === 0 || s.level === '0');
+  const level1 = filteredSpells.filter(s => s.level === 1 || s.level === '1');
 
   if (loading) return <Card title="Magic Initiate">Carregando magias...</Card>;
 
@@ -107,14 +116,15 @@ export const MagicInitiate: React.FC<MagicInitiateProps> = ({ constraintClass })
           </h3>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2 mt-2.5">
             {cantrips.map(spell => {
-              const isSelected = selectedCantrips.includes(spell.id);
+              const spellId = spell.id || spell.name.toLowerCase().replace(/\s+/g, '-');
+              const isSelected = selectedCantrips.includes(spellId);
               const isDisabled = !isSelected && selectedCantrips.length >= 2;
               return (
                 <Checkbox
-                  key={spell.id}
+                  key={spellId}
                   label={spell.name}
                   checked={isSelected}
-                  onChange={() => handleToggle(spell.id, 0)}
+                  onChange={() => handleToggle(spellId, 0)}
                   disabled={isDisabled}
                   className={cn(
                     "flex gap-2 items-center min-w-0 min-h-[36px] px-[9px] py-[7px] rounded-lg bg-[#080808] border border-[#2c2c2c]",
@@ -132,14 +142,15 @@ export const MagicInitiate: React.FC<MagicInitiateProps> = ({ constraintClass })
           </h3>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2 mt-2.5">
             {level1.map(spell => {
-              const isSelected = selectedLevel1.includes(spell.id);
+              const spellId = spell.id || spell.name.toLowerCase().replace(/\s+/g, '-');
+              const isSelected = selectedLevel1.includes(spellId);
               const isDisabled = !isSelected && selectedLevel1.length >= 1;
               return (
                 <Checkbox
-                  key={spell.id}
+                  key={spellId}
                   label={spell.name}
                   checked={isSelected}
-                  onChange={() => handleToggle(spell.id, 1)}
+                  onChange={() => handleToggle(spellId, 1)}
                   disabled={isDisabled}
                   className={cn(
                     "flex gap-2 items-center min-w-0 min-h-[36px] px-[9px] py-[7px] rounded-lg bg-[#080808] border border-[#2c2c2c]",

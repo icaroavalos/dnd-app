@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useCharacterStore } from '../../store/useCharacterStore';
+import { useCharacterStore, CLASS_HIT_DIE } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
 import { cn } from '../../lib/utils';
-import { Heart, Shield, Zap, Plus, Minus, CheckCircle2 } from 'lucide-react';
+import { Heart, Zap, Plus, Minus, CheckCircle2, ArrowUp } from 'lucide-react';
 
 export const SummaryTab: React.FC = () => {
   const { character, applyShortRest, applyLongRest, applyDamage, applyHealing, applyTempHp, spendHitDie, initiateLevelUp } = useCharacterStore();
@@ -25,7 +25,7 @@ export const SummaryTab: React.FC = () => {
   };
 
   const handleSpendHitDie = () => {
-    const dieSize = character.class.toLowerCase().includes('barbarian') ? 12 : 8;
+    const dieSize = CLASS_HIT_DIE[character.class.toLowerCase()] || 8;
     const roll = Math.floor(Math.random() * dieSize) + 1 + (derived.modifiers.con || 0);
     spendHitDie(Math.max(1, roll));
   };
@@ -36,6 +36,9 @@ export const SummaryTab: React.FC = () => {
     try {
       await initiateLevelUp();
       setShowConfirmLevel(false);
+    } catch (err) {
+      console.error('Level up failed:', err);
+      alert('Falha ao iniciar level up. Verifique a conexão com o servidor.');
     } finally {
       setIsLeveling(false);
     }
@@ -74,7 +77,7 @@ export const SummaryTab: React.FC = () => {
             {isLeveling ? (
               <Zap className="animate-spin" size={18} />
             ) : (
-              <Shield className={cn("transition-transform", character.level < 20 && "group-hover:scale-110")} size={18} />
+              <ArrowUp className={cn("transition-transform", character.level < 20 && "group-hover:-translate-y-1")} size={18} />
             )}
             {character.level >= 20 ? 'MAX LEVEL' : 'LEVEL UP'}
           </button>

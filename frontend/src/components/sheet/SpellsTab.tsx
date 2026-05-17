@@ -9,8 +9,25 @@ export const SpellsTab: React.FC = () => {
   const derived = useDerivedState();
   const [selectedSpell, setSelectedSpell] = useState<string | null>(null);
 
-  const castSpell = (level: number) => {
+  const castSpell = (spell: any, level: number) => {
     if (level === 0) return;
+
+    // First try to use background/feat resource if available
+    if (spell.source === 'bg-feat' && spell.resource?.remaining > 0) {
+      const updatedSpells = character.spells.map(s => {
+        if ((s.id || s.name) === (spell.id || spell.name)) {
+          return {
+            ...s,
+            resource: { ...s.resource, remaining: s.resource.remaining - 1 }
+          };
+        }
+        return s;
+      });
+      updateCharacter({ spells: updatedSpells });
+      return;
+    }
+
+    // Otherwise use spell slots
     const current = { ...character.spellSlots };
     const levelSlots = current[level] || { max: 0, used: 0 };
     if (levelSlots.used < levelSlots.max) {
@@ -64,7 +81,9 @@ export const SpellsTab: React.FC = () => {
 
           {group.spells.map((spell, idx) => {
             const isOpen = selectedSpell === spell.name;
-            const canCast = group.level === 0 || (character.spellSlots[group.level]?.used < character.spellSlots[group.level]?.max);
+            const hasBgResource = spell.source === 'bg-feat' && (spell.resource?.remaining > 0);
+            const hasSlots = character.spellSlots[group.level]?.used < character.spellSlots[group.level]?.max;
+            const canCast = group.level === 0 || hasBgResource || hasSlots;
 
             return (
               <div key={idx} className="">
@@ -73,7 +92,7 @@ export const SpellsTab: React.FC = () => {
                     type="button" 
                     className="relative min-h-[28px] grid place-items-center text-white bg-[#cf3036] border-0 rounded-[6px] text-[0.62rem] font-[950] uppercase cursor-pointer disabled:bg-[#2b2b2b] disabled:text-[#777] disabled:cursor-not-allowed"
                     disabled={!canCast}
-                    onClick={() => castSpell(group.level)}
+                    onClick={() => castSpell(spell, group.level)}
                   >
                     {group.level === 0 ? 'Usar' : 'Gastar'}
                   </button>

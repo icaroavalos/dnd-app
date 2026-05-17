@@ -24,7 +24,9 @@ export type CatalogType =
   | 'items'
   | 'features'
   | 'subraces'
-  | 'feats';
+  | 'feats'
+  | 'actions'
+  | 'conditions';
 
 export class CatalogError extends Error {
   constructor(public type: CatalogType, message: string, public cause?: any) {
@@ -63,6 +65,15 @@ export const getItems = () => getCatalog('items');
 export const getFeatures = () => getCatalog('features');
 export const getFeats = () => getCatalog('feats');
 export const getSubraces = () => getCatalog('subraces');
+export const getActions = () => getCatalog('actions');
+export const getConditions = () => getCatalog('conditions');
+
+export async function getLevelUpOptions(className: string, level: number): Promise<any> {
+  const response = await apiClient.get(`/rules/level-up-options`, {
+    params: { className, level }
+  });
+  return response.data;
+}
 
 /**
  * Busca um item específico do catálogo.

@@ -11,29 +11,73 @@ const SKILL_GROUPS = [
   { ability: 'cha', label: 'Carisma', skills: ['Deception', 'Intimidation', 'Performance', 'Persuasion'] },
 ];
 
-export const SkillsTab: React.FC = () => {
+interface SkillsTabProps {
+  isWide?: boolean;
+}
+
+export const SkillsTab: React.FC<SkillsTabProps> = ({ isWide = false }) => {
   const { character } = useCharacterStore();
   const derived = useDerivedState();
 
   return (
-    <section className="columns-2 gap-3">
+    <section className={cn(
+      "gap-4",
+      isWide ? "columns-2" : "flex flex-col"
+    )}>
       {SKILL_GROUPS.map((group) => (
-        <article key={group.ability} className="bg-[#f5f5f5] text-[#111] rounded-lg text-center break-inside-avoid mb-2.5 p-1 border-2 border-teal">
-          <h3 className="flex justify-between mb-1 py-0.5 px-[7px] text-[1.05rem]">
-            <span>{group.label}</span>
-            <strong>{signed(derived.modifiers[group.ability as keyof typeof derived.modifiers])}</strong>
-          </h3>
-          {group.skills.map((skill) => {
-            const bonus = derived.skillBonuses[skill] ?? 0;
-            const isProficient = character.skillProficiencies.includes(skill);
-            
-            return (
-              <div key={skill} className={cn("flex justify-between gap-2 mt-[3px] py-0.5 px-1.25 rounded bg-[#dff4ef] text-left", isProficient && "font-bold")}>
-                <span>{skill}</span>
-                <strong>{signed(bonus)}</strong>
-              </div>
-            );
-          })}
+        <article 
+          key={group.ability} 
+          className="bg-panel/40 border border-line rounded-2xl p-4 shadow-sm break-inside-avoid mb-4"
+        >
+          <header className="flex justify-between items-center mb-3 border-b border-line/50 pb-2">
+            <h3 className="text-[0.65rem] font-black text-gold uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="w-1.5 h-3 bg-gold rounded-full" />
+              {group.label}
+            </h3>
+            <span className="text-xs font-black text-white bg-zinc-800 px-2 py-1 rounded-md border border-line/30">
+              {signed(derived.modifiers[group.ability as keyof typeof derived.modifiers])}
+            </span>
+          </header>
+          
+          <div className="space-y-1.5">
+            {group.skills.map((skill) => {
+              const bonus = derived.skillBonuses[skill] ?? 0;
+              const isProficient = character.skillProficiencies.includes(skill);
+              
+              return (
+                <div 
+                  key={skill} 
+                  className={cn(
+                    "flex justify-between items-center py-2 px-3 rounded-xl border transition-all",
+                    isProficient 
+                      ? "bg-gold/10 border-gold/30 shadow-[0_0_10px_rgba(213,166,51,0.05)]" 
+                      : "bg-bg/20 border-line/30"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "w-3 h-3 rounded-full border-2 transition-all",
+                      isProficient 
+                        ? "bg-gold border-gold shadow-[0_0_8px_rgba(213,166,51,0.4)]" 
+                        : "border-muted/30"
+                    )} />
+                    <span className={cn(
+                      "text-[0.75rem] font-bold tracking-tight",
+                      isProficient ? "text-white" : "text-muted"
+                    )}>
+                      {skill}
+                    </span>
+                  </div>
+                  <strong className={cn(
+                    "text-[0.85rem] font-black tabular-nums",
+                    isProficient ? "text-gold" : "text-white"
+                  )}>
+                    {signed(bonus)}
+                  </strong>
+                </div>
+              );
+            })}
+          </div>
         </article>
       ))}
     </section>

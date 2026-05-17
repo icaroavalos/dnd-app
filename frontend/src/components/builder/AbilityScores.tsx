@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
-import { useDerivedState, signed } from '../../hooks/useDerivedState';
+import { signed } from '../../hooks/useDerivedState';
 import { Card } from '../ui/Card';
 import { Select } from '../ui/Select';
 import type { AbilityScores as AbilityScoresType } from '../../types/character';
@@ -23,27 +23,31 @@ const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8];
 
 export const AbilityScores: React.FC = () => {
   const { character, updateCharacter, updateAbility } = useCharacterStore();
-  const derived = useDerivedState();
 
   const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const method = e.target.value as any;
+    const method = e.target.value as 'standard' | 'pointBuy' | 'manual';
+    let initialAbilities: AbilityScoresType = { str: null, dex: null, con: null, int: null, wis: null, cha: null };
+    
+    if (method === 'pointBuy') {
+      initialAbilities = { str: 8, dex: 8, con: 8, int: 8, wis: 8, cha: 8 };
+    }
+
     updateCharacter({ 
       abilityMethod: method,
-      abilities: method === 'pointBuy' 
-        ? { str: 8, dex: 8, con: 8, int: 8, wis: 8, cha: 8 }
-        : { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
+      abilities: initialAbilities
     });
   };
 
   const calculatePointBuySpent = () => {
-    return Object.values(character.abilities).reduce((acc, score) => acc + (POINT_BUY_COSTS[score] || 0), 0);
+    return Object.values(character.abilities).reduce((acc, score) => acc + (POINT_BUY_COSTS[score || 0] || 0), 0);
   };
 
   const renderAbilityControl = (key: keyof AbilityScoresType, control: React.ReactNode) => {
     const baseScore = character.abilities[key];
     const bonus = character.backgroundChoices?.abilityAssignments?.[key] || 0;
-    const total = baseScore + bonus;
-    const modifier = Math.floor((total - 10) / 2);
+    const total = (baseScore || 0) + bonus;
+    const displayTotal = baseScore === null ? '-' : total;
+    const modifier = Math.floor(((baseScore || 10) + bonus - 10) / 2);
 
     return (
       <div key={key} className="flex flex-col gap-2 p-3 bg-[#080808] border border-[#303030] rounded-xl transition-all hover:border-gold/30 group">
@@ -51,7 +55,7 @@ export const AbilityScores: React.FC = () => {
           <strong className="text-sm font-bold uppercase tracking-wider text-muted group-hover:text-gold transition-colors">{ABILITY_LABELS[key]}</strong>
           <div className="flex items-center gap-1.5">
             <span className="text-[0.65rem] font-black bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">MOD</span>
-            <strong className="text-lg font-black text-white leading-none">{signed(modifier)}</strong>
+            <strong className="text-lg font-black text-white leading-none">{baseScore === null ? '-' : signed(modifier)}</strong>
           </div>
         </div>
         
@@ -60,11 +64,11 @@ export const AbilityScores: React.FC = () => {
           
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-1 text-[0.6rem] font-bold text-muted uppercase">
-              Base {baseScore}
+              Base {baseScore === null ? '-' : baseScore}
               {bonus > 0 && <span className="text-teal">+{bonus} BG</span>}
             </div>
             <div className="text-xl font-black text-gold leading-none mt-0.5">
-              {total}
+              {displayTotal}
             </div>
           </div>
         </div>
@@ -78,8 +82,12 @@ export const AbilityScores: React.FC = () => {
         renderAbilityControl(key, (
           <input 
             type="number" 
-            value={character.abilities[key]} 
-            onChange={(e) => updateAbility(key, parseInt(e.target.value) || 0)}
+            value={character.abilities[key] === null ? '' : character.abilities[key]!} 
+            onChange={(e) => {
+              const val = e.target.value === '' ? null : parseInt(e.target.value);
+              updateAbility(key, val as any);
+            }}
+            placeholder="-"
             className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-center font-bold focus:border-gold outline-none"
           />
         ))
@@ -126,29 +134,41 @@ export const AbilityScores: React.FC = () => {
     );
   };
 
-  const renderStandardArray = () => (
-    <div className="flex flex-col gap-4">
-      <div className="p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl italic text-xs text-muted">
-        Distribua os valores: {STANDARD_ARRAY.join(', ')}
+  const renderStandardArray = () => {
+    const abilities = Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>;
+    const usedScores = abilities.map(key => character.abilities[key]).filter(v => v !== null);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl italic text-xs text-muted">
+          Distribua os valores: {STANDARD_ARRAY.join(', ')}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {abilities.map((key) => {
+            const currentVal = character.abilities[key];
+            return renderAbilityControl(key, (
+              <select 
+                value={currentVal || "0"} 
+                onChange={(e) => updateAbility(key, e.target.value === "0" ? null : parseInt(e.target.value) as any)}
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 font-bold focus:border-gold outline-none text-sm appearance-none"
+              >
+                <option value="0">Escolher...</option>
+                {/* Restrict each value to be used only once (Standard Array rule) */}
+                {STANDARD_ARRAY.map(val => {
+                  const isUsed = usedScores.includes(val) && val !== currentVal;
+                  return (
+                    <option key={val} value={val} disabled={isUsed} className={isUsed ? "text-zinc-600" : ""}>
+                      {val} {isUsed ? '(Em uso)' : ''}
+                    </option>
+                  );
+                })}
+              </select>
+            ));
+          })}
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {(Object.keys(ABILITY_LABELS) as Array<keyof AbilityScoresType>).map((key) => (
-          renderAbilityControl(key, (
-            <select 
-              value={character.abilities[key]} 
-              onChange={(e) => updateAbility(key, parseInt(e.target.value))}
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 font-bold focus:border-gold outline-none text-sm appearance-none"
-            >
-              <option value="0">Escolher...</option>
-              {STANDARD_ARRAY.map(val => (
-                <option key={val} value={val}>{val}</option>
-              ))}
-            </select>
-          ))
-        ))}
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <Card title="Atributos (Ability Scores)">

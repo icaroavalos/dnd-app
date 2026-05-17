@@ -7,16 +7,23 @@ export type RulesCatalogKind =
   | 'items'
   | 'features'
   | 'feats'
-  | 'subraces';
+  | 'subclasses'
+  | 'subraces'
+  | 'actions'
+  | 'conditions';
 
 export interface RulesCatalogEntry {
+  id?: string;
   name: string;
   source: string;
   edition?: string;
-  level?: number;
+  level?: number | string;
   className?: string;
   classSource?: string;
   subclassShortName?: string;
+  entries?: any[];
+  category?: string;
+  type?: string;
   spells?: Array<{ name: string; source: string }>;
 }
 

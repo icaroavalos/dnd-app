@@ -62,10 +62,12 @@ function toActionsCharacterRecord(character: Character): Record<string, unknown>
     skillProficiencies: character.skillProficiencies || [],
     savingThrowProficiencies: character.savingThrows || [],
     inventory: character.inventory || [],
-    spellChoices: (character.spells || []).map((spell: any) => ({
-      spellId: spell.id || spell.name,
-      spellcastingAbility: character.bgChoices?.spellcastingAbility,
-    })),
+    spells: (character.spells || []).map((s: any) => s.name || s),
+    spellChoices: character.bgSpellChoices ? [{
+      selectedCantrips: character.bgSpellChoices.cantrips || [],
+      selectedLevel1Spells: character.bgSpellChoices.level1 || [],
+      spellcastingAbility: character.bgChoices?.spellcastingAbility || 'cha'
+    }] : [],
     resources: character.resources || {},
     state: {
       hp: character.hp || 0,

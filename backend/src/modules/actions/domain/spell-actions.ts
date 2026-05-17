@@ -47,15 +47,15 @@ export function deriveSpellActions(
 ): DerivedAction[] {
   const actions: DerivedAction[] = [];
 
-  for (const choice of character.spellChoices) {
-    for (const cantripName of choice.selectedCantrips) {
+  for (const choice of character.spellChoices ?? []) {
+    for (const cantripName of choice.selectedCantrips ?? []) {
       const detail = spellLookup.get(slugify(cantripName));
       if (!detail) continue;
       const action = createSpellAction(detail, projection, { castMode: 'at-will' });
       if (action) actions.push(action);
     }
 
-    for (const spellName of choice.selectedLevel1Spells) {
+    for (const spellName of choice.selectedLevel1Spells ?? []) {
       const detail = spellLookup.get(slugify(spellName));
       if (!detail) continue;
       const action = createSpellAction(detail, projection, {
