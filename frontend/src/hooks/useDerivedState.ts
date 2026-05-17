@@ -89,10 +89,18 @@ export const useDerivedState = () => {
   }, 0);
 
   // Spellcasting metrics
-  // Check background spellcasting choice or default to class
-  const spellcastingAbility: keyof AbilityScores = character.bgChoices?.spellcastingAbility || 'cha'; 
-  const spellAttack = modifiers[spellcastingAbility] + proficiencyBonus;
-  const spellSaveDc = 8 + modifiers[spellcastingAbility] + proficiencyBonus;
+  const spellcastingMetrics = {
+    int: { attack: modifiers.int + proficiencyBonus, dc: 8 + modifiers.int + proficiencyBonus },
+    wis: { attack: modifiers.wis + proficiencyBonus, dc: 8 + modifiers.wis + proficiencyBonus },
+    cha: { attack: modifiers.cha + proficiencyBonus, dc: 8 + modifiers.cha + proficiencyBonus },
+  };
+
+  // Determine main class spellcasting ability
+  const charClass = (character.class || '').toLowerCase();
+  let mainSpellcastingAbility: 'int' | 'wis' | 'cha' = 'cha';
+  if (['wizard', 'artificer', 'rogue', 'fighter'].includes(charClass)) mainSpellcastingAbility = 'int';
+  if (['cleric', 'druid', 'ranger', 'monk'].includes(charClass)) mainSpellcastingAbility = 'wis';
+  if (['bard', 'paladin', 'sorcerer', 'warlock'].includes(charClass)) mainSpellcastingAbility = 'cha';
 
   // Armor Class Calculation
   const getArmorClass = () => {
@@ -134,8 +142,8 @@ export const useDerivedState = () => {
     initiative: modifiers.dex,
     armorClass: getArmorClass(),
     maxHp: character.maxHp || 10,
-    spellAttack,
-    spellSaveDc,
+    spellcastingMetrics,
+    mainSpellcastingAbility,
     spellSlotsMax,
     encumbrance: {
       carriedWeight,

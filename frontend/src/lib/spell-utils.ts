@@ -80,3 +80,19 @@ export const getSpellOrigin = (spell: any, character: any): string => {
 
   return originKind;
 };
+
+export const getSpellAbility = (spell: any, character: any, mainAbility: 'int' | 'wis' | 'cha'): 'int' | 'wis' | 'cha' => {
+  if (!spell) return mainAbility;
+
+  const originKind = spell.originKind || spell.source;
+  
+  if (originKind === 'background' || originKind === 'bg-feat' || originKind === 'feature' || originKind === 'feat-auto') {
+    const chosenAbility = character.bgChoices?.spellcastingAbility;
+    if (chosenAbility === 'int' || chosenAbility === 'wis' || chosenAbility === 'cha') {
+      return chosenAbility;
+    }
+  }
+
+  // Fallback to main class ability
+  return mainAbility;
+};

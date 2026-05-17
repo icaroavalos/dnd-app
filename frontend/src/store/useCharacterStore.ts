@@ -7,6 +7,8 @@ import { deriveResourcesFromFeatures } from '../lib/feature-resources';
 interface PendingLevelUp {
   nextLevel: number;
   hpGain: number;
+  hitDie: number;
+  conMod: number;
   newFeatures: Feature[];
   choices: Choice[];
   selections: Record<string, string[]>;
@@ -45,6 +47,7 @@ interface CharacterState {
   initiateLevelUp: () => Promise<void>;
   cancelLevelUp: () => void;
   updateLevelUpSelection: (choiceId: string, selection: string[]) => void;
+  updateLevelUpHP: (hpGain: number) => void;
   finalizeLevelUp: () => void;
 
   levelUp: () => Promise<void>; // Legacy/internal
@@ -400,10 +403,25 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
 
       for (const feat of allFeatures) {
         if (!feat.description) continue;
+        
+        // Skip auto-discovery for core spellcasting/spellbook/cantrips features as they usually 
+        // contain example spells or links that shouldn't be automatically learned/added.
+        const featName = feat.name.toLowerCase();
+        if (
+          featName.includes('spellcasting') || 
+          featName.includes('spellbook') || 
+          featName.includes('cantrip')
+        ) continue;
+
         const foundSpellNames = extractSpells(feat.description);
         
         for (const name of foundSpellNames) {
           if (!currentSpellNames.has(name.toLowerCase())) {
+             // Check if this spell is just a recommendation in the text
+             // Pattern in cleaned text: [[spell:Name|Source]] ... is/are recommended
+             const isRecommended = new RegExp(`\\[\\[spell:${name}(?:\\|[^\\]]*)?\\]\\][^.]*\\s+(?:is|are)\\s+recommended|recommended:?\\s+[^.]*\\[\\[spell:${name}`, 'i').test(feat.description);
+             if (isRecommended) continue;
+
              const spell = spellsCatalog.find(s => s.name.toLowerCase() === name.toLowerCase());
              if (spell) {
                const isCantrip = spell.level === 0 || spell.level === '0';
@@ -444,10 +462,20 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
       // Calculate HP gain including Constitution modifier
       const conBase = character.abilities.con || 10;
       const conBonus = character.backgroundChoices?.abilityAssignments?.con || 0;
-      const conMod = Math.floor((conBase + conBonus - 10) / 2);
+      
+      // Sum ASI choices from previous levels
+      const conAsi = Object.entries(character.asiChoices || {}).reduce((total, [lvl, choice]: [string, any]) => {
+        if (parseInt(lvl) < nextLevel) {
+          return total + (Number(choice.con) || 0);
+        }
+        return total;
+      }, 0);
+
+      const totalCon = conBase + conBonus + conAsi;
+      const conMod = Math.floor((totalCon - 10) / 2);
 
       const dieSize = CLASS_HIT_DIE[primaryClass.toLowerCase()] || 8;
-      const hpGain = Math.floor(dieSize / 2) + 1 + conMod;
+      const defaultHpGain = Math.max(1, Math.floor(dieSize / 2) + 1 + conMod);
 
       const newFeatures = (options.features || []).map((f: any) => ({
         id: f.id || `${f.name}-${nextLevel}`.toLowerCase().replace(/\s+/g, '-'),
@@ -475,7 +503,9 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
       set({
         pendingLevelUp: {
           nextLevel,
-          hpGain,
+          hpGain: defaultHpGain,
+          hitDie: dieSize,
+          conMod,
           newFeatures,
           choices,
           selections: {}
@@ -498,6 +528,17 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
             ...state.pendingLevelUp.selections,
             [choiceId]: selection
           }
+        }
+      };
+    }),
+
+  updateLevelUpHP: (hpGain) =>
+    set((state) => {
+      if (!state.pendingLevelUp) return state;
+      return {
+        pendingLevelUp: {
+          ...state.pendingLevelUp,
+          hpGain
         }
       };
     }),
@@ -603,13 +644,33 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
         return cls;
       });
 
+      // Retroactive HP calculation if CON increased
+      let retroactiveHp = 0;
+      const oldConBase = state.character.abilities.con || 10;
+      const conBonus = state.character.backgroundChoices?.abilityAssignments?.con || 0;
+      
+      const oldConAsi = Object.entries(state.character.asiChoices || {}).reduce((total, [lvl, choice]: [string, any]) => {
+        return total + (Number(choice.con) || 0);
+      }, 0);
+      
+      const oldTotalCon = oldConBase + conBonus + oldConAsi;
+      const oldMod = Math.floor((oldTotalCon - 10) / 2);
+
+      const newConAsi = oldConAsi + (nextAsiChoice.con || 0);
+      const newTotalCon = oldConBase + conBonus + newConAsi;
+      const newMod = Math.floor((newTotalCon - 10) / 2);
+
+      if (newMod > oldMod) {
+        retroactiveHp = (newMod - oldMod) * nextLevel;
+      }
+
       return {
         character: {
           ...state.character,
           level: nextLevel,
           classes: updatedClasses,
-          maxHp: state.character.maxHp + hpGain,
-          hp: state.character.hp + hpGain,
+          maxHp: state.character.maxHp + hpGain + retroactiveHp,
+          hp: state.character.hp + hpGain + retroactiveHp,
           features: [...updatedExistingFeatures, ...filteredFeatures, ...nextFeatFeatures],
           asiChoices: {
             ...state.character.asiChoices,

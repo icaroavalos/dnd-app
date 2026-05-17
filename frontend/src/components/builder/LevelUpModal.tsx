@@ -7,6 +7,7 @@ import { ChoiceSelector } from '../ui/ChoiceSelector';
 import { RuleText } from '../ui/RuleText';
 import { ASISelector } from './asi-feat/ASISelector';
 import { FeatSelector } from './asi-feat/FeatSelector';
+import { HPGainSelector } from './HPGainSelector';
 
 export const LevelUpModal: React.FC = () => {
   const { 
@@ -22,7 +23,7 @@ export const LevelUpModal: React.FC = () => {
 
   if (!pendingLevelUp) return null;
 
-  const { nextLevel, hpGain, newFeatures, choices = [], selections = {} } = pendingLevelUp;
+  const { nextLevel, hpGain, hitDie, conMod, newFeatures, choices = [], selections = {} } = pendingLevelUp;
 
   // Detect if this is an ASI/Feat level (4, 8, 12, 16, 19)
   const isASILevel = choices.some(c => c.type === 'asi' || c.type === 'feat');
@@ -81,7 +82,12 @@ export const LevelUpModal: React.FC = () => {
     }
   };
 
-  const allChoicesMade = visibleChoices.every(choice => isChoiceComplete(choice)) && isEvolutionPathComplete();
+  const isHPValid = useMemo(() => {
+    const roll = hpGain - conMod;
+    return roll >= 1 && roll <= hitDie;
+  }, [hpGain, conMod, hitDie]);
+
+  const allChoicesMade = visibleChoices.every(choice => isChoiceComplete(choice)) && isEvolutionPathComplete() && isHPValid;
 
   const handleToggleASI = (ability: string) => {
     if (!asiChoice) return;
@@ -157,14 +163,17 @@ export const LevelUpModal: React.FC = () => {
           
           {/* Summary Section */}
           <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-5 bg-bg/50 border border-line rounded-2xl flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-rose/20 flex items-center justify-center text-rose border border-rose/30">
-                <Heart size={20} />
+            <div className="p-5 bg-bg/50 border border-line rounded-2xl flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-rose/20 flex items-center justify-center text-rose border border-rose/30">
+                  <Heart size={20} />
+                </div>
+                <div>
+                  <span className="block text-[0.65rem] font-black text-muted uppercase tracking-widest">Aumento de Vida</span>
+                  <strong className="text-xl font-black text-white">HP Máximo</strong>
+                </div>
               </div>
-              <div>
-                <span className="block text-[0.65rem] font-black text-muted uppercase tracking-widest">Aumento de HP</span>
-                <strong className="text-xl font-black text-white">+{hpGain} Pontos de Vida</strong>
-              </div>
+              <HPGainSelector />
             </div>
             <div className="p-5 bg-bg/50 border border-line rounded-2xl flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-blue/20 flex items-center justify-center text-blue border border-blue/30">
@@ -314,4 +323,3 @@ export const LevelUpModal: React.FC = () => {
     </div>
   );
 };
-

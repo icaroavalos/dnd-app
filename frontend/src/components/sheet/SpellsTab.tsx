@@ -3,7 +3,7 @@ import { useCharacterStore } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
 import { SpellCard } from './SpellCard';
 import { cn } from '../../lib/utils';
-import { getSpellOrigin } from '../../lib/spell-utils';
+import { getSpellOrigin, getSpellAbility } from '../../lib/spell-utils';
 
 export const SpellsTab: React.FC = () => {
   const { character, updateCharacter } = useCharacterStore();
@@ -14,7 +14,9 @@ export const SpellsTab: React.FC = () => {
     if (level === 0) return;
 
     // First try to use background/feat resource if available
-    if ((spell.originKind === 'background' || spell.source === 'bg-feat') && spell.resource?.remaining > 0) {
+    if ((spell.originKind === 'background' || spell.source === 'bg-feat') && spell.resource) {
+      if (spell.resource.remaining <= 0) return;
+
       const updatedSpells = character.spells.map(s => {
         if ((s.id || s.name) === (spell.id || spell.name)) {
           return {
@@ -67,18 +69,38 @@ export const SpellsTab: React.FC = () => {
     (group.level > 0 && (derived.spellSlotsMax[group.level] || 0) > 0)
   );
 
+  const usedAbilities = new Set<'int' | 'wis' | 'cha'>();
+  usedAbilities.add(derived.mainSpellcastingAbility); // Always include main
+  character.spells.forEach(spell => {
+    usedAbilities.add(getSpellAbility(spell, character, derived.mainSpellcastingAbility));
+  });
+  const activeAbilities = Array.from(usedAbilities);
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-2.5">
-        <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e]">
-          <span className="block font-[850] text-[0.85rem]">Spell Attack</span>
-          <strong className="text-[2.35rem] font-medium leading-none">{signed(derived.spellAttack)}</strong>
-        </div>
-        <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e]">
-          <span className="block font-[850] text-[0.85rem]">Spell DC</span>
-          <strong className="text-[2.35rem] font-medium leading-none">{derived.spellSaveDc}</strong>
-        </div>
-      </div>
+      {activeAbilities.map(ability => {
+        const metrics = derived.spellcastingMetrics[ability];
+        if (!metrics) return null;
+        return (
+          <div key={ability} className="flex flex-col gap-1.5">
+            {activeAbilities.length > 1 && (
+              <h4 className="text-[0.65rem] font-black uppercase text-gold/80 tracking-widest pl-1">
+                Conjuração: {ability.toUpperCase()}
+              </h4>
+            )}
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e]">
+                <span className="block font-[850] text-[0.85rem]">Ataque Mágico</span>
+                <strong className="text-[2.35rem] font-medium leading-none">{signed(metrics.attack)}</strong>
+              </div>
+              <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e]">
+                <span className="block font-[850] text-[0.85rem]">CD de Magia</span>
+                <strong className="text-[2.35rem] font-medium leading-none">{metrics.dc}</strong>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       {spellsByLevel.map((group) => (
         <section key={group.level} className="grid gap-2">
@@ -123,8 +145,6 @@ export const SpellsTab: React.FC = () => {
             const max = derived.spellSlotsMax[group.level] || 0;
             const used = character.spellSlots[group.level]?.used || 0;
             const hasSlots = used < max;
-            
-            // For background spells, they MUST use their resource, not slots
             const canCast = group.level === 0 || (isBgSpell ? hasBgResource : hasSlots);
 
             return (
@@ -148,8 +168,13 @@ export const SpellsTab: React.FC = () => {
                     onClick={() => setSelectedSpell(isOpen ? null : spell.name)}
                   >
                     <span className="text-[0.92rem] font-[900]">{spell.name}</span>
-                    <span className="text-[0.55rem] font-bold opacity-80 uppercase tracking-widest mt-0.5">
+                    <span className="text-[0.55rem] font-bold opacity-80 uppercase tracking-widest mt-0.5 flex items-center gap-1.5">
                       {getSpellOrigin(spell, character)}
+                      {getSpellAbility(spell, character, derived.mainSpellcastingAbility) !== derived.mainSpellcastingAbility && (
+                        <span className="bg-black/30 px-1 py-0.5 rounded text-[0.45rem]">
+                          {getSpellAbility(spell, character, derived.mainSpellcastingAbility).toUpperCase()}
+                        </span>
+                      )}
                     </span>
                   </button>
                 </div>

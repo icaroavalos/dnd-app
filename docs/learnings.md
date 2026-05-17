@@ -118,3 +118,16 @@ O agente tentou realizar múltiplas edições (`replace`) no mesmo arquivo (`Spe
 - **Atomicidade de Edição:** NUNCA realize múltiplos `replace` no mesmo arquivo em um único turno. As edições devem ser sequenciais, esperando o sucesso da primeira antes de iniciar a segunda em um novo turno, ou consolidadas em um único `write_file` caso o arquivo seja pequeno o suficiente. Race conditions em ferramentas de edição são destrutivas para a integridade do código.
 - **Validação Pós-Edição:** Sempre rodar `npm run typecheck` ou observar o log do `npm run dev` após edições complexas para garantir que a árvore sintática (AST) não foi quebrada.
 
+## Gestão de Vida (HP) e Level Up (2024) (2026-05-17)
+
+**O que foi feito:**
+1. **Escolha de HP no Level Up:** Implementada a opção de escolher entre o valor fixo (média arredondada para cima) ou rolar o dado (entrada manual) ao subir de nível.
+2. **Validação Estrita:** O sistema valida se o valor do dado está entre 1 e o tamanho do dado de vida da classe (d6, d8, etc.), impedindo a finalização com valores inválidos.
+3. **Cálculo Retroativo de CON:** Implementada a regra do D&D 2024 (e 2014) onde aumentos no modificador de Constituição aplicam HP adicional retroativamente para todos os níveis anteriores, incluindo o nível atual.
+4. **Mínimo de 1 HP:** Garantido que o ganho de vida por nível seja no mínimo 1, mesmo com modificadores de Constituição negativos, conforme a regra do XPHB 2024.
+
+**Lição aprendida:**
+- **Sincronia de Cálculos:** Em processos complexos como o Level Up, onde uma escolha (ASI em CON) afeta outra métrica (Max HP), é fundamental centralizar a lógica de "finalização" para recalcular o estado total a partir das escolhas feitas, evitando estados inconsistentes se os cálculos fossem feitos apenas no início do processo.
+- **Transparência na UI:** Mostrar ao usuário a decomposição do ganho (`Dado + Modificador`) ajuda a validar a regra e reduz dúvidas sobre por que o HP subiu mais do que o esperado (no caso de aumentos retroativos).
+
+

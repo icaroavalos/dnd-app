@@ -1,8 +1,9 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 import { RuleText } from '../ui/RuleText';
-import { getSpellOrigin } from '../../lib/spell-utils';
+import { getSpellOrigin, getSpellAbility } from '../../lib/spell-utils';
 import { useCharacterStore } from '../../store/useCharacterStore';
+import { useDerivedState } from '../../hooks/useDerivedState';
 
 interface SpellCardProps {
   spell: any;
@@ -22,6 +23,7 @@ const SCHOOL_MAP: Record<string, string> = {
 
 export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
   const { character } = useCharacterStore();
+  const derived = useDerivedState();
   if (!spell) return null;
 
   const levelSuffix = (lvl: number) => {
@@ -129,9 +131,18 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
   // Tenta extrair o tipo de defesa/ataque do texto
   const firstEntry = Array.isArray(spell.entries) ? spell.entries[0] : (spell.description || '');
   const firstEntryText = typeof firstEntry === 'string' ? firstEntry : (firstEntry.entries?.[0] || '');
-  const defense = firstEntryText.toLowerCase().includes('saving throw') 
+  let defense = firstEntryText.toLowerCase().includes('saving throw') 
     ? (firstEntryText.match(/(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma) saving throw/i)?.[1].substring(0, 3).toUpperCase() + ' Save')
     : (firstEntryText.toLowerCase().includes('spell attack') ? 'Spell Attack' : null);
+
+  if (defense) {
+    const ability = getSpellAbility(spell, character, derived.mainSpellcastingAbility).toUpperCase();
+    if (defense === 'Spell Attack') {
+      defense = `Spell Attack (${ability})`;
+    } else {
+      defense = `${defense} (DC ${ability})`;
+    }
+  }
 
   return (
     <article className={cn(

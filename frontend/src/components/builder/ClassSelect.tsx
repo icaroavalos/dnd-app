@@ -51,6 +51,7 @@ export const ClassSelect: React.FC = () => {
       updateCharacter({
         class: cls.name,
         classes: [{ classId: slugify(cls.name), level: character.level || 1 }],
+        spells: character.spells.filter(s => s.originKind !== 'class' && s.source !== 'class'),
         skillProficiencies: character.skillProficiencies.filter(s =>
           !character.classSkillChoices.includes(s)
         ),
