@@ -24,3 +24,18 @@ Ao realizar o Level Up, o nível geral da ficha (`character.level`) era incremen
 
 **Lição aprendida:**
 - **Fontes de Verdade Duplas:** Evite ter o mesmo dado (nível) representado em dois lugares diferentes (`level` global vs `level` no array de classes) sem uma rotina estrita de sincronização. Sempre que possível, o dado global deve ser um estado derivado (soma dos níveis das classes).
+
+## Requisitos da Funcionalidade de Level Up (2026-05-15)
+
+**Status:** 📋 PLANEJADO - Definição de escopo concluída via entrevista com o usuário.
+
+**Diretrizes de Implementação:**
+1. **Arquitetura de Multiclasse:** O sistema deve manter o array `classes` sempre sincronizado, permitindo que novas classes sejam adicionadas no futuro, embora o foco atual seja progressão linear.
+2. **Automatização de ASI/Feats:** Níveis que concedem Aumento de Atributo ou Talentos (4, 8, 12, etc.) devem obrigatoriamente incluir uma etapa de seleção no fluxo de Level Up.
+3. **Incremento de HP Guiado:** Ao subir de nível, o usuário deve poder escolher entre a média fixa ou rolar o dado. O sistema deve validar e travar o valor máximo permitido (Dado de Vida + Mod. de Constituição).
+4. **Gestão de Magias Conhecidas:** Classes conjuradoras devem ter uma etapa dedicada para escolher novas magias, filtrando pelo nível de slot recém-desbloqueado.
+5. **Estética Consistente:** A ficha deve manter sua identidade visual padrão (neutra), independente da subclasse escolhida no nível 3.
+
+**Ações Imediatas:**
+- Iniciar o desenvolvimento da UI para a etapa de HP Guiado.
+- Criar o seletor de magias específico para o contexto de Level Up.
