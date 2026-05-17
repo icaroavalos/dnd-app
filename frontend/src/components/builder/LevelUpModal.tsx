@@ -315,7 +315,7 @@ export const LevelUpModal: React.FC = () => {
                 : "bg-zinc-800 text-zinc-600 grayscale cursor-not-allowed shadow-none"
             )}
           >
-            {allChoicesMade ? <CheckCircle2 size={18} /> : <Shield size={18} />}
+            {allChoicesMade ? <CheckCircle2 size={18} /> : <ArrowUp size={18} />}
             Finalizar Evolução
           </button>
         </footer>
