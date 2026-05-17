@@ -109,11 +109,10 @@ export const SummaryTab: React.FC = () => {
               </button>
               <button 
                 onClick={handleShortRest}
-                className="flex-[2] bg-teal text-bg rounded-xl hover:bg-teal/90 flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-teal/10"
+                className="flex-[2] bg-teal text-bg rounded-xl hover:bg-teal/90 flex items-center justify-center transition-all shadow-lg shadow-teal/10"
                 title="Confirmar Descanso Curto"
               >
-                <Check size={20} className="stroke-[3]" />
-                <span className="text-[0.65rem] font-black uppercase">CURTO</span>
+                <Check size={22} className="stroke-[3]" />
               </button>
             </div>
           ) : (
@@ -143,11 +142,10 @@ export const SummaryTab: React.FC = () => {
               </button>
               <button 
                 onClick={handleLongRest}
-                className="flex-[2] bg-rose text-bg rounded-xl hover:bg-rose/90 flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-rose/10"
+                className="flex-[2] bg-rose text-bg rounded-xl hover:bg-rose/90 flex items-center justify-center transition-all shadow-lg shadow-rose/10"
                 title="Confirmar Descanso Longo"
               >
-                <Check size={20} className="stroke-[3]" />
-                <span className="text-[0.65rem] font-black uppercase">LONGO</span>
+                <Check size={22} className="stroke-[3]" />
               </button>
             </div>
           ) : (
