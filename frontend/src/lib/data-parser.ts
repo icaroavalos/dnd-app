@@ -160,12 +160,13 @@ export const parseResourceInfo = (text: string, character: any, derived: any): a
   }
 
   // If no "use this" mention, it might not be a resource
-  const isResource = clean.includes("use this") || 
+  const isResource = (clean.includes("use this") || 
                      clean.includes("number of times") || 
                      clean.includes("expended use") || 
                      clean.includes("rages column") ||
                      clean.includes("pool of") ||
-                     clean.includes("restore a total number");
+                     clean.includes("restore a total number")) && 
+                     !clean.includes("primal knowledge");
 
   if (!isResource) {
     return null;

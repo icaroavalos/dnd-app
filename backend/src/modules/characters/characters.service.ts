@@ -171,14 +171,28 @@ function resolveBaseArmorClass(
 function deriveAbilityScores(character: CharacterRecord): AbilityScoreMap {
   const assignments = character.backgroundChoices?.abilityAssignments;
   const abilities = character.abilities ?? { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+  
+  // Sum ASI choices from all levels
+  const asiBonuses: Record<string, number> = { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 };
+  if (character.asiChoices) {
+    Object.values(character.asiChoices).forEach((choice: any) => {
+      if (typeof choice === 'object') {
+        Object.entries(choice).forEach(([ab, val]) => {
+          if (ab in asiBonuses) {
+            asiBonuses[ab] += Number(val) || 0;
+          }
+        });
+      }
+    });
+  }
 
   return {
-    str: clamp(abilities.str + (assignments?.str ?? 0)),
-    dex: clamp(abilities.dex + (assignments?.dex ?? 0)),
-    con: clamp(abilities.con + (assignments?.con ?? 0)),
-    int: clamp(abilities.int + (assignments?.int ?? 0)),
-    wis: clamp(abilities.wis + (assignments?.wis ?? 0)),
-    cha: clamp(abilities.cha + (assignments?.cha ?? 0))
+    str: clamp(abilities.str + (assignments?.str ?? 0) + asiBonuses.str),
+    dex: clamp(abilities.dex + (assignments?.dex ?? 0) + asiBonuses.dex),
+    con: clamp(abilities.con + (assignments?.con ?? 0) + asiBonuses.con),
+    int: clamp(abilities.int + (assignments?.int ?? 0) + asiBonuses.int),
+    wis: clamp(abilities.wis + (assignments?.wis ?? 0) + asiBonuses.wis),
+    cha: clamp(abilities.cha + (assignments?.cha ?? 0) + asiBonuses.cha)
   };
 }
 

@@ -56,6 +56,11 @@ interface CharacterState {
   applyShortRest: () => void;
   applyLongRest: (maxHp: number) => void;
   resetCharacter: () => void;
+  addItem: (item: any) => void;
+  removeItem: (instanceId: string) => void;
+  updateItemQuantity: (instanceId: string, quantity: number) => void;
+  updateCurrency: (currency: Partial<Character['currency']>) => void;
+  updateDeathSaves: (successes: number, failures: number) => void;
 }
 
 const createDefaultCharacter = (): Character => ({
@@ -93,6 +98,8 @@ const createDefaultCharacter = (): Character => ({
   pendingChoices: [],
   notes: '',
   bgSpellChoices: {},
+  currency: { gp: 0, sp: 0, cp: 0, pp: 0, ep: 0 },
+  deathSaves: { successes: 0, failures: 0 },
   bgChoices: {
     abilityIncrement: null,
     abilityScores: [],
@@ -227,7 +234,9 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
             backgroundChoices: backgroundChoices,
             bgChoices: bgChoices,
             bgSpellChoices: canonical.bgSpellChoices || {},
-            spellSlots: canonical.spellSlots || {}
+            spellSlots: canonical.spellSlots || {},
+            currency: canonical.currency || { gp: 0, sp: 0, cp: 0, pp: 0, ep: 0 },
+            deathSaves: canonical.deathSaves || { successes: 0, failures: 0 }
           }
         };
       }
@@ -241,6 +250,58 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
     set((state) => ({
       character: { ...state.character, ...updates }
     })),
+
+  addItem: (item, quantity = 1) => set((state) => {
+    const inventory = [...(state.character.inventory || [])];
+    const baseItemId = item.id || item.name;
+    const instanceId = `${baseItemId}-${Date.now()}`;
+    
+    return {
+      character: {
+        ...state.character,
+        inventory: [...inventory, { ...item, instanceId, baseItemId, quantity: Math.max(1, quantity) }]
+      }
+    };
+  }),
+
+  removeItem: (instanceId) => set((state) => ({
+    character: {
+      ...state.character,
+      inventory: (state.character.inventory || []).filter((item: any) => 
+        (item.instanceId || item.id) !== instanceId
+      ),
+      equippedItems: (state.character.equippedItems || []).filter(id => id !== instanceId)
+    }
+  })),
+
+  updateItemQuantity: (instanceId, quantity) => set((state) => ({
+    character: {
+      ...state.character,
+      inventory: (state.character.inventory || []).map((item: any) => {
+        if ((item.instanceId || item.id) === instanceId) {
+          return { ...item, quantity: Math.max(1, quantity) };
+        }
+        return item;
+      })
+    }
+  })),
+
+  updateCurrency: (currency) => set((state) => ({
+    character: {
+      ...state.character,
+      currency: {
+        ...(state.character.currency || { gp: 0, sp: 0, cp: 0, pp: 0, ep: 0 }),
+        ...currency
+      }
+    }
+  })),
+
+  updateDeathSaves: (successes, failures) => set((state) => ({
+    character: {
+      ...state.character,
+      deathSaves: { successes, failures }
+    }
+  })),
 
   updateAbility: (ability, value) =>
     set((state) => {
@@ -284,18 +345,26 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
     })),
 
   applyDamage: (amount) =>
-    set((state) => ({
-      character: {
-        ...state.character,
-        hp: Math.max(0, state.character.hp - amount)
-      }
-    })),
+    set((state) => {
+      const currentTempHp = state.character.tempHp || 0;
+      const damageToTemp = Math.min(currentTempHp, amount);
+      const remainingDamage = amount - damageToTemp;
+
+      return {
+        character: {
+          ...state.character,
+          tempHp: currentTempHp - damageToTemp,
+          hp: Math.max(0, state.character.hp - remainingDamage)
+        }
+      };
+    }),
 
   applyHealing: (amount) =>
     set((state) => ({
       character: {
         ...state.character,
-        hp: Math.min(state.character.maxHp, state.character.hp + amount)
+        hp: Math.min(state.character.maxHp, state.character.hp + amount),
+        deathSaves: { successes: 0, failures: 0 }
       }
     })),
 
@@ -599,10 +668,39 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
             level: nextLevel
           });
 
-          // Handle half-feat ability bonus
+          // Special handling for Actor feat (2024)
+          if (feat.name.toLowerCase() === 'actor') {
+            nextFeatFeatures.push({
+              id: 'actor-impersonation',
+              name: 'Impersonation',
+              kind: 'feat',
+              description: 'You have Advantage on Charisma (Deception) and Charisma (Performance) checks when trying to pass yourself off as another person.',
+              level: nextLevel
+            });
+            nextFeatFeatures.push({
+              id: 'actor-mimicry',
+              name: 'Mimicry',
+              kind: 'feat',
+              description: 'You can mimic the speech of another person or the sounds made by other creatures. You must have heard the person speaking or heard the creature make the sound for at least 1 minute. A successful Wisdom (Insight) check contested by your Charisma (Deception) check allows a listener to determine that the effect is faked.',
+              level: nextLevel
+            });
+          }
+
+          // Handle fixed ability bonus from feat
+          if (feat.ability) {
+            feat.ability.forEach((abObj: any) => {
+              Object.entries(abObj).forEach(([ab, val]) => {
+                if (ab !== 'choose' && typeof val === 'number') {
+                   nextAsiChoice[ab] = (nextAsiChoice[ab] || 0) + val;
+                }
+              });
+            });
+          }
+
+          // Handle half-feat ability bonus (choice)
           const selectedAbility = selections['feat-ability']?.[0];
           if (selectedAbility) {
-            nextAsiChoice[selectedAbility] = 1;
+            nextAsiChoice[selectedAbility] = (nextAsiChoice[selectedAbility] || 0) + 1;
           }
         }
       }

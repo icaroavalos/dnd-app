@@ -53,6 +53,14 @@ export interface BackgroundChoices {
   skillCollisions: string[];
 }
 
+export interface Currency {
+  gp: number;
+  sp: number;
+  cp: number;
+  pp: number;
+  ep: number;
+}
+
 export interface Character {
   id?: string;
   name: string;
@@ -65,10 +73,10 @@ export interface Character {
   experience: number;
   classes: Array<{ classId: string; level: number }>;
   abilityMethod: 'standard' | 'pointBuy' | 'manual';
-  classFeatureChoices: Record<string, string[]>; // Changed to string[] for multiple choices
+  classFeatureChoices: Record<string, string[]>;
   asiChoices: Record<string, any>;
   equipmentChoices: Record<string, string>;
-  inventory: any[]; // Changed to any[] for object support
+  inventory: any[];
   equippedItems: string[];
   hitDiceUsed: number;
   spellSlots: Record<string, { max: number; used: number }>;
@@ -91,4 +99,9 @@ export interface Character {
   bgSpellChoices?: Record<string, string[]>;
   bgChoices: BackgroundChoices;
   backgroundChoices?: any;
+  currency?: Currency;
+  deathSaves?: {
+    successes: number;
+    failures: number;
+  };
 }

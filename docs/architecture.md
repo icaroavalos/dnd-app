@@ -44,7 +44,8 @@ Refatoramos o sistema de bônus de Background para ser explícito:
 
 ### 5. Gestão de Vitalidade e Descansos (D&D 2024)
 Implementamos o sistema de combate e recuperação baseado nas regras do PHB 2024:
-- **Dano e Cura**: Sistema reativo que consome Temporary HP antes do HP real.
+- **Dano e Cura**: Sistema reativo onde o dano consome **Temporary HP antes do HP real** obrigatoriamente.
+- **Death Saves**: Interface de sucessos/falhas que aparece automaticamente quando o personagem chega a 0 HP. Receber cura limpa os testes; receber THP a 0 HP fornece proteção mas não estabiliza.
 - **Cálculo de HP Retroativo**: Sempre que o modificador de Constituição aumenta (ex: via Talento), o `maxHp` é recalculado para todos os níveis anteriores automaticamente.
 - **HP no Level Up**: Agora soma corretamente `Média do Dado de Vida + Modificador de CON`, incluindo bônus vindos de Background.
 - **Rages & Second Wind (2024)**: Implementada a recuperação de **+1 uso** no Descanso Curto (Short Rest), em vez de reset total ou nenhum.
@@ -54,12 +55,14 @@ Implementamos um fluxo dinâmico e estético para evolução de personagens:
 - **Fluxo Hierárquico**: Escolhas críticas (como Subclasse no Nível 3) são priorizadas. 
 - **Automatização de Magias**: Novo passo no Criador que gerencia limites de Truques e Magias Preparadas (ex: Wizard 6 magias no Spellbook nível 1).
 - **Detecção de Escolhas via Texto**: O sistema agora interpreta frases como "gain proficiency with X skills" para gerar seletores dinâmicos, automatizando recursos como *Bonus Proficiencies* do Bardo da Lore.
+- **Talentos Automatizados**: O sistema detecta benefícios fixos de talentos (ex: *Actor* concede +1 Carisma e adiciona sub-habilidades como *Impersonation* e *Mimicry* automaticamente).
 
 ### 7. Sistema Dinâmico de Recursos e Recuperação
 Substituímos lógicas fixas por uma arquitetura baseada em dados (`Strategy Pattern`):
 - **`parseResourceInfo`**: Interpretador que extrai limites de uso (Proficiency Bonus, Multiplicadores de Nível) e regras de recuperação (Reset Total ou Incremento) diretamente da descrição das habilidades.
 - **Escalonamento**: Recursos como *Lay on Hands* (5x Nível) e *Indomitable* atualizam seus máximos e disponíveis instantaneamente ao subir de nível.
 - **Metadados de Recuperação**: Cada característica agora carrega sua própria estratégia (`full` ou `inc`), permitindo suporte universal a qualquer classe ou espécie sem alteração no código central do Store.
+- **Exclusões Inteligentes**: Habilidades como *Primal Knowledge* são filtradas para não exibirem barras de uso desnecessárias.
 
 ### 8. Persistência e Sincronização
 - **Motor de Auto-save Global**: O `useEffect` de sincronização reside no `AppLayout.tsx`. Isso garante que o salvamento não seja interrompido quando o usuário navega entre rotas ou personagens, pois o Layout permanece montado durante toda a sessão.
@@ -69,12 +72,13 @@ Substituímos lógicas fixas por uma arquitetura baseada em dados (`Strategy Pat
 
 ### 9. Interface e Design System
 - **Skills Tab**: Layout dinâmico que alterna entre 1 coluna (sidebar) e 2 colunas (wide view) para otimizar espaço.
+- **Vitality Panel**: Painel interativo que oculta controles de dano/cura sob o círculo de HP para minimizar ruído visual.
 - **Identidade Visual**: Padrão "Modern High Fantasy" com tons de ouro, teal e rose, utilizando blur e bordas arredondadas (3xl).
 - **Atributos Únicos**: No método Standard Array, o sistema bloqueia valores já selecionados para evitar duplicidade.
 
 ### 10. Progressão e Evolução (Level Up)
 - **Histórico de Escolhas**: Bônus de atributos (**ASI**) e Talentos (**Feats**) não modificam os atributos base permanentemente. Eles são armazenados em `character.asiChoices` indexados pelo nível (ex: `character.asiChoices["4"]`).
-- **Cálculo de Projeção**: O hook `useDerivedState.ts` é o responsável por somar: `Atributo Base + Bônus de Background + Soma de todos os ASIs/Feats históricos`.
+- **Cálculo de Projeção**: O hook `useDerivedState.ts` e o serviço de backend `characters.service.ts` somam em sincronia: `Atributo Base + Bônus de Background + Soma de todos os ASIs/Feats históricos`.
 - **Validação Estrita**: A finalização do Level Up utiliza um motor de validação que impede o avanço caso escolhas obrigatórias (Subclasse, Perícias de Primal Knowledge, etc.) não tenham sido feitas ou requisitos de Talentos não sejam atendidos.
 - **Half-Feats**: Talentos que concedem +1 em atributo utilizam um seletor auxiliar que persiste o bônus no mesmo objeto `asiChoices` do nível correspondente.
 
@@ -82,6 +86,12 @@ Substituímos lógicas fixas por uma arquitetura baseada em dados (`Strategy Pat
 - **Cálculo de Slots**: O total de slots por nível é calculado dinamicamente no frontend via `lib/spell-utils.ts`. Isso garante que a UI exiba os slots corretamente mesmo para personagens recém-criados ou sem conexão momentânea com o backend.
 - **Rastreamento de Uso**: O estado `character.spellSlots` armazena o contador `used`. A interface em `SpellsTab.tsx` utiliza quadrados clicáveis que preenchem o pool de uso de forma sequencial.
 - **Integração com Long Rest**: O motor de descanso longo (`applyLongRest`) percorre o objeto de slots e reseta todos os contadores `used` para zero.
+
+### 12. Gestão de Moedas e Inventário
+- **Currency System**: Implementamos suporte completo para moedas (CP, SP, EP, GP, PP) com uma seção dedicada no inventário.
+- **Conversão de Equipamento**: O sistema de Background agora converte automaticamente o valor do equipamento inicial em moedas no objeto `currency`.
+- **Instanciação Única**: Cada item possui um `instanceId`, permitindo a gestão individual de quantidades e estados de equipamento (ex: vestir uma armadura e manter outra idêntica na mochila).
+- **Ações de Inventário**: Adicionada funcionalidade de remoção direta e busca manual no catálogo completo de itens.
 
 ## Modulos Implementados
 

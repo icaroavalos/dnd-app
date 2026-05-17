@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { useDerivedState } from '../../hooks/useDerivedState';
 import { cn } from '../../lib/utils';
-import { Zap, Shield, Heart, CheckCircle2, X, Sparkles, UserPlus } from 'lucide-react';
+import { Zap, ArrowUp, Heart, CheckCircle2, X, Sparkles, UserPlus } from 'lucide-react';
 import { ChoiceSelector } from '../ui/ChoiceSelector';
 import { RuleText } from '../ui/RuleText';
 import { ASISelector } from './asi-feat/ASISelector';
@@ -177,7 +177,7 @@ export const LevelUpModal: React.FC = () => {
             </div>
             <div className="p-5 bg-bg/50 border border-line rounded-2xl flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-blue/20 flex items-center justify-center text-blue border border-blue/30">
-                <Shield size={20} />
+                <ArrowUp size={20} />
               </div>
               <div>
                 <span className="block text-[0.65rem] font-black text-muted uppercase tracking-widest">Nível Atual</span>

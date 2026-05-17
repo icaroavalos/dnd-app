@@ -61,32 +61,35 @@ export const AppLayout: React.FC = () => {
       {pendingLevelUp && <LevelUpModal />}
       
       <main className={cn(
-        "w-full mx-auto p-4 sm:p-6 transition-all duration-500 ease-in-out",
+        "w-full mx-auto p-4 sm:p-6 transition-all duration-500 ease-in-out gap-8",
         isSheetView 
-          ? "max-w-[800px] flex flex-col items-center" 
-          : "max-w-[1260px] grid grid-cols-1 lg:grid-cols-[minmax(360px,1fr)_390px] gap-7 items-start"
+          ? "max-w-[1200px] flex flex-col lg:flex-row items-start justify-center" 
+          : "max-w-[1260px] grid grid-cols-1 lg:grid-cols-[minmax(360px,1fr)_390px] items-start"
       )}>
-        {/* Sidebar do Construtor - só aparece se NÃO estiver na visualização de ficha finalizada */}
-        {!isSheetView && (
-          <aside className="min-w-0 bg-[#111111]/90 border border-[#262626] rounded-lg p-[18px] shadow-[0_18px_70px_rgba(0,0,0,0.34)]">
-            <div className="builder-header">
+        {/* Main Content Area (Builder or Sheet Info) */}
+        <div className={cn(
+          "transition-all duration-500",
+          isSheetView ? "flex-1 w-full order-2 lg:order-1" : "min-w-0 bg-[#111111]/90 border border-[#262626] rounded-lg p-[18px] shadow-[0_18px_70px_rgba(0,0,0,0.34)]"
+        )}>
+          {!isSheetView && (
+            <div className="builder-header mb-6">
               <h1 className="text-mint text-[0.74rem] tracking-normal uppercase mb-[3px] font-black">Construtor de Personagem</h1>
             </div>
-            
-            <div className="builder-content mt-4">
-              <Outlet />
-            </div>
-          </aside>
-        )}
+          )}
+          
+          <div className="content-area">
+            <Outlet />
+          </div>
+        </div>
         
-        {/* Ficha de Personagem */}
+        {/* Character Sheet */}
         <section className={cn(
-          "w-full transition-all duration-500 bg-black border border-[#1d1d1d] rounded-xl shadow-[0_26px_80px_rgba(0,0,0,0.42)]",
+          "w-full transition-all duration-500 bg-black border border-[#1d1d1d] rounded-xl shadow-[0_26px_80px_rgba(0,0,0,0.42)] order-1 lg:order-2",
           isSheetView 
-            ? "max-w-[500px] p-6 sm:p-8" 
-            : "max-w-[390px] p-2.5 min-h-[760px] sticky top-20"
+            ? "max-w-[500px] lg:sticky lg:top-20" 
+            : "max-w-[390px] min-h-[760px] sticky top-20"
         )}>
-          <div className="grid gap-2.5">
+          <div className="grid gap-2.5 p-2.5 sm:p-4">
             <CharacterSheet isWide={isSheetView} />
           </div>
         </section>

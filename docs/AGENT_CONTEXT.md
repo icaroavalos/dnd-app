@@ -182,16 +182,19 @@ O sistema analisa o texto bruto das habilidades em busca de padroes como "choose
 - `parseResourceInfo`: Extrai limites de uso e regras de recuperacao das descricoes.
 - `extractSpells`: Identifica magias referenciadas em textos via `{@spell Name}`.
 
-### Atributos de Background
-No padrao +2/+1: primeira habilidade clicada recebe +2, segunda +1, com badges visuais. `useDerivedState.ts` soma bonuses de background aos atributos base em tempo real.
+### Atributos e Talentos
+- **Cálculo Projetado**: `useDerivedState.ts` (frontend) e `characters.service.ts` (backend) somam bônus de Background e ASIs históricos.
+- **Talentos Automatizados**: O sistema detecta bônus fixos e sub-habilidades de talentos (ex: Ator).
 
-### Sistema de Recursos e Recuperacao (Strategy Pattern)
-Recursos como Rage, Ki e Second Wind carregam metadados de recuperacao (`full` ou `inc`). Escalonamento automatico por nivel (ex: Lay on Hands = 5x Nivel). Sem IFs fixos — tudo baseado em dados.
+### HP, Vitalidade e Descansos
+- **Ordem de Dano**: Subtrai de `Temporary HP` antes do HP real (PHB 2024).
+- **Death Saves**: Interface automática ao chegar a 0 HP. Cura limpa os testes.
+- **Descansos**: `applyShortRest` recupera +1 uso de habilidades incrementais (ex: Rage).
 
-### HP e Descansos
-- Dano consome Temporary HP antes do HP real.
-- Aumento de CON recalcula `maxHp` retroativamente.
-- Rages e Second Wind: +1 uso no Short Rest (2024), nao reset total.
+### Inventário e Moedas
+- **Moedas**: Objeto `currency` gerencia CP, SP, EP, GP, PP de forma centralizada.
+- **Instanciação**: Cada item possui `instanceId` para rastreamento individual.
+- **Gestão**: Suporte a adição manual via catálogo e remoção de itens.
 
 ### Level Up
 - Subclasse no Nivel 3 detectada por nivel + categoria, nao por nome.

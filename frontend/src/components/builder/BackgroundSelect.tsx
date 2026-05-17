@@ -217,12 +217,22 @@ export const BackgroundSelect: React.FC = () => {
     // Handle both uppercase and lowercase keys in the data
     const itemsData = bgEq[option] || bgEq[option.toLowerCase()] || [];
 
-    const newInventory = itemsData.map((entry: any) => {
-      if (typeof entry === 'string') return { baseItemId: entry.split('|')[0], quantity: 1, status: 'backpack' };
-      if (entry.item) return { baseItemId: entry.item.split('|')[0], quantity: entry.quantity || 1, status: 'backpack' };
-      if (entry.value) return { baseItemId: 'gp', quantity: entry.value / 100, status: 'backpack' };
-      return null;
-    }).filter(Boolean);
+    const newInventory: any[] = [];
+    let cpTotal = 0;
+
+    itemsData.forEach((entry: any) => {
+      if (typeof entry === 'string') {
+        newInventory.push({ baseItemId: entry.split('|')[0], quantity: 1, status: 'backpack' });
+      } else if (entry.item) {
+        newInventory.push({ baseItemId: entry.item.split('|')[0], quantity: entry.quantity || 1, status: 'backpack' });
+      } else if (entry.value) {
+        cpTotal += entry.value;
+      }
+    });
+
+    const gp = Math.floor(cpTotal / 100);
+    const sp = Math.floor((cpTotal % 100) / 10);
+    const cp = cpTotal % 10;
 
     updateCharacter({
       bgChoices: {
@@ -232,7 +242,13 @@ export const BackgroundSelect: React.FC = () => {
       inventory: [
         ...character.inventory.filter((i: any) => i.source !== 'background'),
         ...newInventory.map((i: any) => ({ ...i, source: 'background' }))
-      ]
+      ],
+      currency: {
+        ...(character.currency || { gp: 0, sp: 0, cp: 0, pp: 0, ep: 0 }),
+        gp,
+        sp,
+        cp
+      }
     });
   };
 

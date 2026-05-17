@@ -5,17 +5,30 @@ import { cn } from '../../lib/utils';
 import { Heart, Zap, Plus, Minus, CheckCircle2, ArrowUp, Check, X } from 'lucide-react';
 
 export const SummaryTab: React.FC = () => {
-  const { character, applyShortRest, applyLongRest, applyDamage, applyHealing, applyTempHp, spendHitDie, initiateLevelUp } = useCharacterStore();
+  const { 
+    character, 
+    applyShortRest, 
+    applyLongRest, 
+    applyDamage, 
+    applyHealing, 
+    applyTempHp, 
+    spendHitDie, 
+    initiateLevelUp,
+    updateDeathSaves
+  } = useCharacterStore();
   const derived = useDerivedState();
   const [val, setVal] = useState(0);
   const [isLeveling, setIsLeveling] = useState(false);
   const [showConfirmLevel, setShowConfirmLevel] = useState(false);
   const [restConfirm, setRestConfirm] = useState<'short' | 'long' | null>(null);
+  const [showControls, setShowControls] = useState(false);
 
   const maxHp = derived.maxHp || 10;
   const currentHp = character.hp ?? maxHp;
   const tempHp = character.tempHp ?? 0;
   const isBloodied = currentHp <= maxHp / 2;
+  const isDown = currentHp === 0;
+  const deathSaves = character.deathSaves || { successes: 0, failures: 0 };
 
   const handleApply = (type: 'damage' | 'heal' | 'temp') => {
     if (val <= 0) return;
@@ -23,6 +36,7 @@ export const SummaryTab: React.FC = () => {
     else if (type === 'heal') applyHealing(val);
     else if (type === 'temp') applyTempHp(val);
     setVal(0);
+    setShowControls(false);
   };
 
   const handleSpendHitDie = () => {
@@ -53,6 +67,17 @@ export const SummaryTab: React.FC = () => {
   const handleLongRest = () => {
     applyLongRest(maxHp);
     setRestConfirm(null);
+  };
+
+  const handleToggleDeathSave = (type: 'success' | 'failure', index: number) => {
+    const current = type === 'success' ? deathSaves.successes : deathSaves.failures;
+    const newVal = index + 1 === current ? index : index + 1;
+    
+    if (type === 'success') {
+      updateDeathSaves(newVal, deathSaves.failures);
+    } else {
+      updateDeathSaves(deathSaves.successes, newVal);
+    }
   };
 
   return (
@@ -186,10 +211,15 @@ export const SummaryTab: React.FC = () => {
             </div>
           </div>
 
-          <div className={cn(
-            "w-[120px] h-[120px] flex flex-col justify-center items-center gap-0 p-[10px] rounded-full text-[#1288ec] bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.98),#eeeeee_54%,#e3e3e3_100%)] border-[6px] transition-colors duration-500 shadow-[0_0_25px_rgba(0,0,0,0.2)] relative",
-            isBloodied ? "border-rose animate-pulse" : "border-[#8b2531]"
-          )}>
+          <button 
+            type="button"
+            onClick={() => setShowControls(!showControls)}
+            className={cn(
+              "w-[120px] h-[120px] flex flex-col justify-center items-center gap-0 p-[10px] rounded-full text-[#1288ec] bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.98),#eeeeee_54%,#e3e3e3_100%)] border-[6px] transition-all duration-500 shadow-[0_0_25px_rgba(0,0,0,0.2)] relative active:scale-95 outline-none",
+              isBloodied ? "border-rose animate-pulse" : "border-[#8b2531]",
+              showControls && "ring-4 ring-blue/30 scale-105"
+            )}
+          >
             <span className="text-[#111] text-[0.7rem] font-black leading-none uppercase tracking-[0.05em] mb-1">HP</span>
             <strong className="grid justify-items-center gap-px text-[2.8rem] leading-[0.8] tabular-nums font-medium">
               {currentHp}
@@ -201,7 +231,7 @@ export const SummaryTab: React.FC = () => {
               </em>
             )}
             {isBloodied && <span className="absolute -top-1 right-2 text-[10px] font-black text-rose uppercase tracking-tighter">Bloodied</span>}
-          </div>
+          </button>
 
           <div className="text-center">
             <span className="block font-black text-[0.7rem] text-muted uppercase tracking-widest mb-1">Speed</span>
@@ -211,25 +241,73 @@ export const SummaryTab: React.FC = () => {
           </div>
         </div>
 
+        {/* Death Saves */}
+        {isDown && (
+          <div className="flex flex-col items-center gap-3 mb-6 p-4 bg-rose/5 border border-rose/20 rounded-2xl animate-in fade-in zoom-in-95 duration-300">
+            <h4 className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-rose">Death Saves</h4>
+            <div className="flex justify-center gap-8 w-full">
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-[0.55rem] font-black uppercase text-teal tracking-widest">Sucessos</span>
+                <div className="flex gap-2">
+                  {[0, 1, 2].map(i => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleToggleDeathSave('success', i)}
+                      className={cn(
+                        "w-5 h-5 rounded-full border-2 transition-all",
+                        i < deathSaves.successes 
+                          ? "bg-teal border-teal shadow-[0_0_8px_rgba(45,210,75,0.4)]" 
+                          : "border-zinc-700 hover:border-teal/50"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-[0.55rem] font-black uppercase text-rose tracking-widest">Falhas</span>
+                <div className="flex gap-2">
+                  {[0, 1, 2].map(i => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleToggleDeathSave('failure', i)}
+                      className={cn(
+                        "w-5 h-5 rounded-full border-2 transition-all",
+                        i < deathSaves.failures 
+                          ? "bg-rose border-rose shadow-[0_0_8px_rgba(225,29,72,0.4)]" 
+                          : "border-zinc-700 hover:border-rose/50"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Damage/Heal Controls */}
-        <div className="grid gap-3 p-3 bg-[#0a0a0a] rounded-xl border border-line/50">
-          <div className="flex items-center gap-2">
-            <button onClick={() => setVal(v => Math.max(0, v - 1))} className="w-8 h-8 rounded-lg bg-line flex items-center justify-center text-muted hover:text-white transition-colors"><Minus size={16} /></button>
-            <input 
-              type="number" 
-              value={val === 0 ? '' : val} 
-              onChange={e => setVal(parseInt(e.target.value) || 0)}
-              className="flex-1 bg-transparent text-center text-xl font-black text-white outline-none"
-              placeholder="0"
-            />
-            <button onClick={() => setVal(v => v + 1)} className="w-8 h-8 rounded-lg bg-line flex items-center justify-center text-muted hover:text-white transition-colors"><Plus size={16} /></button>
+        {showControls && (
+          <div className="grid gap-3 p-3 bg-[#0a0a0a] rounded-xl border border-blue/30 animate-in slide-in-from-top-2 duration-200 mb-4 shadow-xl">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setVal(v => Math.max(0, v - 1))} className="w-10 h-10 rounded-lg bg-line flex items-center justify-center text-muted hover:text-white transition-colors"><Minus size={18} /></button>
+              <input 
+                type="number" 
+                autoFocus
+                value={val === 0 ? '' : val} 
+                onChange={e => setVal(parseInt(e.target.value) || 0)}
+                className="flex-1 bg-transparent text-center text-2xl font-black text-white outline-none"
+                placeholder="0"
+              />
+              <button onClick={() => setVal(v => v + 1)} className="w-10 h-10 rounded-lg bg-line flex items-center justify-center text-muted hover:text-white transition-colors"><Plus size={18} /></button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button onClick={() => handleApply('damage')} className="py-2.5 bg-rose/20 text-rose border border-rose/30 rounded-lg text-[0.65rem] font-black uppercase hover:bg-rose/30 transition-all">Damage</button>
+              <button onClick={() => handleApply('heal')} className="py-2.5 bg-green/20 text-green border border-green/30 rounded-lg text-[0.65rem] font-black uppercase hover:bg-green/30 transition-all">Heal</button>
+              <button onClick={() => handleApply('temp')} className="py-2.5 bg-blue/20 text-blue border border-blue/30 rounded-lg text-[0.65rem] font-black uppercase hover:bg-blue/30 transition-all">Temp HP</button>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button onClick={() => handleApply('damage')} className="py-2 bg-rose/20 text-rose border border-rose/30 rounded-lg text-[0.65rem] font-black uppercase hover:bg-rose/30 transition-all">Damage</button>
-            <button onClick={() => handleApply('heal')} className="py-2 bg-green/20 text-green border border-green/30 rounded-lg text-[0.65rem] font-black uppercase hover:bg-green/30 transition-all">Heal</button>
-            <button onClick={() => handleApply('temp')} className="py-2 bg-blue/20 text-blue border border-blue/30 rounded-lg text-[0.65rem] font-black uppercase hover:bg-blue/30 transition-all">Temp HP</button>
-          </div>
-        </div>
+        )}
 
         {/* Hit Dice Status */}
         <div className="mt-4 flex items-center justify-between px-2">

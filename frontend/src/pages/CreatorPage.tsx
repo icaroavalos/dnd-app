@@ -73,6 +73,7 @@ export const CreatorPage: React.FC = () => {
         resources,
         equippedItems: character.equippedItems,
         classFeatureChoices: character.classFeatureChoices,
+        currency: character.currency,
         backgroundChoices: {
           backgroundId: slugify(character.background),
           abilityAssignments: backgroundAssignments

@@ -75,4 +75,13 @@ export interface CharacterRecord {
   features?: any[];
   resources: Record<string, CharacterResourceState>;
   state: CharacterRuntimeState;
+  asiChoices?: Record<string, any>;
+  classFeatureChoices?: Record<string, any>;
+  currency?: {
+    cp: number;
+    sp: number;
+    ep: number;
+    gp: number;
+    pp: number;
+  };
 }

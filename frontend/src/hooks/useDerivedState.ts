@@ -142,6 +142,8 @@ export const useDerivedState = () => {
     initiative: modifiers.dex,
     armorClass: getArmorClass(),
     maxHp: character.maxHp || 10,
+    spellAttack: spellcastingMetrics[mainSpellcastingAbility].attack,
+    spellSaveDc: spellcastingMetrics[mainSpellcastingAbility].dc,
     spellcastingMetrics,
     mainSpellcastingAbility,
     spellSlotsMax,
