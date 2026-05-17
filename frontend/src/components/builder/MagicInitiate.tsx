@@ -85,7 +85,8 @@ export const MagicInitiate: React.FC<MagicInitiateProps> = ({ constraintClass })
           ...spell,
           id: spell.id || spell.name.toLowerCase().replace(/\s+/g, '-'),
           description: parse5eEntry(spell),
-          source: 'bg-feat',
+          originKind: 'background',
+          originName: constraintClass || '',
           ...(level === 1 ? {
             resource: {
               remaining: 1,

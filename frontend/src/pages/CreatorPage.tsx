@@ -93,6 +93,7 @@ export const CreatorPage: React.FC = () => {
         id: saved.id,
         hp: initialHp,
         maxHp: initialHp,
+        classes: record.classes,
         resources
       });
       setActiveCharacterId(saved.id || null);

@@ -62,13 +62,26 @@ Substituímos lógicas fixas por uma arquitetura baseada em dados (`Strategy Pat
 - **Metadados de Recuperação**: Cada característica agora carrega sua própria estratégia (`full` ou `inc`), permitindo suporte universal a qualquer classe ou espécie sem alteração no código central do Store.
 
 ### 8. Persistência e Sincronização
-- **Snapshot de Features**: O campo `recordJson` no backend agora armazena o estado completo das `features` (incluindo cargas atuais), garantindo que nada desapareça ao trocar de personagem ou recarregar a página.
+- **Motor de Auto-save Global**: O `useEffect` de sincronização reside no `AppLayout.tsx`. Isso garante que o salvamento não seja interrompido quando o usuário navega entre rotas ou personagens, pois o Layout permanece montado durante toda a sessão.
+- **Ciclo de Salvamento**: Atualmente configurado com um debounce de 1000ms. O estado `isSaving` é definido como `true` imediatamente após qualquer alteração no Store, fornecendo feedback visual e um sinal de sincronização estável para testes E2E.
+- **Snapshot de Features**: O campo `recordJson` no backend armazena o estado completo das `features` (incluindo cargas atuais), garantindo que nada desapareça ao trocar de personagem ou recarregar a página.
 - **Normalização de Classes**: Sincronia entre IDs da API (`path-of-the-berserker`) e nomes exibidos (`Berserker`), permitindo filtragem precisa de habilidades de subclasse no Level Up.
 
 ### 9. Interface e Design System
 - **Skills Tab**: Layout dinâmico que alterna entre 1 coluna (sidebar) e 2 colunas (wide view) para otimizar espaço.
 - **Identidade Visual**: Padrão "Modern High Fantasy" com tons de ouro, teal e rose, utilizando blur e bordas arredondadas (3xl).
 - **Atributos Únicos**: No método Standard Array, o sistema bloqueia valores já selecionados para evitar duplicidade.
+
+### 10. Progressão e Evolução (Level Up)
+- **Histórico de Escolhas**: Bônus de atributos (**ASI**) e Talentos (**Feats**) não modificam os atributos base permanentemente. Eles são armazenados em `character.asiChoices` indexados pelo nível (ex: `character.asiChoices["4"]`).
+- **Cálculo de Projeção**: O hook `useDerivedState.ts` é o responsável por somar: `Atributo Base + Bônus de Background + Soma de todos os ASIs/Feats históricos`.
+- **Validação Estrita**: A finalização do Level Up utiliza um motor de validação que impede o avanço caso escolhas obrigatórias (Subclasse, Perícias de Primal Knowledge, etc.) não tenham sido feitas ou requisitos de Talentos não sejam atendidos.
+- **Half-Feats**: Talentos que concedem +1 em atributo utilizam um seletor auxiliar que persiste o bônus no mesmo objeto `asiChoices` do nível correspondente.
+
+### 11. Sistema de Magias e Slots
+- **Cálculo de Slots**: O total de slots por nível é calculado dinamicamente no frontend via `lib/spell-utils.ts`. Isso garante que a UI exiba os slots corretamente mesmo para personagens recém-criados ou sem conexão momentânea com o backend.
+- **Rastreamento de Uso**: O estado `character.spellSlots` armazena o contador `used`. A interface em `SpellsTab.tsx` utiliza quadrados clicáveis que preenchem o pool de uso de forma sequencial.
+- **Integração com Long Rest**: O motor de descanso longo (`applyLongRest`) percorre o objeto de slots e reseta todos os contadores `used` para zero.
 
 ## Modulos Implementados
 

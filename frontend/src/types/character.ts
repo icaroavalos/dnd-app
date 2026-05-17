@@ -63,6 +63,7 @@ export interface Character {
   background: string;
   alignment: string;
   experience: number;
+  classes: Array<{ classId: string; level: number }>;
   abilityMethod: 'standard' | 'pointBuy' | 'manual';
   classFeatureChoices: Record<string, string[]>; // Changed to string[] for multiple choices
   asiChoices: Record<string, any>;

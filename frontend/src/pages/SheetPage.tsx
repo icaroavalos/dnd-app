@@ -1,49 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useCharacterStore } from '../store/useCharacterStore';
 import { Card } from '../components/ui/Card';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, FileText, Settings, User } from 'lucide-react';
-import { saveCharacter } from '../api/character-api';
 
 export const SheetPage: React.FC = () => {
-  const { character, activeCharacterId, setIsSaving } = useCharacterStore();
-
-  useEffect(() => {
-    if (activeCharacterId && character.creationComplete) {
-      const timer = setTimeout(async () => {
-        setIsSaving(true);
-        try {
-          const slugify = (str: string) => String(str ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-          
-          // Match the record format from CreatorPage for consistency
-          const record = {
-            ...character,
-            ruleset: '5e-2024',
-            lineageId: slugify(character.race),
-            backgroundId: slugify(character.background),
-            classes: character.classes || [{ classId: slugify(character.class), level: character.level }],
-            state: {
-              hp: character.hp,
-              maxHpOverride: character.maxHp,
-              tempHp: character.tempHp,
-              hitDiceUsed: character.hitDiceUsed,
-              spellSlotsUsed: Object.fromEntries(
-                Object.entries(character.spellSlots || {}).map(([level, slot]: [string, any]) => [level, slot?.used || 0])
-              ),
-              activeConditions: []
-            }
-          };
-          
-          await saveCharacter(record as any);
-        } catch (err) {
-          console.error('Auto-save failed:', err);
-        } finally {
-          setIsSaving(false);
-        }
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [character, activeCharacterId, setIsSaving]);
+  const { character } = useCharacterStore();
 
   return (
     <div className="flex flex-col gap-6">

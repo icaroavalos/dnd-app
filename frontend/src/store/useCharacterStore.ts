@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Character, AbilityScores as AbilityScoresType, Feature, Choice, BackgroundChoices } from '../types/character';
-import { getLevelUpOptions, getItems, getSpells } from '../api/catalog-api';
+import { getLevelUpOptions, getItems, getSpells, getFeats } from '../api/catalog-api';
 import { parse5eEntry, parseResourceInfo, extractSpells } from '../lib/data-parser';
 import { deriveResourcesFromFeatures } from '../lib/feature-resources';
 
@@ -13,17 +13,19 @@ interface PendingLevelUp {
 }
 
 interface CharacterState {
-  character: Character & { classes?: Array<{ classId: string; level: number }> };
+  character: Character;
   activeCharacterId: string | null;
   pendingLevelUp: PendingLevelUp | null;
   itemsCatalog: any[];
   spellsCatalog: any[];
+  featsCatalog: any[];
   isSaving: boolean;
 
   // Actions
   setIsSaving: (saving: boolean) => void;
   fetchItemsCatalog: () => Promise<void>;
   fetchSpellsCatalog: () => Promise<void>;
+  fetchFeatsCatalog: () => Promise<void>;
   setCharacter: (character: Character) => void;
   setActiveCharacterId: (id: string | null) => void;
   updateCharacter: (updates: Partial<Character>) => void;
@@ -62,6 +64,7 @@ const createDefaultCharacter = (): Character => ({
   background: '',
   alignment: 'Neutral',
   experience: 0,
+  classes: [],
   abilityMethod: 'standard',
   classFeatureChoices: {},
   asiChoices: {},
@@ -86,17 +89,14 @@ const createDefaultCharacter = (): Character => ({
   features: [],
   pendingChoices: [],
   notes: '',
-  backgroundChoices: {
-    backgroundId: '',
-    abilityAssignments: {}
-  },
+  bgSpellChoices: {},
   bgChoices: {
-    abilityIncrement: null as '2_1' | '1_1_1' | null,
-    abilityScores: [] as string[],
-    spellcastingAbility: null as string | null,
-    equipmentChoice: null as 'A' | 'B' | null,
-    skillChoices: [] as string[],
-    skillCollisions: [] as string[]
+    abilityIncrement: null,
+    abilityScores: [],
+    spellcastingAbility: null,
+    equipmentChoice: null,
+    skillChoices: [],
+    skillCollisions: []
   }
 });
 
@@ -115,12 +115,13 @@ export const CLASS_HIT_DIE: Record<string, number> = {
   'wizard': 6
 };
 
-export const useCharacterStore = create<CharacterState>((set, get) => ({
+export const useCharacterStore = create<CharacterState>()((set, get) => ({
   character: createDefaultCharacter(),
   activeCharacterId: null,
   pendingLevelUp: null,
   itemsCatalog: [],
   spellsCatalog: [],
+  featsCatalog: [],
   isSaving: false,
 
   setIsSaving: (saving) => set({ isSaving: saving }),
@@ -143,6 +144,15 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
     }
   },
 
+  fetchFeatsCatalog: async () => {
+    try {
+      const res = await getFeats();
+      set({ featsCatalog: res.results || [] });
+    } catch (err) {
+      console.error('Failed to load feats catalog in store:', err);
+    }
+  },
+
   setCharacter: (record: any) =>
     set((state) => {
       // Deeply extract the canonical record if available
@@ -158,6 +168,11 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
       // If it's a backend record, map it to the frontend Character type
       if (canonical.ruleset || canonical.classes) {
         const primaryClass = canonical.classes?.[0];
+        const rawClass = primaryClass?.name || primaryClass?.classId || canonical.primaryClass || canonical.class || '';
+        // Slugify the class name for internal lookup consistency (e.g. "Wizard" -> "wizard")
+        const classSlug = rawClass.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        const normalizedClass = rawClass.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
         const backgroundChoices = canonical.backgroundChoices || {
           backgroundId: canonical.backgroundId || '',
           abilityAssignments: {}
@@ -172,9 +187,6 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
           skillCollisions: []
         };
 
-        const rawClass = primaryClass?.name || primaryClass?.classId || canonical.primaryClass || '';
-        const normalizedClass = rawClass.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-
         return {
           character: {
             ...createDefaultCharacter(),
@@ -182,8 +194,8 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
             id: canonical.id || record.id,
             name: canonical.name,
             class: normalizedClass,
-            level: primaryClass?.level || canonical.level || 1,
-            classes: canonical.classes || [{ classId: rawClass, level: canonical.level || 1 }],
+            level: canonical.level || primaryClass?.level || 1,
+            classes: canonical.classes?.map((c: any) => ({ ...c, classId: c.classId.toLowerCase() })) || (classSlug ? [{ classId: classSlug, level: canonical.level || 1 }] : []),
             race: canonical.race || canonical.lineageName || canonical.lineageId || '',
             subrace: canonical.subrace || '',
             background: canonical.background || canonical.backgroundName || canonical.backgroundId || '',
@@ -402,7 +414,8 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
                  ...spell,
                  id: spell.id || spell.name.toLowerCase().replace(/\s+/g, '-'),
                  description: parse5eEntry(spell),
-                 source: 'feat-auto',
+                 originKind: 'feature',
+                 originName: feat.name,
                  resource: resource ? { ...resource, id: `spell-res-${spell.name.toLowerCase()}` } : undefined
                });
                currentSpellNames.add(name.toLowerCase());
@@ -493,7 +506,7 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
     set((state) => {
       if (!state.pendingLevelUp) return state;
 
-      const { nextLevel, hpGain, newFeatures, selections } = state.pendingLevelUp;
+      const { nextLevel, hpGain, newFeatures, choices, selections } = state.pendingLevelUp;
 
       // Filter features by subclass choice if applicable
       const selectedSubclassChoice = Object.entries(selections).find(([id]) => id.startsWith('subclass-'));
@@ -520,6 +533,39 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
 
       const profBonus = Math.ceil(nextLevel / 4) + 1;
 
+      // Process ASI or Feat selection
+      const asiChoice = choices.find(c => c.type === 'asi');
+      const featChoice = choices.find(c => c.type === 'feat');
+      
+      let nextAsiChoice: Record<string, number> = {};
+      let nextFeatFeatures: Feature[] = [];
+
+      if (asiChoice && selections[asiChoice.id]?.length > 0) {
+        const selectedAbilities = selections[asiChoice.id];
+        const bonus = selectedAbilities.length === 1 ? 2 : 1;
+        selectedAbilities.forEach(ab => {
+          nextAsiChoice[ab] = bonus;
+        });
+      } else if (featChoice && selections[featChoice.id]?.length > 0) {
+        const featId = selections[featChoice.id][0];
+        const feat = get().featsCatalog.find(f => f.id === featId);
+        if (feat) {
+          nextFeatFeatures.push({
+            id: feat.id,
+            name: feat.name,
+            kind: 'feat',
+            description: parse5eEntry(feat.entries),
+            level: nextLevel
+          });
+
+          // Handle half-feat ability bonus
+          const selectedAbility = selections['feat-ability']?.[0];
+          if (selectedAbility) {
+            nextAsiChoice[selectedAbility] = 1;
+          }
+        }
+      }
+
       // Refresh resource limits for existing features
       const updatedExistingFeatures = state.character.features.map(f => {
         const resource = parseResourceInfo(f.description, { ...state.character, level: nextLevel }, { proficiencyBonus: profBonus, modifiers: {} });
@@ -543,7 +589,13 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
       });
 
       // Sync classes array for persistence and future multiclass support
-      const updatedClasses = (state.character.classes || []).map((cls, idx) => {
+      let updatedClasses = state.character.classes || [];
+      if (updatedClasses.length === 0 && state.character.class) {
+        const slugify = (str: string) => String(str ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        updatedClasses = [{ classId: slugify(state.character.class), level: state.character.level }];
+      }
+
+      updatedClasses = updatedClasses.map((cls, idx) => {
         // For now, we assume the first class is the primary one being leveled up
         if (idx === 0) {
           return { ...cls, level: nextLevel };
@@ -558,7 +610,11 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
           classes: updatedClasses,
           maxHp: state.character.maxHp + hpGain,
           hp: state.character.hp + hpGain,
-          features: [...updatedExistingFeatures, ...filteredFeatures],
+          features: [...updatedExistingFeatures, ...filteredFeatures, ...nextFeatFeatures],
+          asiChoices: {
+            ...state.character.asiChoices,
+            [nextLevel]: nextAsiChoice
+          },
           classFeatureChoices: {
             ...state.character.classFeatureChoices,
             ...selections
@@ -666,3 +722,8 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
     activeCharacterId: null
   }),
 }));
+
+if (typeof window !== 'undefined') {
+  (window as any).useCharacterStore = useCharacterStore;
+}
+

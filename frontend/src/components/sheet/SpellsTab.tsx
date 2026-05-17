@@ -3,6 +3,7 @@ import { useCharacterStore } from '../../store/useCharacterStore';
 import { useDerivedState, signed } from '../../hooks/useDerivedState';
 import { SpellCard } from './SpellCard';
 import { cn } from '../../lib/utils';
+import { getSpellOrigin } from '../../lib/spell-utils';
 
 export const SpellsTab: React.FC = () => {
   const { character, updateCharacter } = useCharacterStore();
@@ -13,7 +14,7 @@ export const SpellsTab: React.FC = () => {
     if (level === 0) return;
 
     // First try to use background/feat resource if available
-    if (spell.source === 'bg-feat' && spell.resource?.remaining > 0) {
+    if ((spell.originKind === 'background' || spell.source === 'bg-feat') && spell.resource?.remaining > 0) {
       const updatedSpells = character.spells.map(s => {
         if ((s.id || s.name) === (spell.id || spell.name)) {
           return {
@@ -29,22 +30,42 @@ export const SpellsTab: React.FC = () => {
 
     // Otherwise use spell slots
     const current = { ...character.spellSlots };
-    const levelSlots = current[level] || { max: 0, used: 0 };
-    if (levelSlots.used < levelSlots.max) {
+    const max = derived.spellSlotsMax[level] || 0;
+    const used = current[level]?.used || 0;
+
+    if (used < max) {
       updateCharacter({
         spellSlots: {
           ...current,
-          [level]: { ...levelSlots, used: levelSlots.used + 1 }
+          [level]: { max, used: used + 1 }
         }
       });
     }
+  };
+
+  const toggleSlot = (level: number, index: number) => {
+    const current = { ...character.spellSlots };
+    const max = derived.spellSlotsMax[level] || 0;
+    const used = current[level]?.used || 0;
+    
+    const newUsed = index < used ? index : index + 1;
+
+    updateCharacter({
+      spellSlots: {
+        ...current,
+        [level]: { max, used: newUsed }
+      }
+    });
   };
 
   const spellLevels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const spellsByLevel = spellLevels.map(level => ({
     level,
     spells: character.spells.filter(s => (s.level === level))
-  })).filter(group => group.spells.length > 0 || (group.level > 0 && (character.spellSlots[group.level]?.max || 0) > 0));
+  })).filter(group => 
+    group.spells.length > 0 || 
+    (group.level > 0 && (derived.spellSlotsMax[group.level] || 0) > 0)
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -61,29 +82,50 @@ export const SpellsTab: React.FC = () => {
 
       {spellsByLevel.map((group) => (
         <section key={group.level} className="grid gap-2">
-          <div className="min-h-[28px] grid grid-cols-[minmax(0,1fr)_auto] items-center py-1 px-[9px] rounded-lg bg-[#ffc8ef] border-2 border-purple text-left">
-            <span className="text-[1.02rem] font-[950] text-[#111]">{group.level === 0 ? 'Truques' : `${group.level}º Nível`}</span>
-            {group.level > 0 && character.spellSlots[group.level] && character.spellSlots[group.level].max > 0 && (
-              <span className="inline-flex items-center justify-end gap-1 min-w-0">
-                {Array.from({ length: character.spellSlots[group.level].max }).map((_, i) => (
-                  <span 
-                    key={i} 
-                    className={cn(
-                      "w-4 h-4 inline-block bg-white border border-[#d3d3d3] shadow-[inset_0_0_5px_rgba(0,0,0,0.18)]",
-                      i < character.spellSlots[group.level].used && "bg-[#5a5a5a] shadow-[inset_0_0_0_3px_#2a2a2a]"
-                    )}
-                  ></span>
-                ))}
-                <strong className="ml-[3px] text-[0.72rem] uppercase text-[#111]">{group.level}º Slots</strong>
-              </span>
+          <div className="min-h-[32px] flex items-center justify-between py-1 px-3 rounded-lg bg-zinc-900 border border-line text-left group">
+            <span className="text-[0.85rem] font-black uppercase tracking-[0.1em] text-gold/80">
+              {group.level === 0 ? 'Truques' : `${group.level}º Nível`}
+            </span>
+            
+            {group.level > 0 && derived.spellSlotsMax[group.level] > 0 && (
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  {Array.from({ length: derived.spellSlotsMax[group.level] }).map((_, i) => {
+                    const isUsed = i < (character.spellSlots[group.level]?.used || 0);
+                    return (
+                      <button 
+                        key={i}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSlot(group.level, i);
+                        }}
+                        className={cn(
+                          "w-4 h-4 rounded-sm border-2 transition-all duration-200 active:scale-90",
+                          isUsed 
+                            ? "bg-gold border-gold shadow-[0_0_8px_rgba(212,175,55,0.3)]" 
+                            : "bg-zinc-800 border-zinc-700 hover:border-gold/50"
+                        )}
+                        aria-label={`Slot ${i+1} de nível ${group.level}`}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="text-[0.6rem] font-black uppercase tracking-widest text-muted-foreground/60">Slots</span>
+              </div>
             )}
           </div>
 
           {group.spells.map((spell, idx) => {
             const isOpen = selectedSpell === spell.name;
-            const hasBgResource = spell.source === 'bg-feat' && (spell.resource?.remaining > 0);
-            const hasSlots = character.spellSlots[group.level]?.used < character.spellSlots[group.level]?.max;
-            const canCast = group.level === 0 || hasBgResource || hasSlots;
+            const isBgSpell = spell.originKind === 'background' || spell.source === 'bg-feat';
+            const hasBgResource = isBgSpell && (spell.resource ? spell.resource.remaining > 0 : false);
+            const max = derived.spellSlotsMax[group.level] || 0;
+            const used = character.spellSlots[group.level]?.used || 0;
+            const hasSlots = used < max;
+            
+            // For background spells, they MUST use their resource, not slots
+            const canCast = group.level === 0 || (isBgSpell ? hasBgResource : hasSlots);
 
             return (
               <div key={idx} className="">
@@ -99,13 +141,16 @@ export const SpellsTab: React.FC = () => {
                   <button 
                     type="button" 
                     className={cn(
-                      "min-w-0 min-h-[28px] grid place-items-center px-3 rounded-lg font-extrabold text-left leading-[1.05] overflow-hidden break-anywhere bg-[#5e558b] text-[#0f0f0f] cursor-pointer w-full border-0 justify-items-start gap-0.5",
+                      "min-w-0 min-h-[32px] flex flex-col items-start justify-center px-3 py-1 rounded-lg text-left leading-[1.05] overflow-hidden break-anywhere bg-[#5e558b] text-[#0f0f0f] cursor-pointer w-full border-0 gap-0.5 transition-colors",
                       isOpen && "bg-[#7b70b8] text-white",
                       "hover:bg-[#7b70b8] hover:text-white"
                     )}
                     onClick={() => setSelectedSpell(isOpen ? null : spell.name)}
                   >
                     <span className="text-[0.92rem] font-[900]">{spell.name}</span>
+                    <span className="text-[0.55rem] font-bold opacity-80 uppercase tracking-widest mt-0.5">
+                      {getSpellOrigin(spell, character)}
+                    </span>
                   </button>
                 </div>
                 {isOpen && (

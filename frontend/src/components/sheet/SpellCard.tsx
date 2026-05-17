@@ -1,6 +1,8 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 import { RuleText } from '../ui/RuleText';
+import { getSpellOrigin } from '../../lib/spell-utils';
+import { useCharacterStore } from '../../store/useCharacterStore';
 
 interface SpellCardProps {
   spell: any;
@@ -19,6 +21,7 @@ const SCHOOL_MAP: Record<string, string> = {
 };
 
 export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
+  const { character } = useCharacterStore();
   if (!spell) return null;
 
   const levelSuffix = (lvl: number) => {
@@ -142,9 +145,14 @@ export const SpellCard: React.FC<SpellCardProps> = ({ spell, isWide }) => {
           {isRitual && <span className="w-5 h-5 rounded-full bg-[#8b2531] text-white text-[10px] font-black flex items-center justify-center border border-white" title="Ritual">R</span>}
         </div>
         <h2 className="text-[#111] text-xl font-black uppercase tracking-tight leading-none mb-1">{spell.name}</h2>
-        <span className="text-[#8b2531] text-[0.7rem] font-bold uppercase tracking-widest bg-[#8b2531]/10 px-2 py-0.5 rounded-full">
-          {levelSuffix(spell.level)} — {schoolName}
-        </span>
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[#8b2531] text-[0.7rem] font-bold uppercase tracking-widest bg-[#8b2531]/10 px-2 py-0.5 rounded-full inline-block">
+            {levelSuffix(spell.level)} — {schoolName}
+          </span>
+          <span className="text-[#8b2531] text-[0.6rem] font-bold uppercase tracking-widest opacity-80">
+            Origem: {getSpellOrigin(spell, character)}
+          </span>
+        </div>
       </div>
 
       {/* Power Box */}

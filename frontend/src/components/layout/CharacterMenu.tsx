@@ -42,15 +42,25 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
   }, []);
 
   useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
     if (isOpen) {
       fetchCharacters();
       // Lock scroll
       document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleEscape);
     } else {
       document.body.style.overflow = 'unset';
     }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isOpen, fetchCharacters]);
+    return () => { 
+      document.body.style.overflow = 'unset'; 
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, fetchCharacters, onClose]);
 
   const handleNew = () => {
     resetCharacter();
@@ -153,9 +163,10 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
 
       {/* Drawer */}
       <div 
+        aria-hidden={!isOpen}
         className={twMerge(
           "fixed top-0 left-0 z-50 h-full w-full max-w-[340px] bg-panel border-r border-line shadow-[10px_0_40px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-out flex flex-col",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full invisible"
         )}
       >
         {/* Header */}
@@ -169,6 +180,7 @@ export const CharacterMenu: React.FC<CharacterMenuProps> = ({ isOpen, onClose })
           <button 
             onClick={onClose}
             className="p-2 hover:bg-line rounded-xl transition-all active:scale-95 text-muted hover:text-ink"
+            aria-label="Fechar menu"
           >
             <X size={20} />
           </button>

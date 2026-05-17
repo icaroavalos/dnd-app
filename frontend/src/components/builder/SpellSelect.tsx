@@ -72,7 +72,7 @@ export const SpellSelect: React.FC = () => {
     } else {
       if (spell.level === 0 && selectedCantrips.length >= classLimits.cantrips) return;
       if (spell.level === 1 && selectedLevel1.length >= classLimits.level1) return;
-      addSpell(spell);
+      addSpell({ ...spell, originKind: 'class' });
     }
   };
 

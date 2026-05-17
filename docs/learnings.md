@@ -39,3 +39,82 @@ Ao realizar o Level Up, o nível geral da ficha (`character.level`) era incremen
 **Ações Imediatas:**
 - Iniciar o desenvolvimento da UI para a etapa de HP Guiado.
 - Criar o seletor de magias específico para o contexto de Level Up.
+
+## Controle Interativo de Magias e Slots (2026-05-17)
+
+**Status:** ✅ CONCLUÍDO - Interface estilo D&D Beyond implementada.
+
+**Problema:**
+A interface de slots de magia dependia exclusivamente da projeção do backend. Personagens recém-criados no frontend ficavam com os slots "zerados" visualmente até que uma sincronização completa ocorresse, resultando em uma UI vazia para novos Magos e clérigos.
+
+**O que foi feito:**
+1. **Cálculo Derivado no Frontend:** Implementado `spell-utils.ts` com as tabelas de progressão de magias (Full, Half e Pact Magic). O hook `useDerivedState.ts` agora calcula o máximo de slots em tempo real.
+2. **UI Interativa:** Adicionados quadrados clicáveis no cabeçalho de cada nível de magia. Clicar em um quadrado marca o uso sequencial (esquerda para direita).
+3. **Resiliência a Erros de Sintaxe:** Corrigido erro de parênteses/chaves extras no `useCharacterStore.ts` que travava o build do Vite. Identificada a importância de verificar o fechamento de objetos em stores complexos antes de salvar.
+
+**Lição aprendida:**
+- **Derivação Local vs Remota:** Dados de regras que afetam a visibilidade imediata da UI (como slots de magia) devem ser calculados localmente via "Derived State". O backend deve servir apenas como autoridade de persistência e validação final, não como única fonte de renderização.
+- **Atomicidade no Store:** Ao editar arquivos grandes como `useCharacterStore.ts`, realizar mudanças cirúrgicas e garantir que os blocos de exportação e inicialização (Zustand/Window exposure) permaneçam íntegros para evitar quebras silenciosas no HMR.
+
+## Evolução de Personagem: ASI e Talentos (2026-05-17)
+
+**Status:** ✅ CONCLUÍDO - Implementado sistema de escolhas para Nível 4+.
+
+**O que foi feito:**
+1. **Lógica de Escolha Dual:** Implementado seletor de "Caminho de Evolução" (ASI vs Talentos) com exclusão mútua.
+2. **Cálculo de Atributos Histórico:** Em vez de somar bônus diretamente no valor base, as escolhas são armazenadas em `character.asiChoices[level]`. Isso permite reconstruir a ficha fielmente e evita erros de "double counting".
+3. **Validação de Requisitos (Feats):** Implementado validador estrito que verifica Nível, Atributos Mínimos e Características Prévias antes de permitir a seleção de um talento.
+4. **Descoberta de Bug de Referência:** Identificado que o `finalizeLevelUp` falhava silenciosamente porque a variável `choices` não estava sendo desestruturada corretamente do `pendingLevelUp`, interrompendo o ciclo de vida do modal.
+
+**Lições aprendidas:**
+- **Imutabilidade do Histórico:** Armazenar escolhas por nível (`asiChoices: { "4": { "str": 2 } }`) é superior a modificar atributos base, pois mantém a rastreabilidade da ficha.
+- **Ambivalência de IDs:** IDs de escolhas vindos do backend (ex: `asi-undefined`) devem ser tratados com cautela no frontend; preferir IDs semânticos gerados ou mapeados quando possível.
+- **Timing de Teste E2E:** Em SPAs sem persistência automática no reload (stateless), testes Playwright que realizam `page.reload()` devem sempre re-selecionar o registro ativo para restaurar o estado da aplicação.
+
+## Arquitetura de Persistência e Ciclo de Vida (2026-05-17)
+
+**Status:** ✅ RESOLVIDO - Persistência movida para o Layout Global.
+
+**Problema:**
+A lógica de auto-save estava vinculada ao componente `SheetPage.tsx`. Quando o usuário realizava uma ação (como Level Up) e navegava rapidamente para outra página (ou trocava de personagem), o componente era desmontado antes que o temporizador de debounce (2s) disparasse, cancelando o salvamento e causando perda de dados (o personagem voltava ao nível anterior).
+
+**O que foi feito:**
+1. **Centralização da Persistência:** Movi o `useEffect` de auto-save de `SheetPage.tsx` para `AppLayout.tsx`. Como o Layout envolve todas as rotas, ele permanece montado durante toda a sessão, garantindo que o ciclo de salvamento nunca seja interrompido por navegação.
+2. **Redução de Latência:** O debounce foi reduzido de 2000ms para 1000ms para aumentar a responsividade do salvamento.
+3. **Feedback Imediato:** O estado `isSaving` agora é definido como `true` no momento em que a mudança é detectada, e não apenas quando o cronômetro dispara. Isso fornece um sinal confiável para testes E2E e para a UI (bloqueando ações destrutivas enquanto salva).
+
+**Lição aprendida:**
+- **Lógica Transversal em Componentes Persistentes:** Funcionalidades que afetam a integridade dos dados (como sincronização com backend) nunca devem residir em componentes de "página" que podem ser desmontados. Elas pertencem a Layouts globais ou Provedores de Contexto.
+- **Velocidade de Teste vs Usuário:** Testes automatizados (Playwright) expõem race conditions que humanos raramente notariam, pois operam em velocidades de milissegundos. Se um teste falha intermitentemente, a causa provável é uma dependência temporal ou de montagem de componente.
+
+## Padronização da Estrutura de Classes e Nível (2026-05-15)
+
+**Status:** ✅ CONCLUÍDO - Estrutura de dados unificada para garantir persistência.
+
+**Problema:**
+Mesmo após correções parciais, o nível do personagem continuava sendo resetado. Descobriu-se que a estrutura `classes` (um array de objetos) era a fonte da verdade para o backend, mas ela não existia formalmente na interface `Character` do frontend nem era inicializada corretamente no store. Isso fazia com que o array fosse enviado vazio ou inconsistente durante o auto-save.
+
+**O que foi feito:**
+1. **Tipagem Oficial:** Adicionado o campo `classes` à interface `Character` em `character.ts`.
+2. **Inicialização:** O store agora garante que `classes` comece como um array vazio e seja populado imediatamente ao escolher a classe no Builder (`ClassSelect.tsx`).
+3. **Mapeamento de Carga:** A ação `setCharacter` foi blindada para priorizar o nível e o array de classes vindos do `recordJson`, garantindo que personagens de nível alto sejam restaurados com precisão.
+4. **Sincronização no Level Up:** A função `finalizeLevelUp` agora atualiza obrigatoriamente tanto o nível global quanto o nível dentro do array de classes.
+
+**Lição aprendida:**
+- **Contratos de Dados:** Quando o backend e o frontend compartilham a responsabilidade de reconstruir um objeto complexo, a estrutura desse objeto deve ser idêntica e obrigatória em ambos os lados. Campos opcionais ou omitidos em um lado são a causa número 1 de bugs de persistência.
+
+## Prevenção de Corrupção de Arquivos (2026-05-17)
+
+**Status:** ⚠️ ALERTA - Corrupção de sintaxe em `SpellsTab.tsx` por concorrência de edição.
+
+**Problema:**
+O agente tentou realizar múltiplas edições (`replace`) no mesmo arquivo (`SpellsTab.tsx`) dentro do mesmo turno de processamento. Isso gerou uma race condition na ferramenta de edição, resultando em um arquivo corrompido com blocos de código duplicados e texto "sujo" ao final do arquivo, o que travou o servidor de desenvolvimento do Vite.
+
+**O que foi feito:**
+1. **Recuperação Manual:** O arquivo `SpellsTab.tsx` foi sobrescrito com a versão correta e higienizada.
+2. **Auditoria de Importações:** Verificado se o `getSpellOrigin` e outras dependências foram mantidas.
+
+**Lição aprendida:**
+- **Atomicidade de Edição:** NUNCA realize múltiplos `replace` no mesmo arquivo em um único turno. As edições devem ser sequenciais, esperando o sucesso da primeira antes de iniciar a segunda em um novo turno, ou consolidadas em um único `write_file` caso o arquivo seja pequeno o suficiente. Race conditions em ferramentas de edição são destrutivas para a integridade do código.
+- **Validação Pós-Edição:** Sempre rodar `npm run typecheck` ou observar o log do `npm run dev` após edições complexas para garantir que a árvore sintática (AST) não foi quebrada.
+

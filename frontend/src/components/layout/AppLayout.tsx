@@ -1,14 +1,55 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { CharacterSheet } from '../sheet/CharacterSheet';
 import { LevelUpModal } from '../builder/LevelUpModal';
 import { useCharacterStore } from '../../store/useCharacterStore';
 import { cn } from '../../lib/utils';
+import { saveCharacter } from '../../api/character-api';
 
 export const AppLayout: React.FC = () => {
-  const { character, pendingLevelUp } = useCharacterStore();
+  const { character, activeCharacterId, pendingLevelUp, setIsSaving } = useCharacterStore();
   const location = useLocation();
+
+  useEffect(() => {
+    if (activeCharacterId && character.creationComplete) {
+      setIsSaving(true);
+      const timer = setTimeout(async () => {
+        try {
+          const slugify = (str: string) => String(str ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+          
+          const record = {
+            ...character,
+            ruleset: '5e-2024',
+            lineageId: slugify(character.race),
+            backgroundId: slugify(character.background),
+            asiChoices: character.asiChoices,
+            classFeatureChoices: character.classFeatureChoices,
+            classes: (character.classes && character.classes.length > 0) 
+              ? character.classes 
+              : [{ classId: slugify(character.class), level: character.level }],
+            state: {
+              hp: character.hp,
+              maxHpOverride: character.maxHp,
+              tempHp: character.tempHp,
+              hitDiceUsed: character.hitDiceUsed,
+              spellSlotsUsed: Object.fromEntries(
+                Object.entries(character.spellSlots || {}).map(([level, slot]: [string, any]) => [level, slot?.used || 0])
+              ),
+              activeConditions: []
+            }
+          };
+          
+          await saveCharacter(record as any);
+        } catch (err) {
+          console.error('Auto-save failed:', err);
+        } finally {
+          setIsSaving(false);
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [character, activeCharacterId, setIsSaving]);
   
   // A ficha deve ser centralizada se a criação estiver completa OU se estivermos na rota /sheet
   const isSheetView = location.pathname === '/sheet' || character.creationComplete;

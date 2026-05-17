@@ -1,19 +1,27 @@
 import { useCharacterStore } from '../store/useCharacterStore';
 import type { AbilityScores } from '../types/character';
+import { calculateMaxSlots } from '../lib/spell-utils';
 
 export const useDerivedState = () => {
   const { character } = useCharacterStore();
 
-  const proficiencyBonus = Math.ceil((character.level || 1) / 4) + 1;
+  const proficiencyBonus = Math.ceil(character.level / 4) + 1;
+  const spellSlotsMax = calculateMaxSlots(character.class, character.level);
 
-  // Final ability scores including background increments
+  // Final ability scores including background increments and ASI choices
   const finalAbilities: AbilityScores = { ...character.abilities };
   const assignments = character.backgroundChoices?.abilityAssignments || {};
   
   (Object.keys(character.abilities) as Array<keyof AbilityScores>).forEach(ability => {
     const base = Number(character.abilities[ability] ?? 10);
-    const bonus = Number(assignments[ability] || 0);
-    finalAbilities[ability] = base + bonus;
+    const backgroundBonus = Number(assignments[ability] || 0);
+    
+    // Sum ASI choices from all levels
+    const asiBonus = Object.values(character.asiChoices || {}).reduce((total, choice: any) => {
+      return total + (Number(choice[ability]) || 0);
+    }, 0);
+
+    finalAbilities[ability] = base + backgroundBonus + asiBonus;
   });
 
   const modifiers: AbilityScores = {
@@ -128,6 +136,7 @@ export const useDerivedState = () => {
     maxHp: character.maxHp || 10,
     spellAttack,
     spellSaveDc,
+    spellSlotsMax,
     encumbrance: {
       carriedWeight,
       carryingCapacity,

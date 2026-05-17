@@ -46,8 +46,11 @@ export const ClassSelect: React.FC = () => {
     const classId = e.target.value;
     const cls = classList.find(c => c.id === classId);
     if (cls) {
+      const slugify = (str: string) => String(str ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      
       updateCharacter({
         class: cls.name,
+        classes: [{ classId: slugify(cls.name), level: character.level || 1 }],
         skillProficiencies: character.skillProficiencies.filter(s =>
           !character.classSkillChoices.includes(s)
         ),

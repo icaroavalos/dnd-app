@@ -8,11 +8,13 @@ import { useCharacterStore } from './store/useCharacterStore';
 function App() {
   const fetchItems = useCharacterStore(state => state.fetchItemsCatalog);
   const fetchSpells = useCharacterStore(state => state.fetchSpellsCatalog);
+  const fetchFeats = useCharacterStore(state => state.fetchFeatsCatalog);
 
   useEffect(() => {
     fetchItems();
     fetchSpells();
-  }, [fetchItems, fetchSpells]);
+    fetchFeats();
+  }, [fetchItems, fetchSpells, fetchFeats]);
 
   return (
     <BrowserRouter>
