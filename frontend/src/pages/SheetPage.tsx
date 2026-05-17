@@ -21,7 +21,7 @@ export const SheetPage: React.FC = () => {
             ruleset: '5e-2024',
             lineageId: slugify(character.race),
             backgroundId: slugify(character.background),
-            classes: (character as any).classes || [{ classId: slugify(character.class), level: character.level }],
+            classes: character.classes || [{ classId: slugify(character.class), level: character.level }],
             state: {
               hp: character.hp,
               maxHpOverride: character.maxHp,

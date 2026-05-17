@@ -542,10 +542,20 @@ export const useCharacterStore = create<CharacterState>((set, get) => ({
         return { ...f, resource };
       });
 
+      // Sync classes array for persistence and future multiclass support
+      const updatedClasses = (state.character.classes || []).map((cls, idx) => {
+        // For now, we assume the first class is the primary one being leveled up
+        if (idx === 0) {
+          return { ...cls, level: nextLevel };
+        }
+        return cls;
+      });
+
       return {
         character: {
           ...state.character,
           level: nextLevel,
+          classes: updatedClasses,
           maxHp: state.character.maxHp + hpGain,
           hp: state.character.hp + hpGain,
           features: [...updatedExistingFeatures, ...filteredFeatures],
