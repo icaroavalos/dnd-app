@@ -107,7 +107,7 @@ export function resolveResourceMeta(resourceId: string): ResourceActionMeta {
     };
   }
 
-  const fallbackName = titleize(resourceId.replace(/^bgSpell:/, ''));
+  const fallbackName = titleize(resourceId.replace(/^bgSpell:/, '').replace(/_\d+$/, ''));
 
   return {
     id: resourceId,

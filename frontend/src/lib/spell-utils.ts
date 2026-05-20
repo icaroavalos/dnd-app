@@ -6,6 +6,18 @@ const FULL_CASTER_TABLE = [
   [4, 3, 3, 3, 2, 1, 1, 1], [4, 3, 3, 3, 2, 1, 1, 1, 1], [4, 3, 3, 3, 3, 1, 1, 1, 1], [4, 3, 3, 3, 3, 2, 1, 1, 1], [4, 3, 3, 3, 3, 2, 2, 1, 1]
 ];
 
+export const getPreparedSpellsLimit = (className: string | undefined | null, level: number): number | null => {
+  const name = (className || '').toLowerCase();
+  if (name !== 'wizard') return null; 
+
+  // D&D 2024 Wizard Prepared Spells Table
+  const wizardTable = [
+    4, 5, 6, 7, 9, 10, 11, 12, 14, 15,
+    16, 16, 18, 18, 20, 20, 22, 22, 25, 25
+  ];
+  return wizardTable[Math.min(level - 1, 19)];
+};
+
 export const getClassCasterType = (className: string): CasterType => {
   const name = className.toLowerCase();
   if (['wizard', 'sorcerer', 'bard', 'cleric', 'druid'].includes(name)) return 'full';
@@ -81,11 +93,31 @@ export const getSpellOrigin = (spell: any, character: any): string => {
   return originKind;
 };
 
+const inferSpellAbilityFromFeatureText = (description: string | undefined): 'int' | 'wis' | 'cha' | null => {
+  const match = description?.match(/\b(Intelligence|Wisdom|Charisma)\s+is\s+your\s+spellcasting\s+ability\s+for\s+(?:it|this spell|these spells)\b/i);
+  const ability = match?.[1]?.toLowerCase();
+
+  if (ability === 'intelligence') return 'int';
+  if (ability === 'wisdom') return 'wis';
+  if (ability === 'charisma') return 'cha';
+  return null;
+};
+
 export const getSpellAbility = (spell: any, character: any, mainAbility: 'int' | 'wis' | 'cha'): 'int' | 'wis' | 'cha' => {
   if (!spell) return mainAbility;
 
+  if (spell.spellcastingAbility === 'int' || spell.spellcastingAbility === 'wis' || spell.spellcastingAbility === 'cha') {
+    return spell.spellcastingAbility;
+  }
+
   const originKind = spell.originKind || spell.source;
   
+  if (originKind === 'feature' || originKind === 'feat-auto') {
+    const feature = character.features?.find((feat: any) => feat.name === spell.originName || feat.id === spell.originId);
+    const featureAbility = inferSpellAbilityFromFeatureText(feature?.description);
+    if (featureAbility) return featureAbility;
+  }
+
   if (originKind === 'background' || originKind === 'bg-feat' || originKind === 'feature' || originKind === 'feat-auto') {
     const chosenAbility = character.bgChoices?.spellcastingAbility;
     if (chosenAbility === 'int' || chosenAbility === 'wis' || chosenAbility === 'cha') {

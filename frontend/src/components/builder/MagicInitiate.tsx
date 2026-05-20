@@ -89,11 +89,13 @@ export const MagicInitiate: React.FC<MagicInitiateProps> = ({ constraintClass })
           originName: constraintClass || '',
           ...(level === 1 ? {
             resource: {
+              id: `bgSpell:${spell.name.toLowerCase().replace(/\s+/g, '-')}`,
               remaining: 1,
               max: 1,
               recoveryLabel: 'Long Rest'
             }
-          } : {})
+          } : {}),
+          spellcastingAbility: character.bgChoices?.spellcastingAbility || undefined
         });
       }
     }

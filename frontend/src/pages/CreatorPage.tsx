@@ -10,6 +10,7 @@ import { useCharacterStore, CLASS_HIT_DIE } from '../store/useCharacterStore';
 import { saveCharacter } from '../api/character-api';
 import { cn } from '../lib/utils';
 import { deriveResourcesFromFeatures } from '../lib/feature-resources';
+import { addSkillSelections, filterSelectedFeatures } from '../lib/character-rules';
 
 export const CreatorPage: React.FC = () => {
   const { character, updateCharacter, setActiveCharacterId } = useCharacterStore();
@@ -51,7 +52,22 @@ export const CreatorPage: React.FC = () => {
 
       const dieSize = CLASS_HIT_DIE[character.class.toLowerCase()] || 8;
       const initialHp = dieSize + conMod;
-      const resources = deriveResourcesFromFeatures(character.features);
+      const selectedFeatures = filterSelectedFeatures(character.features as any, character.classFeatureChoices || {});
+      const selectedOriginFeatNames = Object.entries(character.classFeatureChoices || {})
+        .filter(([id]) => id.startsWith('origin-feat-choice-'))
+        .flatMap(([, values]) => values);
+      const originFeatFeatures = selectedOriginFeatNames.map((name) => ({
+        id: `origin-feat-${slugify(name)}`,
+        name,
+        kind: 'feat' as const,
+        description: `Origin Feat: ${name}.`,
+        meta: 'XPHB',
+        level: 1,
+        originName: character.race || character.background || 'Origin'
+      }));
+      const featuresForSave = [...selectedFeatures, ...originFeatFeatures];
+      const skillProficienciesForSave = addSkillSelections(character.skillProficiencies || [], character.classFeatureChoices || {});
+      const resources = deriveResourcesFromFeatures(featuresForSave);
 
       // Mapeia para o formato esperado pelo backend (CharacterRecord)
       const record = {
@@ -63,12 +79,12 @@ export const CreatorPage: React.FC = () => {
         experience: character.experience,
         classes: [{ classId: slugify(character.class), level: character.level }],
         abilities: character.abilities,
-        skillProficiencies: character.skillProficiencies || [],
+        skillProficiencies: skillProficienciesForSave,
         savingThrowProficiencies: character.savingThrows || [],
         inventory: (character.inventory || []).map((item: any) => typeof item === 'string' ? { baseItemId: item, quantity: 1, status: 'backpack' } : normalizeInventoryStatus(item)),
         spells: character.spells || [],
         spellChoices: (character.spells || []).map(s => ({ spellId: s.id || s.name, spellcastingAbility: character.bgChoices?.spellcastingAbility })),
-        features: character.features,
+        features: featuresForSave,
         attacks: character.attacks,
         resources,
         equippedItems: character.equippedItems,
@@ -95,6 +111,8 @@ export const CreatorPage: React.FC = () => {
         hp: initialHp,
         maxHp: initialHp,
         classes: record.classes,
+        skillProficiencies: skillProficienciesForSave,
+        features: featuresForSave,
         resources
       });
       setActiveCharacterId(saved.id || null);

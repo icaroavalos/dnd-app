@@ -8,7 +8,7 @@ export const clean5eText = (text: string): string => {
   return text
     .replace(/{@(damage|dice|scaledamage|scaledice) ([^}|]+)(?:\|[^}]*)?}/g, '$2')
     // Preserve interactive tags
-    .replace(/{@(spell|item|class|creature|feat|condition|action|skill|sense|background) ([^}|]+)(?:\|([^}]*))?}/g, '[[$1:$2|$3]]')
+    .replace(/{@(spell|item|class|creature|feat|condition|action|skill|sense|background|status) ([^}|]+)(?:\|([^}]*))?}/g, '[[$1:$2|$3]]')
     .replace(/{@variantrule ([^}|]+)(?:\|([^}]*))?}/g, '[[variantrule:$1|$2]]')
     .replace(/{@i ([^}]+)}/g, '*$1*')
     .replace(/{@b ([^}]+)}/g, '**$1**')
@@ -16,8 +16,11 @@ export const clean5eText = (text: string): string => {
     .replace(/{@h}/g, 'Hit: ')
     .replace(/{@dc ([^}]+)}/g, 'DC $1')
     .replace(/{@note ([^}]+)}/g, '($1)')
+    .replace(/{@filter ([^}|]+)(?:\|[^}]*)?}/g, '$1')
     .replace(/{@(link|url) ([^}|]+)(?:\|[^}]*)?}/g, '$2')
-    .replace(/{@book ([^}|]+)(?:\|[^}]*)?}/g, '$2');
+    .replace(/{@book ([^}|]+)(?:\|[^}]*)?}/g, '$2')
+    .replace(/{@5etools ([^}|]+)(?:\|[^}]*)?}/g, '$1')
+    .replace(/{@[^}]+}/g, '');
 };
 
 export const parse5eEntry = (entry: any): string => {
@@ -35,6 +38,12 @@ export const parse5eEntry = (entry: any): string => {
 
   if (entry.type === 'list' && Array.isArray(entry.items)) {
     return entry.items.map((item: any) => `• ${parse5eEntry(item)}`).join('\n');
+  }
+
+  if (entry.type === 'table' && Array.isArray(entry.rows)) {
+    const caption = entry.caption ? `**${entry.caption}.**\n` : '';
+    const rows = entry.rows.map((row: any[]) => row.map((cell) => parse5eEntry(cell)).join(': '));
+    return caption + rows.join('\n');
   }
 
   if (entry.type === 'item') {

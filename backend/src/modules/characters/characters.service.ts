@@ -33,6 +33,7 @@ const SKILL_TO_ABILITY: Record<string, AbilityKey> = {
 
 interface ClassCatalogEntry extends RulesCatalogEntry {
   hitDie?: string | number;
+  proficiency?: AbilityKey[];
   spellcastingAbility?: AbilityKey;
   classTableGroups?: Array<{
     rowsSpellProgression?: number[][];
@@ -67,9 +68,16 @@ export class CharactersService {
     const proficiencyBonus = Math.ceil(totalLevel / 4) + 1;
     const abilityScores = deriveAbilityScores(character);
     const abilityModifiers = deriveAbilityModifiers(abilityScores);
+    const classResults = (classesCatalog as any)?.results ?? [];
+    const itemResults = (itemsCatalog as any)?.results ?? [];
+
+    const primaryClass = resolvePrimaryClass(character, classResults as ClassCatalogEntry[]);
+    const savingThrowProficiencies = (character.savingThrowProficiencies?.length
+      ? character.savingThrowProficiencies
+      : primaryClass?.proficiency) ?? [];
     const savingThrows = deriveSavingThrows(
       abilityScores,
-      character.savingThrowProficiencies ?? [],
+      savingThrowProficiencies,
       proficiencyBonus
     );
     const skillBonuses = deriveSkillBonuses(
@@ -77,11 +85,6 @@ export class CharactersService {
       character.skillProficiencies ?? [],
       proficiencyBonus
     );
-
-    const classResults = (classesCatalog as any)?.results ?? [];
-    const itemResults = (itemsCatalog as any)?.results ?? [];
-
-    const primaryClass = resolvePrimaryClass(character, classResults as ClassCatalogEntry[]);
     const hitDie = normalizeHitDie(primaryClass?.hitDie);
     const state = character.state ?? { hp: 10, tempHp: 0, hitDiceUsed: 0, spellSlotsUsed: {}, activeConditions: [] };
     const maxHp =
@@ -94,9 +97,16 @@ export class CharactersService {
       proficiencyBonus,
       abilityModifiers
     );
-    const armorClass = deriveArmorClass(
+    const armorOptions = deriveArmorClassOptions(
       character,
       abilityModifiers,
+      itemResults as ItemCatalogEntry[]
+    );
+    const selectedAcFormula = character.acFormulaId || 'standard';
+    const armorClass = armorOptions.find(o => o.id === selectedAcFormula)?.value || armorOptions[0]?.value || 10;
+
+    const proficiencyWarnings = checkProficiencies(
+      character,
       itemResults as ItemCatalogEntry[]
     );
 
@@ -109,6 +119,8 @@ export class CharactersService {
       savingThrows,
       skillBonuses,
       armorClass,
+      armorClassOptions: armorOptions,
+      proficiencyWarnings,
       initiative: abilityModifiers.dex,
       speed: 30,
       maxHp,
@@ -122,27 +134,128 @@ export class CharactersService {
   }
 }
 
-function deriveArmorClass(
+function deriveArmorClassOptions(
   character: CharacterRecord,
   abilityModifiers: AbilityScoreMap,
   itemEntries: ItemCatalogEntry[]
-): number {
-  const items = itemEntries ?? [];
+): any[] {
   const inventory = character.inventory ?? [];
-  const itemLookup = new Map(items.map((entry) => [slugify(entry.name), entry]));
+  const itemLookup = new Map(itemEntries.map((entry) => [slugify(entry.name), entry]));
+  
   const equippedArmor = inventory
     .filter((item) => item.status === 'equipped_armor')
     .map((item) => itemLookup.get(slugify(item.baseItemId)))
     .find((entry): entry is ItemCatalogEntry => Boolean(entry));
+    
   const equippedShield = inventory
     .filter((item) => item.status === 'equipped_shield')
     .map((item) => itemLookup.get(slugify(item.baseItemId)))
     .find((entry): entry is ItemCatalogEntry => Boolean(entry));
 
-  const baseArmorClass = resolveBaseArmorClass(equippedArmor, abilityModifiers.dex);
   const shieldBonus = Number(equippedShield?.ac ?? 0);
+  const options = [];
 
-  return baseArmorClass + shieldBonus;
+  // Standard calculation (Armor or 10+Dex)
+  const baseAc = resolveBaseArmorClass(equippedArmor, abilityModifiers.dex);
+  options.push({
+    id: 'standard',
+    name: equippedArmor ? `Armadura (${equippedArmor.name})` : 'Padrão (10 + Destreza)',
+    value: baseAc + shieldBonus,
+    description: equippedArmor 
+      ? `Base ${equippedArmor.ac} + Destreza (limite conforme tipo) + Escudo (${shieldBonus})`
+      : `10 + Destreza (${abilityModifiers.dex}) + Escudo (${shieldBonus})`
+  });
+
+  // Unarmored Defense (Monk) - only if not wearing armor/shield
+  const hasMonk = (character.features || []).some(f => (f.name || '').toLowerCase().includes('unarmored defense') && (f.description || f.entries || '').toString().toLowerCase().includes('wisdom'));
+  if (hasMonk && !equippedArmor && !equippedShield) {
+    options.push({
+      id: 'unarmored_monk',
+      name: 'Defesa Sem Armadura (Monge)',
+      value: 10 + abilityModifiers.dex + abilityModifiers.wis,
+      description: `10 + Destreza (${abilityModifiers.dex}) + Sabedoria (${abilityModifiers.wis})`
+    });
+  }
+
+  // Unarmored Defense (Barbarian) - only if not wearing armor (shields allowed)
+  const hasBarb = (character.features || []).some(f => (f.name || '').toLowerCase().includes('unarmored defense') && (f.description || f.entries || '').toString().toLowerCase().includes('constitution'));
+  if (hasBarb && !equippedArmor) {
+    options.push({
+      id: 'unarmored_barbarian',
+      name: 'Defesa Sem Armadura (Bárbaro)',
+      value: 10 + abilityModifiers.dex + abilityModifiers.con + shieldBonus,
+      description: `10 + Destreza (${abilityModifiers.dex}) + Constituição (${abilityModifiers.con}) + Escudo (${shieldBonus})`
+    });
+  }
+
+  // Natural Armor
+  const naturalArmor = (character.features || []).find(f => (f.name || '').toLowerCase().includes('natural armor'));
+  if (naturalArmor) {
+    const desc = (naturalArmor.description || naturalArmor.entries || '').toString();
+    const baseNatural = desc.match(/(\d+)\s*\+\s*your\s*Dexterity/);
+    const fixedNatural = desc.match(/Armor\s*Class\s*is\s*(\d+)/);
+    
+    if (baseNatural) {
+      const val = parseInt(baseNatural[1]);
+      options.push({
+        id: 'natural_armor',
+        name: 'Armadura Natural',
+        value: val + abilityModifiers.dex + shieldBonus,
+        description: `${val} + Destreza (${abilityModifiers.dex}) + Escudo (${shieldBonus})`
+      });
+    } else if (fixedNatural) {
+      const val = parseInt(fixedNatural[1]);
+      options.push({
+        id: 'natural_armor',
+        name: 'Armadura Natural',
+        value: val + shieldBonus,
+        description: `${val} (Fixo) + Escudo (${shieldBonus})`
+      });
+    }
+  }
+
+  return options;
+}
+
+function checkProficiencies(
+  character: CharacterRecord,
+  itemEntries: ItemCatalogEntry[]
+): string[] {
+  const inventory = character.inventory ?? [];
+  const itemLookup = new Map(itemEntries.map((entry) => [slugify(entry.name), entry]));
+  const warnings: string[] = [];
+
+  const equippedArmor = inventory
+    .filter((item) => item.status === 'equipped_armor')
+    .map((item) => itemLookup.get(slugify(item.baseItemId)))
+    .find((entry): entry is ItemCatalogEntry => Boolean(entry));
+    
+  const equippedShield = inventory
+    .filter((item) => item.status === 'equipped_shield')
+    .map((item) => itemLookup.get(slugify(item.baseItemId)))
+    .find((entry): entry is ItemCatalogEntry => Boolean(entry));
+
+  // Get proficiencies from features
+  const features = character.features || [];
+  const profText = features.map(f => (f.name + ' ' + (f.description || f.entries || '')).toLowerCase()).join(' ');
+  
+  const hasLight = profText.includes('light armor');
+  const hasMedium = profText.includes('medium armor');
+  const hasHeavy = profText.includes('heavy armor');
+  const hasShield = profText.includes('shield');
+
+  if (equippedArmor) {
+    const type = String(equippedArmor.type || '').split('|')[0];
+    if (type === 'LA' && !hasLight) warnings.push('Armadura Leve');
+    if (type === 'MA' && !hasMedium) warnings.push('Armadura Média');
+    if (type === 'HA' && !hasHeavy) warnings.push('Armadura Pesada');
+  }
+
+  if (equippedShield && !hasShield) {
+    warnings.push('Escudo');
+  }
+
+  return warnings;
 }
 
 function resolveBaseArmorClass(
@@ -258,8 +371,7 @@ function deriveSpellcasting(
   proficiencyBonus: number,
   abilityModifiers: AbilityScoreMap
 ): DerivedSpellcasting | null {
-  const spellChoiceAbility = character.spellChoices?.[0]?.spellcastingAbility;
-  const ability = spellChoiceAbility ?? primaryClass?.spellcastingAbility ?? null;
+  const ability = primaryClass?.spellcastingAbility ?? null;
 
   if (!ability) {
     return null;

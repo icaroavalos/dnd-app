@@ -8,9 +8,10 @@ interface RuleLinkProps {
   type: string;
   name: string;
   label?: string;
+  source?: string;
 }
 
-export const RuleLink: React.FC<RuleLinkProps> = ({ type, name, label }) => {
+export const RuleLink: React.FC<RuleLinkProps> = ({ type, name, label, source }) => {
   const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowConfirm] = useState(false);
@@ -29,6 +30,15 @@ export const RuleLink: React.FC<RuleLinkProps> = ({ type, name, label }) => {
       else if (type === 'spell') data = await getSpells();
       else if (type === 'feat') data = await getFeats();
       else if (type === 'item') data = await getItems();
+      else if (type === 'variantrule' || type === 'status') {
+        setContent({
+          name,
+          source,
+          entries: [`Termo de regra referenciado em ${source || 'XPHB'}.`],
+        });
+        setShowConfirm(true);
+        return;
+      }
 
       if (data) {
         const entry = data.results.find((r: any) => r.name.toLowerCase() === name.toLowerCase());
@@ -111,21 +121,36 @@ interface RuleTextProps {
   className?: string;
 }
 
+type RuleTextPart =
+  | { type: 'text'; text: string }
+  | { type: 'link'; ruleType: string; name: string; source: string };
+
+export const getRuleTextParts = (text: string): RuleTextPart[] => {
+  const cleanedText = clean5eText(text);
+  const parts = cleanedText.split(/(\[\[[a-z]+:[^|\]]+\|?[^\]]*\]\])/g);
+
+  return parts.filter(Boolean).map((part) => {
+    const match = part.match(/\[\[([a-z]+):([^|\]]+)\|?([^\]]*)\]\]/);
+    if (match) {
+      const [, ruleType, name, source = ''] = match;
+      return { type: 'link', ruleType, name, source };
+    }
+    return { type: 'text', text: part };
+  });
+};
+
 export const RuleText: React.FC<RuleTextProps> = ({ text, className }) => {
   if (!text) return null;
 
-  // Split text by the pattern [[type:name|source]]
-  const parts = text.split(/(\[\[[a-z]+:[^|\]]+\|?[^\]]*\]\])/g);
+  const parts = getRuleTextParts(text);
 
   return (
     <div className={className}>
       {parts.map((part, i) => {
-        const match = part.match(/\[\[([a-z]+):([^|\]]+)\|?([^\]]*)\]\]/);
-        if (match) {
-          const [, type, name, source] = match;
-          return <RuleLink key={i} type={type} name={name} source={source} />;
+        if (part.type === 'link') {
+          return <RuleLink key={i} type={part.ruleType} name={part.name} source={part.source} />;
         }
-        return <span key={i}>{part}</span>;
+        return <span key={i}>{part.text}</span>;
       })}
     </div>
   );

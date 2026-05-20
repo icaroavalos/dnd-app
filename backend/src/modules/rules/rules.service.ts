@@ -46,7 +46,8 @@ export class RulesService {
 
     const levelFeatures = featuresCatalog.results.filter(f => 
       f.className?.toLowerCase() === className.toLowerCase() && 
-      Number(f.level) === level
+      Number(f.level) === level &&
+      (!f.source || f.source === 'XPHB')
     );
 
     const choices: LevelUpChoice[] = [];

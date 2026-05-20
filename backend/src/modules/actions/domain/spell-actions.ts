@@ -24,14 +24,19 @@ export function deriveClassSpellActions(
 ): DerivedAction[] {
   const actions: DerivedAction[] = [];
 
-  for (const spellName of character.spells ?? []) {
-    if (!classSpellNames.has(slugify(spellName))) continue;
+  for (const spellEntry of character.spells ?? []) {
+    const spellName = typeof spellEntry === 'string' ? spellEntry : spellEntry?.name;
+    const isClassSpell = classSpellNames.has(slugify(spellName));
+    const isGrantedSpell = typeof spellEntry === 'object' && spellEntry?.originKind && spellEntry.originKind !== 'class';
+    if (!isClassSpell && !isGrantedSpell) continue;
     const detail = spellLookup.get(slugify(spellName));
     if (!detail) continue;
 
     const level = Number(detail.level) || 0;
     const action = createSpellAction(detail, projection, {
-      castMode: level > 0 ? 'slots' : 'at-will'
+      castMode: spellEntry?.resource?.id ? 'resource' : level > 0 && isClassSpell ? 'slots' : 'at-will',
+      resourceId: spellEntry?.resource?.id,
+      spellcastingAbility: spellEntry?.spellcastingAbility
     });
 
     if (action) actions.push(action);
@@ -51,7 +56,10 @@ export function deriveSpellActions(
     for (const cantripName of choice.selectedCantrips ?? []) {
       const detail = spellLookup.get(slugify(cantripName));
       if (!detail) continue;
-      const action = createSpellAction(detail, projection, { castMode: 'at-will' });
+      const action = createSpellAction(detail, projection, {
+        castMode: 'at-will',
+        spellcastingAbility: choice.spellcastingAbility
+      });
       if (action) actions.push(action);
     }
 
@@ -60,7 +68,8 @@ export function deriveSpellActions(
       if (!detail) continue;
       const action = createSpellAction(detail, projection, {
         castMode: 'resource',
-        resourceId: `bgSpell:${slugify(spellName)}`
+        resourceId: `bgSpell:${slugify(spellName)}`,
+        spellcastingAbility: choice.spellcastingAbility
       });
       if (action) actions.push(action);
     }
@@ -72,7 +81,7 @@ export function deriveSpellActions(
 export function createSpellAction(
   detail: SpellCatalogEntry,
   projection: DerivedCharacterSheet,
-  options: { castMode: 'at-will' | 'resource' | 'slots'; resourceId?: string }
+  options: { castMode: 'at-will' | 'resource' | 'slots'; resourceId?: string; spellcastingAbility?: 'int' | 'wis' | 'cha' }
 ): DerivedAction | null {
   const level = Number(detail.level) || 0;
   const description = entriesToText(detail.entries ?? []);
@@ -90,7 +99,7 @@ export function createSpellAction(
     subtitle: level === 0 ? 'Cantrip' : `Spell Level ${level}`,
     range: compactRange(detail.range),
     rangeLabel: rangeLabel(detail.range),
-    hit: spellHitOrDc(description, projection),
+    hit: spellHitOrDc(description, projection, options.spellcastingAbility),
     damage: spellDamageChips(description),
     notes: componentsLabel(detail.components),
     detail: clean5etoolsText(description),
@@ -112,9 +121,9 @@ export function actionKindForSpell(detail: SpellCatalogEntry, description: strin
   if (castingTime.includes('bonus')) return 'bonus';
   if (castingTime.includes('reaction')) return 'reaction';
   if (
-    lowerDescription.includes('saving throw') ||
+    /(?:must|has to|succeed on|make(?:s)? a)\b[\s\S]{0,80}\bsaving throw/i.test(description) ||
     lowerDescription.includes('spell attack') ||
-    lowerDescription.includes(' damage')
+    /\btake(?:s)?\b[\s\S]{0,80}\bdamage\b/i.test(description)
   ) {
     return 'attack';
   }
@@ -134,18 +143,46 @@ export function spellActionVisible(
   return level > 0 || (level === 0 && kind === 'action');
 }
 
-export function spellHitOrDc(description: string, projection: DerivedCharacterSheet): string {
+export function spellHitOrDc(
+  description: string,
+  projection: DerivedCharacterSheet,
+  spellcastingAbility?: 'int' | 'wis' | 'cha'
+): string {
+  const metrics = resolveSpellcastingMetrics(projection, spellcastingAbility);
   const text = String(description).toLowerCase();
-  if (text.includes('saving throw')) return String(projection.spellcasting?.saveDc ?? '--');
-  if (text.includes('spell attack')) return signed(projection.spellcasting?.attackBonus ?? 0);
+  if (/(?:must|has to|succeed on|make(?:s)? a)\b[\s\S]{0,80}\bsaving throw/i.test(description)) {
+    return String(metrics?.saveDc ?? '--');
+  }
+  if (text.includes('spell attack')) return signed(metrics?.attackBonus ?? 0);
   return '--';
 }
 
 export function spellDamageChips(description = ''): string[] {
+  if (!/\btake(?:s)?\b[\s\S]{0,80}\bdamage\b/i.test(description)) {
+    return [];
+  }
   const matches = [...String(description).matchAll(/\b\d+d\d+(?:\s*[+-]\s*\d+)?\b/gi)].map((match) =>
     match[0].replace(/\s+/g, '')
   );
   return [...new Set(matches)].slice(0, 2);
+}
+
+function resolveSpellcastingMetrics(
+  projection: DerivedCharacterSheet,
+  spellcastingAbility?: 'int' | 'wis' | 'cha'
+): { attackBonus: number; saveDc: number } | null | undefined {
+  const byAbility = (projection as any).spellcastingByAbility?.[spellcastingAbility ?? ''];
+  if (byAbility) return byAbility;
+
+  if (spellcastingAbility && projection.abilityModifiers && projection.proficiencyBonus) {
+    const modifier = Number(projection.abilityModifiers[spellcastingAbility]) || 0;
+    return {
+      attackBonus: projection.proficiencyBonus + modifier,
+      saveDc: 8 + projection.proficiencyBonus + modifier,
+    };
+  }
+
+  return projection.spellcasting;
 }
 
 export function createSpellLookup(entries: SpellCatalogEntry[]): Map<string, SpellCatalogEntry> {
@@ -173,8 +210,19 @@ export function componentsLabel(components: SpellCatalogEntry['components']): st
   return labels.length ? labels.join(', ') : 'Magic';
 }
 
-export function entriesToText(entries: string[]): string {
-  return entries.map((entry) => clean5etoolsText(entry)).join('\n\n').trim();
+export function entriesToText(entries: unknown[]): string {
+  return entries.map((entry) => entryToText(entry)).filter(Boolean).join('\n\n').trim();
+}
+
+function entryToText(entry: unknown): string {
+  if (typeof entry === 'string') return clean5etoolsText(entry);
+  if (!entry || typeof entry !== 'object') return '';
+  const value = entry as any;
+  const title = value.name ? `${value.name}. ` : '';
+  if (Array.isArray(value.entries)) return title + entriesToText(value.entries);
+  if (Array.isArray(value.items)) return title + entriesToText(value.items);
+  if (value.entry) return title + entryToText(value.entry);
+  return '';
 }
 
 export function clean5etoolsText(value: string): string {

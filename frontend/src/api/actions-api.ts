@@ -1,5 +1,6 @@
 import { apiClient } from './api-client';
 import type { Character } from '../types/character';
+import { syncResourcesWithFeatures } from '../lib/feature-resources';
 
 export type DerivedActionKind = 'attack' | 'action' | 'bonus' | 'reaction' | 'other' | 'limited';
 
@@ -62,13 +63,16 @@ function toActionsCharacterRecord(character: Character): Record<string, unknown>
     skillProficiencies: character.skillProficiencies || [],
     savingThrowProficiencies: character.savingThrows || [],
     inventory: character.inventory || [],
-    spells: (character.spells || []).map((s: any) => s.name || s),
+    spells: character.spells || [],
     spellChoices: character.bgSpellChoices ? [{
-      selectedCantrips: character.bgSpellChoices.cantrips || [],
-      selectedLevel1Spells: character.bgSpellChoices.level1 || [],
+      selectedCantrips: resolveSpellChoiceNames(character, character.bgSpellChoices.cantrips || []),
+      selectedLevel1Spells: resolveSpellChoiceNames(character, character.bgSpellChoices.level1 || []),
       spellcastingAbility: character.bgChoices?.spellcastingAbility || 'cha'
     }] : [],
-    resources: character.resources || {},
+    resources: {
+      ...syncResourcesWithFeatures(character.resources || {}, character.features || []),
+      ...spellResourcesForActions(character),
+    },
     state: {
       hp: character.hp || 0,
       maxHpOverride: character.maxHp || null,
@@ -80,6 +84,27 @@ function toActionsCharacterRecord(character: Character): Record<string, unknown>
       activeConditions: [],
     },
   };
+}
+
+function resolveSpellChoiceNames(character: Character, ids: string[]): string[] {
+  return ids.map((id) => {
+    const spell = (character.spells || []).find((entry: any) => (entry.id || entry.name) === id);
+    return spell?.name || id;
+  });
+}
+
+function spellResourcesForActions(character: Character): Record<string, { current: number; max: number }> {
+  return Object.fromEntries(
+    (character.spells || [])
+      .filter((spell: any) => spell.resource?.id)
+      .map((spell: any) => [
+        spell.resource.id,
+        {
+          current: Number(spell.resource.remaining ?? spell.resource.current ?? 0),
+          max: Number(spell.resource.max ?? 1),
+        },
+      ])
+  );
 }
 
 function normalizeAbilities(abilities: Character['abilities']): Record<string, number> {

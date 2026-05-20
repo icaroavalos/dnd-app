@@ -8,6 +8,7 @@ import { RuleText } from '../ui/RuleText';
 import { ASISelector } from './asi-feat/ASISelector';
 import { FeatSelector } from './asi-feat/FeatSelector';
 import { HPGainSelector } from './HPGainSelector';
+import { filterSelectedFeatures, normalizeSubclassName } from '../../lib/character-rules';
 
 export const LevelUpModal: React.FC = () => {
   const { 
@@ -36,17 +37,12 @@ export const LevelUpModal: React.FC = () => {
 
   const getSelectedSubclass = () => {
     const subclassChoice = choices.find(c => c.type === 'subclass');
-    if (!subclassChoice) return null;
-    const selected = selections[subclassChoice.id]?.[0];
-    if (!selected) return null;
-    
-    return selected
-      .replace(/Path of the /i, '')
-      .replace(/Circle of the /i, '')
-      .replace(/College of /i, '')
-      .replace(/Oath of /i, '')
-      .replace(/Domain/i, '')
-      .trim();
+    const selected = subclassChoice
+      ? selections[subclassChoice.id]?.[0]
+      : Object.entries(character.classFeatureChoices || {})
+        .find(([id]) => id.startsWith('subclass-'))?.[1]?.[0];
+
+    return selected ? normalizeSubclassName(selected) : null;
   };
 
   const selectedSubclassName = getSelectedSubclass();
@@ -57,7 +53,7 @@ export const LevelUpModal: React.FC = () => {
     if (choice.type === 'asi' || choice.type === 'feat') return false; // Handled separately
     const feat = newFeatures.find(f => f.id === choice.featureId);
     if (!feat || !feat.subclassShortName) return true;
-    return feat.subclassShortName.toLowerCase() === selectedSubclassName?.toLowerCase();
+    return normalizeSubclassName(feat.subclassShortName) === selectedSubclassName;
   });
 
   const asiChoice = choices.find(c => c.type === 'asi');
@@ -128,9 +124,16 @@ export const LevelUpModal: React.FC = () => {
     }
   };
 
-  const visibleFeatures = (newFeatures || []).filter(feat => {
+  const visibleSubclassFeatures = (newFeatures || []).filter((feat: any) =>
+    feat.subclassShortName && normalizeSubclassName(feat.subclassShortName) === selectedSubclassName
+  );
+
+  const visibleFeatures = filterSelectedFeatures((newFeatures || []) as any, selections).filter(feat => {
+    if (!feat.subclassShortName && visibleSubclassFeatures.length > 0 && feat.name.toLowerCase() === 'subclass feature') {
+      return false;
+    }
     if (!feat.subclassShortName) return true;
-    return feat.subclassShortName.toLowerCase() === selectedSubclassName?.toLowerCase();
+    return normalizeSubclassName(feat.subclassShortName) === selectedSubclassName;
   });
 
   return (

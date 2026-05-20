@@ -37,6 +37,29 @@ export function deriveResourcesFromFeatures(features: any[] = []): Record<string
   return resources;
 }
 
+export function syncResourcesWithFeatures(
+  existing: Record<string, any> = {},
+  features: any[] = []
+): Record<string, CharacterResourceState> {
+  const derived = deriveResourcesFromFeatures(features);
+  const synced: Record<string, CharacterResourceState> = { ...existing };
+
+  for (const [id, resource] of Object.entries(derived)) {
+    const previous = existing[id];
+    const previousCurrent = Number(previous?.current ?? previous?.remaining);
+    const previousMax = Number(previous?.max);
+    const maxIncrease = Number.isFinite(previousMax) ? Math.max(0, resource.max - previousMax) : 0;
+    synced[id] = {
+      ...resource,
+      current: Number.isFinite(previousCurrent)
+        ? Math.max(0, Math.min(resource.max, previousCurrent + maxIncrease))
+        : resource.current,
+    };
+  }
+
+  return synced;
+}
+
 export function canonicalResourceId(feature: any, resource: FeatureResource = {}): string {
   const name = String(feature?.name ?? '').toLowerCase();
   if (name.includes('second wind')) return 'second_wind';

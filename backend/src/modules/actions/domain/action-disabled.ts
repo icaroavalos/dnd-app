@@ -6,7 +6,7 @@ export function isActionDisabled(
   projection: DerivedCharacterSheet
 ): boolean {
   if (action.resource) {
-    const resource = character.resources[action.resource];
+    const resource = character.resources[action.resource] ?? spellResourceState(character, action.resource);
     return !resource || Number(resource.current) <= 0;
   }
 
@@ -35,4 +35,10 @@ export function isActionDisabled(
   }
 
   return false;
+}
+
+function spellResourceState(character: CharacterRecord, resourceId: string): { current: number } | null {
+  const spell = (character.spells || []).find((entry: any) => entry?.resource?.id === resourceId) as any;
+  if (!spell?.resource) return null;
+  return { current: Number(spell.resource.remaining ?? spell.resource.current ?? 0) };
 }

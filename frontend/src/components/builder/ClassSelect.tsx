@@ -9,6 +9,12 @@ import { RuleText } from '../ui/RuleText';
 import { cn } from '@/lib/utils';
 import { parse5eEntry, clean5eText, parseResourceInfo } from '../../lib/data-parser';
 import { ChoiceSelector } from '../ui/ChoiceSelector';
+import {
+  buildExclusiveFeatureChoices,
+  buildFeatureTextChoices,
+  instantiateStartingEquipment,
+  normalizeClassSavingThrows,
+} from '../../lib/character-rules';
 
 const SKILLS = [
   "Acrobatics", "Animal Handling", "Arcana", "Athletics", "Deception", "History",
@@ -51,6 +57,7 @@ export const ClassSelect: React.FC = () => {
       updateCharacter({
         class: cls.name,
         classes: [{ classId: slugify(cls.name), level: character.level || 1 }],
+        savingThrows: normalizeClassSavingThrows(cls),
         spells: character.spells.filter(s => s.originKind !== 'class' && s.source !== 'class'),
         skillProficiencies: character.skillProficiencies.filter(s =>
           !character.classSkillChoices.includes(s)
@@ -79,12 +86,14 @@ export const ClassSelect: React.FC = () => {
             name: f.name,
             kind: 'class' as const,
             description: desc,
+            entries: f.entries,
             meta: f.source,
             resource
           };
         });
 
-        setFeaturesByKind('class', mappedFeatures);
+        const proficiencyFeature = buildStartingProficiencyFeature(cls);
+        setFeaturesByKind('class', proficiencyFeature ? [proficiencyFeature, ...mappedFeatures] : mappedFeatures);
       } catch (err) {
         console.error('Failed to load class features:', err);
       }
@@ -93,20 +102,31 @@ export const ClassSelect: React.FC = () => {
 
   const handleEquipmentChange = (option: string) => {
     if (!selectedClass || !selectedClass.startingEquipment) return;
-    const itemsData = selectedClass.startingEquipment.defaultData?.[0]?.[option] || [];
-    const newInventory = itemsData.map((entry: any) => {
-      if (typeof entry === 'string') return { baseItemId: entry.split('|')[0], quantity: 1, status: 'backpack' };
-      if (entry.item) return { baseItemId: entry.item.split('|')[0], quantity: entry.quantity || 1, status: 'backpack' };
-      if (entry.value) return { baseItemId: 'gp', quantity: entry.value / 100, status: 'backpack' };
-      return null;
-    }).filter(Boolean);
+    const equipment = instantiateStartingEquipment(selectedClass.startingEquipment, option, allItems, 'class', character.equippedSlots || {});
 
     updateCharacter({
       equipmentChoices: { ...character.equipmentChoices, class: option },
       inventory: [
         ...character.inventory.filter((i: any) => i.source !== 'class'),
-        ...newInventory.map((i: any) => ({ ...i, source: 'class' }))
-      ]
+        ...equipment.inventory
+      ],
+      equippedItems: [
+        ...character.equippedItems.filter((id) => !character.inventory.some((item: any) => item.source === 'class' && item.instanceId === id)),
+        ...equipment.equippedItems
+      ],
+      equippedSlots: {
+        ...Object.fromEntries(Object.entries(character.equippedSlots || {}).filter(([, id]) =>
+          !character.inventory.some((item: any) => item.source === 'class' && item.instanceId === id)
+        )),
+        ...equipment.equippedSlots
+      },
+      currency: {
+        cp: (character.currency?.cp || 0) + equipment.currency.cp,
+        sp: (character.currency?.sp || 0) + equipment.currency.sp,
+        ep: (character.currency?.ep || 0) + equipment.currency.ep,
+        gp: (character.currency?.gp || 0) + equipment.currency.gp,
+        pp: (character.currency?.pp || 0) + equipment.currency.pp
+      }
     });
   };
 
@@ -147,6 +167,9 @@ export const ClassSelect: React.FC = () => {
         });
       }
     });
+
+    choices.push(...buildExclusiveFeatureChoices(character.features as any));
+    choices.push(...buildFeatureTextChoices(character.features, allFeats));
 
     return choices;
   }, [character.features, allItems, allFeats, character.class]);
@@ -302,4 +325,27 @@ function formatEquipmentOption(startingEquipment: any, option: string, fallbackT
 
 function cleanEquipmentName(value: string): string {
   return String(value).split('|')[0];
+}
+
+function buildStartingProficiencyFeature(cls: CatalogEntry) {
+  const armor = (cls.startingProficiencies?.armor || [])
+    .map((value: string) => value === 'shield' ? 'shield' : `${value} armor`)
+    .join(', ');
+  const weapons = (cls.startingProficiencies?.weapons || []).join(', ');
+  const parts = [
+    armor ? `Armor training: ${armor}.` : '',
+    weapons ? `Weapon training: ${weapons}.` : '',
+  ].filter(Boolean);
+
+  if (parts.length === 0) return null;
+
+  return {
+    id: `starting-proficiencies-${String(cls.name).toLowerCase().replace(/\s+/g, '-')}`,
+    name: 'Starting Proficiencies',
+    kind: 'class' as const,
+    description: parts.join(' '),
+    meta: cls.source,
+    level: 1,
+    originName: cls.name,
+  };
 }

@@ -140,15 +140,19 @@ export const SpellsTab: React.FC = () => {
 
           {group.spells.map((spell, idx) => {
             const isOpen = selectedSpell === spell.name;
+            const isWizard = (character.class || '').toLowerCase() === 'wizard';
+            const isPrepared = !isWizard || group.level === 0 || (character.preparedSpells || []).includes(spell.id || spell.name);
+            const spellAbility = getSpellAbility(spell, character, derived.mainSpellcastingAbility);
+            
             const isBgSpell = spell.originKind === 'background' || spell.source === 'bg-feat';
             const hasBgResource = isBgSpell && (spell.resource ? spell.resource.remaining > 0 : false);
             const max = derived.spellSlotsMax[group.level] || 0;
             const used = character.spellSlots[group.level]?.used || 0;
             const hasSlots = used < max;
-            const canCast = group.level === 0 || (isBgSpell ? hasBgResource : hasSlots);
+            const canCast = (group.level === 0 || (isBgSpell ? hasBgResource : hasSlots)) && isPrepared;
 
             return (
-              <div key={idx} className="">
+              <div key={idx} className={cn("transition-opacity", !isPrepared && "opacity-40 grayscale-[0.5]")}>
                 <div className="grid grid-cols-[54px_minmax(0,1fr)_auto] gap-[7px] items-stretch">
                   <button 
                     type="button" 
@@ -156,23 +160,28 @@ export const SpellsTab: React.FC = () => {
                     disabled={!canCast}
                     onClick={() => castSpell(spell, group.level)}
                   >
-                    {group.level === 0 ? 'Usar' : 'Gastar'}
+                    {!isPrepared ? 'Grimório' : group.level === 0 ? 'Usar' : 'Gastar'}
                   </button>
                   <button 
                     type="button" 
                     className={cn(
-                      "min-w-0 min-h-[32px] flex flex-col items-start justify-center px-3 py-1 rounded-lg text-left leading-[1.05] overflow-hidden break-anywhere bg-[#5e558b] text-[#0f0f0f] cursor-pointer w-full border-0 gap-0.5 transition-colors",
+                      "min-w-0 min-h-[32px] flex flex-col items-start justify-center px-3 py-1 rounded-lg text-left leading-[1.05] overflow-hidden break-anywhere bg-[#5e558b] text-[#0f0f0f] cursor-pointer w-full border-0 gap-0.5 transition-colors relative",
                       isOpen && "bg-[#7b70b8] text-white",
                       "hover:bg-[#7b70b8] hover:text-white"
                     )}
                     onClick={() => setSelectedSpell(isOpen ? null : spell.name)}
                   >
-                    <span className="text-[0.92rem] font-[900]">{spell.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[0.92rem] font-[900]">{spell.name}</span>
+                      {isWizard && group.level > 0 && isPrepared && (
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)]" title="Preparada" />
+                      )}
+                    </div>
                     <span className="text-[0.55rem] font-bold opacity-80 uppercase tracking-widest mt-0.5 flex items-center gap-1.5">
                       {getSpellOrigin(spell, character)}
-                      {getSpellAbility(spell, character, derived.mainSpellcastingAbility) !== derived.mainSpellcastingAbility && (
+                      {(activeAbilities.length > 1 || spellAbility !== derived.mainSpellcastingAbility) && (
                         <span className="bg-black/30 px-1 py-0.5 rounded text-[0.45rem]">
-                          {getSpellAbility(spell, character, derived.mainSpellcastingAbility).toUpperCase()}
+                          {spellAbility.toUpperCase()}
                         </span>
                       )}
                     </span>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useCharacterStore } from '../../store/useCharacterStore';
-import { getBackgrounds } from '../../api/catalog-api';
+import { getBackgrounds, getItems } from '../../api/catalog-api';
 import type { CatalogEntry } from '../../api/catalog-api';
 import { Select } from '../ui/Select';
 import { Card } from '../ui/Card';
@@ -8,6 +8,7 @@ import { MagicInitiate } from './MagicInitiate';
 import { RuleText } from '../ui/RuleText';
 import { cn } from '@/lib/utils';
 import { parse5eEntry, findEntryByName, parseResourceInfo } from '../../lib/data-parser';
+import { instantiateStartingEquipment } from '../../lib/character-rules';
 
 const ABILITIES = [
   { id: 'str', label: 'FOR' },
@@ -27,14 +28,16 @@ const SKILLS = [
 export const BackgroundSelect: React.FC = () => {
   const { character, updateCharacter, setFeaturesByKind } = useCharacterStore();
   const [backgrounds, setBackgrounds] = useState<CatalogEntry[]>([]);
+  const [allItems, setAllItems] = useState<CatalogEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   const bgChoices = character.bgChoices;
 
   useEffect(() => {
-    getBackgrounds()
-      .then((data) => {
+    Promise.all([getBackgrounds(), getItems()])
+      .then(([data, itemsData]) => {
         setBackgrounds(data.results);
+        setAllItems(itemsData.results || []);
         setLoading(false);
       })
       .catch((err) => {
@@ -213,26 +216,7 @@ export const BackgroundSelect: React.FC = () => {
     const bg = selectedBg;
     if (!bg || !bg.startingEquipment) return;
 
-    const bgEq = bg.startingEquipment[0] || {};
-    // Handle both uppercase and lowercase keys in the data
-    const itemsData = bgEq[option] || bgEq[option.toLowerCase()] || [];
-
-    const newInventory: any[] = [];
-    let cpTotal = 0;
-
-    itemsData.forEach((entry: any) => {
-      if (typeof entry === 'string') {
-        newInventory.push({ baseItemId: entry.split('|')[0], quantity: 1, status: 'backpack' });
-      } else if (entry.item) {
-        newInventory.push({ baseItemId: entry.item.split('|')[0], quantity: entry.quantity || 1, status: 'backpack' });
-      } else if (entry.value) {
-        cpTotal += entry.value;
-      }
-    });
-
-    const gp = Math.floor(cpTotal / 100);
-    const sp = Math.floor((cpTotal % 100) / 10);
-    const cp = cpTotal % 10;
+    const equipment = instantiateStartingEquipment(bg.startingEquipment, option, allItems, 'background', character.equippedSlots || {});
 
     updateCharacter({
       bgChoices: {
@@ -241,13 +225,24 @@ export const BackgroundSelect: React.FC = () => {
       },
       inventory: [
         ...character.inventory.filter((i: any) => i.source !== 'background'),
-        ...newInventory.map((i: any) => ({ ...i, source: 'background' }))
+        ...equipment.inventory
       ],
+      equippedItems: [
+        ...character.equippedItems.filter((id) => !character.inventory.some((item: any) => item.source === 'background' && item.instanceId === id)),
+        ...equipment.equippedItems
+      ],
+      equippedSlots: {
+        ...Object.fromEntries(Object.entries(character.equippedSlots || {}).filter(([, id]) =>
+          !character.inventory.some((item: any) => item.source === 'background' && item.instanceId === id)
+        )),
+        ...equipment.equippedSlots
+      },
       currency: {
-        ...(character.currency || { gp: 0, sp: 0, cp: 0, pp: 0, ep: 0 }),
-        gp,
-        sp,
-        cp
+        cp: (character.currency?.cp || 0) + equipment.currency.cp,
+        sp: (character.currency?.sp || 0) + equipment.currency.sp,
+        ep: (character.currency?.ep || 0) + equipment.currency.ep,
+        gp: (character.currency?.gp || 0) + equipment.currency.gp,
+        pp: (character.currency?.pp || 0) + equipment.currency.pp
       }
     });
   };
@@ -479,7 +474,10 @@ export const BackgroundSelect: React.FC = () => {
 
       {hasMagicInitiate && bgChoices.spellcastingAbility && (
         <div className="mt-4">
-          <MagicInitiate constraintClass={spellListConstraint} />
+          <MagicInitiate 
+            constraintClass={spellListConstraint} 
+            knownSpellNames={(character.spells || []).map(s => s.name)} 
+          />
         </div>
       )}
     </div>

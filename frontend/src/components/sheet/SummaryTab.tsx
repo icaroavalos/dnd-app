@@ -22,6 +22,7 @@ export const SummaryTab: React.FC = () => {
   const [showConfirmLevel, setShowConfirmLevel] = useState(false);
   const [restConfirm, setRestConfirm] = useState<'short' | 'long' | null>(null);
   const [showControls, setShowControls] = useState(false);
+  const [showAcModal, setShowAcModal] = useState(false);
 
   const maxHp = derived.maxHp || 10;
   const currentHp = character.hp ?? maxHp;
@@ -337,7 +338,10 @@ export const SummaryTab: React.FC = () => {
 
       {/* Defenses & Proficiency */}
       <section className="grid grid-cols-3 gap-2 p-1.5 border-[3px] border-blue rounded-xl bg-black/20">
-        <div className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e] shadow-md">
+        <div 
+          onClick={() => setShowAcModal(true)}
+          className="bg-[#f5f5f5] text-[#111] rounded-lg text-center min-h-[78px] grid place-items-center p-1.5 border-[3px] border-[#20205e] shadow-md cursor-pointer hover:bg-white transition-all active:scale-95"
+        >
           <span className="block font-[850] text-[0.85rem]">Armor Class</span>
           <strong className="text-2xl font-medium leading-none">{derived.armorClass}</strong>
         </div>
@@ -365,7 +369,7 @@ export const SummaryTab: React.FC = () => {
                 <span className="block text-[0.6rem] font-bold opacity-60">Mod</span>
                 <strong className="text-[1.2rem] leading-none">{signed(derived.modifiers[key])}</strong>
               </div>
-              <div className={cn("flex flex-col items-center", character.savingThrows.includes(key) && "text-blue")}>
+              <div className={cn("flex flex-col items-center", (derived as any).savingThrowProficiencies?.includes(key) && "text-blue")}>
                 <span className="block text-[0.6rem] font-bold opacity-60">Save</span>
                 <strong className="text-[1.2rem] leading-none">{signed(derived.savingThrows[key])}</strong>
               </div>
@@ -373,6 +377,63 @@ export const SummaryTab: React.FC = () => {
           </article>
         ))}
       </section>
+
+      {/* Proficiency Warnings */}
+      {(derived as any).proficiencyWarnings?.length > 0 && (
+        <div className="p-4 bg-white border-2 border-rose rounded-xl shadow-lg animate-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded bg-rose flex items-center justify-center text-white shrink-0 font-black text-xs">D</div>
+            <div className="space-y-1">
+              <p className="text-[0.7rem] font-black uppercase text-rose tracking-widest leading-none">Desvantagem Detectada</p>
+              <p className="text-[0.7rem] font-bold text-zinc-600">
+                Você está vestindo <strong className="text-zinc-800">{(derived as any).proficiencyWarnings.join(', ')}</strong> sem proficiência.
+              </p>
+              <div className="flex flex-col gap-0.5 pt-1 border-t border-rose/10">
+                <p className="text-[0.6rem] font-medium text-zinc-500">• Desvantagem em testes de Força e Destreza.</p>
+                <p className="text-[0.6rem] font-medium text-zinc-500">• Você não pode conjurar magias.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AC Formula Modal */}
+      {showAcModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
+              <h3 className="text-sm font-black uppercase tracking-widest text-zinc-800">Cálculo de CA</h3>
+              <button onClick={() => setShowAcModal(false)} className="w-8 h-8 rounded-full hover:bg-zinc-200 flex items-center justify-center text-zinc-400 transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-4 space-y-2">
+              {(derived as any).armorClassOptions.map((opt: any) => (
+                <button
+                  key={opt.id}
+                  onClick={() => {
+                    useCharacterStore.getState().setAcFormula(opt.id);
+                    setShowAcModal(false);
+                  }}
+                  className={cn(
+                    "w-full text-left p-3 rounded-xl border-2 transition-all",
+                    character.acFormulaId === opt.id || (!character.acFormulaId && opt.id === 'standard')
+                      ? "border-[#20205e] bg-zinc-50 shadow-sm"
+                      : "border-zinc-100 hover:border-zinc-200"
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[0.7rem] font-black uppercase tracking-wider text-zinc-400">Fórmula</span>
+                    <strong className="text-lg font-medium text-[#20205e]">{opt.value}</strong>
+                  </div>
+                  <div className="text-sm font-black text-zinc-800">{opt.name}</div>
+                  <p className="text-[0.65rem] font-bold text-zinc-500 leading-snug mt-1">{opt.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
