@@ -8,7 +8,12 @@ import { MagicInitiate } from './MagicInitiate';
 import { RuleText } from '../ui/RuleText';
 import { cn } from '@/lib/utils';
 import { parse5eEntry, findEntryByName, parseResourceInfo } from '../../lib/data-parser';
-import { instantiateStartingEquipment } from '../../lib/character-rules';
+import {
+  addCurrencies,
+  instantiateStartingEquipment,
+  slotsWithoutSourceItems,
+  subtractCurrencies,
+} from '../../lib/character-rules';
 
 const ABILITIES = [
   { id: 'str', label: 'FOR' },
@@ -216,7 +221,13 @@ export const BackgroundSelect: React.FC = () => {
     const bg = selectedBg;
     if (!bg || !bg.startingEquipment) return;
 
-    const equipment = instantiateStartingEquipment(bg.startingEquipment, option, allItems, 'background', character.equippedSlots || {});
+    const baseSlots = slotsWithoutSourceItems(character.equippedSlots || {}, character.inventory || [], 'background');
+    const equipment = instantiateStartingEquipment(bg.startingEquipment, option, allItems, 'background', baseSlots);
+    const previousOption = character.bgChoices?.equipmentChoice;
+    const previousCurrency = previousOption
+      ? instantiateStartingEquipment(bg.startingEquipment, previousOption, allItems, 'background').currency
+      : undefined;
+    const nextCurrency = addCurrencies(subtractCurrencies(character.currency, previousCurrency), equipment.currency);
 
     updateCharacter({
       bgChoices: {
@@ -232,18 +243,10 @@ export const BackgroundSelect: React.FC = () => {
         ...equipment.equippedItems
       ],
       equippedSlots: {
-        ...Object.fromEntries(Object.entries(character.equippedSlots || {}).filter(([, id]) =>
-          !character.inventory.some((item: any) => item.source === 'background' && item.instanceId === id)
-        )),
+        ...baseSlots,
         ...equipment.equippedSlots
       },
-      currency: {
-        cp: (character.currency?.cp || 0) + equipment.currency.cp,
-        sp: (character.currency?.sp || 0) + equipment.currency.sp,
-        ep: (character.currency?.ep || 0) + equipment.currency.ep,
-        gp: (character.currency?.gp || 0) + equipment.currency.gp,
-        pp: (character.currency?.pp || 0) + equipment.currency.pp
-      }
+      currency: nextCurrency
     });
   };
 

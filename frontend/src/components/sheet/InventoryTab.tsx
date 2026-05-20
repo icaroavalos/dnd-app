@@ -26,7 +26,16 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export const InventoryTab: React.FC = () => {
-  const { character, updateCharacter, addItem, removeItem, updateItemQuantity, updateCurrency } = useCharacterStore();
+  const { 
+    character, 
+    updateCharacter, 
+    addItem, 
+    removeItem, 
+    updateItemQuantity, 
+    updateCurrency,
+    equipItem,
+    unequipItem
+  } = useCharacterStore();
   const derived = useDerivedState();
   const [catalog, setCatalog] = useState<CatalogEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +85,7 @@ export const InventoryTab: React.FC = () => {
       })
       .map((raw: any, idx) => {
         const baseItemId = String(raw?.baseItemId || raw?.id || raw?.name || raw || '');
+        // Priority: instanceId from store -> item id -> name -> index fallback
         const instanceId = String(raw?.instanceId || raw?.id || `${baseItemId || 'item'}-${idx}`);
         const catalogItem = itemMap[baseItemId.toLowerCase()] || itemMap[String(raw?.customName || '').toLowerCase()];
         const name = raw?.customName || raw?.name || catalogItem?.name || baseItemId || `Item ${idx + 1}`;
@@ -149,31 +159,28 @@ export const InventoryTab: React.FC = () => {
     if (!matchesSearch) return false;
     
     if (filter === 'all') return true;
-    if (filter === 'equipped') return item.status.startsWith('equipped');
+    if (filter === 'equipped') return item.status && item.status !== 'backpack' && item.status !== 'attuned';
     if (filter === 'attunement') return item.status === 'attuned' || mayAttune(item);
     if (filter === 'consumable') return ['P', 'SC', 'G', 'FD'].includes(String(item.type).split('|')[0]);
-    return !item.status.startsWith('equipped') && item.status !== 'attuned';
+    return (!item.status || item.status === 'backpack');
   });
 
   const setItemStatus = (instanceId: string, status: string) => {
     setMessage(null);
-    const nextInventory = inventory.map((item: any, idx) => {
-      const baseItemId = String(item?.baseItemId || item?.id || item?.name || item || '');
-      const currentId = String(item?.instanceId || item?.id || `${baseItemId || 'item'}-${idx}`);
-      if (currentId !== instanceId) return item;
-      return { ...item, instanceId: currentId, status };
-    });
-
-    const equippedItems = nextInventory
-      .filter((item: any) => String(item.status || '').startsWith('equipped'))
-      .map((item: any) => item.instanceId || item.baseItemId || item.id)
-      .filter(Boolean);
-
-    updateCharacter({ inventory: nextInventory, equippedItems });
+    if (status === 'backpack') {
+      unequipItem(instanceId);
+    } else {
+      const result = equipItem(instanceId, status);
+      if (!result.success) {
+        setMessage(result.message || 'Não foi possível equipar o item.');
+        // Auto-clear message after 3 seconds
+        setTimeout(() => setMessage(null), 3000);
+      }
+    }
   };
 
   const toggleEquip = (item: any) => {
-    if (item.status.startsWith('equipped')) {
+    if (item.status && item.status !== 'backpack') {
       setItemStatus(item.instanceId, 'backpack');
     } else {
       const type = String(item.type || '').split('|')[0];
@@ -183,8 +190,18 @@ export const InventoryTab: React.FC = () => {
         setItemStatus(item.instanceId, 'equipped_armor');
       } else if (item.dmg1 || type === 'M' || type === 'R') { // Weapon
         setItemStatus(item.instanceId, 'equipped_main_hand');
+      } else if (type === 'RG') { // Ring
+        setItemStatus(item.instanceId, 'ring_1');
       } else {
-        setItemStatus(item.instanceId, 'equipped_main_hand');
+        // Try accessory slots based on name/description if type is generic
+        const name = (item.name || '').toLowerCase();
+        if (name.includes('elmo') || name.includes('capacete') || name.includes('tiara')) setItemStatus(item.instanceId, 'head');
+        else if (name.includes('amuleto') || name.includes('colar') || name.includes('pingente')) setItemStatus(item.instanceId, 'neck');
+        else if (name.includes('capa') || name.includes('manto')) setItemStatus(item.instanceId, 'back');
+        else if (name.includes('bota') || name.includes('sapato')) setItemStatus(item.instanceId, 'feet');
+        else if (name.includes('cinto')) setItemStatus(item.instanceId, 'waist');
+        else if (name.includes('luva') || name.includes('braçadeira')) setItemStatus(item.instanceId, 'wrists');
+        else setItemStatus(item.instanceId, 'equipped_main_hand');
       }
     }
   };
@@ -301,7 +318,7 @@ export const InventoryTab: React.FC = () => {
               {visibleItems.map((item) => {
                 const isOpen = selectedId === item.instanceId;
                 const isEquippable = isItemEquippable(item);
-                const isEquipped = item.status.startsWith('equipped');
+                const isEquipped = item.status && !['backpack', 'attuned'].includes(item.status);
                 const Icon = getItemIcon(item);
 
                 return (
@@ -323,7 +340,7 @@ export const InventoryTab: React.FC = () => {
                           {item.quantity > 1 && <span className="px-1.5 py-0.5 rounded bg-zinc-200 text-[0.6rem] font-black text-zinc-600">x{item.quantity}</span>}
                         </div>
                         <p className="text-[0.65rem] font-bold text-zinc-400 uppercase tracking-tighter">
-                          {STATUS_LABELS[item.status] || item.status} • {item.type || 'Item'}
+                          {STATUS_LABELS[item.status] || item.status || 'Mochila'} • {item.type || 'Item'}
                         </p>
                       </div>
 
@@ -342,7 +359,8 @@ export const InventoryTab: React.FC = () => {
                               : "bg-white border-zinc-200 text-zinc-400 hover:border-[#323264] hover:text-[#323264]"
                           )}
                         >
-                          {isEquipped ? 'VESTIDO' : 'EQUIPAR'}
+                          {isEquipped ? 'EQUIPADO' : 'EQUIPAR'}
+
                         </button>
                       )}
 
@@ -354,15 +372,24 @@ export const InventoryTab: React.FC = () => {
                     {isOpen && (
                       <div className="px-3 pb-3 pt-1 border-t border-zinc-100 animate-in slide-in-from-top-1 duration-200">
                         <div className="flex flex-wrap gap-2 mb-4 mt-2">
-                          <StatusBtn label="Mochila" active={item.status === 'backpack'} onClick={() => setItemStatus(item.instanceId, 'backpack')} />
+                          <StatusBtn label="Mochila" active={!item.status || item.status === 'backpack'} onClick={() => setItemStatus(item.instanceId, 'backpack')} />
                           {isItemWeapon(item) && (
                             <>
-                              <StatusBtn label="Principal" active={item.status === 'equipped_main_hand'} onClick={() => setItemStatus(item.instanceId, 'equipped_main_hand')} />
-                              <StatusBtn label="Secundária" active={item.status === 'equipped_off_hand'} onClick={() => setItemStatus(item.instanceId, 'equipped_off_hand')} />
+                              <StatusBtn label="P. Principal" active={item.status === 'equipped_main_hand'} onClick={() => setItemStatus(item.instanceId, 'equipped_main_hand')} />
+                              <StatusBtn label="P. Secundária" active={item.status === 'equipped_off_hand'} onClick={() => setItemStatus(item.instanceId, 'equipped_off_hand')} />
                             </>
                           )}
                           {isItemArmor(item) && <StatusBtn label="Vestim." active={item.status === 'equipped_armor'} onClick={() => setItemStatus(item.instanceId, 'equipped_armor')} />}
                           {isItemShield(item) && <StatusBtn label="Escudo" active={item.status === 'equipped_shield'} onClick={() => setItemStatus(item.instanceId, 'equipped_shield')} />}
+                          {isRing(item) && (
+                            <>
+                              <StatusBtn label="Anel 1" active={item.status === 'ring_1'} onClick={() => setItemStatus(item.instanceId, 'ring_1')} />
+                              <StatusBtn label="Anel 2" active={item.status === 'ring_2'} onClick={() => setItemStatus(item.instanceId, 'ring_2')} />
+                            </>
+                          )}
+                          {isAccessory(item) && (
+                            <StatusBtn label="Equipar Slot" active={item.status && !['backpack', 'attuned'].includes(item.status)} onClick={() => toggleEquip(item)} />
+                          )}
                           <StatusBtn 
                             label={item.status === 'attuned' ? 'Dessintonizar' : 'Sintonizar'} 
                             active={item.status === 'attuned'} 
@@ -375,10 +402,10 @@ export const InventoryTab: React.FC = () => {
                             <div className="bg-white p-3 rounded-lg border border-zinc-200 space-y-2">
                               <Detail label="Peso" value={`${item.weight} lb. cada`} />
                               <div className="flex items-center justify-between">
-                                <strong className="text-[0.65rem] font-black uppercase text-zinc-400">Quantidade</strong>
+                                <strong className="text-[0.65rem] font-black uppercase text-zinc-600">Quantidade</strong>
                                 <div className="flex items-center gap-2">
                                   <button onClick={() => updateItemQuantity(item.instanceId, item.quantity - 1)} className="w-6 h-6 rounded bg-zinc-100 flex items-center justify-center text-zinc-600 hover:bg-zinc-200"><Minus size={12} /></button>
-                                  <span className="text-sm font-black w-6 text-center">{item.quantity}</span>
+                                  <span className="text-sm font-black w-6 text-center text-zinc-900">{item.quantity}</span>
                                   <button onClick={() => updateItemQuantity(item.instanceId, item.quantity + 1)} className="w-6 h-6 rounded bg-zinc-100 flex items-center justify-center text-zinc-600 hover:bg-zinc-200"><Plus size={12} /></button>
                                 </div>
                               </div>
@@ -388,14 +415,15 @@ export const InventoryTab: React.FC = () => {
                             
                             <button 
                               onClick={() => removeItem(item.instanceId)}
-                              className="w-full h-10 rounded-lg border-2 border-rose-100 text-rose-600 flex items-center justify-center gap-2 text-[0.7rem] font-black uppercase hover:bg-rose-50 transition-colors"
+                              className="w-full h-10 rounded-lg bg-[#cf3036] text-white flex items-center justify-center gap-2 text-[0.7rem] font-black uppercase hover:bg-[#b2292f] transition-all shadow-md mt-2"
                             >
                               <Trash2 size={16} />
                               Excluir Item
                             </button>
+
                           </div>
 
-                          <div className="bg-zinc-800 text-zinc-300 p-4 rounded-lg text-[0.75rem] leading-relaxed italic">
+                          <div className="bg-zinc-800 text-zinc-200 p-4 rounded-lg text-[0.75rem] leading-relaxed italic">
                             {item.notes || 'Nenhuma descrição disponível.'}
                           </div>
                         </div>
@@ -515,16 +543,16 @@ export const InventoryTab: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col gap-2 w-full max-w-[200px]">
-                    <span className="text-[0.6rem] font-black uppercase text-zinc-400 tracking-widest">Quantidade Inicial</span>
+                    <span className="text-[0.6rem] font-black uppercase text-zinc-600 tracking-widest">Quantidade Inicial</span>
                     <div className="flex items-center gap-4 p-2 bg-zinc-50 rounded-2xl border-2 border-zinc-100">
-                      <button onClick={() => setInitialQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-zinc-100"><Minus size={16} /></button>
+                      <button onClick={() => setInitialQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-zinc-700 hover:bg-zinc-50"><Minus size={16} /></button>
                       <input 
                         type="number" 
                         value={initialQuantity} 
                         onChange={(e) => setInitialQuantity(parseInt(e.target.value) || 1)}
-                        className="flex-1 bg-transparent text-center text-xl font-black text-zinc-800 outline-none w-12"
+                        className="flex-1 bg-transparent text-center text-xl font-black text-zinc-900 outline-none w-12"
                       />
-                      <button onClick={() => setInitialQuantity(q => q + 1)} className="w-10 h-10 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-zinc-100"><Plus size={16} /></button>
+                      <button onClick={() => setInitialQuantity(q => q + 1)} className="w-10 h-10 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-zinc-700 hover:bg-zinc-50"><Plus size={16} /></button>
                     </div>
                   </div>
 
@@ -598,8 +626,8 @@ function StatusBtn({ label, active, onClick }: { label: string; active?: boolean
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between text-[0.65rem]">
-      <strong className="text-zinc-400 uppercase font-black">{label}</strong>
-      <span className="text-zinc-700 font-bold">{value}</span>
+      <strong className="text-zinc-600 uppercase font-black">{label}</strong>
+      <span className="text-zinc-900 font-bold">{value}</span>
     </div>
   );
 }
@@ -615,7 +643,22 @@ function getItemIcon(item: any, isCatalog = false) {
 
 function isItemEquippable(item: any): boolean {
   const type = String(item.type || '').split('|')[0];
-  return ['LA', 'MA', 'HA', 'S', 'M', 'R'].includes(type) || !!item.dmg1;
+  if (['LA', 'MA', 'HA', 'S', 'M', 'R', 'RG'].includes(type) || !!item.dmg1) return true;
+  return isAccessory(item);
+}
+
+function isRing(item: any): boolean {
+  return String(item.type || '').split('|')[0] === 'RG';
+}
+
+function isAccessory(item: any): boolean {
+  const name = String(item.name || '').toLowerCase();
+  return name.includes('elmo') || name.includes('capacete') || name.includes('tiara') || 
+         name.includes('amuleto') || name.includes('colar') || name.includes('pingente') ||
+         name.includes('capa') || name.includes('manto') ||
+         name.includes('bota') || name.includes('sapato') ||
+         name.includes('cinto') ||
+         name.includes('luva') || name.includes('braçadeira');
 }
 
 function isItemWeapon(item: any): boolean {

@@ -168,6 +168,7 @@ function normalizeSubclass(subclass) {
 
 function normalizeClassFeature(feature) {
   return pickDefined({
+    id: stableFeatureId(feature),
     name: feature.name,
     source: feature.source,
     className: feature.className,
@@ -179,6 +180,7 @@ function normalizeClassFeature(feature) {
 
 function normalizeSubclassFeature(feature) {
   return pickDefined({
+    id: stableFeatureId(feature),
     name: feature.name,
     source: feature.source,
     className: feature.className,
@@ -188,6 +190,25 @@ function normalizeSubclassFeature(feature) {
     level: feature.level,
     entries: feature.entries,
   });
+}
+
+function stableFeatureId(feature) {
+  return slugify([
+    feature.name,
+    feature.className,
+    feature.subclassShortName,
+    feature.level,
+    feature.source,
+  ].filter(Boolean).join("|"));
+}
+
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function normalizeRace(race) {

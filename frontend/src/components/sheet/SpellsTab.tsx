@@ -4,11 +4,19 @@ import { useDerivedState, signed } from '../../hooks/useDerivedState';
 import { SpellCard } from './SpellCard';
 import { cn } from '../../lib/utils';
 import { getSpellOrigin, getSpellAbility } from '../../lib/spell-utils';
+import { getSpellManagementPolicy } from '../../lib/spell-management-rules';
+import { SpellManagementModal } from './SpellManagementModal';
+import { spellPreparedState } from '../../lib/character-rules';
+import { Settings, RefreshCw, BookOpen } from 'lucide-react';
 
 export const SpellsTab: React.FC = () => {
   const { character, updateCharacter } = useCharacterStore();
   const derived = useDerivedState();
   const [selectedSpell, setSelectedSpell] = useState<string | null>(null);
+  const [isManagementOpen, setIsManagementOpen] = useState(false);
+
+  const policy = getSpellManagementPolicy(character);
+  const showManagement = policy.mode !== 'none';
 
   const castSpell = (spell: any, level: number) => {
     if (level === 0) return;
@@ -78,6 +86,25 @@ export const SpellsTab: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      {showManagement && (
+        <button
+          onClick={() => setIsManagementOpen(true)}
+          className="w-full py-2.5 px-4 bg-zinc-900 border border-gold/30 rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all text-[0.7rem] font-black uppercase tracking-widest text-gold shadow-lg active:scale-[0.98]"
+        >
+          {policy.mode === 'replace-one' ? (
+            <>
+              <RefreshCw size={14} />
+              Trocar Magia
+            </>
+          ) : (
+            <>
+              <BookOpen size={14} />
+              Preparar Magias
+            </>
+          )}
+        </button>
+      )}
+
       {activeAbilities.map(ability => {
         const metrics = derived.spellcastingMetrics[ability];
         if (!metrics) return null;
@@ -141,7 +168,12 @@ export const SpellsTab: React.FC = () => {
           {group.spells.map((spell, idx) => {
             const isOpen = selectedSpell === spell.name;
             const isWizard = (character.class || '').toLowerCase() === 'wizard';
-            const isPrepared = !isWizard || group.level === 0 || (character.preparedSpells || []).includes(spell.id || spell.name);
+            const { isPrepared, canUsePreparedMarker } = spellPreparedState({
+              spell,
+              level: group.level,
+              characterClass: character.class,
+              preparedSpells: character.preparedSpells,
+            });
             const spellAbility = getSpellAbility(spell, character, derived.mainSpellcastingAbility);
             
             const isBgSpell = spell.originKind === 'background' || spell.source === 'bg-feat';
@@ -173,7 +205,7 @@ export const SpellsTab: React.FC = () => {
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-[0.92rem] font-[900]">{spell.name}</span>
-                      {isWizard && group.level > 0 && isPrepared && (
+                      {canUsePreparedMarker && (
                         <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)]" title="Preparada" />
                       )}
                     </div>
@@ -200,6 +232,10 @@ export const SpellsTab: React.FC = () => {
 
       {spellsByLevel.length === 0 && (
         <div className="min-h-[120px] grid place-items-center text-muted border border-dashed border-[#343434] rounded-lg text-center p-4">Nenhuma magia preparada.</div>
+      )}
+
+      {isManagementOpen && (
+        <SpellManagementModal onClose={() => setIsManagementOpen(false)} />
       )}
     </div>
   );

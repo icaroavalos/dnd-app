@@ -6,6 +6,7 @@ export interface LevelUpChoice {
   options: string[];
   featureId?: string;
   description?: string;
+  subclassShortName?: string;
 }
 
 export interface LevelUpOptionsPayload {

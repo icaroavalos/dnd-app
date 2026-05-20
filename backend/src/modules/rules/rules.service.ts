@@ -14,6 +14,26 @@ const SKILLS = [
   'Performance', 'Persuasion', 'Religion', 'Sleight of Hand', 'Stealth', 'Survival'
 ];
 
+function slugify(value: string): string {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function stableFeatureId(feat: RulesCatalogEntry, fallbackLevel: number): string {
+  if (feat.id) return String(feat.id);
+  return slugify([
+    feat.name,
+    feat.className,
+    feat.subclassShortName,
+    feat.level || fallbackLevel,
+    feat.source,
+  ].filter(Boolean).join('|'));
+}
+
 @Injectable()
 export class RulesService {
   constructor(
@@ -53,6 +73,7 @@ export class RulesService {
     const choices: LevelUpChoice[] = [];
 
     for (const feat of levelFeatures) {
+      const featId = stableFeatureId(feat, level);
       const nameLower = feat.name.toLowerCase();
       const entriesStr = JSON.stringify(feat.entries || []);
 
@@ -74,12 +95,13 @@ export class RulesService {
           const options = Array.from(new Set(filteredResults.map(r => r.name))).sort();
           if (options.length > 0) {
             choices.push({
-              id: `filter-${feat.id}-${label.toLowerCase().replace(/\s+/g, '-')}`,
+              id: `filter-${featId}-${label.toLowerCase().replace(/\s+/g, '-')}`,
               type: 'selection',
               name: label,
               count: 1,
               options,
-              featureId: feat.id
+              featureId: featId,
+              subclassShortName: feat.subclassShortName
             });
           }
         }
@@ -88,12 +110,13 @@ export class RulesService {
       // Universal ASI / Feat Choice (Level 4, 8, 12, 16, 19)
       if (nameLower.includes('ability score improvement')) {
         choices.push({
-          id: `asi-${feat.id}`,
+          id: `asi-${featId}`,
           type: 'asi',
           name: 'Ability Score Improvement',
           count: 2,
           options: ['str', 'dex', 'con', 'int', 'wis', 'cha'],
-          featureId: feat.id,
+          featureId: featId,
+          subclassShortName: feat.subclassShortName,
           description: 'Increase one ability score by 2, or two scores by 1.'
         });
 
@@ -103,12 +126,13 @@ export class RulesService {
           .sort();
 
         choices.push({
-          id: `feat-${feat.id}`,
+          id: `feat-${featId}`,
           type: 'feat',
           name: 'General Feat',
           count: 1,
           options: generalFeats,
-          featureId: feat.id,
+          featureId: featId,
+          subclassShortName: feat.subclassShortName,
           description: 'Choose a specialized feat instead of attribute increases.'
         });
       }
@@ -134,12 +158,12 @@ export class RulesService {
 
         if (subclassOptions.length > 0) {
           choices.push({
-            id: `subclass-${feat.id}`,
+            id: `subclass-${featId}`,
             type: 'subclass',
             name: `Choose your ${className} Subclass`,
             count: 1,
             options: subclassOptions,
-            featureId: feat.id
+            featureId: featId
           });
         }
       }
@@ -151,12 +175,13 @@ export class RulesService {
         if (className.toLowerCase() === 'bard' && level === 2) count = 2;
 
         choices.push({
-          id: `expertise-${feat.id}`,
+          id: `expertise-${featId}`,
           type: 'expertise',
           name: 'Expertise',
           count: count,
           options: [], // Frontend will populate with current proficiencies
-          featureId: feat.id,
+          featureId: featId,
+          subclassShortName: feat.subclassShortName,
           description: 'Choose skills you are already proficient in to double your proficiency bonus.'
         });
       }
@@ -171,12 +196,13 @@ export class RulesService {
           .map(i => i.name);
 
         choices.push({
-          id: `weapon-${feat.id}`,
+          id: `weapon-${featId}`,
           type: 'selection',
           name: 'Weapon Mastery',
           count: className.toLowerCase() === 'fighter' ? 3 : 2,
           options: Array.from(new Set(options)).sort(),
-          featureId: feat.id
+          featureId: featId,
+          subclassShortName: feat.subclassShortName
         });
       }
 
@@ -188,12 +214,13 @@ export class RulesService {
         const count = wordToNum[skillMatch[1].toLowerCase()] || 1;
         
         choices.push({
-          id: `skill-${feat.id}`,
+          id: `skill-${featId}`,
           type: 'generic',
           name: feat.name,
           count: count,
           options: SKILLS, // Global list of skills
-          featureId: feat.id,
+          featureId: featId,
+          subclassShortName: feat.subclassShortName,
           description: `Escolha ${count} perícia(s) adicional(is).`
         });
       }
@@ -205,19 +232,20 @@ export class RulesService {
           : ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'];
 
         choices.push({
-          id: `skill-${feat.id}`,
+          id: `skill-${featId}`,
           type: 'generic',
           name: feat.name + ': Additional Skill',
           count: 1,
           options: options.sort(),
-          featureId: feat.id
+          featureId: featId,
+          subclassShortName: feat.subclassShortName
         });
       }
     }
 
     return {
       level,
-      features: levelFeatures,
+      features: levelFeatures.map((feat) => ({ ...feat, id: stableFeatureId(feat, level) })),
       choices
     };
   }

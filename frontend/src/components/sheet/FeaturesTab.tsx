@@ -80,11 +80,9 @@ export const FeaturesTab: React.FC = () => {
                       >
                         <div className="flex flex-col min-w-0">
                           <strong className="text-[0.9rem] font-bold text-ink leading-tight truncate">{feat.name}</strong>
-                          {hasResource && (
-                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mt-0.5">
-                              {feat.resource.max} Total • {feat.resource.recoveryLabel}
-                            </span>
-                          )}
+                          <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mt-0.5">
+                            {formatFeatureOrigin(feat, character)}
+                          </span>
                         </div>
                         <span className={cn(
                           "w-2 h-2 flex-shrink-0 border-r-2 border-b-2 border-muted rotate-45 transition-transform duration-300",
@@ -138,3 +136,23 @@ export const FeaturesTab: React.FC = () => {
     </div>
   );
 };
+
+function formatFeatureOrigin(feature: any, character: any): string {
+  const { kind, originName, level } = feature;
+  
+  switch (kind) {
+    case 'class':
+      return `Classe: ${originName || character.class} ${level || ''}`.trim();
+    case 'subclass':
+      return `Subclasse: ${originName || ''} ${level || ''}`.trim();
+    case 'species':
+    case 'subspecies':
+      return `Raça: ${originName || character.race}`;
+    case 'feat':
+      return `Talento: ${originName || feature.name}`;
+    case 'background':
+      return `Background: ${originName || character.background}`;
+    default:
+      return kind || 'Habilidade';
+  }
+}

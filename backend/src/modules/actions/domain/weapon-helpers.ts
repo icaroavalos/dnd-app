@@ -246,5 +246,7 @@ export function weaponPropertySet(item: ItemCatalogEntry): Set<string> {
 
 export function isWeapon(item: ItemCatalogEntry): boolean {
   const typeCode = String(item.type ?? '').split('|')[0];
+  // D&D 5e/2024 uses 'M' for Melee and 'R' for Ranged weapons. 
+  // We also check for dmg1 to ensure it's an actual weapon entry and not a miscellaneous item.
   return Boolean(item.dmg1) && (typeCode === 'M' || typeCode === 'R');
 }

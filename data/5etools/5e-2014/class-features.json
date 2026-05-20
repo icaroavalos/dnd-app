@@ -2,6 +2,7 @@
   "ruleset": "5e-2014",
   "results": [
     {
+      "id": "magical-tinkering-artificer-1-tce",
       "name": "Magical Tinkering",
       "source": "TCE",
       "className": "Artificer",
@@ -24,6 +25,7 @@
       ]
     },
     {
+      "id": "optional-rule-firearm-proficiency-artificer-1-tce",
       "name": "Optional Rule: Firearm Proficiency",
       "source": "TCE",
       "className": "Artificer",
@@ -34,6 +36,7 @@
       ]
     },
     {
+      "id": "spellcasting-artificer-1-tce",
       "name": "Spellcasting",
       "source": "TCE",
       "className": "Artificer",
@@ -108,6 +111,7 @@
       ]
     },
     {
+      "id": "infuse-item-artificer-2-tce",
       "name": "Infuse Item",
       "source": "TCE",
       "className": "Artificer",
@@ -143,6 +147,7 @@
       ]
     },
     {
+      "id": "infusions-known-artificer-2-tce",
       "name": "Infusions Known",
       "source": "TCE",
       "className": "Artificer",
@@ -154,6 +159,7 @@
       ]
     },
     {
+      "id": "artificer-specialist-artificer-3-tce",
       "name": "Artificer Specialist",
       "source": "TCE",
       "className": "Artificer",
@@ -165,6 +171,7 @@
       ]
     },
     {
+      "id": "the-right-tool-for-the-job-artificer-3-tce",
       "name": "The Right Tool for the Job",
       "source": "TCE",
       "className": "Artificer",
@@ -176,6 +183,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-artificer-4-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Artificer",
@@ -188,6 +196,7 @@
       ]
     },
     {
+      "id": "artificer-specialist-feature-artificer-5-tce",
       "name": "Artificer Specialist Feature",
       "source": "TCE",
       "className": "Artificer",
@@ -199,6 +208,7 @@
       ]
     },
     {
+      "id": "tool-expertise-artificer-6-tce",
       "name": "Tool Expertise",
       "source": "TCE",
       "className": "Artificer",
@@ -210,6 +220,7 @@
       ]
     },
     {
+      "id": "flash-of-genius-artificer-7-tce",
       "name": "Flash of Genius",
       "source": "TCE",
       "className": "Artificer",
@@ -222,6 +233,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-artificer-8-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Artificer",
@@ -234,6 +246,7 @@
       ]
     },
     {
+      "id": "artificer-specialist-feature-artificer-9-tce",
       "name": "Artificer Specialist Feature",
       "source": "TCE",
       "className": "Artificer",
@@ -245,6 +258,7 @@
       ]
     },
     {
+      "id": "magic-item-adept-artificer-10-tce",
       "name": "Magic Item Adept",
       "source": "TCE",
       "className": "Artificer",
@@ -263,6 +277,7 @@
       ]
     },
     {
+      "id": "spell-storing-item-artificer-11-tce",
       "name": "Spell-Storing Item",
       "source": "TCE",
       "className": "Artificer",
@@ -275,6 +290,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-artificer-12-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Artificer",
@@ -287,6 +303,7 @@
       ]
     },
     {
+      "id": "magic-item-savant-artificer-14-tce",
       "name": "Magic Item Savant",
       "source": "TCE",
       "className": "Artificer",
@@ -305,6 +322,7 @@
       ]
     },
     {
+      "id": "artificer-specialist-feature-artificer-15-tce",
       "name": "Artificer Specialist Feature",
       "source": "TCE",
       "className": "Artificer",
@@ -316,6 +334,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-artificer-16-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Artificer",
@@ -328,6 +347,7 @@
       ]
     },
     {
+      "id": "magic-item-master-artificer-18-tce",
       "name": "Magic Item Master",
       "source": "TCE",
       "className": "Artificer",
@@ -339,6 +359,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-artificer-19-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Artificer",
@@ -351,6 +372,7 @@
       ]
     },
     {
+      "id": "soul-of-artifice-artificer-20-tce",
       "name": "Soul of Artifice",
       "source": "TCE",
       "className": "Artificer",
@@ -369,6 +391,7 @@
       ]
     },
     {
+      "id": "rage-barbarian-1-phb",
       "name": "Rage",
       "source": "PHB",
       "className": "Barbarian",
@@ -391,6 +414,7 @@
       ]
     },
     {
+      "id": "unarmored-defense-barbarian-1-phb",
       "name": "Unarmored Defense",
       "source": "PHB",
       "className": "Barbarian",
@@ -401,6 +425,7 @@
       ]
     },
     {
+      "id": "danger-sense-barbarian-2-phb",
       "name": "Danger Sense",
       "source": "PHB",
       "className": "Barbarian",
@@ -411,6 +436,7 @@
       ]
     },
     {
+      "id": "reckless-attack-barbarian-2-phb",
       "name": "Reckless Attack",
       "source": "PHB",
       "className": "Barbarian",
@@ -421,6 +447,7 @@
       ]
     },
     {
+      "id": "primal-knowledge-barbarian-3-tce",
       "name": "Primal Knowledge",
       "source": "TCE",
       "className": "Barbarian",
@@ -432,6 +459,7 @@
       ]
     },
     {
+      "id": "primal-path-barbarian-3-phb",
       "name": "Primal Path",
       "source": "PHB",
       "className": "Barbarian",
@@ -442,6 +470,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-barbarian-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Barbarian",
@@ -453,6 +482,7 @@
       ]
     },
     {
+      "id": "extra-attack-barbarian-5-phb",
       "name": "Extra Attack",
       "source": "PHB",
       "className": "Barbarian",
@@ -463,6 +493,7 @@
       ]
     },
     {
+      "id": "fast-movement-barbarian-5-phb",
       "name": "Fast Movement",
       "source": "PHB",
       "className": "Barbarian",
@@ -473,6 +504,7 @@
       ]
     },
     {
+      "id": "path-feature-barbarian-6-phb",
       "name": "Path Feature",
       "source": "PHB",
       "className": "Barbarian",
@@ -483,6 +515,7 @@
       ]
     },
     {
+      "id": "feral-instinct-barbarian-7-phb",
       "name": "Feral Instinct",
       "source": "PHB",
       "className": "Barbarian",
@@ -494,6 +527,7 @@
       ]
     },
     {
+      "id": "instinctive-pounce-barbarian-7-tce",
       "name": "Instinctive Pounce",
       "source": "TCE",
       "className": "Barbarian",
@@ -505,6 +539,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-barbarian-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Barbarian",
@@ -516,6 +551,7 @@
       ]
     },
     {
+      "id": "brutal-critical-1-die-barbarian-9-phb",
       "name": "Brutal Critical (1 die)",
       "source": "PHB",
       "className": "Barbarian",
@@ -527,6 +563,7 @@
       ]
     },
     {
+      "id": "path-feature-barbarian-10-phb",
       "name": "Path feature",
       "source": "PHB",
       "className": "Barbarian",
@@ -537,6 +574,7 @@
       ]
     },
     {
+      "id": "relentless-rage-barbarian-11-phb",
       "name": "Relentless Rage",
       "source": "PHB",
       "className": "Barbarian",
@@ -548,6 +586,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-barbarian-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Barbarian",
@@ -559,6 +598,7 @@
       ]
     },
     {
+      "id": "brutal-critical-2-dice-barbarian-13-phb",
       "name": "Brutal Critical (2 dice)",
       "source": "PHB",
       "className": "Barbarian",
@@ -570,6 +610,7 @@
       ]
     },
     {
+      "id": "path-feature-barbarian-14-phb",
       "name": "Path feature",
       "source": "PHB",
       "className": "Barbarian",
@@ -580,6 +621,7 @@
       ]
     },
     {
+      "id": "persistent-rage-barbarian-15-phb",
       "name": "Persistent Rage",
       "source": "PHB",
       "className": "Barbarian",
@@ -590,6 +632,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-barbarian-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Barbarian",
@@ -601,6 +644,7 @@
       ]
     },
     {
+      "id": "brutal-critical-3-dice-barbarian-17-phb",
       "name": "Brutal Critical (3 dice)",
       "source": "PHB",
       "className": "Barbarian",
@@ -611,6 +655,7 @@
       ]
     },
     {
+      "id": "indomitable-might-barbarian-18-phb",
       "name": "Indomitable Might",
       "source": "PHB",
       "className": "Barbarian",
@@ -621,6 +666,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-barbarian-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Barbarian",
@@ -632,6 +678,7 @@
       ]
     },
     {
+      "id": "primal-champion-barbarian-20-phb",
       "name": "Primal Champion",
       "source": "PHB",
       "className": "Barbarian",
@@ -642,6 +689,7 @@
       ]
     },
     {
+      "id": "bardic-inspiration-bard-1-phb",
       "name": "Bardic Inspiration",
       "source": "PHB",
       "className": "Bard",
@@ -655,6 +703,7 @@
       ]
     },
     {
+      "id": "spellcasting-bard-1-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Bard",
@@ -724,6 +773,7 @@
       ]
     },
     {
+      "id": "jack-of-all-trades-bard-2-phb",
       "name": "Jack of All Trades",
       "source": "PHB",
       "className": "Bard",
@@ -734,6 +784,7 @@
       ]
     },
     {
+      "id": "magical-inspiration-bard-2-tce",
       "name": "Magical Inspiration",
       "source": "TCE",
       "className": "Bard",
@@ -745,6 +796,7 @@
       ]
     },
     {
+      "id": "song-of-rest-d6-bard-2-phb",
       "name": "Song of Rest (d6)",
       "source": "PHB",
       "className": "Bard",
@@ -756,6 +808,7 @@
       ]
     },
     {
+      "id": "bard-college-bard-3-phb",
       "name": "Bard College",
       "source": "PHB",
       "className": "Bard",
@@ -766,6 +819,7 @@
       ]
     },
     {
+      "id": "expertise-bard-3-phb",
       "name": "Expertise",
       "source": "PHB",
       "className": "Bard",
@@ -777,6 +831,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-bard-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Bard",
@@ -788,6 +843,7 @@
       ]
     },
     {
+      "id": "bardic-versatility-bard-4-tce",
       "name": "Bardic Versatility",
       "source": "TCE",
       "className": "Bard",
@@ -806,6 +862,7 @@
       ]
     },
     {
+      "id": "bardic-inspiration-d8-bard-5-phb",
       "name": "Bardic Inspiration (d8)",
       "source": "PHB",
       "className": "Bard",
@@ -816,6 +873,7 @@
       ]
     },
     {
+      "id": "font-of-inspiration-bard-5-phb",
       "name": "Font of Inspiration",
       "source": "PHB",
       "className": "Bard",
@@ -826,6 +884,7 @@
       ]
     },
     {
+      "id": "bard-college-feature-bard-6-phb",
       "name": "Bard College feature",
       "source": "PHB",
       "className": "Bard",
@@ -836,6 +895,7 @@
       ]
     },
     {
+      "id": "countercharm-bard-6-phb",
       "name": "Countercharm",
       "source": "PHB",
       "className": "Bard",
@@ -846,6 +906,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-bard-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Bard",
@@ -857,6 +918,7 @@
       ]
     },
     {
+      "id": "song-of-rest-d8-bard-9-phb",
       "name": "Song of Rest (d8)",
       "source": "PHB",
       "className": "Bard",
@@ -867,6 +929,7 @@
       ]
     },
     {
+      "id": "bardic-inspiration-d10-bard-10-phb",
       "name": "Bardic Inspiration (d10)",
       "source": "PHB",
       "className": "Bard",
@@ -877,6 +940,7 @@
       ]
     },
     {
+      "id": "expertise-bard-10-phb",
       "name": "Expertise",
       "source": "PHB",
       "className": "Bard",
@@ -887,6 +951,7 @@
       ]
     },
     {
+      "id": "magical-secrets-bard-10-phb",
       "name": "Magical Secrets",
       "source": "PHB",
       "className": "Bard",
@@ -899,6 +964,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-bard-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Bard",
@@ -910,6 +976,7 @@
       ]
     },
     {
+      "id": "song-of-rest-d10-bard-13-phb",
       "name": "Song of Rest (d10)",
       "source": "PHB",
       "className": "Bard",
@@ -920,6 +987,7 @@
       ]
     },
     {
+      "id": "bard-college-feature-bard-14-phb",
       "name": "Bard College feature",
       "source": "PHB",
       "className": "Bard",
@@ -930,6 +998,7 @@
       ]
     },
     {
+      "id": "magical-secrets-bard-14-phb",
       "name": "Magical Secrets",
       "source": "PHB",
       "className": "Bard",
@@ -941,6 +1010,7 @@
       ]
     },
     {
+      "id": "bardic-inspiration-d12-bard-15-phb",
       "name": "Bardic Inspiration (d12)",
       "source": "PHB",
       "className": "Bard",
@@ -951,6 +1021,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-bard-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Bard",
@@ -962,6 +1033,7 @@
       ]
     },
     {
+      "id": "song-of-rest-d12-bard-17-phb",
       "name": "Song of Rest (d12)",
       "source": "PHB",
       "className": "Bard",
@@ -972,6 +1044,7 @@
       ]
     },
     {
+      "id": "magical-secrets-bard-18-phb",
       "name": "Magical Secrets",
       "source": "PHB",
       "className": "Bard",
@@ -983,6 +1056,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-bard-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Bard",
@@ -994,6 +1068,7 @@
       ]
     },
     {
+      "id": "superior-inspiration-bard-20-phb",
       "name": "Superior Inspiration",
       "source": "PHB",
       "className": "Bard",
@@ -1004,6 +1079,7 @@
       ]
     },
     {
+      "id": "divine-domain-cleric-1-phb",
       "name": "Divine Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -1022,6 +1098,7 @@
       ]
     },
     {
+      "id": "spellcasting-cleric-1-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Cleric",
@@ -1084,6 +1161,7 @@
       ]
     },
     {
+      "id": "channel-divinity-cleric-2-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Cleric",
@@ -1101,6 +1179,7 @@
       ]
     },
     {
+      "id": "channel-divinity-harness-divine-power-cleric-2-tce",
       "name": "Channel Divinity: Harness Divine Power",
       "source": "TCE",
       "className": "Cleric",
@@ -1112,6 +1191,7 @@
       ]
     },
     {
+      "id": "channel-divinity-turn-undead-cleric-2-phb",
       "name": "Channel Divinity: Turn Undead",
       "source": "PHB",
       "className": "Cleric",
@@ -1123,6 +1203,7 @@
       ]
     },
     {
+      "id": "divine-domain-feature-cleric-2-phb",
       "name": "Divine Domain feature",
       "source": "PHB",
       "className": "Cleric",
@@ -1133,6 +1214,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-cleric-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Cleric",
@@ -1144,6 +1226,7 @@
       ]
     },
     {
+      "id": "cantrip-versatility-cleric-4-tce",
       "name": "Cantrip Versatility",
       "source": "TCE",
       "className": "Cleric",
@@ -1155,6 +1238,7 @@
       ]
     },
     {
+      "id": "destroy-undead-cr-1-2-cleric-5-phb",
       "name": "Destroy Undead (CR 1/2)",
       "source": "PHB",
       "className": "Cleric",
@@ -1165,6 +1249,7 @@
       ]
     },
     {
+      "id": "channel-divinity-cleric-6-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Cleric",
@@ -1175,6 +1260,7 @@
       ]
     },
     {
+      "id": "divine-domain-feature-cleric-6-phb",
       "name": "Divine Domain feature",
       "source": "PHB",
       "className": "Cleric",
@@ -1185,6 +1271,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-cleric-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Cleric",
@@ -1196,6 +1283,7 @@
       ]
     },
     {
+      "id": "destroy-undead-cr-1-cleric-8-phb",
       "name": "Destroy Undead (CR 1)",
       "source": "PHB",
       "className": "Cleric",
@@ -1206,6 +1294,7 @@
       ]
     },
     {
+      "id": "divine-domain-feature-cleric-8-phb",
       "name": "Divine Domain feature",
       "source": "PHB",
       "className": "Cleric",
@@ -1216,6 +1305,7 @@
       ]
     },
     {
+      "id": "divine-intervention-cleric-10-phb",
       "name": "Divine Intervention",
       "source": "PHB",
       "className": "Cleric",
@@ -1228,6 +1318,7 @@
       ]
     },
     {
+      "id": "destroy-undead-cr-2-cleric-11-phb",
       "name": "Destroy Undead (CR 2)",
       "source": "PHB",
       "className": "Cleric",
@@ -1238,6 +1329,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-cleric-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Cleric",
@@ -1249,6 +1341,7 @@
       ]
     },
     {
+      "id": "destroy-undead-cr-3-cleric-14-phb",
       "name": "Destroy Undead (CR 3)",
       "source": "PHB",
       "className": "Cleric",
@@ -1259,6 +1352,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-cleric-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Cleric",
@@ -1270,6 +1364,7 @@
       ]
     },
     {
+      "id": "destroy-undead-cr-4-cleric-17-phb",
       "name": "Destroy Undead (CR 4)",
       "source": "PHB",
       "className": "Cleric",
@@ -1280,6 +1375,7 @@
       ]
     },
     {
+      "id": "divine-domain-feature-cleric-17-phb",
       "name": "Divine Domain feature",
       "source": "PHB",
       "className": "Cleric",
@@ -1290,6 +1386,7 @@
       ]
     },
     {
+      "id": "channel-divinity-cleric-18-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Cleric",
@@ -1300,6 +1397,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-cleric-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Cleric",
@@ -1311,6 +1409,7 @@
       ]
     },
     {
+      "id": "divine-intervention-improvement-cleric-20-phb",
       "name": "Divine Intervention Improvement",
       "source": "PHB",
       "className": "Cleric",
@@ -1321,6 +1420,7 @@
       ]
     },
     {
+      "id": "druidic-druid-1-phb",
       "name": "Druidic",
       "source": "PHB",
       "className": "Druid",
@@ -1331,6 +1431,7 @@
       ]
     },
     {
+      "id": "spellcasting-druid-1-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Druid",
@@ -1393,6 +1494,7 @@
       ]
     },
     {
+      "id": "druid-circle-druid-2-phb",
       "name": "Druid Circle",
       "source": "PHB",
       "className": "Druid",
@@ -1403,6 +1505,7 @@
       ]
     },
     {
+      "id": "wild-companion-druid-2-tce",
       "name": "Wild Companion",
       "source": "TCE",
       "className": "Druid",
@@ -1415,6 +1518,7 @@
       ]
     },
     {
+      "id": "wild-shape-druid-2-phb",
       "name": "Wild Shape",
       "source": "PHB",
       "className": "Druid",
@@ -1474,6 +1578,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-druid-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1485,6 +1590,7 @@
       ]
     },
     {
+      "id": "cantrip-versatility-druid-4-tce",
       "name": "Cantrip Versatility",
       "source": "TCE",
       "className": "Druid",
@@ -1496,6 +1602,7 @@
       ]
     },
     {
+      "id": "wild-shape-improvement-druid-4-phb",
       "name": "Wild Shape Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1506,6 +1613,7 @@
       ]
     },
     {
+      "id": "druid-circle-feature-druid-6-phb",
       "name": "Druid Circle feature",
       "source": "PHB",
       "className": "Druid",
@@ -1516,6 +1624,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-druid-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1527,6 +1636,7 @@
       ]
     },
     {
+      "id": "wild-shape-improvement-druid-8-phb",
       "name": "Wild Shape Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1537,6 +1647,7 @@
       ]
     },
     {
+      "id": "druid-circle-feature-druid-10-phb",
       "name": "Druid Circle feature",
       "source": "PHB",
       "className": "Druid",
@@ -1547,6 +1658,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-druid-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1558,6 +1670,7 @@
       ]
     },
     {
+      "id": "druid-circle-feature-druid-14-phb",
       "name": "Druid Circle feature",
       "source": "PHB",
       "className": "Druid",
@@ -1568,6 +1681,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-druid-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1579,6 +1693,7 @@
       ]
     },
     {
+      "id": "beast-spells-druid-18-phb",
       "name": "Beast Spells",
       "source": "PHB",
       "className": "Druid",
@@ -1589,6 +1704,7 @@
       ]
     },
     {
+      "id": "timeless-body-druid-18-phb",
       "name": "Timeless Body",
       "source": "PHB",
       "className": "Druid",
@@ -1599,6 +1715,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-druid-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Druid",
@@ -1610,6 +1727,7 @@
       ]
     },
     {
+      "id": "archdruid-druid-20-phb",
       "name": "Archdruid",
       "source": "PHB",
       "className": "Druid",
@@ -1621,6 +1739,7 @@
       ]
     },
     {
+      "id": "fighting-style-fighter-1-phb",
       "name": "Fighting Style",
       "source": "PHB",
       "className": "Fighter",
@@ -1681,6 +1800,7 @@
       ]
     },
     {
+      "id": "second-wind-fighter-1-phb",
       "name": "Second Wind",
       "source": "PHB",
       "className": "Fighter",
@@ -1692,6 +1812,7 @@
       ]
     },
     {
+      "id": "action-surge-fighter-2-phb",
       "name": "Action Surge",
       "source": "PHB",
       "className": "Fighter",
@@ -1703,6 +1824,7 @@
       ]
     },
     {
+      "id": "martial-archetype-fighter-3-phb",
       "name": "Martial Archetype",
       "source": "PHB",
       "className": "Fighter",
@@ -1713,6 +1835,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1724,6 +1847,7 @@
       ]
     },
     {
+      "id": "martial-versatility-fighter-4-tce",
       "name": "Martial Versatility",
       "source": "TCE",
       "className": "Fighter",
@@ -1742,6 +1866,7 @@
       ]
     },
     {
+      "id": "extra-attack-fighter-5-phb",
       "name": "Extra Attack",
       "source": "PHB",
       "className": "Fighter",
@@ -1753,6 +1878,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-6-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1764,6 +1890,7 @@
       ]
     },
     {
+      "id": "martial-archetype-feature-fighter-7-phb",
       "name": "Martial Archetype feature",
       "source": "PHB",
       "className": "Fighter",
@@ -1774,6 +1901,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1785,6 +1913,7 @@
       ]
     },
     {
+      "id": "indomitable-fighter-9-phb",
       "name": "Indomitable",
       "source": "PHB",
       "className": "Fighter",
@@ -1796,6 +1925,7 @@
       ]
     },
     {
+      "id": "martial-archetype-feature-fighter-10-phb",
       "name": "Martial Archetype feature",
       "source": "PHB",
       "className": "Fighter",
@@ -1806,6 +1936,7 @@
       ]
     },
     {
+      "id": "extra-attack-2-fighter-11-phb",
       "name": "Extra Attack (2)",
       "source": "PHB",
       "className": "Fighter",
@@ -1816,6 +1947,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1827,6 +1959,7 @@
       ]
     },
     {
+      "id": "indomitable-two-uses-fighter-13-phb",
       "name": "Indomitable (two uses)",
       "source": "PHB",
       "className": "Fighter",
@@ -1837,6 +1970,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-14-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1848,6 +1982,7 @@
       ]
     },
     {
+      "id": "martial-archetype-feature-fighter-15-phb",
       "name": "Martial Archetype feature",
       "source": "PHB",
       "className": "Fighter",
@@ -1858,6 +1993,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1869,6 +2005,7 @@
       ]
     },
     {
+      "id": "action-surge-two-uses-fighter-17-phb",
       "name": "Action Surge (two uses)",
       "source": "PHB",
       "className": "Fighter",
@@ -1879,6 +2016,7 @@
       ]
     },
     {
+      "id": "indomitable-three-uses-fighter-17-phb",
       "name": "Indomitable (three uses)",
       "source": "PHB",
       "className": "Fighter",
@@ -1889,6 +2027,7 @@
       ]
     },
     {
+      "id": "martial-archetype-feature-fighter-18-phb",
       "name": "Martial Archetype feature",
       "source": "PHB",
       "className": "Fighter",
@@ -1899,6 +2038,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-fighter-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Fighter",
@@ -1910,6 +2050,7 @@
       ]
     },
     {
+      "id": "extra-attack-3-fighter-20-phb",
       "name": "Extra Attack (3)",
       "source": "PHB",
       "className": "Fighter",
@@ -1920,6 +2061,7 @@
       ]
     },
     {
+      "id": "martial-arts-monk-1-phb",
       "name": "Martial Arts",
       "source": "PHB",
       "className": "Monk",
@@ -1940,6 +2082,7 @@
       ]
     },
     {
+      "id": "unarmored-defense-monk-1-phb",
       "name": "Unarmored Defense",
       "source": "PHB",
       "className": "Monk",
@@ -1950,6 +2093,7 @@
       ]
     },
     {
+      "id": "dedicated-weapon-monk-2-tce",
       "name": "Dedicated Weapon",
       "source": "TCE",
       "className": "Monk",
@@ -1970,6 +2114,7 @@
       ]
     },
     {
+      "id": "flurry-of-blows-monk-2-phb",
       "name": "Flurry of Blows",
       "source": "PHB",
       "className": "Monk",
@@ -1980,6 +2125,7 @@
       ]
     },
     {
+      "id": "ki-monk-2-phb",
       "name": "Ki",
       "source": "PHB",
       "className": "Monk",
@@ -2017,6 +2163,7 @@
       ]
     },
     {
+      "id": "patient-defense-monk-2-phb",
       "name": "Patient Defense",
       "source": "PHB",
       "className": "Monk",
@@ -2027,6 +2174,7 @@
       ]
     },
     {
+      "id": "step-of-the-wind-monk-2-phb",
       "name": "Step of the Wind",
       "source": "PHB",
       "className": "Monk",
@@ -2037,6 +2185,7 @@
       ]
     },
     {
+      "id": "unarmored-movement-monk-2-phb",
       "name": "Unarmored Movement",
       "source": "PHB",
       "className": "Monk",
@@ -2048,6 +2197,7 @@
       ]
     },
     {
+      "id": "deflect-missiles-monk-3-phb",
       "name": "Deflect Missiles",
       "source": "PHB",
       "className": "Monk",
@@ -2059,6 +2209,7 @@
       ]
     },
     {
+      "id": "ki-fueled-attack-monk-3-tce",
       "name": "Ki-Fueled Attack",
       "source": "TCE",
       "className": "Monk",
@@ -2070,6 +2221,7 @@
       ]
     },
     {
+      "id": "monastic-tradition-monk-3-phb",
       "name": "Monastic Tradition",
       "source": "PHB",
       "className": "Monk",
@@ -2080,6 +2232,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-monk-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Monk",
@@ -2091,6 +2244,7 @@
       ]
     },
     {
+      "id": "quickened-healing-monk-4-tce",
       "name": "Quickened Healing",
       "source": "TCE",
       "className": "Monk",
@@ -2102,6 +2256,7 @@
       ]
     },
     {
+      "id": "slow-fall-monk-4-phb",
       "name": "Slow Fall",
       "source": "PHB",
       "className": "Monk",
@@ -2112,6 +2267,7 @@
       ]
     },
     {
+      "id": "extra-attack-monk-5-phb",
       "name": "Extra Attack",
       "source": "PHB",
       "className": "Monk",
@@ -2122,6 +2278,7 @@
       ]
     },
     {
+      "id": "focused-aim-monk-5-tce",
       "name": "Focused Aim",
       "source": "TCE",
       "className": "Monk",
@@ -2133,6 +2290,7 @@
       ]
     },
     {
+      "id": "stunning-strike-monk-5-phb",
       "name": "Stunning Strike",
       "source": "PHB",
       "className": "Monk",
@@ -2143,6 +2301,7 @@
       ]
     },
     {
+      "id": "ki-empowered-strikes-monk-6-phb",
       "name": "Ki-Empowered Strikes",
       "source": "PHB",
       "className": "Monk",
@@ -2153,6 +2312,7 @@
       ]
     },
     {
+      "id": "monastic-tradition-feature-monk-6-phb",
       "name": "Monastic Tradition feature",
       "source": "PHB",
       "className": "Monk",
@@ -2163,6 +2323,7 @@
       ]
     },
     {
+      "id": "evasion-monk-7-phb",
       "name": "Evasion",
       "source": "PHB",
       "className": "Monk",
@@ -2173,6 +2334,7 @@
       ]
     },
     {
+      "id": "stillness-of-mind-monk-7-phb",
       "name": "Stillness of Mind",
       "source": "PHB",
       "className": "Monk",
@@ -2183,6 +2345,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-monk-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Monk",
@@ -2194,6 +2357,7 @@
       ]
     },
     {
+      "id": "unarmored-movement-improvement-monk-9-phb",
       "name": "Unarmored Movement improvement",
       "source": "PHB",
       "className": "Monk",
@@ -2204,6 +2368,7 @@
       ]
     },
     {
+      "id": "purity-of-body-monk-10-phb",
       "name": "Purity of Body",
       "source": "PHB",
       "className": "Monk",
@@ -2214,6 +2379,7 @@
       ]
     },
     {
+      "id": "monastic-tradition-feature-monk-11-phb",
       "name": "Monastic Tradition feature",
       "source": "PHB",
       "className": "Monk",
@@ -2224,6 +2390,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-monk-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Monk",
@@ -2235,6 +2402,7 @@
       ]
     },
     {
+      "id": "tongue-of-the-sun-and-moon-monk-13-phb",
       "name": "Tongue of the Sun and Moon",
       "source": "PHB",
       "className": "Monk",
@@ -2245,6 +2413,7 @@
       ]
     },
     {
+      "id": "diamond-soul-monk-14-phb",
       "name": "Diamond Soul",
       "source": "PHB",
       "className": "Monk",
@@ -2256,6 +2425,7 @@
       ]
     },
     {
+      "id": "timeless-body-monk-15-phb",
       "name": "Timeless Body",
       "source": "PHB",
       "className": "Monk",
@@ -2266,6 +2436,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-monk-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Monk",
@@ -2277,6 +2448,7 @@
       ]
     },
     {
+      "id": "monastic-tradition-feature-monk-17-phb",
       "name": "Monastic Tradition feature",
       "source": "PHB",
       "className": "Monk",
@@ -2287,6 +2459,7 @@
       ]
     },
     {
+      "id": "empty-body-monk-18-phb",
       "name": "Empty Body",
       "source": "PHB",
       "className": "Monk",
@@ -2298,6 +2471,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-monk-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Monk",
@@ -2309,6 +2483,7 @@
       ]
     },
     {
+      "id": "perfect-self-monk-20-phb",
       "name": "Perfect Self",
       "source": "PHB",
       "className": "Monk",
@@ -2319,6 +2494,7 @@
       ]
     },
     {
+      "id": "mystic-order-mystic-1-uathemysticclass",
       "name": "Mystic Order",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2330,6 +2506,7 @@
       ]
     },
     {
+      "id": "psionic-disciplines-and-talents-mystic-1-uathemysticclass",
       "name": "Psionic Disciplines and Talents",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2341,6 +2518,7 @@
       ]
     },
     {
+      "id": "psionics-mystic-1-uathemysticclass",
       "name": "Psionics",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2411,6 +2589,7 @@
       ]
     },
     {
+      "id": "using-a-discipline-mystic-1-uathemysticclass",
       "name": "Using a Discipline",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2490,6 +2669,7 @@
       ]
     },
     {
+      "id": "mystical-recovery-mystic-2-uathemysticclass",
       "name": "Mystical Recovery",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2501,6 +2681,7 @@
       ]
     },
     {
+      "id": "telepathy-mystic-2-uathemysticclass",
       "name": "Telepathy",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2511,6 +2692,7 @@
       ]
     },
     {
+      "id": "mystic-order-feature-mystic-3-uathemysticclass",
       "name": "Mystic Order feature",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2521,6 +2703,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-mystic-4-uathemysticclass",
       "name": "Ability Score Improvement",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2531,6 +2714,7 @@
       ]
     },
     {
+      "id": "strength-of-mind-mystic-4-uathemysticclass",
       "name": "Strength of Mind",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2542,6 +2726,7 @@
       ]
     },
     {
+      "id": "mystic-order-feature-mystic-6-uathemysticclass",
       "name": "Mystic Order feature",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2552,6 +2737,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-mystic-8-uathemysticclass",
       "name": "Ability Score Improvement",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2562,6 +2748,7 @@
       ]
     },
     {
+      "id": "potent-psionics-1d8-mystic-8-uathemysticclass",
       "name": "Potent Psionics (1d8)",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2573,6 +2760,7 @@
       ]
     },
     {
+      "id": "consumptive-power-mystic-10-uathemysticclass",
       "name": "Consumptive Power",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2584,6 +2772,7 @@
       ]
     },
     {
+      "id": "psionic-mastery-1-day-mystic-11-uathemysticclass",
       "name": "Psionic Mastery (1/Day)",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2597,6 +2786,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-mystic-12-uathemysticclass",
       "name": "Ability Score Improvement",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2607,6 +2797,7 @@
       ]
     },
     {
+      "id": "psionic-mastery-2-day-mystic-13-uathemysticclass",
       "name": "Psionic Mastery (2/Day)",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2617,6 +2808,7 @@
       ]
     },
     {
+      "id": "mystic-order-feature-mystic-14-uathemysticclass",
       "name": "Mystic Order feature",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2627,6 +2819,7 @@
       ]
     },
     {
+      "id": "potent-psionics-2d8-mystic-14-uathemysticclass",
       "name": "Potent Psionics (2d8)",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2637,6 +2830,7 @@
       ]
     },
     {
+      "id": "psionic-mastery-3-day-mystic-15-uathemysticclass",
       "name": "Psionic Mastery (3/Day)",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2647,6 +2841,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-mystic-16-uathemysticclass",
       "name": "Ability Score Improvement",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2657,6 +2852,7 @@
       ]
     },
     {
+      "id": "psionic-mastery-4-day-mystic-17-uathemysticclass",
       "name": "Psionic Mastery (4/Day)",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2667,6 +2863,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-mystic-19-uathemysticclass",
       "name": "Ability Score Improvement",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2677,6 +2874,7 @@
       ]
     },
     {
+      "id": "psionic-body-mystic-20-uathemysticclass",
       "name": "Psionic Body",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -2696,6 +2894,7 @@
       ]
     },
     {
+      "id": "divine-sense-paladin-1-phb",
       "name": "Divine Sense",
       "source": "PHB",
       "className": "Paladin",
@@ -2707,6 +2906,7 @@
       ]
     },
     {
+      "id": "lay-on-hands-paladin-1-phb",
       "name": "Lay on Hands",
       "source": "PHB",
       "className": "Paladin",
@@ -2720,6 +2920,7 @@
       ]
     },
     {
+      "id": "divine-smite-paladin-2-phb",
       "name": "Divine Smite",
       "source": "PHB",
       "className": "Paladin",
@@ -2730,6 +2931,7 @@
       ]
     },
     {
+      "id": "fighting-style-paladin-2-phb",
       "name": "Fighting Style",
       "source": "PHB",
       "className": "Paladin",
@@ -2774,6 +2976,7 @@
       ]
     },
     {
+      "id": "spellcasting-paladin-2-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Paladin",
@@ -2822,6 +3025,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-3-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Paladin",
@@ -2834,6 +3038,7 @@
       ]
     },
     {
+      "id": "channel-divinity-harness-divine-power-paladin-3-tce",
       "name": "Channel Divinity: Harness Divine Power",
       "source": "TCE",
       "className": "Paladin",
@@ -2845,6 +3050,7 @@
       ]
     },
     {
+      "id": "divine-health-paladin-3-phb",
       "name": "Divine Health",
       "source": "PHB",
       "className": "Paladin",
@@ -2855,6 +3061,7 @@
       ]
     },
     {
+      "id": "sacred-oath-paladin-3-phb",
       "name": "Sacred Oath",
       "source": "PHB",
       "className": "Paladin",
@@ -2891,6 +3098,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-paladin-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Paladin",
@@ -2902,6 +3110,7 @@
       ]
     },
     {
+      "id": "martial-versatility-paladin-4-tce",
       "name": "Martial Versatility",
       "source": "TCE",
       "className": "Paladin",
@@ -2913,6 +3122,7 @@
       ]
     },
     {
+      "id": "extra-attack-paladin-5-phb",
       "name": "Extra Attack",
       "source": "PHB",
       "className": "Paladin",
@@ -2923,6 +3133,7 @@
       ]
     },
     {
+      "id": "aura-of-protection-paladin-6-phb",
       "name": "Aura of Protection",
       "source": "PHB",
       "className": "Paladin",
@@ -2934,6 +3145,7 @@
       ]
     },
     {
+      "id": "sacred-oath-feature-paladin-7-phb",
       "name": "Sacred Oath feature",
       "source": "PHB",
       "className": "Paladin",
@@ -2944,6 +3156,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-paladin-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Paladin",
@@ -2955,6 +3168,7 @@
       ]
     },
     {
+      "id": "aura-of-courage-paladin-10-phb",
       "name": "Aura of Courage",
       "source": "PHB",
       "className": "Paladin",
@@ -2966,6 +3180,7 @@
       ]
     },
     {
+      "id": "improved-divine-smite-paladin-11-phb",
       "name": "Improved Divine Smite",
       "source": "PHB",
       "className": "Paladin",
@@ -2976,6 +3191,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-paladin-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Paladin",
@@ -2987,6 +3203,7 @@
       ]
     },
     {
+      "id": "cleansing-touch-paladin-14-phb",
       "name": "Cleansing Touch",
       "source": "PHB",
       "className": "Paladin",
@@ -2998,6 +3215,7 @@
       ]
     },
     {
+      "id": "sacred-oath-feature-paladin-15-phb",
       "name": "Sacred Oath feature",
       "source": "PHB",
       "className": "Paladin",
@@ -3008,6 +3226,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-paladin-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Paladin",
@@ -3019,6 +3238,7 @@
       ]
     },
     {
+      "id": "aura-improvements-paladin-18-phb",
       "name": "Aura improvements",
       "source": "PHB",
       "className": "Paladin",
@@ -3029,6 +3249,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-paladin-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Paladin",
@@ -3040,6 +3261,7 @@
       ]
     },
     {
+      "id": "sacred-oath-feature-paladin-20-phb",
       "name": "Sacred Oath feature",
       "source": "PHB",
       "className": "Paladin",
@@ -3050,6 +3272,7 @@
       ]
     },
     {
+      "id": "deft-explorer-ranger-1-tce",
       "name": "Deft Explorer",
       "source": "TCE",
       "className": "Ranger",
@@ -3069,6 +3292,7 @@
       ]
     },
     {
+      "id": "favored-enemy-ranger-1-phb",
       "name": "Favored Enemy",
       "source": "PHB",
       "className": "Ranger",
@@ -3083,6 +3307,7 @@
       ]
     },
     {
+      "id": "favored-foe-ranger-1-tce",
       "name": "Favored Foe",
       "source": "TCE",
       "className": "Ranger",
@@ -3097,6 +3322,7 @@
       ]
     },
     {
+      "id": "natural-explorer-ranger-1-phb",
       "name": "Natural Explorer",
       "source": "PHB",
       "className": "Ranger",
@@ -3120,6 +3346,7 @@
       ]
     },
     {
+      "id": "fighting-style-ranger-2-phb",
       "name": "Fighting Style",
       "source": "PHB",
       "className": "Ranger",
@@ -3164,6 +3391,7 @@
       ]
     },
     {
+      "id": "spellcasting-ranger-2-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Ranger",
@@ -3212,6 +3440,7 @@
       ]
     },
     {
+      "id": "spellcasting-focus-ranger-2-tce",
       "name": "Spellcasting Focus",
       "source": "TCE",
       "className": "Ranger",
@@ -3223,6 +3452,7 @@
       ]
     },
     {
+      "id": "primal-awareness-ranger-3-tce",
       "name": "Primal Awareness",
       "source": "TCE",
       "className": "Ranger",
@@ -3269,6 +3499,7 @@
       ]
     },
     {
+      "id": "primeval-awareness-ranger-3-phb",
       "name": "Primeval Awareness",
       "source": "PHB",
       "className": "Ranger",
@@ -3279,6 +3510,7 @@
       ]
     },
     {
+      "id": "ranger-archetype-ranger-3-phb",
       "name": "Ranger Archetype",
       "source": "PHB",
       "className": "Ranger",
@@ -3289,6 +3521,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-ranger-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3300,6 +3533,7 @@
       ]
     },
     {
+      "id": "martial-versatility-ranger-4-tce",
       "name": "Martial Versatility",
       "source": "TCE",
       "className": "Ranger",
@@ -3311,6 +3545,7 @@
       ]
     },
     {
+      "id": "extra-attack-ranger-5-phb",
       "name": "Extra Attack",
       "source": "PHB",
       "className": "Ranger",
@@ -3321,6 +3556,7 @@
       ]
     },
     {
+      "id": "deft-explorer-improvement-ranger-6-tce",
       "name": "Deft Explorer Improvement",
       "source": "TCE",
       "className": "Ranger",
@@ -3338,6 +3574,7 @@
       ]
     },
     {
+      "id": "favored-enemy-and-natural-explorer-improvements-ranger-6-phb",
       "name": "Favored Enemy and Natural Explorer improvements",
       "source": "PHB",
       "className": "Ranger",
@@ -3349,6 +3586,7 @@
       ]
     },
     {
+      "id": "ranger-archetype-feature-ranger-7-phb",
       "name": "Ranger Archetype feature",
       "source": "PHB",
       "className": "Ranger",
@@ -3359,6 +3597,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-ranger-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3370,6 +3609,7 @@
       ]
     },
     {
+      "id": "land-s-stride-ranger-8-phb",
       "name": "Land's Stride",
       "source": "PHB",
       "className": "Ranger",
@@ -3381,6 +3621,7 @@
       ]
     },
     {
+      "id": "deft-explorer-improvement-ranger-10-tce",
       "name": "Deft Explorer Improvement",
       "source": "TCE",
       "className": "Ranger",
@@ -3399,6 +3640,7 @@
       ]
     },
     {
+      "id": "hide-in-plain-sight-ranger-10-phb",
       "name": "Hide in Plain Sight",
       "source": "PHB",
       "className": "Ranger",
@@ -3410,6 +3652,7 @@
       ]
     },
     {
+      "id": "natural-explorer-improvement-ranger-10-phb",
       "name": "Natural Explorer improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3420,6 +3663,7 @@
       ]
     },
     {
+      "id": "nature-s-veil-ranger-10-tce",
       "name": "Nature's Veil",
       "source": "TCE",
       "className": "Ranger",
@@ -3432,6 +3676,7 @@
       ]
     },
     {
+      "id": "ranger-archetype-feature-ranger-11-phb",
       "name": "Ranger Archetype feature",
       "source": "PHB",
       "className": "Ranger",
@@ -3442,6 +3687,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-ranger-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3453,6 +3699,7 @@
       ]
     },
     {
+      "id": "favored-enemy-improvement-ranger-14-phb",
       "name": "Favored Enemy improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3463,6 +3710,7 @@
       ]
     },
     {
+      "id": "vanish-ranger-14-phb",
       "name": "Vanish",
       "source": "PHB",
       "className": "Ranger",
@@ -3473,6 +3721,7 @@
       ]
     },
     {
+      "id": "ranger-archetype-feature-ranger-15-phb",
       "name": "Ranger Archetype feature",
       "source": "PHB",
       "className": "Ranger",
@@ -3483,6 +3732,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-ranger-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3494,6 +3744,7 @@
       ]
     },
     {
+      "id": "feral-senses-ranger-18-phb",
       "name": "Feral Senses",
       "source": "PHB",
       "className": "Ranger",
@@ -3504,6 +3755,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-ranger-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Ranger",
@@ -3515,6 +3767,7 @@
       ]
     },
     {
+      "id": "foe-slayer-ranger-20-phb",
       "name": "Foe Slayer",
       "source": "PHB",
       "className": "Ranger",
@@ -3525,6 +3778,7 @@
       ]
     },
     {
+      "id": "expertise-rogue-1-phb",
       "name": "Expertise",
       "source": "PHB",
       "className": "Rogue",
@@ -3536,6 +3790,7 @@
       ]
     },
     {
+      "id": "sneak-attack-rogue-1-phb",
       "name": "Sneak Attack",
       "source": "PHB",
       "className": "Rogue",
@@ -3548,6 +3803,7 @@
       ]
     },
     {
+      "id": "thieves-cant-rogue-1-phb",
       "name": "Thieves' Cant",
       "source": "PHB",
       "className": "Rogue",
@@ -3559,6 +3815,7 @@
       ]
     },
     {
+      "id": "cunning-action-rogue-2-phb",
       "name": "Cunning Action",
       "source": "PHB",
       "className": "Rogue",
@@ -3569,6 +3826,7 @@
       ]
     },
     {
+      "id": "roguish-archetype-rogue-3-phb",
       "name": "Roguish Archetype",
       "source": "PHB",
       "className": "Rogue",
@@ -3579,6 +3837,7 @@
       ]
     },
     {
+      "id": "steady-aim-rogue-3-tce",
       "name": "Steady Aim",
       "source": "TCE",
       "className": "Rogue",
@@ -3590,6 +3849,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-rogue-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Rogue",
@@ -3601,6 +3861,7 @@
       ]
     },
     {
+      "id": "uncanny-dodge-rogue-5-phb",
       "name": "Uncanny Dodge",
       "source": "PHB",
       "className": "Rogue",
@@ -3611,6 +3872,7 @@
       ]
     },
     {
+      "id": "expertise-rogue-6-phb",
       "name": "Expertise",
       "source": "PHB",
       "className": "Rogue",
@@ -3621,6 +3883,7 @@
       ]
     },
     {
+      "id": "evasion-rogue-7-phb",
       "name": "Evasion",
       "source": "PHB",
       "className": "Rogue",
@@ -3631,6 +3894,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-rogue-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Rogue",
@@ -3642,6 +3906,7 @@
       ]
     },
     {
+      "id": "roguish-archetype-feature-rogue-9-phb",
       "name": "Roguish Archetype feature",
       "source": "PHB",
       "className": "Rogue",
@@ -3652,6 +3917,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-rogue-10-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Rogue",
@@ -3663,6 +3929,7 @@
       ]
     },
     {
+      "id": "reliable-talent-rogue-11-phb",
       "name": "Reliable Talent",
       "source": "PHB",
       "className": "Rogue",
@@ -3673,6 +3940,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-rogue-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Rogue",
@@ -3684,6 +3952,7 @@
       ]
     },
     {
+      "id": "roguish-archetype-feature-rogue-13-phb",
       "name": "Roguish Archetype feature",
       "source": "PHB",
       "className": "Rogue",
@@ -3694,6 +3963,7 @@
       ]
     },
     {
+      "id": "blindsense-rogue-14-phb",
       "name": "Blindsense",
       "source": "PHB",
       "className": "Rogue",
@@ -3704,6 +3974,7 @@
       ]
     },
     {
+      "id": "slippery-mind-rogue-15-phb",
       "name": "Slippery Mind",
       "source": "PHB",
       "className": "Rogue",
@@ -3714,6 +3985,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-rogue-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Rogue",
@@ -3725,6 +3997,7 @@
       ]
     },
     {
+      "id": "roguish-archetype-feature-rogue-17-phb",
       "name": "Roguish Archetype feature",
       "source": "PHB",
       "className": "Rogue",
@@ -3735,6 +4008,7 @@
       ]
     },
     {
+      "id": "elusive-rogue-18-phb",
       "name": "Elusive",
       "source": "PHB",
       "className": "Rogue",
@@ -3745,6 +4019,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-rogue-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Rogue",
@@ -3756,6 +4031,7 @@
       ]
     },
     {
+      "id": "stroke-of-luck-rogue-20-phb",
       "name": "Stroke of Luck",
       "source": "PHB",
       "className": "Rogue",
@@ -3767,6 +4043,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-expert-sidekick-1-tce",
       "name": "Bonus Proficiencies",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3779,6 +4056,7 @@
       ]
     },
     {
+      "id": "helpful-expert-sidekick-1-tce",
       "name": "Helpful",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3790,6 +4068,7 @@
       ]
     },
     {
+      "id": "sidekick-class-expert-sidekick-1-tce",
       "name": "Sidekick Class",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3801,6 +4080,7 @@
       ]
     },
     {
+      "id": "cunning-action-expert-sidekick-2-tce",
       "name": "Cunning Action",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3812,6 +4092,7 @@
       ]
     },
     {
+      "id": "expertise-expert-sidekick-3-tce",
       "name": "Expertise",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3824,6 +4105,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-expert-sidekick-4-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3836,6 +4118,7 @@
       ]
     },
     {
+      "id": "coordinated-strike-expert-sidekick-6-tce",
       "name": "Coordinated Strike",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3847,6 +4130,7 @@
       ]
     },
     {
+      "id": "evasion-expert-sidekick-7-tce",
       "name": "Evasion",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3858,6 +4142,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-expert-sidekick-8-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3870,6 +4155,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-expert-sidekick-10-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3882,6 +4168,7 @@
       ]
     },
     {
+      "id": "inspiring-help-expert-sidekick-11-tce",
       "name": "Inspiring Help",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3894,6 +4181,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-expert-sidekick-12-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3906,6 +4194,7 @@
       ]
     },
     {
+      "id": "reliable-talent-expert-sidekick-14-tce",
       "name": "Reliable Talent",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3917,6 +4206,7 @@
       ]
     },
     {
+      "id": "expertise-expert-sidekick-15-tce",
       "name": "Expertise",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3928,6 +4218,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-expert-sidekick-16-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3940,6 +4231,7 @@
       ]
     },
     {
+      "id": "sharp-mind-expert-sidekick-18-tce",
       "name": "Sharp Mind",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3951,6 +4243,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-expert-sidekick-19-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3963,6 +4256,7 @@
       ]
     },
     {
+      "id": "inspiring-help-improvement-expert-sidekick-20-tce",
       "name": "Inspiring Help Improvement",
       "source": "TCE",
       "className": "Expert Sidekick",
@@ -3974,6 +4268,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-spellcaster-sidekick-1-tce",
       "name": "Bonus Proficiencies",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -3987,6 +4282,7 @@
       ]
     },
     {
+      "id": "sidekick-class-spellcaster-sidekick-1-tce",
       "name": "Sidekick Class",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -3998,6 +4294,7 @@
       ]
     },
     {
+      "id": "spellcasting-spellcaster-sidekick-1-tce",
       "name": "Spellcasting",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4111,6 +4408,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-spellcaster-sidekick-4-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4123,6 +4421,7 @@
       ]
     },
     {
+      "id": "potent-cantrips-spellcaster-sidekick-6-tce",
       "name": "Potent Cantrips",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4134,6 +4433,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-spellcaster-sidekick-8-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4146,6 +4446,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-spellcaster-sidekick-12-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4158,6 +4459,7 @@
       ]
     },
     {
+      "id": "empowered-spells-spellcaster-sidekick-14-tce",
       "name": "Empowered Spells",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4169,6 +4471,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-spellcaster-sidekick-16-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4181,6 +4484,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-spellcaster-sidekick-18-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4193,6 +4497,7 @@
       ]
     },
     {
+      "id": "focused-casting-spellcaster-sidekick-20-tce",
       "name": "Focused Casting",
       "source": "TCE",
       "className": "Spellcaster Sidekick",
@@ -4204,6 +4509,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-warrior-sidekick-1-tce",
       "name": "Bonus Proficiencies",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4217,6 +4523,7 @@
       ]
     },
     {
+      "id": "martial-role-warrior-sidekick-1-tce",
       "name": "Martial Role",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4244,6 +4551,7 @@
       ]
     },
     {
+      "id": "sidekick-class-warrior-sidekick-1-tce",
       "name": "Sidekick Class",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4254,6 +4562,7 @@
       ]
     },
     {
+      "id": "second-wind-warrior-sidekick-2-tce",
       "name": "Second Wind",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4266,6 +4575,7 @@
       ]
     },
     {
+      "id": "improved-critical-warrior-sidekick-3-tce",
       "name": "Improved Critical",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4277,6 +4587,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warrior-sidekick-4-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4289,6 +4600,7 @@
       ]
     },
     {
+      "id": "extra-attack-warrior-sidekick-6-tce",
       "name": "Extra Attack",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4302,6 +4614,7 @@
       ]
     },
     {
+      "id": "battle-readiness-warrior-sidekick-7-tce",
       "name": "Battle Readiness",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4313,6 +4626,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warrior-sidekick-8-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4325,6 +4639,7 @@
       ]
     },
     {
+      "id": "improved-defense-warrior-sidekick-10-tce",
       "name": "Improved Defense",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4336,6 +4651,7 @@
       ]
     },
     {
+      "id": "indomitable-warrior-sidekick-11-tce",
       "name": "Indomitable",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4348,6 +4664,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warrior-sidekick-12-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4360,6 +4677,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warrior-sidekick-14-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4372,6 +4690,7 @@
       ]
     },
     {
+      "id": "extra-attack-improvement-warrior-sidekick-15-tce",
       "name": "Extra Attack Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4385,6 +4704,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warrior-sidekick-16-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4397,6 +4717,7 @@
       ]
     },
     {
+      "id": "indomitable-improvement-warrior-sidekick-18-tce",
       "name": "Indomitable Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4409,6 +4730,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warrior-sidekick-19-tce",
       "name": "Ability Score Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4421,6 +4743,7 @@
       ]
     },
     {
+      "id": "second-wind-improvement-warrior-sidekick-20-tce",
       "name": "Second Wind Improvement",
       "source": "TCE",
       "className": "Warrior Sidekick",
@@ -4432,6 +4755,7 @@
       ]
     },
     {
+      "id": "sorcerous-origin-sorcerer-1-phb",
       "name": "Sorcerous Origin",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4443,6 +4767,7 @@
       ]
     },
     {
+      "id": "spellcasting-sorcerer-1-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4505,6 +4830,7 @@
       ]
     },
     {
+      "id": "flexible-casting-sorcerer-2-phb",
       "name": "Flexible Casting",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4563,6 +4889,7 @@
       ]
     },
     {
+      "id": "font-of-magic-sorcerer-2-phb",
       "name": "Font of Magic",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4581,6 +4908,7 @@
       ]
     },
     {
+      "id": "sorcery-points-sorcerer-2-phb",
       "name": "Sorcery Points",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4591,6 +4919,7 @@
       ]
     },
     {
+      "id": "metamagic-sorcerer-3-phb",
       "name": "Metamagic",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4664,6 +4993,7 @@
       ]
     },
     {
+      "id": "metamagic-options-sorcerer-3-tce",
       "name": "Metamagic Options",
       "source": "TCE",
       "className": "Sorcerer",
@@ -4694,6 +5024,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-sorcerer-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4705,6 +5036,7 @@
       ]
     },
     {
+      "id": "sorcerous-versatility-sorcerer-4-tce",
       "name": "Sorcerous Versatility",
       "source": "TCE",
       "className": "Sorcerer",
@@ -4723,6 +5055,7 @@
       ]
     },
     {
+      "id": "magical-guidance-sorcerer-5-tce",
       "name": "Magical Guidance",
       "source": "TCE",
       "className": "Sorcerer",
@@ -4734,6 +5067,7 @@
       ]
     },
     {
+      "id": "sorcerous-origin-feature-sorcerer-6-phb",
       "name": "Sorcerous Origin feature",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4744,6 +5078,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-sorcerer-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4755,6 +5090,7 @@
       ]
     },
     {
+      "id": "metamagic-sorcerer-10-phb",
       "name": "Metamagic",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4765,6 +5101,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-sorcerer-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4776,6 +5113,7 @@
       ]
     },
     {
+      "id": "sorcerous-origin-feature-sorcerer-14-phb",
       "name": "Sorcerous Origin feature",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4786,6 +5124,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-sorcerer-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4797,6 +5136,7 @@
       ]
     },
     {
+      "id": "metamagic-sorcerer-17-phb",
       "name": "Metamagic",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4807,6 +5147,7 @@
       ]
     },
     {
+      "id": "sorcerous-origin-feature-sorcerer-18-phb",
       "name": "Sorcerous Origin feature",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4817,6 +5158,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-sorcerer-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4828,6 +5170,7 @@
       ]
     },
     {
+      "id": "sorcerous-restoration-sorcerer-20-phb",
       "name": "Sorcerous Restoration",
       "source": "PHB",
       "className": "Sorcerer",
@@ -4838,6 +5181,7 @@
       ]
     },
     {
+      "id": "otherworldly-patron-warlock-1-phb",
       "name": "Otherworldly Patron",
       "source": "PHB",
       "className": "Warlock",
@@ -4848,6 +5192,7 @@
       ]
     },
     {
+      "id": "pact-magic-warlock-1-phb",
       "name": "Pact Magic",
       "source": "PHB",
       "className": "Warlock",
@@ -4910,6 +5255,7 @@
       ]
     },
     {
+      "id": "eldritch-invocations-warlock-2-phb",
       "name": "Eldritch Invocations",
       "source": "PHB",
       "className": "Warlock",
@@ -4923,6 +5269,7 @@
       ]
     },
     {
+      "id": "pact-boon-warlock-3-phb",
       "name": "Pact Boon",
       "source": "PHB",
       "className": "Warlock",
@@ -4955,6 +5302,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warlock-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Warlock",
@@ -4966,6 +5314,7 @@
       ]
     },
     {
+      "id": "eldritch-versatility-warlock-4-tce",
       "name": "Eldritch Versatility",
       "source": "TCE",
       "className": "Warlock",
@@ -4986,6 +5335,7 @@
       ]
     },
     {
+      "id": "otherworldly-patron-feature-warlock-6-phb",
       "name": "Otherworldly Patron feature",
       "source": "PHB",
       "className": "Warlock",
@@ -4996,6 +5346,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warlock-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Warlock",
@@ -5007,6 +5358,7 @@
       ]
     },
     {
+      "id": "otherworldly-patron-feature-warlock-10-phb",
       "name": "Otherworldly Patron feature",
       "source": "PHB",
       "className": "Warlock",
@@ -5017,6 +5369,7 @@
       ]
     },
     {
+      "id": "mystic-arcanum-6th-level-warlock-11-phb",
       "name": "Mystic Arcanum (6th level)",
       "source": "PHB",
       "className": "Warlock",
@@ -5029,6 +5382,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warlock-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Warlock",
@@ -5040,6 +5394,7 @@
       ]
     },
     {
+      "id": "mystic-arcanum-7th-level-warlock-13-phb",
       "name": "Mystic Arcanum (7th level)",
       "source": "PHB",
       "className": "Warlock",
@@ -5051,6 +5406,7 @@
       ]
     },
     {
+      "id": "otherworldly-patron-feature-warlock-14-phb",
       "name": "Otherworldly Patron feature",
       "source": "PHB",
       "className": "Warlock",
@@ -5061,6 +5417,7 @@
       ]
     },
     {
+      "id": "mystic-arcanum-8th-level-warlock-15-phb",
       "name": "Mystic Arcanum (8th level)",
       "source": "PHB",
       "className": "Warlock",
@@ -5072,6 +5429,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warlock-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Warlock",
@@ -5083,6 +5441,7 @@
       ]
     },
     {
+      "id": "mystic-arcanum-9th-level-warlock-17-phb",
       "name": "Mystic Arcanum (9th level)",
       "source": "PHB",
       "className": "Warlock",
@@ -5094,6 +5453,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-warlock-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Warlock",
@@ -5105,6 +5465,7 @@
       ]
     },
     {
+      "id": "eldritch-master-warlock-20-phb",
       "name": "Eldritch Master",
       "source": "PHB",
       "className": "Warlock",
@@ -5115,6 +5476,7 @@
       ]
     },
     {
+      "id": "arcane-recovery-wizard-1-phb",
       "name": "Arcane Recovery",
       "source": "PHB",
       "className": "Wizard",
@@ -5126,6 +5488,7 @@
       ]
     },
     {
+      "id": "spellcasting-wizard-1-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Wizard",
@@ -5258,6 +5621,7 @@
       ]
     },
     {
+      "id": "arcane-tradition-wizard-2-phb",
       "name": "Arcane Tradition",
       "source": "PHB",
       "className": "Wizard",
@@ -5268,6 +5632,7 @@
       ]
     },
     {
+      "id": "cantrip-formulas-wizard-3-tce",
       "name": "Cantrip Formulas",
       "source": "TCE",
       "className": "Wizard",
@@ -5279,6 +5644,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-wizard-4-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Wizard",
@@ -5290,6 +5656,7 @@
       ]
     },
     {
+      "id": "arcane-tradition-feature-wizard-6-phb",
       "name": "Arcane Tradition feature",
       "source": "PHB",
       "className": "Wizard",
@@ -5300,6 +5667,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-wizard-8-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Wizard",
@@ -5311,6 +5679,7 @@
       ]
     },
     {
+      "id": "arcane-tradition-feature-wizard-10-phb",
       "name": "Arcane Tradition feature",
       "source": "PHB",
       "className": "Wizard",
@@ -5321,6 +5690,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-wizard-12-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Wizard",
@@ -5332,6 +5702,7 @@
       ]
     },
     {
+      "id": "arcane-tradition-feature-wizard-14-phb",
       "name": "Arcane Tradition feature",
       "source": "PHB",
       "className": "Wizard",
@@ -5342,6 +5713,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-wizard-16-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Wizard",
@@ -5353,6 +5725,7 @@
       ]
     },
     {
+      "id": "spell-mastery-wizard-18-phb",
       "name": "Spell Mastery",
       "source": "PHB",
       "className": "Wizard",
@@ -5364,6 +5737,7 @@
       ]
     },
     {
+      "id": "ability-score-improvement-wizard-19-phb",
       "name": "Ability Score Improvement",
       "source": "PHB",
       "className": "Wizard",
@@ -5375,6 +5749,7 @@
       ]
     },
     {
+      "id": "signature-spells-wizard-20-phb",
       "name": "Signature Spells",
       "source": "PHB",
       "className": "Wizard",

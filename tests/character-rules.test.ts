@@ -6,9 +6,12 @@ import {
   classPreparedSpellLimit,
   classCantripLimit,
   classResourceLimit,
+  filterLevelUpChoicesForSubclass,
   instantiateStartingEquipment,
   normalizeClassSavingThrows,
   selectedFeatureNames,
+  slotsWithoutSourceItems,
+  spellPreparedState,
 } from '../frontend/src/lib/character-rules.ts';
 
 const clericClass = {
@@ -112,5 +115,49 @@ describe('character rules helpers', () => {
       'Blessed Strikes',
       'Divine Strike',
     ]);
+  });
+
+  it('hides subclass-scoped choices for unselected subclasses even when feature ids are catalog fallbacks', () => {
+    const choices = [
+      { id: 'subclass-fighter-subclass', type: 'subclass', featureId: 'fighter-subclass', name: 'Choose Subclass', count: 1, options: ['Champion', 'Battle Master'] },
+      { id: 'skill-student-of-war', type: 'generic', featureId: 'student-of-war', subclassShortName: 'Battle Master', name: 'Student of War', count: 1, options: ['Insight'] },
+      { id: 'always-visible', type: 'generic', featureId: 'base-feature', name: 'Base Choice', count: 1, options: ['A'] },
+    ];
+
+    const visible = filterLevelUpChoicesForSubclass(choices as any, [], 'Champion');
+
+    assert.deepEqual(visible.map((choice) => choice.id), ['subclass-fighter-subclass', 'always-visible']);
+  });
+
+  it('removes equipped slots belonging to old source items before instantiating replacement equipment', () => {
+    const inventory = [
+      { instanceId: 'old-background-staff', source: 'background' },
+      { instanceId: 'class-shield', source: 'class' },
+    ];
+    const slots = {
+      equipped_main_hand: 'old-background-staff',
+      equipped_shield: 'class-shield',
+    };
+
+    assert.deepEqual(slotsWithoutSourceItems(slots, inventory, 'background'), {
+      equipped_shield: 'class-shield',
+    });
+  });
+
+  it('treats background spells with their own resource as prepared for wizard casting UI', () => {
+    const state = spellPreparedState({
+      spell: {
+        id: 'magic-initiate-cure-wounds',
+        name: 'Cure Wounds',
+        originKind: 'background',
+        resource: { remaining: 1 },
+      },
+      level: 1,
+      characterClass: 'Wizard',
+      preparedSpells: [],
+    });
+
+    assert.equal(state.isPrepared, true);
+    assert.equal(state.canUsePreparedMarker, true);
   });
 });

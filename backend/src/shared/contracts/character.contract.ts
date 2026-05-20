@@ -68,8 +68,11 @@ export interface CharacterRecord {
   skillProficiencies: string[];
   savingThrowProficiencies: string[];
   inventory: CharacterInventoryItem[];
+  equippedSlots?: Record<string, string>; // Maps slot name to instanceId
+  acFormulaId?: string; // e.g. 'standard', 'unarmored_monk', 'unarmored_barbarian'
   attacks?: CharacterAttack[];
   spells?: string[];
+  preparedSpells?: string[];
   spellChoices: SpellChoiceState[];
   backgroundChoices?: BackgroundChoiceState | null;
   features?: any[];

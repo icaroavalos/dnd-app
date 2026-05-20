@@ -10,6 +10,7 @@ import {
   classResourceLimit,
   filterSelectedFeatures,
   normalizeSubclassName,
+  stableFeatureId,
 } from '../lib/character-rules';
 
 interface PendingLevelUp {
@@ -30,6 +31,7 @@ interface CharacterState {
   pendingLevelUp: PendingLevelUp | null;
   itemsCatalog: any[];
   spellsCatalog: any[];
+  classSpellsCatalog: Record<string, string[]>;
   featsCatalog: any[];
   isSaving: boolean;
 
@@ -49,6 +51,8 @@ interface CharacterState {
   spendHitDie: (roll: number) => void;
   addSpell: (spell: any) => void;
   removeSpell: (spellId: string) => void;
+  addClassSpell: (spell: any) => void;
+  replaceSpell: (oldSpellId: string, newSpell: any) => void;
   toggleSkillProficiency: (skill: string, isClassChoice?: boolean) => void;
   consumeFeatureResource: (featureId: string) => void;
   setFeaturesByKind: (kind: Feature['kind'], features: Feature[]) => void;
@@ -200,6 +204,7 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
   pendingLevelUp: null,
   itemsCatalog: [],
   spellsCatalog: [],
+  classSpellsCatalog: {},
   featsCatalog: [],
   isSaving: false,
 
@@ -216,8 +221,26 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
 
   fetchSpellsCatalog: async () => {
     try {
-      const res = await getSpells();
-      set({ spellsCatalog: res.results || [] });
+      const [spellsRes, classSpellsRes] = await Promise.all([
+        getSpells(),
+        getClassSpells()
+      ]);
+      
+      const formattedClassSpells: Record<string, string[]> = {};
+      const results = classSpellsRes.results || [];
+      if (Array.isArray(results)) {
+        results.forEach((item: any) => {
+          if (item && item.className && item.classSource) {
+            const key = `${item.className.toLowerCase()}|${item.classSource.toLowerCase()}`;
+            formattedClassSpells[key] = (item.spells || []).map((s: any) => s.name);
+          }
+        });
+      }
+
+      set({ 
+        spellsCatalog: spellsRes.results || [],
+        classSpellsCatalog: formattedClassSpells
+      });
     } catch (err) {
       console.error('Failed to load spells catalog in store:', err);
     }
@@ -537,8 +560,24 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
     character: { ...state.character, spells: [...state.character.spells, spell] }
   })),
 
+  addClassSpell: (spell) => set((state) => ({
+    character: { 
+      ...state.character, 
+      spells: [...state.character.spells, { ...spell, originKind: 'class', source: 'XPHB' }] 
+    }
+  })),
+
   removeSpell: (spellId) => set((state) => ({
     character: { ...state.character, spells: state.character.spells.filter(s => (s.id || s.name) !== spellId) }
+  })),
+
+  replaceSpell: (oldSpellId, newSpell) => set((state) => ({
+    character: {
+      ...state.character,
+      spells: state.character.spells.map(s => 
+        (s.id || s.name) === oldSpellId ? { ...newSpell, originKind: 'class', source: 'XPHB' } : s
+      )
+    }
   })),
 
   toggleSkillProficiency: (skill, isClassChoice) => set((state) => {
@@ -662,7 +701,7 @@ export const useCharacterStore = create<CharacterState>()((set, get) => ({
       const dieSize = CLASS_HIT_DIE[primaryClass.toLowerCase()] || 8;
       const defaultHpGain = Math.max(1, Math.floor(dieSize / 2) + 1 + conMod);
       const newFeatures = (options.features || []).map((f: any) => ({ 
-        id: f.id || `${f.name}-${nextLevel}`.toLowerCase().replace(/\s+/g, '-'), 
+        id: stableFeatureId(f, nextLevel), 
         name: f.name, 
         kind: 'class', 
         description: parse5eEntry(f.entries || f.description), 

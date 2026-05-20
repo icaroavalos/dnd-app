@@ -12,8 +12,11 @@ import { ChoiceSelector } from '../ui/ChoiceSelector';
 import {
   buildExclusiveFeatureChoices,
   buildFeatureTextChoices,
+  addCurrencies,
   instantiateStartingEquipment,
   normalizeClassSavingThrows,
+  slotsWithoutSourceItems,
+  subtractCurrencies,
 } from '../../lib/character-rules';
 
 const SKILLS = [
@@ -102,7 +105,13 @@ export const ClassSelect: React.FC = () => {
 
   const handleEquipmentChange = (option: string) => {
     if (!selectedClass || !selectedClass.startingEquipment) return;
-    const equipment = instantiateStartingEquipment(selectedClass.startingEquipment, option, allItems, 'class', character.equippedSlots || {});
+    const baseSlots = slotsWithoutSourceItems(character.equippedSlots || {}, character.inventory || [], 'class');
+    const equipment = instantiateStartingEquipment(selectedClass.startingEquipment, option, allItems, 'class', baseSlots);
+    const previousOption = character.equipmentChoices?.class;
+    const previousCurrency = previousOption
+      ? instantiateStartingEquipment(selectedClass.startingEquipment, previousOption, allItems, 'class').currency
+      : undefined;
+    const nextCurrency = addCurrencies(subtractCurrencies(character.currency, previousCurrency), equipment.currency);
 
     updateCharacter({
       equipmentChoices: { ...character.equipmentChoices, class: option },
@@ -115,18 +124,10 @@ export const ClassSelect: React.FC = () => {
         ...equipment.equippedItems
       ],
       equippedSlots: {
-        ...Object.fromEntries(Object.entries(character.equippedSlots || {}).filter(([, id]) =>
-          !character.inventory.some((item: any) => item.source === 'class' && item.instanceId === id)
-        )),
+        ...baseSlots,
         ...equipment.equippedSlots
       },
-      currency: {
-        cp: (character.currency?.cp || 0) + equipment.currency.cp,
-        sp: (character.currency?.sp || 0) + equipment.currency.sp,
-        ep: (character.currency?.ep || 0) + equipment.currency.ep,
-        gp: (character.currency?.gp || 0) + equipment.currency.gp,
-        pp: (character.currency?.pp || 0) + equipment.currency.pp
-      }
+      currency: nextCurrency
     });
   };
 

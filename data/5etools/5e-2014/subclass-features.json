@@ -2,6 +2,7 @@
   "ruleset": "5e-2014",
   "results": [
     {
+      "id": "alchemist-artificer-alchemist-3-tce",
       "name": "Alchemist",
       "source": "TCE",
       "className": "Artificer",
@@ -26,6 +27,7 @@
       ]
     },
     {
+      "id": "alchemist-spells-artificer-alchemist-3-tce",
       "name": "Alchemist Spells",
       "source": "TCE",
       "className": "Artificer",
@@ -72,6 +74,7 @@
       ]
     },
     {
+      "id": "experimental-elixir-artificer-alchemist-3-tce",
       "name": "Experimental Elixir",
       "source": "TCE",
       "className": "Artificer",
@@ -125,6 +128,7 @@
       ]
     },
     {
+      "id": "tool-proficiency-artificer-alchemist-3-tce",
       "name": "Tool Proficiency",
       "source": "TCE",
       "className": "Artificer",
@@ -137,6 +141,7 @@
       ]
     },
     {
+      "id": "alchemical-savant-artificer-alchemist-5-tce",
       "name": "Alchemical Savant",
       "source": "TCE",
       "className": "Artificer",
@@ -149,6 +154,7 @@
       ]
     },
     {
+      "id": "restorative-reagents-artificer-alchemist-9-tce",
       "name": "Restorative Reagents",
       "source": "TCE",
       "className": "Artificer",
@@ -168,6 +174,7 @@
       ]
     },
     {
+      "id": "chemical-mastery-artificer-alchemist-15-tce",
       "name": "Chemical Mastery",
       "source": "TCE",
       "className": "Artificer",
@@ -187,6 +194,7 @@
       ]
     },
     {
+      "id": "armorer-artificer-armorer-3-tce",
       "name": "Armorer",
       "source": "TCE",
       "className": "Artificer",
@@ -215,6 +223,7 @@
       ]
     },
     {
+      "id": "dampening-field-artificer-armorer-3-tce",
       "name": "Dampening Field",
       "source": "TCE",
       "className": "Artificer",
@@ -227,6 +236,7 @@
       ]
     },
     {
+      "id": "defensive-field-artificer-armorer-3-tce",
       "name": "Defensive Field",
       "source": "TCE",
       "className": "Artificer",
@@ -239,6 +249,7 @@
       ]
     },
     {
+      "id": "lightning-launcher-artificer-armorer-3-tce",
       "name": "Lightning Launcher",
       "source": "TCE",
       "className": "Artificer",
@@ -251,6 +262,7 @@
       ]
     },
     {
+      "id": "powered-steps-artificer-armorer-3-tce",
       "name": "Powered Steps",
       "source": "TCE",
       "className": "Artificer",
@@ -263,6 +275,7 @@
       ]
     },
     {
+      "id": "thunder-gauntlets-artificer-armorer-3-tce",
       "name": "Thunder Gauntlets",
       "source": "TCE",
       "className": "Artificer",
@@ -275,6 +288,7 @@
       ]
     },
     {
+      "id": "arcane-armor-artificer-armorer-3-tce",
       "name": "Arcane Armor",
       "source": "TCE",
       "className": "Artificer",
@@ -298,6 +312,7 @@
       ]
     },
     {
+      "id": "armor-model-artificer-armorer-3-tce",
       "name": "Armor Model",
       "source": "TCE",
       "className": "Artificer",
@@ -364,6 +379,7 @@
       ]
     },
     {
+      "id": "armorer-spells-artificer-armorer-3-tce",
       "name": "Armorer Spells",
       "source": "TCE",
       "className": "Artificer",
@@ -411,6 +427,7 @@
       ]
     },
     {
+      "id": "tools-of-the-trade-artificer-armorer-3-tce",
       "name": "Tools of the Trade",
       "source": "TCE",
       "className": "Artificer",
@@ -424,6 +441,7 @@
       ]
     },
     {
+      "id": "extra-attack-artificer-armorer-5-tce",
       "name": "Extra Attack",
       "source": "TCE",
       "className": "Artificer",
@@ -437,6 +455,7 @@
       ]
     },
     {
+      "id": "armor-modifications-artificer-armorer-9-tce",
       "name": "Armor Modifications",
       "source": "TCE",
       "className": "Artificer",
@@ -450,6 +469,7 @@
       ]
     },
     {
+      "id": "guardian-artificer-armorer-15-tce",
       "name": "Guardian",
       "source": "TCE",
       "className": "Artificer",
@@ -463,6 +483,7 @@
       ]
     },
     {
+      "id": "infiltrator-artificer-armorer-15-tce",
       "name": "Infiltrator",
       "source": "TCE",
       "className": "Artificer",
@@ -475,6 +496,7 @@
       ]
     },
     {
+      "id": "perfected-armor-artificer-armorer-15-tce",
       "name": "Perfected Armor",
       "source": "TCE",
       "className": "Artificer",
@@ -496,6 +518,7 @@
       ]
     },
     {
+      "id": "artillerist-artificer-artillerist-3-tce",
       "name": "Artillerist",
       "source": "TCE",
       "className": "Artificer",
@@ -521,6 +544,7 @@
       ]
     },
     {
+      "id": "artillerist-spells-artificer-artillerist-3-tce",
       "name": "Artillerist Spells",
       "source": "TCE",
       "className": "Artificer",
@@ -567,6 +591,7 @@
       ]
     },
     {
+      "id": "eldritch-cannon-artificer-artillerist-3-tce",
       "name": "Eldritch Cannon",
       "source": "TCE",
       "className": "Artificer",
@@ -608,6 +633,7 @@
       ]
     },
     {
+      "id": "tool-proficiency-artificer-artillerist-3-tce",
       "name": "Tool Proficiency",
       "source": "TCE",
       "className": "Artificer",
@@ -620,6 +646,7 @@
       ]
     },
     {
+      "id": "arcane-firearm-artificer-artillerist-5-tce",
       "name": "Arcane Firearm",
       "source": "TCE",
       "className": "Artificer",
@@ -633,6 +660,7 @@
       ]
     },
     {
+      "id": "explosive-cannon-artificer-artillerist-9-tce",
       "name": "Explosive Cannon",
       "source": "TCE",
       "className": "Artificer",
@@ -652,6 +680,7 @@
       ]
     },
     {
+      "id": "fortified-position-artificer-artillerist-15-tce",
       "name": "Fortified Position",
       "source": "TCE",
       "className": "Artificer",
@@ -671,6 +700,7 @@
       ]
     },
     {
+      "id": "battle-smith-artificer-battle-smith-3-tce",
       "name": "Battle Smith",
       "source": "TCE",
       "className": "Artificer",
@@ -700,6 +730,7 @@
       ]
     },
     {
+      "id": "battle-ready-artificer-battle-smith-3-tce",
       "name": "Battle Ready",
       "source": "TCE",
       "className": "Artificer",
@@ -719,6 +750,7 @@
       ]
     },
     {
+      "id": "battle-smith-spells-artificer-battle-smith-3-tce",
       "name": "Battle Smith Spells",
       "source": "TCE",
       "className": "Artificer",
@@ -765,6 +797,7 @@
       ]
     },
     {
+      "id": "steel-defender-artificer-battle-smith-3-tce",
       "name": "Steel Defender",
       "source": "TCE",
       "className": "Artificer",
@@ -780,6 +813,7 @@
       ]
     },
     {
+      "id": "tool-proficiency-artificer-battle-smith-3-tce",
       "name": "Tool Proficiency",
       "source": "TCE",
       "className": "Artificer",
@@ -792,6 +826,7 @@
       ]
     },
     {
+      "id": "extra-attack-artificer-battle-smith-5-tce",
       "name": "Extra Attack",
       "source": "TCE",
       "className": "Artificer",
@@ -804,6 +839,7 @@
       ]
     },
     {
+      "id": "arcane-jolt-artificer-battle-smith-9-tce",
       "name": "Arcane Jolt",
       "source": "TCE",
       "className": "Artificer",
@@ -824,6 +860,7 @@
       ]
     },
     {
+      "id": "improved-defender-artificer-battle-smith-15-tce",
       "name": "Improved Defender",
       "source": "TCE",
       "className": "Artificer",
@@ -844,6 +881,7 @@
       ]
     },
     {
+      "id": "giant-power-barbarian-giant-3-bgg",
       "name": "Giant Power",
       "source": "BGG",
       "className": "Barbarian",
@@ -857,6 +895,7 @@
       ]
     },
     {
+      "id": "giant-s-havoc-barbarian-giant-3-bgg",
       "name": "Giant's Havoc",
       "source": "BGG",
       "className": "Barbarian",
@@ -886,6 +925,7 @@
       ]
     },
     {
+      "id": "path-of-the-giant-barbarian-giant-3-bgg",
       "name": "Path of the Giant",
       "source": "BGG",
       "className": "Barbarian",
@@ -906,6 +946,7 @@
       ]
     },
     {
+      "id": "elemental-cleaver-barbarian-giant-6-bgg",
       "name": "Elemental Cleaver",
       "source": "BGG",
       "className": "Barbarian",
@@ -921,6 +962,7 @@
       ]
     },
     {
+      "id": "mighty-impel-barbarian-giant-10-bgg",
       "name": "Mighty Impel",
       "source": "BGG",
       "className": "Barbarian",
@@ -935,6 +977,7 @@
       ]
     },
     {
+      "id": "demiurgic-colossus-barbarian-giant-14-bgg",
       "name": "Demiurgic Colossus",
       "source": "BGG",
       "className": "Barbarian",
@@ -949,6 +992,7 @@
       ]
     },
     {
+      "id": "path-of-the-berserker-barbarian-berserker-3-phb",
       "name": "Path of the Berserker",
       "source": "PHB",
       "className": "Barbarian",
@@ -965,6 +1009,7 @@
       ]
     },
     {
+      "id": "frenzy-barbarian-berserker-3-phb",
       "name": "Frenzy",
       "source": "PHB",
       "className": "Barbarian",
@@ -977,6 +1022,7 @@
       ]
     },
     {
+      "id": "mindless-rage-barbarian-berserker-6-phb",
       "name": "Mindless Rage",
       "source": "PHB",
       "className": "Barbarian",
@@ -989,6 +1035,7 @@
       ]
     },
     {
+      "id": "intimidating-presence-barbarian-berserker-10-phb",
       "name": "Intimidating Presence",
       "source": "PHB",
       "className": "Barbarian",
@@ -1002,6 +1049,7 @@
       ]
     },
     {
+      "id": "retaliation-barbarian-berserker-14-phb",
       "name": "Retaliation",
       "source": "PHB",
       "className": "Barbarian",
@@ -1014,6 +1062,7 @@
       ]
     },
     {
+      "id": "bear-barbarian-totem-warrior-3-phb",
       "name": "Bear",
       "source": "PHB",
       "className": "Barbarian",
@@ -1026,6 +1075,7 @@
       ]
     },
     {
+      "id": "eagle-barbarian-totem-warrior-3-phb",
       "name": "Eagle",
       "source": "PHB",
       "className": "Barbarian",
@@ -1038,6 +1088,7 @@
       ]
     },
     {
+      "id": "elk-barbarian-totem-warrior-3-scag",
       "name": "Elk",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1050,6 +1101,7 @@
       ]
     },
     {
+      "id": "path-of-the-totem-warrior-barbarian-totem-warrior-3-phb",
       "name": "Path of the Totem Warrior",
       "source": "PHB",
       "className": "Barbarian",
@@ -1071,6 +1123,7 @@
       ]
     },
     {
+      "id": "tiger-barbarian-totem-warrior-3-scag",
       "name": "Tiger",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1083,6 +1136,7 @@
       ]
     },
     {
+      "id": "wolf-barbarian-totem-warrior-3-phb",
       "name": "Wolf",
       "source": "PHB",
       "className": "Barbarian",
@@ -1095,6 +1149,7 @@
       ]
     },
     {
+      "id": "spirit-seeker-barbarian-totem-warrior-3-phb",
       "name": "Spirit Seeker",
       "source": "PHB",
       "className": "Barbarian",
@@ -1107,6 +1162,7 @@
       ]
     },
     {
+      "id": "totem-spirit-barbarian-totem-warrior-3-phb",
       "name": "Totem Spirit",
       "source": "PHB",
       "className": "Barbarian",
@@ -1146,6 +1202,7 @@
       ]
     },
     {
+      "id": "bear-barbarian-totem-warrior-6-phb",
       "name": "Bear",
       "source": "PHB",
       "className": "Barbarian",
@@ -1158,6 +1215,7 @@
       ]
     },
     {
+      "id": "eagle-barbarian-totem-warrior-6-phb",
       "name": "Eagle",
       "source": "PHB",
       "className": "Barbarian",
@@ -1170,6 +1228,7 @@
       ]
     },
     {
+      "id": "elk-barbarian-totem-warrior-6-scag",
       "name": "Elk",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1182,6 +1241,7 @@
       ]
     },
     {
+      "id": "tiger-barbarian-totem-warrior-6-scag",
       "name": "Tiger",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1194,6 +1254,7 @@
       ]
     },
     {
+      "id": "wolf-barbarian-totem-warrior-6-phb",
       "name": "Wolf",
       "source": "PHB",
       "className": "Barbarian",
@@ -1206,6 +1267,7 @@
       ]
     },
     {
+      "id": "aspect-of-the-beast-barbarian-totem-warrior-6-phb",
       "name": "Aspect of the Beast",
       "source": "PHB",
       "className": "Barbarian",
@@ -1244,6 +1306,7 @@
       ]
     },
     {
+      "id": "spirit-walker-barbarian-totem-warrior-10-phb",
       "name": "Spirit Walker",
       "source": "PHB",
       "className": "Barbarian",
@@ -1256,6 +1319,7 @@
       ]
     },
     {
+      "id": "bear-barbarian-totem-warrior-14-phb",
       "name": "Bear",
       "source": "PHB",
       "className": "Barbarian",
@@ -1268,6 +1332,7 @@
       ]
     },
     {
+      "id": "eagle-barbarian-totem-warrior-14-phb",
       "name": "Eagle",
       "source": "PHB",
       "className": "Barbarian",
@@ -1280,6 +1345,7 @@
       ]
     },
     {
+      "id": "elk-barbarian-totem-warrior-14-scag",
       "name": "Elk",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1292,6 +1358,7 @@
       ]
     },
     {
+      "id": "tiger-barbarian-totem-warrior-14-scag",
       "name": "Tiger",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1304,6 +1371,7 @@
       ]
     },
     {
+      "id": "wolf-barbarian-totem-warrior-14-phb",
       "name": "Wolf",
       "source": "PHB",
       "className": "Barbarian",
@@ -1316,6 +1384,7 @@
       ]
     },
     {
+      "id": "totemic-attunement-barbarian-totem-warrior-14-phb",
       "name": "Totemic Attunement",
       "source": "PHB",
       "className": "Barbarian",
@@ -1354,6 +1423,7 @@
       ]
     },
     {
+      "id": "path-of-the-battlerager-barbarian-battlerager-3-scag",
       "name": "Path of the Battlerager",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1374,6 +1444,7 @@
       ]
     },
     {
+      "id": "battlerager-armor-barbarian-battlerager-3-scag",
       "name": "Battlerager Armor",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1388,6 +1459,7 @@
       ]
     },
     {
+      "id": "restriction-dwarves-only-barbarian-battlerager-3-scag",
       "name": "Restriction—Dwarves Only",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1401,6 +1473,7 @@
       ]
     },
     {
+      "id": "reckless-abandon-barbarian-battlerager-6-scag",
       "name": "Reckless Abandon",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1413,6 +1486,7 @@
       ]
     },
     {
+      "id": "battlerager-charge-barbarian-battlerager-10-scag",
       "name": "Battlerager Charge",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1425,6 +1499,7 @@
       ]
     },
     {
+      "id": "spiked-retribution-barbarian-battlerager-14-scag",
       "name": "Spiked Retribution",
       "source": "SCAG",
       "className": "Barbarian",
@@ -1437,6 +1512,7 @@
       ]
     },
     {
+      "id": "path-of-the-beast-barbarian-beast-3-tce",
       "name": "Path of the Beast",
       "source": "TCE",
       "className": "Barbarian",
@@ -1484,6 +1560,7 @@
       ]
     },
     {
+      "id": "form-of-the-beast-barbarian-beast-3-tce",
       "name": "Form of the Beast",
       "source": "TCE",
       "className": "Barbarian",
@@ -1519,6 +1596,7 @@
       ]
     },
     {
+      "id": "bestial-soul-barbarian-beast-6-tce",
       "name": "Bestial Soul",
       "source": "TCE",
       "className": "Barbarian",
@@ -1541,6 +1619,7 @@
       ]
     },
     {
+      "id": "infectious-fury-barbarian-beast-10-tce",
       "name": "Infectious Fury",
       "source": "TCE",
       "className": "Barbarian",
@@ -1562,6 +1641,7 @@
       ]
     },
     {
+      "id": "call-the-hunt-barbarian-beast-14-tce",
       "name": "Call the Hunt",
       "source": "TCE",
       "className": "Barbarian",
@@ -1577,6 +1657,7 @@
       ]
     },
     {
+      "id": "path-of-wild-magic-barbarian-wild-magic-3-tce",
       "name": "Path of Wild Magic",
       "source": "TCE",
       "className": "Barbarian",
@@ -1597,6 +1678,7 @@
       ]
     },
     {
+      "id": "magic-awareness-barbarian-wild-magic-3-tce",
       "name": "Magic Awareness",
       "source": "TCE",
       "className": "Barbarian",
@@ -1611,6 +1693,7 @@
       ]
     },
     {
+      "id": "wild-surge-barbarian-wild-magic-3-tce",
       "name": "Wild Surge",
       "source": "TCE",
       "className": "Barbarian",
@@ -1676,6 +1759,7 @@
       ]
     },
     {
+      "id": "bolstering-magic-barbarian-wild-magic-6-tce",
       "name": "Bolstering Magic",
       "source": "TCE",
       "className": "Barbarian",
@@ -1697,6 +1781,7 @@
       ]
     },
     {
+      "id": "unstable-backlash-barbarian-wild-magic-10-tce",
       "name": "Unstable Backlash",
       "source": "TCE",
       "className": "Barbarian",
@@ -1710,6 +1795,7 @@
       ]
     },
     {
+      "id": "controlled-surge-barbarian-wild-magic-14-tce",
       "name": "Controlled Surge",
       "source": "TCE",
       "className": "Barbarian",
@@ -1723,6 +1809,7 @@
       ]
     },
     {
+      "id": "path-of-the-ancestral-guardian-barbarian-ancestral-guardian-3-xge",
       "name": "Path of the Ancestral Guardian",
       "source": "XGE",
       "className": "Barbarian",
@@ -1740,6 +1827,7 @@
       ]
     },
     {
+      "id": "ancestral-protectors-barbarian-ancestral-guardian-3-xge",
       "name": "Ancestral Protectors",
       "source": "XGE",
       "className": "Barbarian",
@@ -1752,6 +1840,7 @@
       ]
     },
     {
+      "id": "spirit-shield-barbarian-ancestral-guardian-6-xge",
       "name": "Spirit Shield",
       "source": "XGE",
       "className": "Barbarian",
@@ -1765,6 +1854,7 @@
       ]
     },
     {
+      "id": "consult-the-spirits-barbarian-ancestral-guardian-10-xge",
       "name": "Consult the Spirits",
       "source": "XGE",
       "className": "Barbarian",
@@ -1778,6 +1868,7 @@
       ]
     },
     {
+      "id": "vengeful-ancestors-barbarian-ancestral-guardian-14-xge",
       "name": "Vengeful Ancestors",
       "source": "XGE",
       "className": "Barbarian",
@@ -1790,6 +1881,7 @@
       ]
     },
     {
+      "id": "desert-barbarian-storm-herald-3-xge",
       "name": "Desert",
       "source": "XGE",
       "className": "Barbarian",
@@ -1802,6 +1894,7 @@
       ]
     },
     {
+      "id": "path-of-the-storm-herald-barbarian-storm-herald-3-xge",
       "name": "Path of the Storm Herald",
       "source": "XGE",
       "className": "Barbarian",
@@ -1819,6 +1912,7 @@
       ]
     },
     {
+      "id": "sea-barbarian-storm-herald-3-xge",
       "name": "Sea",
       "source": "XGE",
       "className": "Barbarian",
@@ -1831,6 +1925,7 @@
       ]
     },
     {
+      "id": "tundra-barbarian-storm-herald-3-xge",
       "name": "Tundra",
       "source": "XGE",
       "className": "Barbarian",
@@ -1843,6 +1938,7 @@
       ]
     },
     {
+      "id": "storm-aura-barbarian-storm-herald-3-xge",
       "name": "Storm Aura",
       "source": "XGE",
       "className": "Barbarian",
@@ -1874,6 +1970,7 @@
       ]
     },
     {
+      "id": "desert-barbarian-storm-herald-6-xge",
       "name": "Desert",
       "source": "XGE",
       "className": "Barbarian",
@@ -1886,6 +1983,7 @@
       ]
     },
     {
+      "id": "sea-barbarian-storm-herald-6-xge",
       "name": "Sea",
       "source": "XGE",
       "className": "Barbarian",
@@ -1898,6 +1996,7 @@
       ]
     },
     {
+      "id": "tundra-barbarian-storm-herald-6-xge",
       "name": "Tundra",
       "source": "XGE",
       "className": "Barbarian",
@@ -1910,6 +2009,7 @@
       ]
     },
     {
+      "id": "storm-soul-barbarian-storm-herald-6-xge",
       "name": "Storm Soul",
       "source": "XGE",
       "className": "Barbarian",
@@ -1939,6 +2039,7 @@
       ]
     },
     {
+      "id": "shielding-storm-barbarian-storm-herald-10-xge",
       "name": "Shielding Storm",
       "source": "XGE",
       "className": "Barbarian",
@@ -1951,6 +2052,7 @@
       ]
     },
     {
+      "id": "desert-barbarian-storm-herald-14-xge",
       "name": "Desert",
       "source": "XGE",
       "className": "Barbarian",
@@ -1963,6 +2065,7 @@
       ]
     },
     {
+      "id": "sea-barbarian-storm-herald-14-xge",
       "name": "Sea",
       "source": "XGE",
       "className": "Barbarian",
@@ -1975,6 +2078,7 @@
       ]
     },
     {
+      "id": "tundra-barbarian-storm-herald-14-xge",
       "name": "Tundra",
       "source": "XGE",
       "className": "Barbarian",
@@ -1987,6 +2091,7 @@
       ]
     },
     {
+      "id": "raging-storm-barbarian-storm-herald-14-xge",
       "name": "Raging Storm",
       "source": "XGE",
       "className": "Barbarian",
@@ -2016,6 +2121,7 @@
       ]
     },
     {
+      "id": "path-of-the-zealot-barbarian-zealot-3-xge",
       "name": "Path of the Zealot",
       "source": "XGE",
       "className": "Barbarian",
@@ -2037,6 +2143,7 @@
       ]
     },
     {
+      "id": "divine-fury-barbarian-zealot-3-xge",
       "name": "Divine Fury",
       "source": "XGE",
       "className": "Barbarian",
@@ -2049,6 +2156,7 @@
       ]
     },
     {
+      "id": "warrior-of-the-gods-barbarian-zealot-3-xge",
       "name": "Warrior of the Gods",
       "source": "XGE",
       "className": "Barbarian",
@@ -2061,6 +2169,7 @@
       ]
     },
     {
+      "id": "fanatical-focus-barbarian-zealot-6-xge",
       "name": "Fanatical Focus",
       "source": "XGE",
       "className": "Barbarian",
@@ -2073,6 +2182,7 @@
       ]
     },
     {
+      "id": "zealous-presence-barbarian-zealot-10-xge",
       "name": "Zealous Presence",
       "source": "XGE",
       "className": "Barbarian",
@@ -2086,6 +2196,7 @@
       ]
     },
     {
+      "id": "rage-beyond-death-barbarian-zealot-14-xge",
       "name": "Rage beyond Death",
       "source": "XGE",
       "className": "Barbarian",
@@ -2099,6 +2210,7 @@
       ]
     },
     {
+      "id": "college-of-lore-bard-lore-3-phb",
       "name": "College of Lore",
       "source": "PHB",
       "className": "Bard",
@@ -2121,6 +2233,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-bard-lore-3-phb",
       "name": "Bonus Proficiencies",
       "source": "PHB",
       "className": "Bard",
@@ -2133,6 +2246,7 @@
       ]
     },
     {
+      "id": "cutting-words-bard-lore-3-phb",
       "name": "Cutting Words",
       "source": "PHB",
       "className": "Bard",
@@ -2145,6 +2259,7 @@
       ]
     },
     {
+      "id": "additional-magical-secrets-bard-lore-6-phb",
       "name": "Additional Magical Secrets",
       "source": "PHB",
       "className": "Bard",
@@ -2157,6 +2272,7 @@
       ]
     },
     {
+      "id": "peerless-skill-bard-lore-14-phb",
       "name": "Peerless Skill",
       "source": "PHB",
       "className": "Bard",
@@ -2169,6 +2285,7 @@
       ]
     },
     {
+      "id": "college-of-valor-bard-valor-3-phb",
       "name": "College of Valor",
       "source": "PHB",
       "className": "Bard",
@@ -2189,6 +2306,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-bard-valor-3-phb",
       "name": "Bonus Proficiencies",
       "source": "PHB",
       "className": "Bard",
@@ -2201,6 +2319,7 @@
       ]
     },
     {
+      "id": "combat-inspiration-bard-valor-3-phb",
       "name": "Combat Inspiration",
       "source": "PHB",
       "className": "Bard",
@@ -2213,6 +2332,7 @@
       ]
     },
     {
+      "id": "extra-attack-bard-valor-6-phb",
       "name": "Extra Attack",
       "source": "PHB",
       "className": "Bard",
@@ -2225,6 +2345,7 @@
       ]
     },
     {
+      "id": "battle-magic-bard-valor-14-phb",
       "name": "Battle Magic",
       "source": "PHB",
       "className": "Bard",
@@ -2237,6 +2358,7 @@
       ]
     },
     {
+      "id": "college-of-creation-bard-creation-3-tce",
       "name": "College of Creation",
       "source": "TCE",
       "className": "Bard",
@@ -2259,6 +2381,7 @@
       ]
     },
     {
+      "id": "mote-of-potential-bard-creation-3-tce",
       "name": "Mote of Potential",
       "source": "TCE",
       "className": "Bard",
@@ -2294,6 +2417,7 @@
       ]
     },
     {
+      "id": "performance-of-creation-bard-creation-3-tce",
       "name": "Performance of Creation",
       "source": "TCE",
       "className": "Bard",
@@ -2309,6 +2433,7 @@
       ]
     },
     {
+      "id": "animating-performance-bard-creation-6-tce",
       "name": "Animating Performance",
       "source": "TCE",
       "className": "Bard",
@@ -2325,6 +2450,7 @@
       ]
     },
     {
+      "id": "creative-crescendo-bard-creation-14-tce",
       "name": "Creative Crescendo",
       "source": "TCE",
       "className": "Bard",
@@ -2339,6 +2465,7 @@
       ]
     },
     {
+      "id": "college-of-eloquence-bard-eloquence-3-tce",
       "name": "College of Eloquence",
       "source": "TCE",
       "className": "Bard",
@@ -2359,6 +2486,7 @@
       ]
     },
     {
+      "id": "silver-tongue-bard-eloquence-3-tce",
       "name": "Silver Tongue",
       "source": "TCE",
       "className": "Bard",
@@ -2372,6 +2500,7 @@
       ]
     },
     {
+      "id": "unsettling-words-bard-eloquence-3-tce",
       "name": "Unsettling Words",
       "source": "TCE",
       "className": "Bard",
@@ -2385,6 +2514,7 @@
       ]
     },
     {
+      "id": "unfailing-inspiration-bard-eloquence-6-tce",
       "name": "Unfailing Inspiration",
       "source": "TCE",
       "className": "Bard",
@@ -2398,6 +2528,7 @@
       ]
     },
     {
+      "id": "universal-speech-bard-eloquence-6-tce",
       "name": "Universal Speech",
       "source": "TCE",
       "className": "Bard",
@@ -2412,6 +2543,7 @@
       ]
     },
     {
+      "id": "infectious-inspiration-bard-eloquence-14-tce",
       "name": "Infectious Inspiration",
       "source": "TCE",
       "className": "Bard",
@@ -2426,6 +2558,7 @@
       ]
     },
     {
+      "id": "college-of-spirits-bard-spirits-3-vrgr",
       "name": "College of Spirits",
       "source": "VRGR",
       "className": "Bard",
@@ -2450,6 +2583,7 @@
       ]
     },
     {
+      "id": "guiding-whispers-bard-spirits-3-vrgr",
       "name": "Guiding Whispers",
       "source": "VRGR",
       "className": "Bard",
@@ -2463,6 +2597,7 @@
       ]
     },
     {
+      "id": "spiritual-focus-bard-spirits-3-vrgr",
       "name": "Spiritual Focus",
       "source": "VRGR",
       "className": "Bard",
@@ -2477,6 +2612,7 @@
       ]
     },
     {
+      "id": "tales-from-beyond-bard-spirits-3-vrgr",
       "name": "Tales from Beyond",
       "source": "VRGR",
       "className": "Bard",
@@ -2560,6 +2696,7 @@
       ]
     },
     {
+      "id": "spirit-session-bard-spirits-6-vrgr",
       "name": "Spirit Session",
       "source": "VRGR",
       "className": "Bard",
@@ -2575,6 +2712,7 @@
       ]
     },
     {
+      "id": "mystical-connection-bard-spirits-14-vrgr",
       "name": "Mystical Connection",
       "source": "VRGR",
       "className": "Bard",
@@ -2595,6 +2733,7 @@
       ]
     },
     {
+      "id": "college-of-glamour-bard-glamour-3-xge",
       "name": "College of Glamour",
       "source": "XGE",
       "className": "Bard",
@@ -2616,6 +2755,7 @@
       ]
     },
     {
+      "id": "enthralling-performance-bard-glamour-3-xge",
       "name": "Enthralling Performance",
       "source": "XGE",
       "className": "Bard",
@@ -2631,6 +2771,7 @@
       ]
     },
     {
+      "id": "mantle-of-inspiration-bard-glamour-3-xge",
       "name": "Mantle of Inspiration",
       "source": "XGE",
       "className": "Bard",
@@ -2645,6 +2786,7 @@
       ]
     },
     {
+      "id": "mantle-of-majesty-bard-glamour-6-xge",
       "name": "Mantle of Majesty",
       "source": "XGE",
       "className": "Bard",
@@ -2659,6 +2801,7 @@
       ]
     },
     {
+      "id": "unbreakable-majesty-bard-glamour-14-xge",
       "name": "Unbreakable Majesty",
       "source": "XGE",
       "className": "Bard",
@@ -2673,6 +2816,7 @@
       ]
     },
     {
+      "id": "college-of-swords-bard-swords-3-xge",
       "name": "College of Swords",
       "source": "XGE",
       "className": "Bard",
@@ -2699,6 +2843,7 @@
       ]
     },
     {
+      "id": "defensive-flourish-bard-swords-3-xge",
       "name": "Defensive Flourish",
       "source": "XGE",
       "className": "Bard",
@@ -2711,6 +2856,7 @@
       ]
     },
     {
+      "id": "mobile-flourish-bard-swords-3-xge",
       "name": "Mobile Flourish",
       "source": "XGE",
       "className": "Bard",
@@ -2723,6 +2869,7 @@
       ]
     },
     {
+      "id": "slashing-flourish-bard-swords-3-xge",
       "name": "Slashing Flourish",
       "source": "XGE",
       "className": "Bard",
@@ -2735,6 +2882,7 @@
       ]
     },
     {
+      "id": "blade-flourish-bard-swords-3-xge",
       "name": "Blade Flourish",
       "source": "XGE",
       "className": "Bard",
@@ -2765,6 +2913,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-bard-swords-3-xge",
       "name": "Bonus Proficiencies",
       "source": "XGE",
       "className": "Bard",
@@ -2778,6 +2927,7 @@
       ]
     },
     {
+      "id": "fighting-style-bard-swords-3-xge",
       "name": "Fighting Style",
       "source": "XGE",
       "className": "Bard",
@@ -2804,6 +2954,7 @@
       ]
     },
     {
+      "id": "extra-attack-bard-swords-6-xge",
       "name": "Extra Attack",
       "source": "XGE",
       "className": "Bard",
@@ -2816,6 +2967,7 @@
       ]
     },
     {
+      "id": "master-s-flourish-bard-swords-14-xge",
       "name": "Master's Flourish",
       "source": "XGE",
       "className": "Bard",
@@ -2828,6 +2980,7 @@
       ]
     },
     {
+      "id": "college-of-whispers-bard-whispers-3-xge",
       "name": "College of Whispers",
       "source": "XGE",
       "className": "Bard",
@@ -2849,6 +3002,7 @@
       ]
     },
     {
+      "id": "psychic-blades-bard-whispers-3-xge",
       "name": "Psychic Blades",
       "source": "XGE",
       "className": "Bard",
@@ -2863,6 +3017,7 @@
       ]
     },
     {
+      "id": "words-of-terror-bard-whispers-3-xge",
       "name": "Words of Terror",
       "source": "XGE",
       "className": "Bard",
@@ -2878,6 +3033,7 @@
       ]
     },
     {
+      "id": "mantle-of-whispers-bard-whispers-6-xge",
       "name": "Mantle of Whispers",
       "source": "XGE",
       "className": "Bard",
@@ -2894,6 +3050,7 @@
       ]
     },
     {
+      "id": "shadow-lore-bard-whispers-14-xge",
       "name": "Shadow Lore",
       "source": "XGE",
       "className": "Bard",
@@ -2911,6 +3068,7 @@
       ]
     },
     {
+      "id": "death-domain-cleric-death-1-dmg",
       "name": "Death Domain",
       "source": "DMG",
       "className": "Cleric",
@@ -2966,6 +3124,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-cleric-death-1-dmg",
       "name": "Bonus Proficiency",
       "source": "DMG",
       "className": "Cleric",
@@ -2978,6 +3137,7 @@
       ]
     },
     {
+      "id": "reaper-cleric-death-1-dmg",
       "name": "Reaper",
       "source": "DMG",
       "className": "Cleric",
@@ -2990,6 +3150,7 @@
       ]
     },
     {
+      "id": "channel-divinity-touch-of-death-cleric-death-2-dmg",
       "name": "Channel Divinity: Touch of Death",
       "source": "DMG",
       "className": "Cleric",
@@ -3003,6 +3164,7 @@
       ]
     },
     {
+      "id": "inescapable-destruction-cleric-death-6-dmg",
       "name": "Inescapable Destruction",
       "source": "DMG",
       "className": "Cleric",
@@ -3015,6 +3177,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-death-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3028,6 +3191,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-death-8-dmg",
       "name": "Divine Strike",
       "source": "DMG",
       "className": "Cleric",
@@ -3040,6 +3204,7 @@
       ]
     },
     {
+      "id": "improved-reaper-cleric-death-17-dmg",
       "name": "Improved Reaper",
       "source": "DMG",
       "className": "Cleric",
@@ -3052,6 +3217,7 @@
       ]
     },
     {
+      "id": "knowledge-domain-cleric-knowledge-1-phb",
       "name": "Knowledge Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3103,6 +3269,7 @@
       ]
     },
     {
+      "id": "blessings-of-knowledge-cleric-knowledge-1-phb",
       "name": "Blessings of Knowledge",
       "source": "PHB",
       "className": "Cleric",
@@ -3116,6 +3283,7 @@
       ]
     },
     {
+      "id": "channel-divinity-knowledge-of-the-ages-cleric-knowledge-2-phb",
       "name": "Channel Divinity: Knowledge of the Ages",
       "source": "PHB",
       "className": "Cleric",
@@ -3128,6 +3296,7 @@
       ]
     },
     {
+      "id": "channel-divinity-read-thoughts-cleric-knowledge-6-phb",
       "name": "Channel Divinity: Read Thoughts",
       "source": "PHB",
       "className": "Cleric",
@@ -3143,6 +3312,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-knowledge-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3156,6 +3326,7 @@
       ]
     },
     {
+      "id": "potent-spellcasting-cleric-knowledge-8-phb",
       "name": "Potent Spellcasting",
       "source": "PHB",
       "className": "Cleric",
@@ -3168,6 +3339,7 @@
       ]
     },
     {
+      "id": "visions-of-the-past-cleric-knowledge-17-phb",
       "name": "Visions of the Past",
       "source": "PHB",
       "className": "Cleric",
@@ -3205,6 +3377,7 @@
       ]
     },
     {
+      "id": "life-domain-cleric-life-1-phb",
       "name": "Life Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3260,6 +3433,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-cleric-life-1-phb",
       "name": "Bonus Proficiency",
       "source": "PHB",
       "className": "Cleric",
@@ -3272,6 +3446,7 @@
       ]
     },
     {
+      "id": "disciple-of-life-cleric-life-1-phb",
       "name": "Disciple of Life",
       "source": "PHB",
       "className": "Cleric",
@@ -3284,6 +3459,7 @@
       ]
     },
     {
+      "id": "channel-divinity-preserve-life-cleric-life-2-phb",
       "name": "Channel Divinity: Preserve Life",
       "source": "PHB",
       "className": "Cleric",
@@ -3297,6 +3473,7 @@
       ]
     },
     {
+      "id": "blessed-healer-cleric-life-6-phb",
       "name": "Blessed Healer",
       "source": "PHB",
       "className": "Cleric",
@@ -3309,6 +3486,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-life-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3322,6 +3500,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-life-8-phb",
       "name": "Divine Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -3334,6 +3513,7 @@
       ]
     },
     {
+      "id": "supreme-healing-cleric-life-17-phb",
       "name": "Supreme Healing",
       "source": "PHB",
       "className": "Cleric",
@@ -3346,6 +3526,7 @@
       ]
     },
     {
+      "id": "light-domain-cleric-light-1-phb",
       "name": "Light Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3401,6 +3582,7 @@
       ]
     },
     {
+      "id": "bonus-cantrip-cleric-light-1-phb",
       "name": "Bonus Cantrip",
       "source": "PHB",
       "className": "Cleric",
@@ -3413,6 +3595,7 @@
       ]
     },
     {
+      "id": "warding-flare-cleric-light-1-phb",
       "name": "Warding Flare",
       "source": "PHB",
       "className": "Cleric",
@@ -3426,6 +3609,7 @@
       ]
     },
     {
+      "id": "channel-divinity-radiance-of-the-dawn-cleric-light-2-phb",
       "name": "Channel Divinity: Radiance of the Dawn",
       "source": "PHB",
       "className": "Cleric",
@@ -3439,6 +3623,7 @@
       ]
     },
     {
+      "id": "improved-flare-cleric-light-6-phb",
       "name": "Improved Flare",
       "source": "PHB",
       "className": "Cleric",
@@ -3451,6 +3636,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-light-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3464,6 +3650,7 @@
       ]
     },
     {
+      "id": "potent-spellcasting-cleric-light-8-phb",
       "name": "Potent Spellcasting",
       "source": "PHB",
       "className": "Cleric",
@@ -3476,6 +3663,7 @@
       ]
     },
     {
+      "id": "corona-of-light-cleric-light-17-phb",
       "name": "Corona of Light",
       "source": "PHB",
       "className": "Cleric",
@@ -3488,6 +3676,7 @@
       ]
     },
     {
+      "id": "nature-domain-cleric-nature-1-phb",
       "name": "Nature Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3543,6 +3732,7 @@
       ]
     },
     {
+      "id": "acolyte-of-nature-cleric-nature-1-phb",
       "name": "Acolyte of Nature",
       "source": "PHB",
       "className": "Cleric",
@@ -3555,6 +3745,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-cleric-nature-1-phb",
       "name": "Bonus Proficiency",
       "source": "PHB",
       "className": "Cleric",
@@ -3567,6 +3758,7 @@
       ]
     },
     {
+      "id": "channel-divinity-charm-animals-and-plants-cleric-nature-2-phb",
       "name": "Channel Divinity: Charm Animals and Plants",
       "source": "PHB",
       "className": "Cleric",
@@ -3580,6 +3772,7 @@
       ]
     },
     {
+      "id": "dampen-elements-cleric-nature-6-phb",
       "name": "Dampen Elements",
       "source": "PHB",
       "className": "Cleric",
@@ -3592,6 +3785,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-nature-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3605,6 +3799,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-nature-8-phb",
       "name": "Divine Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -3617,6 +3812,7 @@
       ]
     },
     {
+      "id": "master-of-nature-cleric-nature-17-phb",
       "name": "Master of Nature",
       "source": "PHB",
       "className": "Cleric",
@@ -3629,6 +3825,7 @@
       ]
     },
     {
+      "id": "tempest-domain-cleric-tempest-1-phb",
       "name": "Tempest Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3684,6 +3881,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-cleric-tempest-1-phb",
       "name": "Bonus Proficiencies",
       "source": "PHB",
       "className": "Cleric",
@@ -3696,6 +3894,7 @@
       ]
     },
     {
+      "id": "wrath-of-the-storm-cleric-tempest-1-phb",
       "name": "Wrath of the Storm",
       "source": "PHB",
       "className": "Cleric",
@@ -3709,6 +3908,7 @@
       ]
     },
     {
+      "id": "channel-divinity-destructive-wrath-cleric-tempest-2-phb",
       "name": "Channel Divinity: Destructive Wrath",
       "source": "PHB",
       "className": "Cleric",
@@ -3722,6 +3922,7 @@
       ]
     },
     {
+      "id": "thunderbolt-strike-cleric-tempest-6-phb",
       "name": "Thunderbolt Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -3734,6 +3935,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-tempest-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3747,6 +3949,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-tempest-8-phb",
       "name": "Divine Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -3759,6 +3962,7 @@
       ]
     },
     {
+      "id": "stormborn-cleric-tempest-17-phb",
       "name": "Stormborn",
       "source": "PHB",
       "className": "Cleric",
@@ -3771,6 +3975,7 @@
       ]
     },
     {
+      "id": "trickery-domain-cleric-trickery-1-phb",
       "name": "Trickery Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3822,6 +4027,7 @@
       ]
     },
     {
+      "id": "blessing-of-the-trickster-cleric-trickery-1-phb",
       "name": "Blessing of the Trickster",
       "source": "PHB",
       "className": "Cleric",
@@ -3834,6 +4040,7 @@
       ]
     },
     {
+      "id": "channel-divinity-invoke-duplicity-cleric-trickery-2-phb",
       "name": "Channel Divinity: Invoke Duplicity",
       "source": "PHB",
       "className": "Cleric",
@@ -3848,6 +4055,7 @@
       ]
     },
     {
+      "id": "channel-divinity-cloak-of-shadows-cleric-trickery-6-phb",
       "name": "Channel Divinity: Cloak of Shadows",
       "source": "PHB",
       "className": "Cleric",
@@ -3861,6 +4069,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-trickery-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -3874,6 +4083,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-trickery-8-phb",
       "name": "Divine Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -3886,6 +4096,7 @@
       ]
     },
     {
+      "id": "improved-duplicity-cleric-trickery-17-phb",
       "name": "Improved Duplicity",
       "source": "PHB",
       "className": "Cleric",
@@ -3898,6 +4109,7 @@
       ]
     },
     {
+      "id": "war-domain-cleric-war-1-phb",
       "name": "War Domain",
       "source": "PHB",
       "className": "Cleric",
@@ -3953,6 +4165,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-cleric-war-1-phb",
       "name": "Bonus Proficiencies",
       "source": "PHB",
       "className": "Cleric",
@@ -3965,6 +4178,7 @@
       ]
     },
     {
+      "id": "war-priest-cleric-war-1-phb",
       "name": "War Priest",
       "source": "PHB",
       "className": "Cleric",
@@ -3977,6 +4191,7 @@
       ]
     },
     {
+      "id": "channel-divinity-guided-strike-cleric-war-2-phb",
       "name": "Channel Divinity: Guided Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -3989,6 +4204,7 @@
       ]
     },
     {
+      "id": "channel-divinity-war-god-s-blessing-cleric-war-6-phb",
       "name": "Channel Divinity: War God's Blessing",
       "source": "PHB",
       "className": "Cleric",
@@ -4001,6 +4217,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-war-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4014,6 +4231,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-war-8-phb",
       "name": "Divine Strike",
       "source": "PHB",
       "className": "Cleric",
@@ -4026,6 +4244,7 @@
       ]
     },
     {
+      "id": "avatar-of-battle-cleric-war-17-phb",
       "name": "Avatar of Battle",
       "source": "PHB",
       "className": "Cleric",
@@ -4038,6 +4257,7 @@
       ]
     },
     {
+      "id": "ambition-domain-psa-cleric-ambition-psa-1-psa",
       "name": "Ambition Domain (PSA)",
       "source": "PSA",
       "className": "Cleric",
@@ -4095,6 +4315,7 @@
       ]
     },
     {
+      "id": "warding-flare-cleric-ambition-psa-1-psa",
       "name": "Warding Flare",
       "source": "PSA",
       "className": "Cleric",
@@ -4108,6 +4329,7 @@
       ]
     },
     {
+      "id": "channel-divinity-invoke-duplicity-cleric-ambition-psa-2-psa",
       "name": "Channel Divinity: Invoke Duplicity",
       "source": "PSA",
       "className": "Cleric",
@@ -4122,6 +4344,7 @@
       ]
     },
     {
+      "id": "channel-divinity-cloak-of-shadows-cleric-ambition-psa-6-psa",
       "name": "Channel Divinity: Cloak of Shadows",
       "source": "PSA",
       "className": "Cleric",
@@ -4134,6 +4357,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-ambition-psa-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4147,6 +4371,7 @@
       ]
     },
     {
+      "id": "potent-spellcasting-cleric-ambition-psa-8-psa",
       "name": "Potent Spellcasting",
       "source": "PSA",
       "className": "Cleric",
@@ -4159,6 +4384,7 @@
       ]
     },
     {
+      "id": "improved-duplicity-cleric-ambition-psa-17-psa",
       "name": "Improved Duplicity",
       "source": "PSA",
       "className": "Cleric",
@@ -4171,6 +4397,7 @@
       ]
     },
     {
+      "id": "knowledge-domain-psa-cleric-knowledge-psa-1-psa",
       "name": "Knowledge Domain (PSA)",
       "source": "PSA",
       "className": "Cleric",
@@ -4194,6 +4421,7 @@
       ]
     },
     {
+      "id": "solidarity-domain-psa-cleric-solidarity-psa-1-psa",
       "name": "Solidarity Domain (PSA)",
       "source": "PSA",
       "className": "Cleric",
@@ -4255,6 +4483,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-cleric-solidarity-psa-1-psa",
       "name": "Bonus Proficiency",
       "source": "PSA",
       "className": "Cleric",
@@ -4267,6 +4496,7 @@
       ]
     },
     {
+      "id": "solidarity-s-action-cleric-solidarity-psa-1-psa",
       "name": "Solidarity's Action",
       "source": "PSA",
       "className": "Cleric",
@@ -4279,6 +4509,7 @@
       ]
     },
     {
+      "id": "channel-divinity-preserve-life-cleric-solidarity-psa-2-psa",
       "name": "Channel Divinity: Preserve Life",
       "source": "PSA",
       "className": "Cleric",
@@ -4292,6 +4523,7 @@
       ]
     },
     {
+      "id": "oketra-s-blessing-cleric-solidarity-psa-6-psa",
       "name": "Oketra's Blessing",
       "source": "PSA",
       "className": "Cleric",
@@ -4304,6 +4536,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-solidarity-psa-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4317,6 +4550,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-solidarity-psa-8-psa",
       "name": "Divine Strike",
       "source": "PSA",
       "className": "Cleric",
@@ -4329,6 +4563,7 @@
       ]
     },
     {
+      "id": "supreme-healing-cleric-solidarity-psa-17-psa",
       "name": "Supreme Healing",
       "source": "PSA",
       "className": "Cleric",
@@ -4341,6 +4576,7 @@
       ]
     },
     {
+      "id": "strength-domain-psa-cleric-strength-psa-1-psa",
       "name": "Strength Domain (PSA)",
       "source": "PSA",
       "className": "Cleric",
@@ -4402,6 +4638,7 @@
       ]
     },
     {
+      "id": "acolyte-of-strength-cleric-strength-psa-1-psa",
       "name": "Acolyte of Strength",
       "source": "PSA",
       "className": "Cleric",
@@ -4414,6 +4651,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-cleric-strength-psa-1-psa",
       "name": "Bonus Proficiency",
       "source": "PSA",
       "className": "Cleric",
@@ -4426,6 +4664,7 @@
       ]
     },
     {
+      "id": "channel-divinity-feat-of-strength-cleric-strength-psa-2-psa",
       "name": "Channel Divinity: Feat of Strength",
       "source": "PSA",
       "className": "Cleric",
@@ -4438,6 +4677,7 @@
       ]
     },
     {
+      "id": "rhonas-s-blessing-cleric-strength-psa-6-psa",
       "name": "Rhonas's Blessing",
       "source": "PSA",
       "className": "Cleric",
@@ -4450,6 +4690,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-strength-psa-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4463,6 +4704,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-strength-psa-8-psa",
       "name": "Divine Strike",
       "source": "PSA",
       "className": "Cleric",
@@ -4475,6 +4717,7 @@
       ]
     },
     {
+      "id": "avatar-of-battle-cleric-strength-psa-17-psa",
       "name": "Avatar of Battle",
       "source": "PSA",
       "className": "Cleric",
@@ -4487,6 +4730,7 @@
       ]
     },
     {
+      "id": "zeal-domain-psa-cleric-zeal-psa-1-psa",
       "name": "Zeal Domain (PSA)",
       "source": "PSA",
       "className": "Cleric",
@@ -4548,6 +4792,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-cleric-zeal-psa-1-psa",
       "name": "Bonus Proficiencies",
       "source": "PSA",
       "className": "Cleric",
@@ -4560,6 +4805,7 @@
       ]
     },
     {
+      "id": "priest-of-zeal-cleric-zeal-psa-1-psa",
       "name": "Priest of Zeal",
       "source": "PSA",
       "className": "Cleric",
@@ -4573,6 +4819,7 @@
       ]
     },
     {
+      "id": "channel-divinity-consuming-fervor-cleric-zeal-psa-2-psa",
       "name": "Channel Divinity: Consuming Fervor",
       "source": "PSA",
       "className": "Cleric",
@@ -4586,6 +4833,7 @@
       ]
     },
     {
+      "id": "resounding-strike-cleric-zeal-psa-6-psa",
       "name": "Resounding Strike",
       "source": "PSA",
       "className": "Cleric",
@@ -4598,6 +4846,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-zeal-psa-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4611,6 +4860,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-zeal-psa-8-psa",
       "name": "Divine Strike",
       "source": "PSA",
       "className": "Cleric",
@@ -4623,6 +4873,7 @@
       ]
     },
     {
+      "id": "blaze-of-glory-cleric-zeal-psa-17-psa",
       "name": "Blaze of Glory",
       "source": "PSA",
       "className": "Cleric",
@@ -4637,6 +4888,7 @@
       ]
     },
     {
+      "id": "arcana-domain-cleric-arcana-1-scag",
       "name": "Arcana Domain",
       "source": "SCAG",
       "className": "Cleric",
@@ -4689,6 +4941,7 @@
       ]
     },
     {
+      "id": "arcane-initiate-cleric-arcana-1-scag",
       "name": "Arcane Initiate",
       "source": "SCAG",
       "className": "Cleric",
@@ -4701,6 +4954,7 @@
       ]
     },
     {
+      "id": "channel-divinity-arcane-abjuration-cleric-arcana-2-scag",
       "name": "Channel Divinity: Arcane Abjuration",
       "source": "SCAG",
       "className": "Cleric",
@@ -4750,6 +5004,7 @@
       ]
     },
     {
+      "id": "spell-breaker-cleric-arcana-6-scag",
       "name": "Spell Breaker",
       "source": "SCAG",
       "className": "Cleric",
@@ -4762,6 +5017,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-arcana-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4775,6 +5031,7 @@
       ]
     },
     {
+      "id": "potent-spellcasting-cleric-arcana-8-scag",
       "name": "Potent Spellcasting",
       "source": "SCAG",
       "className": "Cleric",
@@ -4787,6 +5044,7 @@
       ]
     },
     {
+      "id": "arcane-mastery-cleric-arcana-17-scag",
       "name": "Arcane Mastery",
       "source": "SCAG",
       "className": "Cleric",
@@ -4799,6 +5057,7 @@
       ]
     },
     {
+      "id": "order-domain-cleric-order-1-tce",
       "name": "Order Domain",
       "source": "TCE",
       "className": "Cleric",
@@ -4856,6 +5115,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-cleric-order-1-tce",
       "name": "Bonus Proficiencies",
       "source": "TCE",
       "className": "Cleric",
@@ -4868,6 +5128,7 @@
       ]
     },
     {
+      "id": "voice-of-authority-cleric-order-1-tce",
       "name": "Voice of Authority",
       "source": "TCE",
       "className": "Cleric",
@@ -4881,6 +5142,7 @@
       ]
     },
     {
+      "id": "channel-divinity-order-s-demand-cleric-order-2-tce",
       "name": "Channel Divinity: Order's Demand",
       "source": "TCE",
       "className": "Cleric",
@@ -4894,6 +5156,7 @@
       ]
     },
     {
+      "id": "embodiment-of-the-law-cleric-order-6-tce",
       "name": "Embodiment of the Law",
       "source": "TCE",
       "className": "Cleric",
@@ -4908,6 +5171,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-order-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -4921,6 +5185,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-order-8-tce",
       "name": "Divine Strike",
       "source": "TCE",
       "className": "Cleric",
@@ -4933,6 +5198,7 @@
       ]
     },
     {
+      "id": "order-s-wrath-cleric-order-17-tce",
       "name": "Order's Wrath",
       "source": "TCE",
       "className": "Cleric",
@@ -4945,6 +5211,7 @@
       ]
     },
     {
+      "id": "peace-domain-cleric-peace-1-tce",
       "name": "Peace Domain",
       "source": "TCE",
       "className": "Cleric",
@@ -5054,6 +5321,7 @@
       ]
     },
     {
+      "id": "emboldening-bond-cleric-peace-1-tce",
       "name": "Emboldening Bond",
       "source": "TCE",
       "className": "Cleric",
@@ -5068,6 +5336,7 @@
       ]
     },
     {
+      "id": "implement-of-peace-cleric-peace-1-tce",
       "name": "Implement of Peace",
       "source": "TCE",
       "className": "Cleric",
@@ -5081,6 +5350,7 @@
       ]
     },
     {
+      "id": "channel-divinity-balm-of-peace-cleric-peace-2-tce",
       "name": "Channel Divinity: Balm of Peace",
       "source": "TCE",
       "className": "Cleric",
@@ -5094,6 +5364,7 @@
       ]
     },
     {
+      "id": "protective-bond-cleric-peace-6-tce",
       "name": "Protective Bond",
       "source": "TCE",
       "className": "Cleric",
@@ -5107,6 +5378,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-peace-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -5120,6 +5392,7 @@
       ]
     },
     {
+      "id": "potent-spellcasting-cleric-peace-8-tce",
       "name": "Potent Spellcasting",
       "source": "TCE",
       "className": "Cleric",
@@ -5133,6 +5406,7 @@
       ]
     },
     {
+      "id": "expansive-bond-cleric-peace-17-tce",
       "name": "Expansive Bond",
       "source": "TCE",
       "className": "Cleric",
@@ -5146,6 +5420,7 @@
       ]
     },
     {
+      "id": "twilight-domain-cleric-twilight-1-tce",
       "name": "Twilight Domain",
       "source": "TCE",
       "className": "Cleric",
@@ -5259,6 +5534,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-cleric-twilight-1-tce",
       "name": "Bonus Proficiencies",
       "source": "TCE",
       "className": "Cleric",
@@ -5272,6 +5548,7 @@
       ]
     },
     {
+      "id": "eyes-of-night-cleric-twilight-1-tce",
       "name": "Eyes of Night",
       "source": "TCE",
       "className": "Cleric",
@@ -5286,6 +5563,7 @@
       ]
     },
     {
+      "id": "vigilant-blessing-cleric-twilight-1-tce",
       "name": "Vigilant Blessing",
       "source": "TCE",
       "className": "Cleric",
@@ -5299,6 +5577,7 @@
       ]
     },
     {
+      "id": "channel-divinity-twilight-sanctuary-cleric-twilight-2-tce",
       "name": "Channel Divinity: Twilight Sanctuary",
       "source": "TCE",
       "className": "Cleric",
@@ -5320,6 +5599,7 @@
       ]
     },
     {
+      "id": "steps-of-night-cleric-twilight-6-tce",
       "name": "Steps of Night",
       "source": "TCE",
       "className": "Cleric",
@@ -5333,6 +5613,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-twilight-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -5346,6 +5627,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-twilight-8-tce",
       "name": "Divine Strike",
       "source": "TCE",
       "className": "Cleric",
@@ -5359,6 +5641,7 @@
       ]
     },
     {
+      "id": "twilight-shroud-cleric-twilight-17-tce",
       "name": "Twilight Shroud",
       "source": "TCE",
       "className": "Cleric",
@@ -5372,6 +5655,7 @@
       ]
     },
     {
+      "id": "forge-domain-cleric-forge-1-xge",
       "name": "Forge Domain",
       "source": "XGE",
       "className": "Cleric",
@@ -5427,6 +5711,7 @@
       ]
     },
     {
+      "id": "blessing-of-the-forge-cleric-forge-1-xge",
       "name": "Blessing of the Forge",
       "source": "XGE",
       "className": "Cleric",
@@ -5440,6 +5725,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-cleric-forge-1-xge",
       "name": "Bonus Proficiency",
       "source": "XGE",
       "className": "Cleric",
@@ -5452,6 +5738,7 @@
       ]
     },
     {
+      "id": "channel-divinity-artisan-s-blessing-cleric-forge-2-xge",
       "name": "Channel Divinity: Artisan's Blessing",
       "source": "XGE",
       "className": "Cleric",
@@ -5466,6 +5753,7 @@
       ]
     },
     {
+      "id": "soul-of-the-forge-cleric-forge-6-xge",
       "name": "Soul of the Forge",
       "source": "XGE",
       "className": "Cleric",
@@ -5485,6 +5773,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-forge-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -5498,6 +5787,7 @@
       ]
     },
     {
+      "id": "divine-strike-cleric-forge-8-xge",
       "name": "Divine Strike",
       "source": "XGE",
       "className": "Cleric",
@@ -5510,6 +5800,7 @@
       ]
     },
     {
+      "id": "saint-of-forge-and-fire-cleric-forge-17-xge",
       "name": "Saint of Forge and Fire",
       "source": "XGE",
       "className": "Cleric",
@@ -5529,6 +5820,7 @@
       ]
     },
     {
+      "id": "grave-domain-cleric-grave-1-xge",
       "name": "Grave Domain",
       "source": "XGE",
       "className": "Cleric",
@@ -5583,6 +5875,7 @@
       ]
     },
     {
+      "id": "circle-of-mortality-cleric-grave-1-xge",
       "name": "Circle of Mortality",
       "source": "XGE",
       "className": "Cleric",
@@ -5596,6 +5889,7 @@
       ]
     },
     {
+      "id": "eyes-of-the-grave-cleric-grave-1-xge",
       "name": "Eyes of the Grave",
       "source": "XGE",
       "className": "Cleric",
@@ -5609,6 +5903,7 @@
       ]
     },
     {
+      "id": "channel-divinity-path-to-the-grave-cleric-grave-2-xge",
       "name": "Channel Divinity: Path to the Grave",
       "source": "XGE",
       "className": "Cleric",
@@ -5622,6 +5917,7 @@
       ]
     },
     {
+      "id": "sentinel-at-death-s-door-cleric-grave-6-xge",
       "name": "Sentinel at Death's Door",
       "source": "XGE",
       "className": "Cleric",
@@ -5635,6 +5931,7 @@
       ]
     },
     {
+      "id": "blessed-strikes-cleric-grave-8-tce",
       "name": "Blessed Strikes",
       "source": "TCE",
       "className": "Cleric",
@@ -5648,6 +5945,7 @@
       ]
     },
     {
+      "id": "potent-spellcasting-cleric-grave-8-xge",
       "name": "Potent Spellcasting",
       "source": "XGE",
       "className": "Cleric",
@@ -5660,6 +5958,7 @@
       ]
     },
     {
+      "id": "keeper-of-souls-cleric-grave-17-xge",
       "name": "Keeper of Souls",
       "source": "XGE",
       "className": "Cleric",
@@ -5672,6 +5971,7 @@
       ]
     },
     {
+      "id": "circle-of-the-land-druid-land-2-phb",
       "name": "Circle of the Land",
       "source": "PHB",
       "className": "Druid",
@@ -5696,6 +5996,7 @@
       ]
     },
     {
+      "id": "bonus-cantrip-druid-land-2-phb",
       "name": "Bonus Cantrip",
       "source": "PHB",
       "className": "Druid",
@@ -5708,6 +6009,7 @@
       ]
     },
     {
+      "id": "circle-spells-druid-land-2-phb",
       "name": "Circle Spells",
       "source": "PHB",
       "className": "Druid",
@@ -5961,6 +6263,7 @@
       ]
     },
     {
+      "id": "natural-recovery-druid-land-2-phb",
       "name": "Natural Recovery",
       "source": "PHB",
       "className": "Druid",
@@ -5974,6 +6277,7 @@
       ]
     },
     {
+      "id": "land-s-stride-druid-land-6-phb",
       "name": "Land's Stride",
       "source": "PHB",
       "className": "Druid",
@@ -5987,6 +6291,7 @@
       ]
     },
     {
+      "id": "nature-s-ward-druid-land-10-phb",
       "name": "Nature's Ward",
       "source": "PHB",
       "className": "Druid",
@@ -5999,6 +6304,7 @@
       ]
     },
     {
+      "id": "nature-s-sanctuary-druid-land-14-phb",
       "name": "Nature's Sanctuary",
       "source": "PHB",
       "className": "Druid",
@@ -6012,6 +6318,7 @@
       ]
     },
     {
+      "id": "circle-of-the-moon-druid-moon-2-phb",
       "name": "Circle of the Moon",
       "source": "PHB",
       "className": "Druid",
@@ -6033,6 +6340,7 @@
       ]
     },
     {
+      "id": "circle-forms-druid-moon-2-phb",
       "name": "Circle Forms",
       "source": "PHB",
       "className": "Druid",
@@ -6102,6 +6410,7 @@
       ]
     },
     {
+      "id": "combat-wild-shape-druid-moon-2-phb",
       "name": "Combat Wild Shape",
       "source": "PHB",
       "className": "Druid",
@@ -6115,6 +6424,7 @@
       ]
     },
     {
+      "id": "primal-strike-druid-moon-6-phb",
       "name": "Primal Strike",
       "source": "PHB",
       "className": "Druid",
@@ -6127,6 +6437,7 @@
       ]
     },
     {
+      "id": "elemental-wild-shape-druid-moon-10-phb",
       "name": "Elemental Wild Shape",
       "source": "PHB",
       "className": "Druid",
@@ -6139,6 +6450,7 @@
       ]
     },
     {
+      "id": "thousand-forms-druid-moon-14-phb",
       "name": "Thousand Forms",
       "source": "PHB",
       "className": "Druid",
@@ -6151,6 +6463,7 @@
       ]
     },
     {
+      "id": "circle-of-spores-druid-spores-2-tce",
       "name": "Circle of Spores",
       "source": "TCE",
       "className": "Druid",
@@ -6177,6 +6490,7 @@
       ]
     },
     {
+      "id": "circle-spells-druid-spores-2-tce",
       "name": "Circle Spells",
       "source": "TCE",
       "className": "Druid",
@@ -6220,6 +6534,7 @@
       ]
     },
     {
+      "id": "halo-of-spores-druid-spores-2-tce",
       "name": "Halo of Spores",
       "source": "TCE",
       "className": "Druid",
@@ -6232,6 +6547,7 @@
       ]
     },
     {
+      "id": "symbiotic-entity-druid-spores-2-tce",
       "name": "Symbiotic Entity",
       "source": "TCE",
       "className": "Druid",
@@ -6252,6 +6568,7 @@
       ]
     },
     {
+      "id": "fungal-infestation-druid-spores-6-tce",
       "name": "Fungal Infestation",
       "source": "TCE",
       "className": "Druid",
@@ -6266,6 +6583,7 @@
       ]
     },
     {
+      "id": "spreading-spores-druid-spores-10-tce",
       "name": "Spreading Spores",
       "source": "TCE",
       "className": "Druid",
@@ -6280,6 +6598,7 @@
       ]
     },
     {
+      "id": "fungal-body-druid-spores-14-tce",
       "name": "Fungal Body",
       "source": "TCE",
       "className": "Druid",
@@ -6292,6 +6611,7 @@
       ]
     },
     {
+      "id": "circle-of-stars-druid-stars-2-tce",
       "name": "Circle of Stars",
       "source": "TCE",
       "className": "Druid",
@@ -6313,6 +6633,7 @@
       ]
     },
     {
+      "id": "star-map-druid-stars-2-tce",
       "name": "Star Map",
       "source": "TCE",
       "className": "Druid",
@@ -6374,6 +6695,7 @@
       ]
     },
     {
+      "id": "starry-form-druid-stars-2-tce",
       "name": "Starry Form",
       "source": "TCE",
       "className": "Druid",
@@ -6401,6 +6723,7 @@
       ]
     },
     {
+      "id": "archer-druid-stars-2-tce",
       "name": "Archer",
       "source": "TCE",
       "className": "Druid",
@@ -6413,6 +6736,7 @@
       ]
     },
     {
+      "id": "chalice-druid-stars-2-tce",
       "name": "Chalice",
       "source": "TCE",
       "className": "Druid",
@@ -6425,6 +6749,7 @@
       ]
     },
     {
+      "id": "dragon-druid-stars-2-tce",
       "name": "Dragon",
       "source": "TCE",
       "className": "Druid",
@@ -6437,6 +6762,7 @@
       ]
     },
     {
+      "id": "cosmic-omen-druid-stars-6-tce",
       "name": "Cosmic Omen",
       "source": "TCE",
       "className": "Druid",
@@ -6467,6 +6793,7 @@
       ]
     },
     {
+      "id": "twinkling-constellations-druid-stars-10-tce",
       "name": "Twinkling Constellations",
       "source": "TCE",
       "className": "Druid",
@@ -6481,6 +6808,7 @@
       ]
     },
     {
+      "id": "full-of-stars-druid-stars-14-tce",
       "name": "Full of Stars",
       "source": "TCE",
       "className": "Druid",
@@ -6494,6 +6822,7 @@
       ]
     },
     {
+      "id": "circle-of-wildfire-druid-wildfire-2-tce",
       "name": "Circle of Wildfire",
       "source": "TCE",
       "className": "Druid",
@@ -6514,6 +6843,7 @@
       ]
     },
     {
+      "id": "circle-spells-druid-wildfire-2-tce",
       "name": "Circle Spells",
       "source": "TCE",
       "className": "Druid",
@@ -6562,6 +6892,7 @@
       ]
     },
     {
+      "id": "summon-wildfire-spirit-druid-wildfire-2-tce",
       "name": "Summon Wildfire Spirit",
       "source": "TCE",
       "className": "Druid",
@@ -6579,6 +6910,7 @@
       ]
     },
     {
+      "id": "enhanced-bond-druid-wildfire-6-tce",
       "name": "Enhanced Bond",
       "source": "TCE",
       "className": "Druid",
@@ -6593,6 +6925,7 @@
       ]
     },
     {
+      "id": "cauterizing-flames-druid-wildfire-10-tce",
       "name": "Cauterizing Flames",
       "source": "TCE",
       "className": "Druid",
@@ -6607,6 +6940,7 @@
       ]
     },
     {
+      "id": "blazing-revival-druid-wildfire-14-tce",
       "name": "Blazing Revival",
       "source": "TCE",
       "className": "Druid",
@@ -6621,6 +6955,7 @@
       ]
     },
     {
+      "id": "circle-of-dreams-druid-dreams-2-xge",
       "name": "Circle of Dreams",
       "source": "XGE",
       "className": "Druid",
@@ -6637,6 +6972,7 @@
       ]
     },
     {
+      "id": "balm-of-the-summer-court-druid-dreams-2-xge",
       "name": "Balm of the Summer Court",
       "source": "XGE",
       "className": "Druid",
@@ -6651,6 +6987,7 @@
       ]
     },
     {
+      "id": "hearth-of-moonlight-and-shadow-druid-dreams-6-xge",
       "name": "Hearth of Moonlight and Shadow",
       "source": "XGE",
       "className": "Druid",
@@ -6665,6 +7002,7 @@
       ]
     },
     {
+      "id": "hidden-paths-druid-dreams-10-xge",
       "name": "Hidden Paths",
       "source": "XGE",
       "className": "Druid",
@@ -6678,6 +7016,7 @@
       ]
     },
     {
+      "id": "walker-in-dreams-druid-dreams-14-xge",
       "name": "Walker in Dreams",
       "source": "XGE",
       "className": "Druid",
@@ -6693,6 +7032,7 @@
       ]
     },
     {
+      "id": "circle-of-the-shepherd-druid-shepherd-2-xge",
       "name": "Circle of the Shepherd",
       "source": "XGE",
       "className": "Druid",
@@ -6714,6 +7054,7 @@
       ]
     },
     {
+      "id": "speech-of-the-woods-druid-shepherd-2-xge",
       "name": "Speech of the Woods",
       "source": "XGE",
       "className": "Druid",
@@ -6727,6 +7068,7 @@
       ]
     },
     {
+      "id": "spirit-totem-druid-shepherd-2-xge",
       "name": "Spirit Totem",
       "source": "XGE",
       "className": "Druid",
@@ -6763,6 +7105,7 @@
       ]
     },
     {
+      "id": "mighty-summoner-druid-shepherd-6-xge",
       "name": "Mighty Summoner",
       "source": "XGE",
       "className": "Druid",
@@ -6782,6 +7125,7 @@
       ]
     },
     {
+      "id": "guardian-spirit-druid-shepherd-10-xge",
       "name": "Guardian Spirit",
       "source": "XGE",
       "className": "Druid",
@@ -6794,6 +7138,7 @@
       ]
     },
     {
+      "id": "faithful-summons-druid-shepherd-14-xge",
       "name": "Faithful Summons",
       "source": "XGE",
       "className": "Druid",
@@ -6807,6 +7152,7 @@
       ]
     },
     {
+      "id": "echo-knight-fighter-echo-knight-3-egw",
       "name": "Echo Knight",
       "source": "EGW",
       "className": "Fighter",
@@ -6827,6 +7173,7 @@
       ]
     },
     {
+      "id": "manifest-echo-fighter-echo-knight-3-egw",
       "name": "Manifest Echo",
       "source": "EGW",
       "className": "Fighter",
@@ -6850,6 +7197,7 @@
       ]
     },
     {
+      "id": "unleash-incarnation-fighter-echo-knight-3-egw",
       "name": "Unleash Incarnation",
       "source": "EGW",
       "className": "Fighter",
@@ -6864,6 +7212,7 @@
       ]
     },
     {
+      "id": "echo-avatar-fighter-echo-knight-7-egw",
       "name": "Echo Avatar",
       "source": "EGW",
       "className": "Fighter",
@@ -6877,6 +7226,7 @@
       ]
     },
     {
+      "id": "shadow-martyr-fighter-echo-knight-10-egw",
       "name": "Shadow Martyr",
       "source": "EGW",
       "className": "Fighter",
@@ -6891,6 +7241,7 @@
       ]
     },
     {
+      "id": "reclaim-potential-fighter-echo-knight-15-egw",
       "name": "Reclaim Potential",
       "source": "EGW",
       "className": "Fighter",
@@ -6905,6 +7256,7 @@
       ]
     },
     {
+      "id": "legion-of-one-fighter-echo-knight-18-egw",
       "name": "Legion of One",
       "source": "EGW",
       "className": "Fighter",
@@ -6919,6 +7271,7 @@
       ]
     },
     {
+      "id": "battle-master-fighter-battle-master-3-phb",
       "name": "Battle Master",
       "source": "PHB",
       "className": "Fighter",
@@ -6947,6 +7300,7 @@
       ]
     },
     {
+      "id": "combat-superiority-fighter-battle-master-3-phb",
       "name": "Combat Superiority",
       "source": "PHB",
       "className": "Fighter",
@@ -7005,6 +7359,7 @@
       ]
     },
     {
+      "id": "maneuver-options-fighter-battle-master-3-tce",
       "name": "Maneuver Options",
       "source": "TCE",
       "className": "Fighter",
@@ -7056,6 +7411,7 @@
       ]
     },
     {
+      "id": "maneuvers-fighter-battle-master-3-phb",
       "name": "Maneuvers",
       "source": "PHB",
       "className": "Fighter",
@@ -7138,6 +7494,7 @@
       ]
     },
     {
+      "id": "student-of-war-fighter-battle-master-3-phb",
       "name": "Student of War",
       "source": "PHB",
       "className": "Fighter",
@@ -7150,6 +7507,7 @@
       ]
     },
     {
+      "id": "additional-maneuvers-fighter-battle-master-7-phb",
       "name": "Additional Maneuvers",
       "source": "PHB",
       "className": "Fighter",
@@ -7162,6 +7520,7 @@
       ]
     },
     {
+      "id": "additional-superiority-die-fighter-battle-master-7-phb",
       "name": "Additional Superiority Die",
       "source": "PHB",
       "className": "Fighter",
@@ -7174,6 +7533,7 @@
       ]
     },
     {
+      "id": "know-your-enemy-fighter-battle-master-7-phb",
       "name": "Know Your Enemy",
       "source": "PHB",
       "className": "Fighter",
@@ -7198,6 +7558,7 @@
       ]
     },
     {
+      "id": "additional-maneuvers-fighter-battle-master-10-phb",
       "name": "Additional Maneuvers",
       "source": "PHB",
       "className": "Fighter",
@@ -7210,6 +7571,7 @@
       ]
     },
     {
+      "id": "improved-combat-superiority-d10-fighter-battle-master-10-phb",
       "name": "Improved Combat Superiority (d10)",
       "source": "PHB",
       "className": "Fighter",
@@ -7222,6 +7584,7 @@
       ]
     },
     {
+      "id": "additional-maneuvers-fighter-battle-master-15-phb",
       "name": "Additional Maneuvers",
       "source": "PHB",
       "className": "Fighter",
@@ -7234,6 +7597,7 @@
       ]
     },
     {
+      "id": "additional-superiority-die-fighter-battle-master-15-phb",
       "name": "Additional Superiority Die",
       "source": "PHB",
       "className": "Fighter",
@@ -7246,6 +7610,7 @@
       ]
     },
     {
+      "id": "relentless-fighter-battle-master-15-phb",
       "name": "Relentless",
       "source": "PHB",
       "className": "Fighter",
@@ -7258,6 +7623,7 @@
       ]
     },
     {
+      "id": "improved-combat-superiority-d12-fighter-battle-master-18-phb",
       "name": "Improved Combat Superiority (d12)",
       "source": "PHB",
       "className": "Fighter",
@@ -7270,6 +7636,7 @@
       ]
     },
     {
+      "id": "champion-fighter-champion-3-phb",
       "name": "Champion",
       "source": "PHB",
       "className": "Fighter",
@@ -7286,6 +7653,7 @@
       ]
     },
     {
+      "id": "improved-critical-fighter-champion-3-phb",
       "name": "Improved Critical",
       "source": "PHB",
       "className": "Fighter",
@@ -7298,6 +7666,7 @@
       ]
     },
     {
+      "id": "remarkable-athlete-fighter-champion-7-phb",
       "name": "Remarkable Athlete",
       "source": "PHB",
       "className": "Fighter",
@@ -7311,6 +7680,7 @@
       ]
     },
     {
+      "id": "additional-fighting-style-fighter-champion-10-phb",
       "name": "Additional Fighting Style",
       "source": "PHB",
       "className": "Fighter",
@@ -7323,6 +7693,7 @@
       ]
     },
     {
+      "id": "superior-critical-fighter-champion-15-phb",
       "name": "Superior Critical",
       "source": "PHB",
       "className": "Fighter",
@@ -7335,6 +7706,7 @@
       ]
     },
     {
+      "id": "survivor-fighter-champion-18-phb",
       "name": "Survivor",
       "source": "PHB",
       "className": "Fighter",
@@ -7347,6 +7719,7 @@
       ]
     },
     {
+      "id": "eldritch-knight-fighter-eldritch-knight-3-phb",
       "name": "Eldritch Knight",
       "source": "PHB",
       "className": "Fighter",
@@ -7367,6 +7740,7 @@
       ]
     },
     {
+      "id": "spellcasting-fighter-eldritch-knight-3-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Fighter",
@@ -7440,6 +7814,7 @@
       ]
     },
     {
+      "id": "weapon-bond-fighter-eldritch-knight-3-phb",
       "name": "Weapon Bond",
       "source": "PHB",
       "className": "Fighter",
@@ -7454,6 +7829,7 @@
       ]
     },
     {
+      "id": "war-magic-fighter-eldritch-knight-7-phb",
       "name": "War Magic",
       "source": "PHB",
       "className": "Fighter",
@@ -7466,6 +7842,7 @@
       ]
     },
     {
+      "id": "eldritch-strike-fighter-eldritch-knight-10-phb",
       "name": "Eldritch Strike",
       "source": "PHB",
       "className": "Fighter",
@@ -7478,6 +7855,7 @@
       ]
     },
     {
+      "id": "arcane-charge-fighter-eldritch-knight-15-phb",
       "name": "Arcane Charge",
       "source": "PHB",
       "className": "Fighter",
@@ -7490,6 +7868,7 @@
       ]
     },
     {
+      "id": "improved-war-magic-fighter-eldritch-knight-18-phb",
       "name": "Improved War Magic",
       "source": "PHB",
       "className": "Fighter",
@@ -7502,6 +7881,7 @@
       ]
     },
     {
+      "id": "purple-dragon-knight-banneret-fighter-purple-dragon-knight-banneret-3-scag",
       "name": "Purple Dragon Knight (Banneret)",
       "source": "SCAG",
       "className": "Fighter",
@@ -7524,6 +7904,7 @@
       ]
     },
     {
+      "id": "rallying-cry-fighter-purple-dragon-knight-banneret-3-scag",
       "name": "Rallying Cry",
       "source": "SCAG",
       "className": "Fighter",
@@ -7537,6 +7918,7 @@
       ]
     },
     {
+      "id": "restriction-knighthood-fighter-purple-dragon-knight-banneret-3-scag",
       "name": "Restriction: Knighthood",
       "source": "SCAG",
       "className": "Fighter",
@@ -7550,6 +7932,7 @@
       ]
     },
     {
+      "id": "royal-envoy-fighter-purple-dragon-knight-banneret-7-scag",
       "name": "Royal Envoy",
       "source": "SCAG",
       "className": "Fighter",
@@ -7564,6 +7947,7 @@
       ]
     },
     {
+      "id": "inspiring-surge-fighter-purple-dragon-knight-banneret-10-scag",
       "name": "Inspiring Surge",
       "source": "SCAG",
       "className": "Fighter",
@@ -7577,6 +7961,7 @@
       ]
     },
     {
+      "id": "bulwark-fighter-purple-dragon-knight-banneret-15-scag",
       "name": "Bulwark",
       "source": "SCAG",
       "className": "Fighter",
@@ -7589,6 +7974,7 @@
       ]
     },
     {
+      "id": "inspiring-surge-fighter-purple-dragon-knight-banneret-18-scag",
       "name": "Inspiring Surge",
       "source": "SCAG",
       "className": "Fighter",
@@ -7601,6 +7987,7 @@
       ]
     },
     {
+      "id": "protective-field-fighter-psi-warrior-3-tce",
       "name": "Protective Field",
       "source": "TCE",
       "className": "Fighter",
@@ -7613,6 +8000,7 @@
       ]
     },
     {
+      "id": "psi-warrior-fighter-psi-warrior-3-tce",
       "name": "Psi Warrior",
       "source": "TCE",
       "className": "Fighter",
@@ -7630,6 +8018,7 @@
       ]
     },
     {
+      "id": "psionic-strike-fighter-psi-warrior-3-tce",
       "name": "Psionic Strike",
       "source": "TCE",
       "className": "Fighter",
@@ -7642,6 +8031,7 @@
       ]
     },
     {
+      "id": "telekinetic-movement-fighter-psi-warrior-3-tce",
       "name": "Telekinetic Movement",
       "source": "TCE",
       "className": "Fighter",
@@ -7654,6 +8044,7 @@
       ]
     },
     {
+      "id": "psionic-power-fighter-psi-warrior-3-tce",
       "name": "Psionic Power",
       "source": "TCE",
       "className": "Fighter",
@@ -7688,6 +8079,7 @@
       ]
     },
     {
+      "id": "psi-powered-leap-fighter-psi-warrior-7-tce",
       "name": "Psi-Powered Leap",
       "source": "TCE",
       "className": "Fighter",
@@ -7700,6 +8092,7 @@
       ]
     },
     {
+      "id": "telekinetic-thrust-fighter-psi-warrior-7-tce",
       "name": "Telekinetic Thrust",
       "source": "TCE",
       "className": "Fighter",
@@ -7712,6 +8105,7 @@
       ]
     },
     {
+      "id": "telekinetic-adept-fighter-psi-warrior-7-tce",
       "name": "Telekinetic Adept",
       "source": "TCE",
       "className": "Fighter",
@@ -7739,6 +8133,7 @@
       ]
     },
     {
+      "id": "guarded-mind-fighter-psi-warrior-10-tce",
       "name": "Guarded Mind",
       "source": "TCE",
       "className": "Fighter",
@@ -7752,6 +8147,7 @@
       ]
     },
     {
+      "id": "bulwark-of-force-fighter-psi-warrior-15-tce",
       "name": "Bulwark of Force",
       "source": "TCE",
       "className": "Fighter",
@@ -7766,6 +8162,7 @@
       ]
     },
     {
+      "id": "telekinetic-master-fighter-psi-warrior-18-tce",
       "name": "Telekinetic Master",
       "source": "TCE",
       "className": "Fighter",
@@ -7780,6 +8177,7 @@
       ]
     },
     {
+      "id": "rune-knight-fighter-rune-knight-3-tce",
       "name": "Rune Knight",
       "source": "TCE",
       "className": "Fighter",
@@ -7804,6 +8202,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-fighter-rune-knight-3-tce",
       "name": "Bonus Proficiencies",
       "source": "TCE",
       "className": "Fighter",
@@ -7817,6 +8216,7 @@
       ]
     },
     {
+      "id": "giant-s-might-fighter-rune-knight-3-tce",
       "name": "Giant's Might",
       "source": "TCE",
       "className": "Fighter",
@@ -7839,6 +8239,7 @@
       ]
     },
     {
+      "id": "rune-carver-fighter-rune-knight-3-tce",
       "name": "Rune Carver",
       "source": "TCE",
       "className": "Fighter",
@@ -7916,6 +8317,7 @@
       ]
     },
     {
+      "id": "additional-rune-known-fighter-rune-knight-7-tce",
       "name": "Additional Rune Known",
       "source": "TCE",
       "className": "Fighter",
@@ -7929,6 +8331,7 @@
       ]
     },
     {
+      "id": "runic-shield-fighter-rune-knight-7-tce",
       "name": "Runic Shield",
       "source": "TCE",
       "className": "Fighter",
@@ -7943,6 +8346,7 @@
       ]
     },
     {
+      "id": "additional-rune-known-fighter-rune-knight-10-tce",
       "name": "Additional Rune Known",
       "source": "TCE",
       "className": "Fighter",
@@ -7956,6 +8360,7 @@
       ]
     },
     {
+      "id": "great-stature-fighter-rune-knight-10-tce",
       "name": "Great Stature",
       "source": "TCE",
       "className": "Fighter",
@@ -7970,6 +8375,7 @@
       ]
     },
     {
+      "id": "additional-rune-known-fighter-rune-knight-15-tce",
       "name": "Additional Rune Known",
       "source": "TCE",
       "className": "Fighter",
@@ -7983,6 +8389,7 @@
       ]
     },
     {
+      "id": "master-of-runes-fighter-rune-knight-15-tce",
       "name": "Master of Runes",
       "source": "TCE",
       "className": "Fighter",
@@ -7996,6 +8403,7 @@
       ]
     },
     {
+      "id": "runic-juggernaut-fighter-rune-knight-18-tce",
       "name": "Runic Juggernaut",
       "source": "TCE",
       "className": "Fighter",
@@ -8009,6 +8417,7 @@
       ]
     },
     {
+      "id": "arcane-archer-fighter-arcane-archer-3-xge",
       "name": "Arcane Archer",
       "source": "XGE",
       "className": "Fighter",
@@ -8033,6 +8442,7 @@
       ]
     },
     {
+      "id": "arcane-archer-lore-fighter-arcane-archer-3-xge",
       "name": "Arcane Archer Lore",
       "source": "XGE",
       "className": "Fighter",
@@ -8045,6 +8455,7 @@
       ]
     },
     {
+      "id": "arcane-shot-fighter-arcane-archer-3-xge",
       "name": "Arcane Shot",
       "source": "XGE",
       "className": "Fighter",
@@ -8059,6 +8470,7 @@
       ]
     },
     {
+      "id": "arcane-shot-options-fighter-arcane-archer-3-xge",
       "name": "Arcane Shot Options",
       "source": "XGE",
       "className": "Fighter",
@@ -8117,6 +8529,7 @@
       ]
     },
     {
+      "id": "additional-arcane-shot-option-fighter-arcane-archer-7-xge",
       "name": "Additional Arcane Shot Option",
       "source": "XGE",
       "className": "Fighter",
@@ -8129,6 +8542,7 @@
       ]
     },
     {
+      "id": "curving-shot-fighter-arcane-archer-7-xge",
       "name": "Curving Shot",
       "source": "XGE",
       "className": "Fighter",
@@ -8141,6 +8555,7 @@
       ]
     },
     {
+      "id": "magic-arrow-fighter-arcane-archer-7-xge",
       "name": "Magic Arrow",
       "source": "XGE",
       "className": "Fighter",
@@ -8153,6 +8568,7 @@
       ]
     },
     {
+      "id": "additional-arcane-shot-option-fighter-arcane-archer-10-xge",
       "name": "Additional Arcane Shot Option",
       "source": "XGE",
       "className": "Fighter",
@@ -8165,6 +8581,7 @@
       ]
     },
     {
+      "id": "additional-arcane-shot-option-fighter-arcane-archer-15-xge",
       "name": "Additional Arcane Shot Option",
       "source": "XGE",
       "className": "Fighter",
@@ -8177,6 +8594,7 @@
       ]
     },
     {
+      "id": "ever-ready-shot-fighter-arcane-archer-15-xge",
       "name": "Ever-Ready Shot",
       "source": "XGE",
       "className": "Fighter",
@@ -8189,6 +8607,7 @@
       ]
     },
     {
+      "id": "additional-arcane-shot-option-fighter-arcane-archer-18-xge",
       "name": "Additional Arcane Shot Option",
       "source": "XGE",
       "className": "Fighter",
@@ -8201,6 +8620,7 @@
       ]
     },
     {
+      "id": "cavalier-fighter-cavalier-3-xge",
       "name": "Cavalier",
       "source": "XGE",
       "className": "Fighter",
@@ -8225,6 +8645,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-fighter-cavalier-3-xge",
       "name": "Bonus Proficiency",
       "source": "XGE",
       "className": "Fighter",
@@ -8237,6 +8658,7 @@
       ]
     },
     {
+      "id": "born-to-the-saddle-fighter-cavalier-3-xge",
       "name": "Born to the Saddle",
       "source": "XGE",
       "className": "Fighter",
@@ -8250,6 +8672,7 @@
       ]
     },
     {
+      "id": "unwavering-mark-fighter-cavalier-3-xge",
       "name": "Unwavering Mark",
       "source": "XGE",
       "className": "Fighter",
@@ -8265,6 +8688,7 @@
       ]
     },
     {
+      "id": "warding-maneuver-fighter-cavalier-7-xge",
       "name": "Warding Maneuver",
       "source": "XGE",
       "className": "Fighter",
@@ -8278,6 +8702,7 @@
       ]
     },
     {
+      "id": "hold-the-line-fighter-cavalier-10-xge",
       "name": "Hold the Line",
       "source": "XGE",
       "className": "Fighter",
@@ -8290,6 +8715,7 @@
       ]
     },
     {
+      "id": "ferocious-charger-fighter-cavalier-15-xge",
       "name": "Ferocious Charger",
       "source": "XGE",
       "className": "Fighter",
@@ -8302,6 +8728,7 @@
       ]
     },
     {
+      "id": "vigilant-defender-fighter-cavalier-18-xge",
       "name": "Vigilant Defender",
       "source": "XGE",
       "className": "Fighter",
@@ -8314,6 +8741,7 @@
       ]
     },
     {
+      "id": "samurai-fighter-samurai-3-xge",
       "name": "Samurai",
       "source": "XGE",
       "className": "Fighter",
@@ -8334,6 +8762,7 @@
       ]
     },
     {
+      "id": "bonus-proficiency-fighter-samurai-3-xge",
       "name": "Bonus Proficiency",
       "source": "XGE",
       "className": "Fighter",
@@ -8346,6 +8775,7 @@
       ]
     },
     {
+      "id": "fighting-spirit-fighter-samurai-3-xge",
       "name": "Fighting Spirit",
       "source": "XGE",
       "className": "Fighter",
@@ -8359,6 +8789,7 @@
       ]
     },
     {
+      "id": "elegant-courtier-fighter-samurai-7-xge",
       "name": "Elegant Courtier",
       "source": "XGE",
       "className": "Fighter",
@@ -8372,6 +8803,7 @@
       ]
     },
     {
+      "id": "tireless-spirit-fighter-samurai-10-xge",
       "name": "Tireless Spirit",
       "source": "XGE",
       "className": "Fighter",
@@ -8384,6 +8816,7 @@
       ]
     },
     {
+      "id": "rapid-strike-fighter-samurai-15-xge",
       "name": "Rapid Strike",
       "source": "XGE",
       "className": "Fighter",
@@ -8396,6 +8829,7 @@
       ]
     },
     {
+      "id": "strength-before-death-fighter-samurai-18-xge",
       "name": "Strength before Death",
       "source": "XGE",
       "className": "Fighter",
@@ -8409,6 +8843,7 @@
       ]
     },
     {
+      "id": "way-of-the-ascendant-dragon-monk-ascendant-dragon-3-ftd",
       "name": "Way of the Ascendant Dragon",
       "source": "FTD",
       "className": "Monk",
@@ -8468,6 +8903,7 @@
       ]
     },
     {
+      "id": "breath-of-the-dragon-monk-ascendant-dragon-3-ftd",
       "name": "Breath of the Dragon",
       "source": "FTD",
       "className": "Monk",
@@ -8483,6 +8919,7 @@
       ]
     },
     {
+      "id": "draconic-disciple-monk-ascendant-dragon-3-ftd",
       "name": "Draconic Disciple",
       "source": "FTD",
       "className": "Monk",
@@ -8517,6 +8954,7 @@
       ]
     },
     {
+      "id": "wings-unfurled-monk-ascendant-dragon-6-ftd",
       "name": "Wings Unfurled",
       "source": "FTD",
       "className": "Monk",
@@ -8531,6 +8969,7 @@
       ]
     },
     {
+      "id": "aspect-of-the-wyrm-monk-ascendant-dragon-11-ftd",
       "name": "Aspect of the Wyrm",
       "source": "FTD",
       "className": "Monk",
@@ -8561,6 +9000,7 @@
       ]
     },
     {
+      "id": "ascendant-aspect-monk-ascendant-dragon-17-ftd",
       "name": "Ascendant Aspect",
       "source": "FTD",
       "className": "Monk",
@@ -8595,6 +9035,7 @@
       ]
     },
     {
+      "id": "way-of-the-four-elements-monk-four-elements-3-phb",
       "name": "Way of the Four Elements",
       "source": "PHB",
       "className": "Monk",
@@ -8616,6 +9057,7 @@
       ]
     },
     {
+      "id": "disciple-of-the-elements-monk-four-elements-3-phb",
       "name": "Disciple of the Elements",
       "source": "PHB",
       "className": "Monk",
@@ -8669,6 +9111,7 @@
       ]
     },
     {
+      "id": "elemental-disciplines-monk-four-elements-3-phb",
       "name": "Elemental Disciplines",
       "source": "PHB",
       "className": "Monk",
@@ -8767,6 +9210,7 @@
       ]
     },
     {
+      "id": "extra-elemental-discipline-monk-four-elements-6-phb",
       "name": "Extra Elemental Discipline",
       "source": "PHB",
       "className": "Monk",
@@ -8780,6 +9224,7 @@
       ]
     },
     {
+      "id": "extra-elemental-discipline-monk-four-elements-11-phb",
       "name": "Extra Elemental Discipline",
       "source": "PHB",
       "className": "Monk",
@@ -8793,6 +9238,7 @@
       ]
     },
     {
+      "id": "extra-elemental-discipline-monk-four-elements-17-phb",
       "name": "Extra Elemental Discipline",
       "source": "PHB",
       "className": "Monk",
@@ -8806,6 +9252,7 @@
       ]
     },
     {
+      "id": "way-of-the-open-hand-monk-open-hand-3-phb",
       "name": "Way of the Open Hand",
       "source": "PHB",
       "className": "Monk",
@@ -8822,6 +9269,7 @@
       ]
     },
     {
+      "id": "open-hand-technique-monk-open-hand-3-phb",
       "name": "Open Hand Technique",
       "source": "PHB",
       "className": "Monk",
@@ -8842,6 +9290,7 @@
       ]
     },
     {
+      "id": "wholeness-of-body-monk-open-hand-6-phb",
       "name": "Wholeness of Body",
       "source": "PHB",
       "className": "Monk",
@@ -8854,6 +9303,7 @@
       ]
     },
     {
+      "id": "tranquility-monk-open-hand-11-phb",
       "name": "Tranquility",
       "source": "PHB",
       "className": "Monk",
@@ -8866,6 +9316,7 @@
       ]
     },
     {
+      "id": "quivering-palm-monk-open-hand-17-phb",
       "name": "Quivering Palm",
       "source": "PHB",
       "className": "Monk",
@@ -8879,6 +9330,7 @@
       ]
     },
     {
+      "id": "way-of-shadow-monk-shadow-3-phb",
       "name": "Way of Shadow",
       "source": "PHB",
       "className": "Monk",
@@ -8895,6 +9347,7 @@
       ]
     },
     {
+      "id": "shadow-arts-monk-shadow-3-phb",
       "name": "Shadow Arts",
       "source": "PHB",
       "className": "Monk",
@@ -8907,6 +9360,7 @@
       ]
     },
     {
+      "id": "shadow-step-monk-shadow-6-phb",
       "name": "Shadow Step",
       "source": "PHB",
       "className": "Monk",
@@ -8919,6 +9373,7 @@
       ]
     },
     {
+      "id": "cloak-of-shadows-monk-shadow-11-phb",
       "name": "Cloak of Shadows",
       "source": "PHB",
       "className": "Monk",
@@ -8931,6 +9386,7 @@
       ]
     },
     {
+      "id": "opportunist-monk-shadow-17-phb",
       "name": "Opportunist",
       "source": "PHB",
       "className": "Monk",
@@ -8943,6 +9399,7 @@
       ]
     },
     {
+      "id": "way-of-the-long-death-monk-long-death-3-scag",
       "name": "Way of the Long Death",
       "source": "SCAG",
       "className": "Monk",
@@ -8959,6 +9416,7 @@
       ]
     },
     {
+      "id": "touch-of-death-monk-long-death-3-scag",
       "name": "Touch of Death",
       "source": "SCAG",
       "className": "Monk",
@@ -8971,6 +9429,7 @@
       ]
     },
     {
+      "id": "hour-of-reaping-monk-long-death-6-scag",
       "name": "Hour of Reaping",
       "source": "SCAG",
       "className": "Monk",
@@ -8983,6 +9442,7 @@
       ]
     },
     {
+      "id": "mastery-of-death-monk-long-death-11-scag",
       "name": "Mastery of Death",
       "source": "SCAG",
       "className": "Monk",
@@ -8995,6 +9455,7 @@
       ]
     },
     {
+      "id": "touch-of-the-long-death-monk-long-death-17-scag",
       "name": "Touch of the Long Death",
       "source": "SCAG",
       "className": "Monk",
@@ -9007,6 +9468,7 @@
       ]
     },
     {
+      "id": "way-of-the-astral-self-monk-astral-self-3-tce",
       "name": "Way of the Astral Self",
       "source": "TCE",
       "className": "Monk",
@@ -9027,6 +9489,7 @@
       ]
     },
     {
+      "id": "arms-of-the-astral-self-monk-astral-self-3-tce",
       "name": "Arms of the Astral Self",
       "source": "TCE",
       "className": "Monk",
@@ -9051,6 +9514,7 @@
       ]
     },
     {
+      "id": "forms-of-your-astral-self-monk-astral-self-3-tce",
       "name": "Forms of Your Astral Self",
       "source": "TCE",
       "className": "Monk",
@@ -9064,6 +9528,7 @@
       ]
     },
     {
+      "id": "visage-of-the-astral-self-monk-astral-self-6-tce",
       "name": "Visage of the Astral Self",
       "source": "TCE",
       "className": "Monk",
@@ -9100,6 +9565,7 @@
       ]
     },
     {
+      "id": "body-of-the-astral-self-monk-astral-self-11-tce",
       "name": "Body of the Astral Self",
       "source": "TCE",
       "className": "Monk",
@@ -9128,6 +9594,7 @@
       ]
     },
     {
+      "id": "awakened-astral-self-monk-astral-self-17-tce",
       "name": "Awakened Astral Self",
       "source": "TCE",
       "className": "Monk",
@@ -9156,6 +9623,7 @@
       ]
     },
     {
+      "id": "way-of-mercy-monk-mercy-3-tce",
       "name": "Way of Mercy",
       "source": "TCE",
       "className": "Monk",
@@ -9182,6 +9650,7 @@
       ]
     },
     {
+      "id": "hand-of-harm-monk-mercy-3-tce",
       "name": "Hand of Harm",
       "source": "TCE",
       "className": "Monk",
@@ -9195,6 +9664,7 @@
       ]
     },
     {
+      "id": "hand-of-healing-monk-mercy-3-tce",
       "name": "Hand of Healing",
       "source": "TCE",
       "className": "Monk",
@@ -9209,6 +9679,7 @@
       ]
     },
     {
+      "id": "implements-of-mercy-monk-mercy-3-tce",
       "name": "Implements of Mercy",
       "source": "TCE",
       "className": "Monk",
@@ -9261,6 +9732,7 @@
       ]
     },
     {
+      "id": "physician-s-touch-monk-mercy-6-tce",
       "name": "Physician's Touch",
       "source": "TCE",
       "className": "Monk",
@@ -9276,6 +9748,7 @@
       ]
     },
     {
+      "id": "flurry-of-healing-and-harm-monk-mercy-11-tce",
       "name": "Flurry of Healing and Harm",
       "source": "TCE",
       "className": "Monk",
@@ -9290,6 +9763,7 @@
       ]
     },
     {
+      "id": "hand-of-ultimate-mercy-monk-mercy-17-tce",
       "name": "Hand of Ultimate Mercy",
       "source": "TCE",
       "className": "Monk",
@@ -9304,6 +9778,7 @@
       ]
     },
     {
+      "id": "way-of-the-drunken-master-monk-drunken-master-3-xge",
       "name": "Way of the Drunken Master",
       "source": "XGE",
       "className": "Monk",
@@ -9325,6 +9800,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-monk-drunken-master-3-xge",
       "name": "Bonus Proficiencies",
       "source": "XGE",
       "className": "Monk",
@@ -9337,6 +9813,7 @@
       ]
     },
     {
+      "id": "drunken-technique-monk-drunken-master-3-xge",
       "name": "Drunken Technique",
       "source": "XGE",
       "className": "Monk",
@@ -9349,6 +9826,7 @@
       ]
     },
     {
+      "id": "leap-to-your-feet-monk-drunken-master-6-xge",
       "name": "Leap to Your Feet",
       "source": "XGE",
       "className": "Monk",
@@ -9361,6 +9839,7 @@
       ]
     },
     {
+      "id": "redirect-attack-monk-drunken-master-6-xge",
       "name": "Redirect Attack",
       "source": "XGE",
       "className": "Monk",
@@ -9373,6 +9852,7 @@
       ]
     },
     {
+      "id": "tipsy-sway-monk-drunken-master-6-xge",
       "name": "Tipsy Sway",
       "source": "XGE",
       "className": "Monk",
@@ -9398,6 +9878,7 @@
       ]
     },
     {
+      "id": "drunkard-s-luck-monk-drunken-master-11-xge",
       "name": "Drunkard's Luck",
       "source": "XGE",
       "className": "Monk",
@@ -9410,6 +9891,7 @@
       ]
     },
     {
+      "id": "intoxicated-frenzy-monk-drunken-master-17-xge",
       "name": "Intoxicated Frenzy",
       "source": "XGE",
       "className": "Monk",
@@ -9422,6 +9904,7 @@
       ]
     },
     {
+      "id": "agile-parry-monk-kensei-3-xge",
       "name": "Agile Parry",
       "source": "XGE",
       "className": "Monk",
@@ -9434,6 +9917,7 @@
       ]
     },
     {
+      "id": "kensei-s-shot-monk-kensei-3-xge",
       "name": "Kensei's Shot",
       "source": "XGE",
       "className": "Monk",
@@ -9446,6 +9930,7 @@
       ]
     },
     {
+      "id": "way-of-the-kensei-monk-kensei-3-xge",
       "name": "Way of the Kensei",
       "source": "XGE",
       "className": "Monk",
@@ -9463,6 +9948,7 @@
       ]
     },
     {
+      "id": "path-of-the-kensei-monk-kensei-3-xge",
       "name": "Path of the Kensei",
       "source": "XGE",
       "className": "Monk",
@@ -9502,6 +9988,7 @@
       ]
     },
     {
+      "id": "one-with-the-blade-monk-kensei-6-xge",
       "name": "One with the Blade",
       "source": "XGE",
       "className": "Monk",
@@ -9528,6 +10015,7 @@
       ]
     },
     {
+      "id": "sharpen-the-blade-monk-kensei-11-xge",
       "name": "Sharpen the Blade",
       "source": "XGE",
       "className": "Monk",
@@ -9540,6 +10028,7 @@
       ]
     },
     {
+      "id": "unerring-accuracy-monk-kensei-17-xge",
       "name": "Unerring Accuracy",
       "source": "XGE",
       "className": "Monk",
@@ -9552,6 +10041,7 @@
       ]
     },
     {
+      "id": "way-of-the-sun-soul-monk-sun-soul-3-xge",
       "name": "Way of the Sun Soul",
       "source": "XGE",
       "className": "Monk",
@@ -9568,6 +10058,7 @@
       ]
     },
     {
+      "id": "radiant-sun-bolt-monk-sun-soul-3-xge",
       "name": "Radiant Sun Bolt",
       "source": "XGE",
       "className": "Monk",
@@ -9582,6 +10073,7 @@
       ]
     },
     {
+      "id": "searing-arc-strike-monk-sun-soul-6-xge",
       "name": "Searing Arc Strike",
       "source": "XGE",
       "className": "Monk",
@@ -9595,6 +10087,7 @@
       ]
     },
     {
+      "id": "searing-sunburst-monk-sun-soul-11-xge",
       "name": "Searing Sunburst",
       "source": "XGE",
       "className": "Monk",
@@ -9609,6 +10102,7 @@
       ]
     },
     {
+      "id": "sun-shield-monk-sun-soul-17-xge",
       "name": "Sun Shield",
       "source": "XGE",
       "className": "Monk",
@@ -9622,6 +10116,7 @@
       ]
     },
     {
+      "id": "order-of-the-avatar-mystic-avatar-1-uathemysticclass",
       "name": "Order of the Avatar",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9643,6 +10138,7 @@
       ]
     },
     {
+      "id": "armor-training-mystic-avatar-1-uathemysticclass",
       "name": "Armor Training",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9655,6 +10151,7 @@
       ]
     },
     {
+      "id": "bonus-disciplines-mystic-avatar-1-uathemysticclass",
       "name": "Bonus Disciplines",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9667,6 +10164,7 @@
       ]
     },
     {
+      "id": "avatar-of-battle-mystic-avatar-3-uathemysticclass",
       "name": "Avatar of Battle",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9679,6 +10177,7 @@
       ]
     },
     {
+      "id": "avatar-of-healing-mystic-avatar-6-uathemysticclass",
       "name": "Avatar of Healing",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9691,6 +10190,7 @@
       ]
     },
     {
+      "id": "avatar-of-speed-mystic-avatar-14-uathemysticclass",
       "name": "Avatar of Speed",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9703,6 +10203,7 @@
       ]
     },
     {
+      "id": "order-of-the-awakened-mystic-awakened-1-uathemysticclass",
       "name": "Order of the Awakened",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9724,6 +10225,7 @@
       ]
     },
     {
+      "id": "awakened-talent-mystic-awakened-1-uathemysticclass",
       "name": "Awakened Talent",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9736,6 +10238,7 @@
       ]
     },
     {
+      "id": "bonus-disciplines-mystic-awakened-1-uathemysticclass",
       "name": "Bonus Disciplines",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9748,6 +10251,7 @@
       ]
     },
     {
+      "id": "psionic-investigation-mystic-awakened-3-uathemysticclass",
       "name": "Psionic Investigation",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9763,6 +10267,7 @@
       ]
     },
     {
+      "id": "psionic-surge-mystic-awakened-6-uathemysticclass",
       "name": "Psionic Surge",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9776,6 +10281,7 @@
       ]
     },
     {
+      "id": "spectral-form-mystic-awakened-14-uathemysticclass",
       "name": "Spectral Form",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9789,6 +10295,7 @@
       ]
     },
     {
+      "id": "order-of-the-immortal-mystic-immortal-1-uathemysticclass",
       "name": "Order of the Immortal",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9810,6 +10317,7 @@
       ]
     },
     {
+      "id": "bonus-disciplines-mystic-immortal-1-uathemysticclass",
       "name": "Bonus Disciplines",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9822,6 +10330,7 @@
       ]
     },
     {
+      "id": "immortal-durability-mystic-immortal-1-uathemysticclass",
       "name": "Immortal Durability",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9835,6 +10344,7 @@
       ]
     },
     {
+      "id": "psionic-resilience-mystic-immortal-3-uathemysticclass",
       "name": "Psionic Resilience",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9847,6 +10357,7 @@
       ]
     },
     {
+      "id": "surge-of-health-mystic-immortal-6-uathemysticclass",
       "name": "Surge of Health",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9860,6 +10371,7 @@
       ]
     },
     {
+      "id": "immortal-will-mystic-immortal-14-uathemysticclass",
       "name": "Immortal Will",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9872,6 +10384,7 @@
       ]
     },
     {
+      "id": "order-of-the-nomad-mystic-nomad-1-uathemysticclass",
       "name": "Order of the Nomad",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9893,6 +10406,7 @@
       ]
     },
     {
+      "id": "bonus-disciplines-mystic-nomad-1-uathemysticclass",
       "name": "Bonus Disciplines",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9905,6 +10419,7 @@
       ]
     },
     {
+      "id": "breadth-of-knowledge-mystic-nomad-1-uathemysticclass",
       "name": "Breadth of Knowledge",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9917,6 +10432,7 @@
       ]
     },
     {
+      "id": "memory-of-one-thousand-steps-mystic-nomad-3-uathemysticclass",
       "name": "Memory of One Thousand Steps",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9929,6 +10445,7 @@
       ]
     },
     {
+      "id": "superior-teleportation-mystic-nomad-6-uathemysticclass",
       "name": "Superior Teleportation",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9941,6 +10458,7 @@
       ]
     },
     {
+      "id": "effortless-journey-mystic-nomad-14-uathemysticclass",
       "name": "Effortless Journey",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9953,6 +10471,7 @@
       ]
     },
     {
+      "id": "order-of-the-soul-knife-mystic-soul-knife-1-uathemysticclass",
       "name": "Order of the Soul Knife",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9974,6 +10493,7 @@
       ]
     },
     {
+      "id": "martial-training-mystic-soul-knife-1-uathemysticclass",
       "name": "Martial Training",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -9986,6 +10506,7 @@
       ]
     },
     {
+      "id": "soul-knife-mystic-soul-knife-1-uathemysticclass",
       "name": "Soul Knife",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10000,6 +10521,7 @@
       ]
     },
     {
+      "id": "hone-the-blade-mystic-soul-knife-3-uathemysticclass",
       "name": "Hone the Blade",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10037,6 +10559,7 @@
       ]
     },
     {
+      "id": "consumptive-knife-mystic-soul-knife-6-uathemysticclass",
       "name": "Consumptive Knife",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10049,6 +10572,7 @@
       ]
     },
     {
+      "id": "phantom-knife-mystic-soul-knife-14-uathemysticclass",
       "name": "Phantom Knife",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10061,6 +10585,7 @@
       ]
     },
     {
+      "id": "order-of-the-wu-jen-mystic-wu-jen-1-uathemysticclass",
       "name": "Order of the Wu Jen",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10082,6 +10607,7 @@
       ]
     },
     {
+      "id": "bonus-disciplines-mystic-wu-jen-1-uathemysticclass",
       "name": "Bonus Disciplines",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10094,6 +10620,7 @@
       ]
     },
     {
+      "id": "hermit-s-study-mystic-wu-jen-1-uathemysticclass",
       "name": "Hermit's Study",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10106,6 +10633,7 @@
       ]
     },
     {
+      "id": "elemental-attunement-mystic-wu-jen-3-uathemysticclass",
       "name": "Elemental Attunement",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10118,6 +10646,7 @@
       ]
     },
     {
+      "id": "arcane-dabbler-mystic-wu-jen-6-uathemysticclass",
       "name": "Arcane Dabbler",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10166,6 +10695,7 @@
       ]
     },
     {
+      "id": "elemental-mastery-mystic-wu-jen-14-uathemysticclass",
       "name": "Elemental Mastery",
       "source": "UATheMysticClass",
       "className": "Mystic",
@@ -10178,6 +10708,7 @@
       ]
     },
     {
+      "id": "oathbreaker-paladin-oathbreaker-3-dmg",
       "name": "Oathbreaker",
       "source": "DMG",
       "className": "Paladin",
@@ -10199,6 +10730,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-oathbreaker-3-dmg",
       "name": "Channel Divinity",
       "source": "DMG",
       "className": "Paladin",
@@ -10219,6 +10751,7 @@
       ]
     },
     {
+      "id": "control-undead-paladin-oathbreaker-3-dmg",
       "name": "Control Undead",
       "source": "DMG",
       "className": "Paladin",
@@ -10231,6 +10764,7 @@
       ]
     },
     {
+      "id": "dreadful-aspect-paladin-oathbreaker-3-dmg",
       "name": "Dreadful Aspect",
       "source": "DMG",
       "className": "Paladin",
@@ -10243,6 +10777,7 @@
       ]
     },
     {
+      "id": "oathbreaker-spells-paladin-oathbreaker-3-dmg",
       "name": "Oathbreaker Spells",
       "source": "DMG",
       "className": "Paladin",
@@ -10289,6 +10824,7 @@
       ]
     },
     {
+      "id": "aura-of-hate-paladin-oathbreaker-7-dmg",
       "name": "Aura of Hate",
       "source": "DMG",
       "className": "Paladin",
@@ -10302,6 +10838,7 @@
       ]
     },
     {
+      "id": "supernatural-resistance-paladin-oathbreaker-15-dmg",
       "name": "Supernatural Resistance",
       "source": "DMG",
       "className": "Paladin",
@@ -10314,6 +10851,7 @@
       ]
     },
     {
+      "id": "dread-lord-paladin-oathbreaker-20-dmg",
       "name": "Dread Lord",
       "source": "DMG",
       "className": "Paladin",
@@ -10328,6 +10866,7 @@
       ]
     },
     {
+      "id": "oath-of-the-ancients-paladin-ancients-3-phb",
       "name": "Oath of the Ancients",
       "source": "PHB",
       "className": "Paladin",
@@ -10352,6 +10891,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-ancients-3-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Paladin",
@@ -10372,6 +10912,7 @@
       ]
     },
     {
+      "id": "nature-s-wrath-paladin-ancients-3-phb",
       "name": "Nature's Wrath",
       "source": "PHB",
       "className": "Paladin",
@@ -10384,6 +10925,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-ancients-3-phb",
       "name": "Oath Spells",
       "source": "PHB",
       "className": "Paladin",
@@ -10430,6 +10972,7 @@
       ]
     },
     {
+      "id": "tenets-of-the-ancients-paladin-ancients-3-phb",
       "name": "Tenets of the Ancients",
       "source": "PHB",
       "className": "Paladin",
@@ -10490,6 +11033,7 @@
       ]
     },
     {
+      "id": "turn-the-faithless-paladin-ancients-3-phb",
       "name": "Turn the Faithless",
       "source": "PHB",
       "className": "Paladin",
@@ -10504,6 +11048,7 @@
       ]
     },
     {
+      "id": "aura-of-warding-paladin-ancients-7-phb",
       "name": "Aura of Warding",
       "source": "PHB",
       "className": "Paladin",
@@ -10517,6 +11062,7 @@
       ]
     },
     {
+      "id": "undying-sentinel-paladin-ancients-15-phb",
       "name": "Undying Sentinel",
       "source": "PHB",
       "className": "Paladin",
@@ -10530,6 +11076,7 @@
       ]
     },
     {
+      "id": "elder-champion-paladin-ancients-20-phb",
       "name": "Elder Champion",
       "source": "PHB",
       "className": "Paladin",
@@ -10552,6 +11099,7 @@
       ]
     },
     {
+      "id": "oath-of-devotion-paladin-devotion-3-phb",
       "name": "Oath of Devotion",
       "source": "PHB",
       "className": "Paladin",
@@ -10576,6 +11124,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-devotion-3-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Paladin",
@@ -10596,6 +11145,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-devotion-3-phb",
       "name": "Oath Spells",
       "source": "PHB",
       "className": "Paladin",
@@ -10642,6 +11192,7 @@
       ]
     },
     {
+      "id": "sacred-weapon-paladin-devotion-3-phb",
       "name": "Sacred Weapon",
       "source": "PHB",
       "className": "Paladin",
@@ -10655,6 +11206,7 @@
       ]
     },
     {
+      "id": "tenets-of-devotion-paladin-devotion-3-phb",
       "name": "Tenets of Devotion",
       "source": "PHB",
       "className": "Paladin",
@@ -10727,6 +11279,7 @@
       ]
     },
     {
+      "id": "turn-the-unholy-paladin-devotion-3-phb",
       "name": "Turn the Unholy",
       "source": "PHB",
       "className": "Paladin",
@@ -10740,6 +11293,7 @@
       ]
     },
     {
+      "id": "aura-of-devotion-paladin-devotion-7-phb",
       "name": "Aura of Devotion",
       "source": "PHB",
       "className": "Paladin",
@@ -10753,6 +11307,7 @@
       ]
     },
     {
+      "id": "purity-of-spirit-paladin-devotion-15-phb",
       "name": "Purity of Spirit",
       "source": "PHB",
       "className": "Paladin",
@@ -10765,6 +11320,7 @@
       ]
     },
     {
+      "id": "holy-nimbus-paladin-devotion-20-phb",
       "name": "Holy Nimbus",
       "source": "PHB",
       "className": "Paladin",
@@ -10780,6 +11336,7 @@
       ]
     },
     {
+      "id": "oath-of-vengeance-paladin-vengeance-3-phb",
       "name": "Oath of Vengeance",
       "source": "PHB",
       "className": "Paladin",
@@ -10804,6 +11361,7 @@
       ]
     },
     {
+      "id": "abjure-enemy-paladin-vengeance-3-phb",
       "name": "Abjure Enemy",
       "source": "PHB",
       "className": "Paladin",
@@ -10818,6 +11376,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-vengeance-3-phb",
       "name": "Channel Divinity",
       "source": "PHB",
       "className": "Paladin",
@@ -10838,6 +11397,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-vengeance-3-phb",
       "name": "Oath Spells",
       "source": "PHB",
       "className": "Paladin",
@@ -10884,6 +11444,7 @@
       ]
     },
     {
+      "id": "tenets-of-vengeance-paladin-vengeance-3-phb",
       "name": "Tenets of Vengeance",
       "source": "PHB",
       "className": "Paladin",
@@ -10944,6 +11505,7 @@
       ]
     },
     {
+      "id": "vow-of-enmity-paladin-vengeance-3-phb",
       "name": "Vow of Enmity",
       "source": "PHB",
       "className": "Paladin",
@@ -10956,6 +11518,7 @@
       ]
     },
     {
+      "id": "relentless-avenger-paladin-vengeance-7-phb",
       "name": "Relentless Avenger",
       "source": "PHB",
       "className": "Paladin",
@@ -10968,6 +11531,7 @@
       ]
     },
     {
+      "id": "soul-of-vengeance-paladin-vengeance-15-phb",
       "name": "Soul of Vengeance",
       "source": "PHB",
       "className": "Paladin",
@@ -10980,6 +11544,7 @@
       ]
     },
     {
+      "id": "avenging-angel-paladin-vengeance-20-phb",
       "name": "Avenging Angel",
       "source": "PHB",
       "className": "Paladin",
@@ -11000,6 +11565,7 @@
       ]
     },
     {
+      "id": "oath-of-the-crown-paladin-crown-3-scag",
       "name": "Oath of the Crown",
       "source": "SCAG",
       "className": "Paladin",
@@ -11024,6 +11590,7 @@
       ]
     },
     {
+      "id": "champion-challenge-paladin-crown-3-scag",
       "name": "Champion Challenge",
       "source": "SCAG",
       "className": "Paladin",
@@ -11036,6 +11603,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-crown-3-scag",
       "name": "Channel Divinity",
       "source": "SCAG",
       "className": "Paladin",
@@ -11056,6 +11624,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-crown-3-scag",
       "name": "Oath Spells",
       "source": "SCAG",
       "className": "Paladin",
@@ -11102,6 +11671,7 @@
       ]
     },
     {
+      "id": "tenets-of-the-crown-paladin-crown-3-scag",
       "name": "Tenets of the Crown",
       "source": "SCAG",
       "className": "Paladin",
@@ -11162,6 +11732,7 @@
       ]
     },
     {
+      "id": "turn-the-tide-paladin-crown-3-scag",
       "name": "Turn the Tide",
       "source": "SCAG",
       "className": "Paladin",
@@ -11174,6 +11745,7 @@
       ]
     },
     {
+      "id": "divine-allegiance-paladin-crown-7-scag",
       "name": "Divine Allegiance",
       "source": "SCAG",
       "className": "Paladin",
@@ -11186,6 +11758,7 @@
       ]
     },
     {
+      "id": "unyielding-spirit-paladin-crown-15-scag",
       "name": "Unyielding Spirit",
       "source": "SCAG",
       "className": "Paladin",
@@ -11198,6 +11771,7 @@
       ]
     },
     {
+      "id": "exalted-champion-paladin-crown-20-scag",
       "name": "Exalted Champion",
       "source": "SCAG",
       "className": "Paladin",
@@ -11219,6 +11793,7 @@
       ]
     },
     {
+      "id": "oath-of-glory-paladin-glory-3-tce",
       "name": "Oath of Glory",
       "source": "TCE",
       "className": "Paladin",
@@ -11243,6 +11818,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-glory-3-tce",
       "name": "Channel Divinity",
       "source": "TCE",
       "className": "Paladin",
@@ -11264,6 +11840,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-glory-3-tce",
       "name": "Oath Spells",
       "source": "TCE",
       "className": "Paladin",
@@ -11311,6 +11888,7 @@
       ]
     },
     {
+      "id": "tenets-of-glory-paladin-glory-3-tce",
       "name": "Tenets of Glory",
       "source": "TCE",
       "className": "Paladin",
@@ -11351,6 +11929,7 @@
       ]
     },
     {
+      "id": "inspiring-smite-paladin-glory-3-tce",
       "name": "Inspiring Smite",
       "source": "TCE",
       "className": "Paladin",
@@ -11363,6 +11942,7 @@
       ]
     },
     {
+      "id": "peerless-athlete-paladin-glory-3-tce",
       "name": "Peerless Athlete",
       "source": "TCE",
       "className": "Paladin",
@@ -11375,6 +11955,7 @@
       ]
     },
     {
+      "id": "aura-of-alacrity-paladin-glory-7-tce",
       "name": "Aura of Alacrity",
       "source": "TCE",
       "className": "Paladin",
@@ -11389,6 +11970,7 @@
       ]
     },
     {
+      "id": "glorious-defense-paladin-glory-15-tce",
       "name": "Glorious Defense",
       "source": "TCE",
       "className": "Paladin",
@@ -11403,6 +11985,7 @@
       ]
     },
     {
+      "id": "living-legend-paladin-glory-20-tce",
       "name": "Living Legend",
       "source": "TCE",
       "className": "Paladin",
@@ -11425,6 +12008,7 @@
       ]
     },
     {
+      "id": "oath-of-the-watchers-paladin-watchers-3-tce",
       "name": "Oath of the Watchers",
       "source": "TCE",
       "className": "Paladin",
@@ -11450,6 +12034,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-watchers-3-tce",
       "name": "Channel Divinity",
       "source": "TCE",
       "className": "Paladin",
@@ -11471,6 +12056,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-watchers-3-tce",
       "name": "Oath Spells",
       "source": "TCE",
       "className": "Paladin",
@@ -11518,6 +12104,7 @@
       ]
     },
     {
+      "id": "tenets-of-the-watchers-paladin-watchers-3-tce",
       "name": "Tenets of the Watchers",
       "source": "TCE",
       "className": "Paladin",
@@ -11551,6 +12138,7 @@
       ]
     },
     {
+      "id": "abjure-the-extraplanar-paladin-watchers-3-tce",
       "name": "Abjure the Extraplanar",
       "source": "TCE",
       "className": "Paladin",
@@ -11564,6 +12152,7 @@
       ]
     },
     {
+      "id": "watcher-s-will-paladin-watchers-3-tce",
       "name": "Watcher's Will",
       "source": "TCE",
       "className": "Paladin",
@@ -11576,6 +12165,7 @@
       ]
     },
     {
+      "id": "aura-of-the-sentinel-paladin-watchers-7-tce",
       "name": "Aura of the Sentinel",
       "source": "TCE",
       "className": "Paladin",
@@ -11590,6 +12180,7 @@
       ]
     },
     {
+      "id": "vigilant-rebuke-paladin-watchers-15-tce",
       "name": "Vigilant Rebuke",
       "source": "TCE",
       "className": "Paladin",
@@ -11603,6 +12194,7 @@
       ]
     },
     {
+      "id": "mortal-bulwark-paladin-watchers-20-tce",
       "name": "Mortal Bulwark",
       "source": "TCE",
       "className": "Paladin",
@@ -11625,6 +12217,7 @@
       ]
     },
     {
+      "id": "oath-of-conquest-paladin-conquest-3-xge",
       "name": "Oath of Conquest",
       "source": "XGE",
       "className": "Paladin",
@@ -11650,6 +12243,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-conquest-3-xge",
       "name": "Channel Divinity",
       "source": "XGE",
       "className": "Paladin",
@@ -11670,6 +12264,7 @@
       ]
     },
     {
+      "id": "conquering-presence-paladin-conquest-3-xge",
       "name": "Conquering Presence",
       "source": "XGE",
       "className": "Paladin",
@@ -11682,6 +12277,7 @@
       ]
     },
     {
+      "id": "guided-strike-paladin-conquest-3-xge",
       "name": "Guided Strike",
       "source": "XGE",
       "className": "Paladin",
@@ -11694,6 +12290,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-conquest-3-xge",
       "name": "Oath Spells",
       "source": "XGE",
       "className": "Paladin",
@@ -11740,6 +12337,7 @@
       ]
     },
     {
+      "id": "tenets-of-conquest-paladin-conquest-3-xge",
       "name": "Tenets of Conquest",
       "source": "XGE",
       "className": "Paladin",
@@ -11778,6 +12376,7 @@
       ]
     },
     {
+      "id": "aura-of-conquest-paladin-conquest-7-xge",
       "name": "Aura of Conquest",
       "source": "XGE",
       "className": "Paladin",
@@ -11792,6 +12391,7 @@
       ]
     },
     {
+      "id": "scornful-rebuke-paladin-conquest-15-xge",
       "name": "Scornful Rebuke",
       "source": "XGE",
       "className": "Paladin",
@@ -11804,6 +12404,7 @@
       ]
     },
     {
+      "id": "invincible-conqueror-paladin-conquest-20-xge",
       "name": "Invincible Conqueror",
       "source": "XGE",
       "className": "Paladin",
@@ -11825,6 +12426,7 @@
       ]
     },
     {
+      "id": "oath-of-redemption-paladin-redemption-3-xge",
       "name": "Oath of Redemption",
       "source": "XGE",
       "className": "Paladin",
@@ -11850,6 +12452,7 @@
       ]
     },
     {
+      "id": "channel-divinity-paladin-redemption-3-xge",
       "name": "Channel Divinity",
       "source": "XGE",
       "className": "Paladin",
@@ -11870,6 +12473,7 @@
       ]
     },
     {
+      "id": "emissary-of-peace-paladin-redemption-3-xge",
       "name": "Emissary of Peace",
       "source": "XGE",
       "className": "Paladin",
@@ -11882,6 +12486,7 @@
       ]
     },
     {
+      "id": "oath-spells-paladin-redemption-3-xge",
       "name": "Oath Spells",
       "source": "XGE",
       "className": "Paladin",
@@ -11928,6 +12533,7 @@
       ]
     },
     {
+      "id": "rebuke-the-violent-paladin-redemption-3-xge",
       "name": "Rebuke the Violent",
       "source": "XGE",
       "className": "Paladin",
@@ -11940,6 +12546,7 @@
       ]
     },
     {
+      "id": "tenets-of-redemption-paladin-redemption-3-xge",
       "name": "Tenets of Redemption",
       "source": "XGE",
       "className": "Paladin",
@@ -12000,6 +12607,7 @@
       ]
     },
     {
+      "id": "aura-of-the-guardian-paladin-redemption-7-xge",
       "name": "Aura of the Guardian",
       "source": "XGE",
       "className": "Paladin",
@@ -12013,6 +12621,7 @@
       ]
     },
     {
+      "id": "protective-spirit-paladin-redemption-15-xge",
       "name": "Protective Spirit",
       "source": "XGE",
       "className": "Paladin",
@@ -12025,6 +12634,7 @@
       ]
     },
     {
+      "id": "emissary-of-redemption-paladin-redemption-20-xge",
       "name": "Emissary of Redemption",
       "source": "XGE",
       "className": "Paladin",
@@ -12045,6 +12655,7 @@
       ]
     },
     {
+      "id": "drakewarden-ranger-drakewarden-3-ftd",
       "name": "Drakewarden",
       "source": "FTD",
       "className": "Ranger",
@@ -12104,6 +12715,7 @@
       ]
     },
     {
+      "id": "draconic-gift-ranger-drakewarden-3-ftd",
       "name": "Draconic Gift",
       "source": "FTD",
       "className": "Ranger",
@@ -12133,6 +12745,7 @@
       ]
     },
     {
+      "id": "drake-companion-ranger-drakewarden-3-ftd",
       "name": "Drake Companion",
       "source": "FTD",
       "className": "Ranger",
@@ -12150,6 +12763,7 @@
       ]
     },
     {
+      "id": "bond-of-fang-and-scale-ranger-drakewarden-7-ftd",
       "name": "Bond of Fang and Scale",
       "source": "FTD",
       "className": "Ranger",
@@ -12191,6 +12805,7 @@
       ]
     },
     {
+      "id": "drake-s-breath-ranger-drakewarden-11-ftd",
       "name": "Drake's Breath",
       "source": "FTD",
       "className": "Ranger",
@@ -12206,6 +12821,7 @@
       ]
     },
     {
+      "id": "perfected-bond-ranger-drakewarden-15-ftd",
       "name": "Perfected Bond",
       "source": "FTD",
       "className": "Ranger",
@@ -12246,6 +12862,7 @@
       ]
     },
     {
+      "id": "beast-master-ranger-beast-master-3-phb",
       "name": "Beast Master",
       "source": "PHB",
       "className": "Ranger",
@@ -12266,6 +12883,7 @@
       ]
     },
     {
+      "id": "primal-companion-ranger-beast-master-3-tce",
       "name": "Primal Companion",
       "source": "TCE",
       "className": "Ranger",
@@ -12282,6 +12900,7 @@
       ]
     },
     {
+      "id": "ranger-s-companion-ranger-beast-master-3-phb",
       "name": "Ranger's Companion",
       "source": "PHB",
       "className": "Ranger",
@@ -12298,6 +12917,7 @@
       ]
     },
     {
+      "id": "exceptional-training-ranger-beast-master-7-phb",
       "name": "Exceptional Training",
       "source": "PHB",
       "className": "Ranger",
@@ -12310,6 +12930,7 @@
       ]
     },
     {
+      "id": "bestial-fury-ranger-beast-master-11-phb",
       "name": "Bestial Fury",
       "source": "PHB",
       "className": "Ranger",
@@ -12322,6 +12943,7 @@
       ]
     },
     {
+      "id": "share-spells-ranger-beast-master-15-phb",
       "name": "Share Spells",
       "source": "PHB",
       "className": "Ranger",
@@ -12334,6 +12956,7 @@
       ]
     },
     {
+      "id": "hunter-ranger-hunter-3-phb",
       "name": "Hunter",
       "source": "PHB",
       "className": "Ranger",
@@ -12350,6 +12973,7 @@
       ]
     },
     {
+      "id": "horde-breaker-ranger-hunter-3-phb",
       "name": "Horde Breaker",
       "source": "PHB",
       "className": "Ranger",
@@ -12362,6 +12986,7 @@
       ]
     },
     {
+      "id": "hunter-s-prey-ranger-hunter-3-phb",
       "name": "Hunter's Prey",
       "source": "PHB",
       "className": "Ranger",
@@ -12392,6 +13017,7 @@
       ]
     },
     {
+      "id": "colossus-slayer-ranger-hunter-3-phb",
       "name": "Colossus Slayer",
       "source": "PHB",
       "className": "Ranger",
@@ -12404,6 +13030,7 @@
       ]
     },
     {
+      "id": "giant-killer-ranger-hunter-3-phb",
       "name": "Giant Killer",
       "source": "PHB",
       "className": "Ranger",
@@ -12416,6 +13043,7 @@
       ]
     },
     {
+      "id": "defensive-tactics-ranger-hunter-7-phb",
       "name": "Defensive Tactics",
       "source": "PHB",
       "className": "Ranger",
@@ -12446,6 +13074,7 @@
       ]
     },
     {
+      "id": "escape-the-horde-ranger-hunter-7-phb",
       "name": "Escape the Horde",
       "source": "PHB",
       "className": "Ranger",
@@ -12458,6 +13087,7 @@
       ]
     },
     {
+      "id": "multiattack-defense-ranger-hunter-7-phb",
       "name": "Multiattack Defense",
       "source": "PHB",
       "className": "Ranger",
@@ -12470,6 +13100,7 @@
       ]
     },
     {
+      "id": "steel-will-ranger-hunter-7-phb",
       "name": "Steel Will",
       "source": "PHB",
       "className": "Ranger",
@@ -12482,6 +13113,7 @@
       ]
     },
     {
+      "id": "multiattack-ranger-hunter-11-phb",
       "name": "Multiattack",
       "source": "PHB",
       "className": "Ranger",
@@ -12508,6 +13140,7 @@
       ]
     },
     {
+      "id": "volley-ranger-hunter-11-phb",
       "name": "Volley",
       "source": "PHB",
       "className": "Ranger",
@@ -12520,6 +13153,7 @@
       ]
     },
     {
+      "id": "whirlwind-attack-ranger-hunter-11-phb",
       "name": "Whirlwind Attack",
       "source": "PHB",
       "className": "Ranger",
@@ -12532,6 +13166,7 @@
       ]
     },
     {
+      "id": "evasion-ranger-hunter-15-phb",
       "name": "Evasion",
       "source": "PHB",
       "className": "Ranger",
@@ -12544,6 +13179,7 @@
       ]
     },
     {
+      "id": "stand-against-the-tide-ranger-hunter-15-phb",
       "name": "Stand Against the Tide",
       "source": "PHB",
       "className": "Ranger",
@@ -12556,6 +13192,7 @@
       ]
     },
     {
+      "id": "superior-hunter-s-defense-ranger-hunter-15-phb",
       "name": "Superior Hunter's Defense",
       "source": "PHB",
       "className": "Ranger",
@@ -12586,6 +13223,7 @@
       ]
     },
     {
+      "id": "uncanny-dodge-ranger-hunter-15-phb",
       "name": "Uncanny Dodge",
       "source": "PHB",
       "className": "Ranger",
@@ -12598,6 +13236,7 @@
       ]
     },
     {
+      "id": "fey-wanderer-ranger-fey-wanderer-3-tce",
       "name": "Fey Wanderer",
       "source": "TCE",
       "className": "Ranger",
@@ -12622,6 +13261,7 @@
       ]
     },
     {
+      "id": "dreadful-strikes-ranger-fey-wanderer-3-tce",
       "name": "Dreadful Strikes",
       "source": "TCE",
       "className": "Ranger",
@@ -12636,6 +13276,7 @@
       ]
     },
     {
+      "id": "fey-wanderer-magic-ranger-fey-wanderer-3-tce",
       "name": "Fey Wanderer Magic",
       "source": "TCE",
       "className": "Ranger",
@@ -12722,6 +13363,7 @@
       ]
     },
     {
+      "id": "otherworldly-glamour-ranger-fey-wanderer-3-tce",
       "name": "Otherworldly Glamour",
       "source": "TCE",
       "className": "Ranger",
@@ -12736,6 +13378,7 @@
       ]
     },
     {
+      "id": "beguiling-twist-ranger-fey-wanderer-7-tce",
       "name": "Beguiling Twist",
       "source": "TCE",
       "className": "Ranger",
@@ -12750,6 +13393,7 @@
       ]
     },
     {
+      "id": "fey-reinforcements-ranger-fey-wanderer-11-tce",
       "name": "Fey Reinforcements",
       "source": "TCE",
       "className": "Ranger",
@@ -12764,6 +13408,7 @@
       ]
     },
     {
+      "id": "misty-wanderer-ranger-fey-wanderer-15-tce",
       "name": "Misty Wanderer",
       "source": "TCE",
       "className": "Ranger",
@@ -12778,6 +13423,7 @@
       ]
     },
     {
+      "id": "swarmkeeper-ranger-swarmkeeper-3-tce",
       "name": "Swarmkeeper",
       "source": "TCE",
       "className": "Ranger",
@@ -12798,6 +13444,7 @@
       ]
     },
     {
+      "id": "gathered-swarm-ranger-swarmkeeper-3-tce",
       "name": "Gathered Swarm",
       "source": "TCE",
       "className": "Ranger",
@@ -12858,6 +13505,7 @@
       ]
     },
     {
+      "id": "swarmkeeper-magic-ranger-swarmkeeper-3-tce",
       "name": "Swarmkeeper Magic",
       "source": "TCE",
       "className": "Ranger",
@@ -12906,6 +13554,7 @@
       ]
     },
     {
+      "id": "writhing-tide-ranger-swarmkeeper-7-tce",
       "name": "Writhing Tide",
       "source": "TCE",
       "className": "Ranger",
@@ -12920,6 +13569,7 @@
       ]
     },
     {
+      "id": "mighty-swarm-ranger-swarmkeeper-11-tce",
       "name": "Mighty Swarm",
       "source": "TCE",
       "className": "Ranger",
@@ -12941,6 +13591,7 @@
       ]
     },
     {
+      "id": "swarming-dispersal-ranger-swarmkeeper-15-tce",
       "name": "Swarming Dispersal",
       "source": "TCE",
       "className": "Ranger",
@@ -12955,6 +13606,7 @@
       ]
     },
     {
+      "id": "gloom-stalker-ranger-gloom-stalker-3-xge",
       "name": "Gloom Stalker",
       "source": "XGE",
       "className": "Ranger",
@@ -12979,6 +13631,7 @@
       ]
     },
     {
+      "id": "dread-ambusher-ranger-gloom-stalker-3-xge",
       "name": "Dread Ambusher",
       "source": "XGE",
       "className": "Ranger",
@@ -12992,6 +13645,7 @@
       ]
     },
     {
+      "id": "gloom-stalker-magic-ranger-gloom-stalker-3-xge",
       "name": "Gloom Stalker Magic",
       "source": "XGE",
       "className": "Ranger",
@@ -13038,6 +13692,7 @@
       ]
     },
     {
+      "id": "umbral-sight-ranger-gloom-stalker-3-xge",
       "name": "Umbral Sight",
       "source": "XGE",
       "className": "Ranger",
@@ -13051,6 +13706,7 @@
       ]
     },
     {
+      "id": "iron-mind-ranger-gloom-stalker-7-xge",
       "name": "Iron Mind",
       "source": "XGE",
       "className": "Ranger",
@@ -13063,6 +13719,7 @@
       ]
     },
     {
+      "id": "stalker-s-flurry-ranger-gloom-stalker-11-xge",
       "name": "Stalker's Flurry",
       "source": "XGE",
       "className": "Ranger",
@@ -13075,6 +13732,7 @@
       ]
     },
     {
+      "id": "shadowy-dodge-ranger-gloom-stalker-15-xge",
       "name": "Shadowy Dodge",
       "source": "XGE",
       "className": "Ranger",
@@ -13087,6 +13745,7 @@
       ]
     },
     {
+      "id": "horizon-walker-ranger-horizon-walker-3-xge",
       "name": "Horizon Walker",
       "source": "XGE",
       "className": "Ranger",
@@ -13111,6 +13770,7 @@
       ]
     },
     {
+      "id": "detect-portal-ranger-horizon-walker-3-xge",
       "name": "Detect Portal",
       "source": "XGE",
       "className": "Ranger",
@@ -13125,6 +13785,7 @@
       ]
     },
     {
+      "id": "horizon-walker-magic-ranger-horizon-walker-3-xge",
       "name": "Horizon Walker Magic",
       "source": "XGE",
       "className": "Ranger",
@@ -13171,6 +13832,7 @@
       ]
     },
     {
+      "id": "planar-warrior-ranger-horizon-walker-3-xge",
       "name": "Planar Warrior",
       "source": "XGE",
       "className": "Ranger",
@@ -13184,6 +13846,7 @@
       ]
     },
     {
+      "id": "ethereal-step-ranger-horizon-walker-7-xge",
       "name": "Ethereal Step",
       "source": "XGE",
       "className": "Ranger",
@@ -13197,6 +13860,7 @@
       ]
     },
     {
+      "id": "distant-strike-ranger-horizon-walker-11-xge",
       "name": "Distant Strike",
       "source": "XGE",
       "className": "Ranger",
@@ -13210,6 +13874,7 @@
       ]
     },
     {
+      "id": "spectral-defense-ranger-horizon-walker-15-xge",
       "name": "Spectral Defense",
       "source": "XGE",
       "className": "Ranger",
@@ -13222,6 +13887,7 @@
       ]
     },
     {
+      "id": "monster-slayer-ranger-monster-slayer-3-xge",
       "name": "Monster Slayer",
       "source": "XGE",
       "className": "Ranger",
@@ -13246,6 +13912,7 @@
       ]
     },
     {
+      "id": "hunter-s-sense-ranger-monster-slayer-3-xge",
       "name": "Hunter's Sense",
       "source": "XGE",
       "className": "Ranger",
@@ -13259,6 +13926,7 @@
       ]
     },
     {
+      "id": "monster-slayer-magic-ranger-monster-slayer-3-xge",
       "name": "Monster Slayer Magic",
       "source": "XGE",
       "className": "Ranger",
@@ -13305,6 +13973,7 @@
       ]
     },
     {
+      "id": "slayer-s-prey-ranger-monster-slayer-3-xge",
       "name": "Slayer's Prey",
       "source": "XGE",
       "className": "Ranger",
@@ -13318,6 +13987,7 @@
       ]
     },
     {
+      "id": "supernatural-defense-ranger-monster-slayer-7-xge",
       "name": "Supernatural Defense",
       "source": "XGE",
       "className": "Ranger",
@@ -13330,6 +14000,7 @@
       ]
     },
     {
+      "id": "magic-user-s-nemesis-ranger-monster-slayer-11-xge",
       "name": "Magic-User's Nemesis",
       "source": "XGE",
       "className": "Ranger",
@@ -13343,6 +14014,7 @@
       ]
     },
     {
+      "id": "slayer-s-counter-ranger-monster-slayer-15-xge",
       "name": "Slayer's Counter",
       "source": "XGE",
       "className": "Ranger",
@@ -13355,6 +14027,7 @@
       ]
     },
     {
+      "id": "arcane-trickster-rogue-arcane-trickster-3-phb",
       "name": "Arcane Trickster",
       "source": "PHB",
       "className": "Rogue",
@@ -13375,6 +14048,7 @@
       ]
     },
     {
+      "id": "mage-hand-legerdemain-rogue-arcane-trickster-3-phb",
       "name": "Mage Hand Legerdemain",
       "source": "PHB",
       "className": "Rogue",
@@ -13397,6 +14071,7 @@
       ]
     },
     {
+      "id": "spellcasting-rogue-arcane-trickster-3-phb",
       "name": "Spellcasting",
       "source": "PHB",
       "className": "Rogue",
@@ -13475,6 +14150,7 @@
       ]
     },
     {
+      "id": "magical-ambush-rogue-arcane-trickster-9-phb",
       "name": "Magical Ambush",
       "source": "PHB",
       "className": "Rogue",
@@ -13487,6 +14163,7 @@
       ]
     },
     {
+      "id": "versatile-trickster-rogue-arcane-trickster-13-phb",
       "name": "Versatile Trickster",
       "source": "PHB",
       "className": "Rogue",
@@ -13499,6 +14176,7 @@
       ]
     },
     {
+      "id": "spell-thief-rogue-arcane-trickster-17-phb",
       "name": "Spell Thief",
       "source": "PHB",
       "className": "Rogue",
@@ -13513,6 +14191,7 @@
       ]
     },
     {
+      "id": "assassin-rogue-assassin-3-phb",
       "name": "Assassin",
       "source": "PHB",
       "className": "Rogue",
@@ -13534,6 +14213,7 @@
       ]
     },
     {
+      "id": "assassinate-rogue-assassin-3-phb",
       "name": "Assassinate",
       "source": "PHB",
       "className": "Rogue",
@@ -13546,6 +14226,7 @@
       ]
     },
     {
+      "id": "bonus-proficiencies-rogue-assassin-3-phb",
       "name": "Bonus Proficiencies",
       "source": "PHB",
       "className": "Rogue",
@@ -13558,6 +14239,7 @@
       ]
     },
     {
+      "id": "infiltration-expertise-rogue-assassin-9-phb",
       "name": "Infiltration Expertise",
       "source": "PHB",
       "className": "Rogue",
@@ -13571,6 +14253,7 @@
       ]
     },
     {
+      "id": "impostor-rogue-assassin-13-phb",
       "name": "Impostor",
       "source": "PHB",
       "className": "Rogue",
@@ -13584,6 +14267,7 @@
       ]
     },
     {
+      "id": "death-strike-rogue-assassin-17-phb",
       "name": "Death Strike",
       "source": "PHB",
       "className": "Rogue",
@@ -13596,6 +14280,7 @@
       ]
     },
     {
+      "id": "thief-rogue-thief-3-phb",
       "name": "Thief",
       "source": "PHB",
       "className": "Rogue",
@@ -13616,6 +14301,7 @@
       ]
     },
     {
+      "id": "fast-hands-rogue-thief-3-phb",
       "name": "Fast Hands",
       "source": "PHB",
       "className": "Rogue",
@@ -13628,6 +14314,7 @@
       ]
     },
     {
+      "id": "second-story-work-rogue-thief-3-phb",
       "name": "Second-Story Work",
       "source": "PHB",
       "className": "Rogue",
@@ -13641,6 +14328,7 @@
       ]
     },
     {
+      "id": "supreme-sneak-rogue-thief-9-phb",
       "name": "Supreme Sneak",
       "source": "PHB",
       "className": "Rogue",
@@ -13653,6 +14341,7 @@
       ]
     },
     {
+      "id": "use-magic-device-rogue-thief-13-phb",
       "name": "Use Magic Device",
       "source": "PHB",
       "className": "Rogue",
@@ -13665,6 +14354,7 @@
       ]
     },
     {
+      "id": "thief-s-reflexes-rogue-thief-17-phb",
       "name": "Thief's Reflexes",
       "source": "PHB",
       "className": "Rogue",
@@ -13677,6 +14367,7 @@
       ]
     },
     {
+      "id": "phantom-rogue-phantom-3-tce",
       "name": "Phantom",
       "source": "TCE",
       "className": "Rogue",
@@ -13699,6 +14390,7 @@
       ]
     },
     {
+      "id": "wails-from-the-grave-rogue-phantom-3-tce",
       "name": "Wails from the Grave",
       "source": "TCE",
       "className": "Rogue",
@@ -13713,6 +14405,7 @@
       ]
     },
     {
+      "id": "whispers-of-the-dead-rogue-phantom-3-tce",
       "name": "Whispers of the Dead",
       "source": "TCE",
       "className": "Rogue",
@@ -13726,6 +14419,7 @@
       ]
     },
     {
+      "id": "tokens-of-the-departed-rogue-phantom-9-tce",
       "name": "Tokens of the Departed",
       "source": "TCE",
       "className": "Rogue",
@@ -13748,6 +14442,7 @@
       ]
     },
     {
+      "id": "ghost-walk-rogue-phantom-13-tce",
       "name": "Ghost Walk",
       "source": "TCE",
       "className": "Rogue",
@@ -13762,6 +14457,7 @@
       ]
     },
     {
+      "id": "death-s-friend-rogue-phantom-17-tce",
       "name": "Death's Friend",
       "source": "TCE",
       "className": "Rogue",
@@ -13782,6 +14478,7 @@
       ]
     },
     {
+      "id": "psi-bolstered-knack-rogue-soulknife-3-tce",
       "name": "Psi-Bolstered Knack",
       "source": "TCE",
       "className": "Rogue",
@@ -13794,6 +14491,7 @@
       ]
     },
     {
+      "id": "psychic-whispers-rogue-soulknife-3-tce",
       "name": "Psychic Whispers",
       "source": "TCE",
       "className": "Rogue",
@@ -13807,6 +14505,7 @@
       ]
     },
     {
+      "id": "soulknife-rogue-soulknife-3-tce",
       "name": "Soulknife",
       "source": "TCE",
       "className": "Rogue",
@@ -13829,6 +14528,7 @@
       ]
     },
     {
+      "id": "psionic-power-rogue-soulknife-3-tce",
       "name": "Psionic Power",
       "source": "TCE",
       "className": "Rogue",
@@ -13858,6 +14558,7 @@
       ]
     },
     {
+      "id": "psychic-blades-rogue-soulknife-3-tce",
       "name": "Psychic Blades",
       "source": "TCE",
       "className": "Rogue",
@@ -13872,6 +14573,7 @@
       ]
     },
     {
+      "id": "homing-strikes-rogue-soulknife-9-tce",
       "name": "Homing Strikes",
       "source": "TCE",
       "className": "Rogue",
@@ -13884,6 +14586,7 @@
       ]
     },
     {
+      "id": "psychic-teleportation-rogue-soulknife-9-tce",
       "name": "Psychic Teleportation",
       "source": "TCE",
       "className": "Rogue",
@@ -13896,6 +14599,7 @@
       ]
     },
     {
+      "id": "soul-blades-rogue-soulknife-9-tce",
       "name": "Soul Blades",
       "source": "TCE",
       "className": "Rogue",
@@ -13922,6 +14626,7 @@
       ]
     },
     {
+      "id": "psychic-veil-rogue-soulknife-13-tce",
       "name": "Psychic Veil",
       "source": "TCE",
       "className": "Rogue",
@@ -13936,6 +14641,7 @@
       ]
     },
     {
+      "id": "rend-mind-rogue-soulknife-17-tce",
       "name": "Rend Mind",
       "source": "TCE",
       "className": "Rogue",
@@ -13950,6 +14656,7 @@
       ]
     },
     {
+      "id": "inquisitive-rogue-inquisitive-3-xge",
       "name": "Inquisitive",
       "source": "XGE",
       "className": "Rogue",
@@ -13974,6 +14681,7 @@
       ]
     },
     {
+      "id": "ear-for-deceit-rogue-inquisitive-3-xge",
       "name": "Ear for Deceit",
       "source": "XGE",
       "className": "Rogue",
@@ -13986,6 +14694,7 @@
       ]
     },
     {
+      "id": "eye-for-detail-rogue-inquisitive-3-xge",
       "name": "Eye for Detail",
       "source": "XGE",
       "className": "Rogue",
@@ -13998,6 +14707,7 @@
       ]
     },
     {
+      "id": "insightful-fighting-rogue-inquisitive-3-xge",
       "name": "Insightful Fighting",
       "source": "XGE",
       "className": "Rogue",
@@ -14011,6 +14721,7 @@
       ]
     },
     {
+      "id": "steady-eye-rogue-inquisitive-9-xge",
       "name": "Steady Eye",
       "source": "XGE",
       "className": "Rogue",
@@ -14023,6 +14734,7 @@
       ]
     },
     {
+      "id": "unerring-eye-rogue-inquisitive-13-xge",
       "name": "Unerring Eye",
       "source": "XGE",
       "className": "Rogue",
@@ -14036,6 +14748,7 @@
       ]
     },
     {
+      "id": "eye-for-weakness-rogue-inquisitive-17-xge",
       "name": "Eye for Weakness",
       "source": "XGE",
       "className": "Rogue",
@@ -14048,6 +14761,7 @@
       ]
     },
     {
+      "id": "mastermind-rogue-mastermind-3-xge",
       "name": "Mastermind",
       "source": "XGE",
       "className": "Rogue",
@@ -14068,6 +14782,7 @@
       ]
     },
     {
+      "id": "master-of-intrigue-rogue-mastermind-3-xge",
       "name": "Master of Intrigue",
       "source": "XGE",
       "className": "Rogue",
@@ -14081,6 +14796,7 @@
       ]
     },
     {
+      "id": "master-of-tactics-rogue-mastermind-3-xge",
       "name": "Master of Tactics",
       "source": "XGE",
       "className": "Rogue",
@@ -14093,6 +14809,7 @@
       ]
     },
     {
+      "id": "insightful-manipulator-rogue-mastermind-9-xge",
       "name": "Insightful Manipulator",
       "source": "XGE",
       "className": "Rogue",
@@ -14115,6 +14832,7 @@
       ]
     },
     {
+      "id": "misdirection-rogue-mastermind-13-xge",
       "name": "Misdirection",
       "source": "XGE",
       "className": "Rogue",
@@ -14127,6 +14845,7 @@
       ]
     },
     {
+      "id": "soul-of-deceit-rogue-mastermind-17-xge",
       "name": "Soul of Deceit",
       "source": "XGE",
       "className": "Rogue",
@@ -14140,6 +14859,7 @@
       ]
     },
     {
+      "id": "scout-rogue-scout-3-xge",
       "name": "Scout",
       "source": "XGE",
       "className": "Rogue",
@@ -14160,6 +14880,7 @@
       ]
     },
     {
+      "id": "skirmisher-rogue-scout-3-xge",
       "name": "Skirmisher",
       "source": "XGE",
       "className": "Rogue",
@@ -14172,6 +14893,7 @@
       ]
     },
     {
+      "id": "survivalist-rogue-scout-3-xge",
       "name": "Survivalist",
       "source": "XGE",
       "className": "Rogue",
@@ -14184,6 +14906,7 @@
       ]
     },
     {
+      "id": "superior-mobility-rogue-scout-9-xge",
       "name": "Superior Mobility",
       "source": "XGE",
       "className": "Rogue",
@@ -14196,6 +14919,7 @@
       ]
     },
     {
+      "id": "ambush-master-rogue-scout-13-xge",
       "name": "Ambush Master",
       "source": "XGE",
       "className": "Rogue",
@@ -14209,6 +14933,7 @@
       ]
     },
     {
+      "id": "sudden-strike-rogue-scout-17-xge",
       "name": "Sudden Strike",
       "source": "XGE",
       "className": "Rogue",
@@ -14221,6 +14946,7 @@
       ]
     },
     {
+      "id": "swashbuckler-rogue-swashbuckler-3-xge",
       "name": "Swashbuckler",
       "source": "XGE",
       "className": "Rogue",
@@ -14242,6 +14968,7 @@
       ]
     },
     {
+      "id": "fancy-footwork-rogue-swashbuckler-3-xge",
       "name": "Fancy Footwork",
       "source": "XGE",
       "className": "Rogue",
@@ -14254,6 +14981,7 @@
       ]
     },
     {
+      "id": "rakish-audacity-rogue-swashbuckler-3-xge",
       "name": "Rakish Audacity",
       "source": "XGE",
       "className": "Rogue",
@@ -14267,6 +14995,7 @@
       ]
     },
     {
+      "id": "panache-rogue-swashbuckler-9-xge",
       "name": "Panache",
       "source": "XGE",
       "className": "Rogue",
@@ -14281,6 +15010,7 @@
       ]
     },
     {
+      "id": "elegant-maneuver-rogue-swashbuckler-13-xge",
       "name": "Elegant Maneuver",
       "source": "XGE",
       "className": "Rogue",
@@ -14293,6 +15023,7 @@
       ]
     },
     {
+      "id": "master-duelist-rogue-swashbuckler-17-xge",
       "name": "Master Duelist",
       "source": "XGE",
       "className": "Rogue",
@@ -14305,6 +15036,7 @@
       ]
     },
     {
+      "id": "lunar-sorcery-sorcerer-lunar-1-dsotdq",
       "name": "Lunar Sorcery",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14326,6 +15058,7 @@
       ]
     },
     {
+      "id": "lunar-embodiment-sorcerer-lunar-1-dsotdq",
       "name": "Lunar Embodiment",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14388,6 +15121,7 @@
       ]
     },
     {
+      "id": "moon-fire-sorcerer-lunar-1-dsotdq",
       "name": "Moon Fire",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14401,6 +15135,7 @@
       ]
     },
     {
+      "id": "lunar-boons-sorcerer-lunar-6-dsotdq",
       "name": "Lunar Boons",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14442,6 +15177,7 @@
       ]
     },
     {
+      "id": "waxing-and-waning-sorcerer-lunar-6-dsotdq",
       "name": "Waxing and Waning",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14456,6 +15192,7 @@
       ]
     },
     {
+      "id": "lunar-empowerment-sorcerer-lunar-14-dsotdq",
       "name": "Lunar Empowerment",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14496,6 +15233,7 @@
       ]
     },
     {
+      "id": "lunar-phenomenon-sorcerer-lunar-18-dsotdq",
       "name": "Lunar Phenomenon",
       "source": "DSotDQ",
       "className": "Sorcerer",
@@ -14537,6 +15275,7 @@
       ]
     },
     {
+      "id": "draconic-bloodline-sorcerer-draconic-1-phb",
       "name": "Draconic Bloodline",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14557,6 +15296,7 @@
       ]
     },
     {
+      "id": "draconic-resilience-sorcerer-draconic-1-phb",
       "name": "Draconic Resilience",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14570,6 +15310,7 @@
       ]
     },
     {
+      "id": "dragon-ancestor-sorcerer-draconic-1-phb",
       "name": "Dragon Ancestor",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14637,6 +15378,7 @@
       ]
     },
     {
+      "id": "elemental-affinity-sorcerer-draconic-6-phb",
       "name": "Elemental Affinity",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14649,6 +15391,7 @@
       ]
     },
     {
+      "id": "dragon-wings-sorcerer-draconic-14-phb",
       "name": "Dragon Wings",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14662,6 +15405,7 @@
       ]
     },
     {
+      "id": "draconic-presence-sorcerer-draconic-18-phb",
       "name": "Draconic Presence",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14674,6 +15418,7 @@
       ]
     },
     {
+      "id": "wild-magic-sorcerer-wild-1-phb",
       "name": "Wild Magic",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14694,6 +15439,7 @@
       ]
     },
     {
+      "id": "tides-of-chaos-sorcerer-wild-1-phb",
       "name": "Tides of Chaos",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14707,6 +15453,7 @@
       ]
     },
     {
+      "id": "wild-magic-surge-sorcerer-wild-1-phb",
       "name": "Wild Magic Surge",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14942,6 +15689,7 @@
       ]
     },
     {
+      "id": "bend-luck-sorcerer-wild-6-phb",
       "name": "Bend Luck",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14954,6 +15702,7 @@
       ]
     },
     {
+      "id": "controlled-chaos-sorcerer-wild-14-phb",
       "name": "Controlled Chaos",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14966,6 +15715,7 @@
       ]
     },
     {
+      "id": "spell-bombardment-sorcerer-wild-18-phb",
       "name": "Spell Bombardment",
       "source": "PHB",
       "className": "Sorcerer",
@@ -14978,6 +15728,7 @@
       ]
     },
     {
+      "id": "pyromancer-psk-sorcerer-pyromancer-psk-1-psk",
       "name": "Pyromancer (PSK)",
       "source": "PSK",
       "className": "Sorcerer",
@@ -14994,6 +15745,7 @@
       ]
     },
     {
+      "id": "heart-of-fire-sorcerer-pyromancer-psk-1-psk",
       "name": "Heart of Fire",
       "source": "PSK",
       "className": "Sorcerer",
@@ -15006,6 +15758,7 @@
       ]
     },
     {
+      "id": "fire-in-the-veins-sorcerer-pyromancer-psk-6-psk",
       "name": "Fire in the Veins",
       "source": "PSK",
       "className": "Sorcerer",
@@ -15018,6 +15771,7 @@
       ]
     },
     {
+      "id": "pyromancer-s-fury-sorcerer-pyromancer-psk-14-psk",
       "name": "Pyromancer's Fury",
       "source": "PSK",
       "className": "Sorcerer",
@@ -15030,6 +15784,7 @@
       ]
     },
     {
+      "id": "fiery-soul-sorcerer-pyromancer-psk-18-psk",
       "name": "Fiery Soul",
       "source": "PSK",
       "className": "Sorcerer",
@@ -15042,6 +15797,7 @@
       ]
     },
     {
+      "id": "aberrant-mind-sorcerer-aberrant-mind-1-tce",
       "name": "Aberrant Mind",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15101,6 +15857,7 @@
       ]
     },
     {
+      "id": "psionic-spells-sorcerer-aberrant-mind-1-tce",
       "name": "Psionic Spells",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15149,6 +15906,7 @@
       ]
     },
     {
+      "id": "telepathic-speech-sorcerer-aberrant-mind-1-tce",
       "name": "Telepathic Speech",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15163,6 +15921,7 @@
       ]
     },
     {
+      "id": "psionic-sorcery-sorcerer-aberrant-mind-6-tce",
       "name": "Psionic Sorcery",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15177,6 +15936,7 @@
       ]
     },
     {
+      "id": "psychic-defenses-sorcerer-aberrant-mind-6-tce",
       "name": "Psychic Defenses",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15190,6 +15950,7 @@
       ]
     },
     {
+      "id": "revelation-in-flesh-sorcerer-aberrant-mind-14-tce",
       "name": "Revelation in Flesh",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15212,6 +15973,7 @@
       ]
     },
     {
+      "id": "warping-implosion-sorcerer-aberrant-mind-18-tce",
       "name": "Warping Implosion",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15226,6 +15988,7 @@
       ]
     },
     {
+      "id": "clockwork-soul-sorcerer-clockwork-soul-1-tce",
       "name": "Clockwork Soul",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15246,6 +16009,7 @@
       ]
     },
     {
+      "id": "clockwork-magic-sorcerer-clockwork-soul-1-tce",
       "name": "Clockwork Magic",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15333,6 +16097,7 @@
       ]
     },
     {
+      "id": "restore-balance-sorcerer-clockwork-soul-1-tce",
       "name": "Restore Balance",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15347,6 +16112,7 @@
       ]
     },
     {
+      "id": "bastion-of-law-sorcerer-clockwork-soul-6-tce",
       "name": "Bastion of Law",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15361,6 +16127,7 @@
       ]
     },
     {
+      "id": "trance-of-order-sorcerer-clockwork-soul-14-tce",
       "name": "Trance of Order",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15375,6 +16142,7 @@
       ]
     },
     {
+      "id": "clockwork-cavalcade-sorcerer-clockwork-soul-18-tce",
       "name": "Clockwork Cavalcade",
       "source": "TCE",
       "className": "Sorcerer",
@@ -15397,6 +16165,7 @@
       ]
     },
     {
+      "id": "divine-soul-sorcerer-divine-soul-1-xge",
       "name": "Divine Soul",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15420,6 +16189,7 @@
       ]
     },
     {
+      "id": "divine-magic-sorcerer-divine-soul-1-xge",
       "name": "Divine Magic",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15466,6 +16236,7 @@
       ]
     },
     {
+      "id": "favored-by-the-gods-sorcerer-divine-soul-1-xge",
       "name": "Favored by the Gods",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15478,6 +16249,7 @@
       ]
     },
     {
+      "id": "empowered-healing-sorcerer-divine-soul-6-xge",
       "name": "Empowered Healing",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15490,6 +16262,7 @@
       ]
     },
     {
+      "id": "otherworldly-wings-sorcerer-divine-soul-14-xge",
       "name": "Otherworldly Wings",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15503,6 +16276,7 @@
       ]
     },
     {
+      "id": "unearthly-recovery-sorcerer-divine-soul-18-xge",
       "name": "Unearthly Recovery",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15516,6 +16290,7 @@
       ]
     },
     {
+      "id": "shadow-magic-sorcerer-shadow-1-xge",
       "name": "Shadow Magic",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15575,6 +16350,7 @@
       ]
     },
     {
+      "id": "eyes-of-the-dark-sorcerer-shadow-1-xge",
       "name": "Eyes of the Dark",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15588,6 +16364,7 @@
       ]
     },
     {
+      "id": "strength-of-the-grave-sorcerer-shadow-1-xge",
       "name": "Strength of the Grave",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15601,6 +16378,7 @@
       ]
     },
     {
+      "id": "hound-of-ill-omen-sorcerer-shadow-6-xge",
       "name": "Hound of Ill Omen",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15623,6 +16401,7 @@
       ]
     },
     {
+      "id": "shadow-walk-sorcerer-shadow-14-xge",
       "name": "Shadow Walk",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15635,6 +16414,7 @@
       ]
     },
     {
+      "id": "umbral-form-sorcerer-shadow-18-xge",
       "name": "Umbral Form",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15648,6 +16428,7 @@
       ]
     },
     {
+      "id": "storm-sorcery-sorcerer-storm-1-xge",
       "name": "Storm Sorcery",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15669,6 +16450,7 @@
       ]
     },
     {
+      "id": "tempestuous-magic-sorcerer-storm-1-xge",
       "name": "Tempestuous Magic",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15681,6 +16463,7 @@
       ]
     },
     {
+      "id": "wind-speaker-sorcerer-storm-1-xge",
       "name": "Wind Speaker",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15693,6 +16476,7 @@
       ]
     },
     {
+      "id": "heart-of-the-storm-sorcerer-storm-6-xge",
       "name": "Heart of the Storm",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15705,6 +16489,7 @@
       ]
     },
     {
+      "id": "storm-guide-sorcerer-storm-6-xge",
       "name": "Storm Guide",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15719,6 +16504,7 @@
       ]
     },
     {
+      "id": "storm-s-fury-sorcerer-storm-14-xge",
       "name": "Storm's Fury",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15731,6 +16517,7 @@
       ]
     },
     {
+      "id": "wind-soul-sorcerer-storm-18-xge",
       "name": "Wind Soul",
       "source": "XGE",
       "className": "Sorcerer",
@@ -15744,6 +16531,7 @@
       ]
     },
     {
+      "id": "the-archfey-warlock-archfey-1-phb",
       "name": "The Archfey",
       "source": "PHB",
       "className": "Warlock",
@@ -15801,6 +16589,7 @@
       ]
     },
     {
+      "id": "fey-presence-warlock-archfey-1-phb",
       "name": "Fey Presence",
       "source": "PHB",
       "className": "Warlock",
@@ -15814,6 +16603,7 @@
       ]
     },
     {
+      "id": "misty-escape-warlock-archfey-6-phb",
       "name": "Misty Escape",
       "source": "PHB",
       "className": "Warlock",
@@ -15827,6 +16617,7 @@
       ]
     },
     {
+      "id": "beguiling-defenses-warlock-archfey-10-phb",
       "name": "Beguiling Defenses",
       "source": "PHB",
       "className": "Warlock",
@@ -15839,6 +16630,7 @@
       ]
     },
     {
+      "id": "dark-delirium-warlock-archfey-14-phb",
       "name": "Dark Delirium",
       "source": "PHB",
       "className": "Warlock",
@@ -15853,6 +16645,7 @@
       ]
     },
     {
+      "id": "the-fiend-warlock-fiend-1-phb",
       "name": "The Fiend",
       "source": "PHB",
       "className": "Warlock",
@@ -15910,6 +16703,7 @@
       ]
     },
     {
+      "id": "dark-one-s-blessing-warlock-fiend-1-phb",
       "name": "Dark One's Blessing",
       "source": "PHB",
       "className": "Warlock",
@@ -15922,6 +16716,7 @@
       ]
     },
     {
+      "id": "dark-one-s-own-luck-warlock-fiend-6-phb",
       "name": "Dark One's Own Luck",
       "source": "PHB",
       "className": "Warlock",
@@ -15935,6 +16730,7 @@
       ]
     },
     {
+      "id": "fiendish-resilience-warlock-fiend-10-phb",
       "name": "Fiendish Resilience",
       "source": "PHB",
       "className": "Warlock",
@@ -15947,6 +16743,7 @@
       ]
     },
     {
+      "id": "hurl-through-hell-warlock-fiend-14-phb",
       "name": "Hurl Through Hell",
       "source": "PHB",
       "className": "Warlock",
@@ -15961,6 +16758,7 @@
       ]
     },
     {
+      "id": "the-great-old-one-warlock-great-old-one-1-phb",
       "name": "The Great Old One",
       "source": "PHB",
       "className": "Warlock",
@@ -16018,6 +16816,7 @@
       ]
     },
     {
+      "id": "awakened-mind-warlock-great-old-one-1-phb",
       "name": "Awakened Mind",
       "source": "PHB",
       "className": "Warlock",
@@ -16030,6 +16829,7 @@
       ]
     },
     {
+      "id": "entropic-ward-warlock-great-old-one-6-phb",
       "name": "Entropic Ward",
       "source": "PHB",
       "className": "Warlock",
@@ -16043,6 +16843,7 @@
       ]
     },
     {
+      "id": "thought-shield-warlock-great-old-one-10-phb",
       "name": "Thought Shield",
       "source": "PHB",
       "className": "Warlock",
@@ -16055,6 +16856,7 @@
       ]
     },
     {
+      "id": "create-thrall-warlock-great-old-one-14-phb",
       "name": "Create Thrall",
       "source": "PHB",
       "className": "Warlock",
@@ -16068,6 +16870,7 @@
       ]
     },
     {
+      "id": "the-undying-warlock-undying-1-scag",
       "name": "The Undying",
       "source": "SCAG",
       "className": "Warlock",
@@ -16126,6 +16929,7 @@
       ]
     },
     {
+      "id": "among-the-dead-warlock-undying-1-scag",
       "name": "Among the Dead",
       "source": "SCAG",
       "className": "Warlock",
@@ -16139,6 +16943,7 @@
       ]
     },
     {
+      "id": "defy-death-warlock-undying-6-scag",
       "name": "Defy Death",
       "source": "SCAG",
       "className": "Warlock",
@@ -16152,6 +16957,7 @@
       ]
     },
     {
+      "id": "undying-nature-warlock-undying-10-scag",
       "name": "Undying Nature",
       "source": "SCAG",
       "className": "Warlock",
@@ -16165,6 +16971,7 @@
       ]
     },
     {
+      "id": "indestructible-life-warlock-undying-14-scag",
       "name": "Indestructible Life",
       "source": "SCAG",
       "className": "Warlock",
@@ -16178,6 +16985,7 @@
       ]
     },
     {
+      "id": "the-fathomless-warlock-fathomless-1-tce",
       "name": "The Fathomless",
       "source": "TCE",
       "className": "Warlock",
@@ -16242,6 +17050,7 @@
       ]
     },
     {
+      "id": "gift-of-the-sea-warlock-fathomless-1-tce",
       "name": "Gift of the Sea",
       "source": "TCE",
       "className": "Warlock",
@@ -16255,6 +17064,7 @@
       ]
     },
     {
+      "id": "tentacle-of-the-deeps-warlock-fathomless-1-tce",
       "name": "Tentacle of the Deeps",
       "source": "TCE",
       "className": "Warlock",
@@ -16271,6 +17081,7 @@
       ]
     },
     {
+      "id": "guardian-coil-warlock-fathomless-6-tce",
       "name": "Guardian Coil",
       "source": "TCE",
       "className": "Warlock",
@@ -16284,6 +17095,7 @@
       ]
     },
     {
+      "id": "oceanic-soul-warlock-fathomless-6-tce",
       "name": "Oceanic Soul",
       "source": "TCE",
       "className": "Warlock",
@@ -16297,6 +17109,7 @@
       ]
     },
     {
+      "id": "grasping-tentacles-warlock-fathomless-10-tce",
       "name": "Grasping Tentacles",
       "source": "TCE",
       "className": "Warlock",
@@ -16311,6 +17124,7 @@
       ]
     },
     {
+      "id": "fathomless-plunge-warlock-fathomless-14-tce",
       "name": "Fathomless Plunge",
       "source": "TCE",
       "className": "Warlock",
@@ -16325,6 +17139,7 @@
       ]
     },
     {
+      "id": "bottled-respite-warlock-genie-1-tce",
       "name": "Bottled Respite",
       "source": "TCE",
       "className": "Warlock",
@@ -16337,6 +17152,7 @@
       ]
     },
     {
+      "id": "genie-s-wrath-warlock-genie-1-tce",
       "name": "Genie's Wrath",
       "source": "TCE",
       "className": "Warlock",
@@ -16349,6 +17165,7 @@
       ]
     },
     {
+      "id": "the-genie-warlock-genie-1-tce",
       "name": "The Genie",
       "source": "TCE",
       "className": "Warlock",
@@ -16480,6 +17297,7 @@
       ]
     },
     {
+      "id": "genie-s-vessel-warlock-genie-1-tce",
       "name": "Genie's Vessel",
       "source": "TCE",
       "className": "Warlock",
@@ -16548,6 +17366,7 @@
       ]
     },
     {
+      "id": "elemental-gift-warlock-genie-6-tce",
       "name": "Elemental Gift",
       "source": "TCE",
       "className": "Warlock",
@@ -16562,6 +17381,7 @@
       ]
     },
     {
+      "id": "sanctuary-vessel-warlock-genie-10-tce",
       "name": "Sanctuary Vessel",
       "source": "TCE",
       "className": "Warlock",
@@ -16577,6 +17397,7 @@
       ]
     },
     {
+      "id": "limited-wish-warlock-genie-14-tce",
       "name": "Limited Wish",
       "source": "TCE",
       "className": "Warlock",
@@ -16591,6 +17412,7 @@
       ]
     },
     {
+      "id": "the-undead-warlock-undead-1-vrgr",
       "name": "The Undead",
       "source": "VRGR",
       "className": "Warlock",
@@ -16650,6 +17472,7 @@
       ]
     },
     {
+      "id": "form-of-dread-warlock-undead-1-vrgr",
       "name": "Form of Dread",
       "source": "VRGR",
       "className": "Warlock",
@@ -16673,6 +17496,7 @@
       ]
     },
     {
+      "id": "grave-touched-warlock-undead-6-vrgr",
       "name": "Grave Touched",
       "source": "VRGR",
       "className": "Warlock",
@@ -16687,6 +17511,7 @@
       ]
     },
     {
+      "id": "necrotic-husk-warlock-undead-10-vrgr",
       "name": "Necrotic Husk",
       "source": "VRGR",
       "className": "Warlock",
@@ -16701,6 +17526,7 @@
       ]
     },
     {
+      "id": "spirit-projection-warlock-undead-14-vrgr",
       "name": "Spirit Projection",
       "source": "VRGR",
       "className": "Warlock",
@@ -16726,6 +17552,7 @@
       ]
     },
     {
+      "id": "the-celestial-warlock-celestial-1-xge",
       "name": "The Celestial",
       "source": "XGE",
       "className": "Warlock",
@@ -16788,6 +17615,7 @@
       ]
     },
     {
+      "id": "bonus-cantrips-warlock-celestial-1-xge",
       "name": "Bonus Cantrips",
       "source": "XGE",
       "className": "Warlock",
@@ -16800,6 +17628,7 @@
       ]
     },
     {
+      "id": "healing-light-warlock-celestial-1-xge",
       "name": "Healing Light",
       "source": "XGE",
       "className": "Warlock",
@@ -16814,6 +17643,7 @@
       ]
     },
     {
+      "id": "radiant-soul-warlock-celestial-6-xge",
       "name": "Radiant Soul",
       "source": "XGE",
       "className": "Warlock",
@@ -16826,6 +17656,7 @@
       ]
     },
     {
+      "id": "celestial-resilience-warlock-celestial-10-xge",
       "name": "Celestial Resilience",
       "source": "XGE",
       "className": "Warlock",
@@ -16838,6 +17669,7 @@
       ]
     },
     {
+      "id": "searing-vengeance-warlock-celestial-14-xge",
       "name": "Searing Vengeance",
       "source": "XGE",
       "className": "Warlock",
@@ -16851,6 +17683,7 @@
       ]
     },
     {
+      "id": "the-hexblade-warlock-hexblade-1-xge",
       "name": "The Hexblade",
       "source": "XGE",
       "className": "Warlock",
@@ -16913,6 +17746,7 @@
       ]
     },
     {
+      "id": "hex-warrior-warlock-hexblade-1-xge",
       "name": "Hex Warrior",
       "source": "XGE",
       "className": "Warlock",
@@ -16926,6 +17760,7 @@
       ]
     },
     {
+      "id": "hexblade-s-curse-warlock-hexblade-1-xge",
       "name": "Hexblade's Curse",
       "source": "XGE",
       "className": "Warlock",
@@ -16947,6 +17782,7 @@
       ]
     },
     {
+      "id": "accursed-specter-warlock-hexblade-6-xge",
       "name": "Accursed Specter",
       "source": "XGE",
       "className": "Warlock",
@@ -16961,6 +17797,7 @@
       ]
     },
     {
+      "id": "armor-of-hexes-warlock-hexblade-10-xge",
       "name": "Armor of Hexes",
       "source": "XGE",
       "className": "Warlock",
@@ -16973,6 +17810,7 @@
       ]
     },
     {
+      "id": "master-of-hexes-warlock-hexblade-14-xge",
       "name": "Master of Hexes",
       "source": "XGE",
       "className": "Warlock",
@@ -16985,6 +17823,7 @@
       ]
     },
     {
+      "id": "chronurgy-magic-wizard-chronurgy-2-egw",
       "name": "Chronurgy Magic",
       "source": "EGW",
       "className": "Wizard",
@@ -17006,6 +17845,7 @@
       ]
     },
     {
+      "id": "chronal-shift-wizard-chronurgy-2-egw",
       "name": "Chronal Shift",
       "source": "EGW",
       "className": "Wizard",
@@ -17020,6 +17860,7 @@
       ]
     },
     {
+      "id": "temporal-awareness-wizard-chronurgy-2-egw",
       "name": "Temporal Awareness",
       "source": "EGW",
       "className": "Wizard",
@@ -17033,6 +17874,7 @@
       ]
     },
     {
+      "id": "momentary-stasis-wizard-chronurgy-6-egw",
       "name": "Momentary Stasis",
       "source": "EGW",
       "className": "Wizard",
@@ -17047,6 +17889,7 @@
       ]
     },
     {
+      "id": "arcane-abeyance-wizard-chronurgy-10-egw",
       "name": "Arcane Abeyance",
       "source": "EGW",
       "className": "Wizard",
@@ -17062,6 +17905,7 @@
       ]
     },
     {
+      "id": "convergent-future-wizard-chronurgy-14-egw",
       "name": "Convergent Future",
       "source": "EGW",
       "className": "Wizard",
@@ -17076,6 +17920,7 @@
       ]
     },
     {
+      "id": "graviturgy-magic-wizard-graviturgy-2-egw",
       "name": "Graviturgy Magic",
       "source": "EGW",
       "className": "Wizard",
@@ -17093,6 +17938,7 @@
       ]
     },
     {
+      "id": "adjust-density-wizard-graviturgy-2-egw",
       "name": "Adjust Density",
       "source": "EGW",
       "className": "Wizard",
@@ -17108,6 +17954,7 @@
       ]
     },
     {
+      "id": "gravity-well-wizard-graviturgy-6-egw",
       "name": "Gravity Well",
       "source": "EGW",
       "className": "Wizard",
@@ -17121,6 +17968,7 @@
       ]
     },
     {
+      "id": "violent-attraction-wizard-graviturgy-10-egw",
       "name": "Violent Attraction",
       "source": "EGW",
       "className": "Wizard",
@@ -17136,6 +17984,7 @@
       ]
     },
     {
+      "id": "event-horizon-wizard-graviturgy-14-egw",
       "name": "Event Horizon",
       "source": "EGW",
       "className": "Wizard",
@@ -17150,6 +17999,7 @@
       ]
     },
     {
+      "id": "school-of-abjuration-wizard-abjuration-2-phb",
       "name": "School of Abjuration",
       "source": "PHB",
       "className": "Wizard",
@@ -17171,6 +18021,7 @@
       ]
     },
     {
+      "id": "abjuration-savant-wizard-abjuration-2-phb",
       "name": "Abjuration Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17183,6 +18034,7 @@
       ]
     },
     {
+      "id": "arcane-ward-wizard-abjuration-2-phb",
       "name": "Arcane Ward",
       "source": "PHB",
       "className": "Wizard",
@@ -17197,6 +18049,7 @@
       ]
     },
     {
+      "id": "projected-ward-wizard-abjuration-6-phb",
       "name": "Projected Ward",
       "source": "PHB",
       "className": "Wizard",
@@ -17209,6 +18062,7 @@
       ]
     },
     {
+      "id": "improved-abjuration-wizard-abjuration-10-phb",
       "name": "Improved Abjuration",
       "source": "PHB",
       "className": "Wizard",
@@ -17221,6 +18075,7 @@
       ]
     },
     {
+      "id": "spell-resistance-wizard-abjuration-14-phb",
       "name": "Spell Resistance",
       "source": "PHB",
       "className": "Wizard",
@@ -17234,6 +18089,7 @@
       ]
     },
     {
+      "id": "school-of-conjuration-wizard-conjuration-2-phb",
       "name": "School of Conjuration",
       "source": "PHB",
       "className": "Wizard",
@@ -17254,6 +18110,7 @@
       ]
     },
     {
+      "id": "conjuration-savant-wizard-conjuration-2-phb",
       "name": "Conjuration Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17266,6 +18123,7 @@
       ]
     },
     {
+      "id": "minor-conjuration-wizard-conjuration-2-phb",
       "name": "Minor Conjuration",
       "source": "PHB",
       "className": "Wizard",
@@ -17279,6 +18137,7 @@
       ]
     },
     {
+      "id": "benign-transposition-wizard-conjuration-6-phb",
       "name": "Benign Transposition",
       "source": "PHB",
       "className": "Wizard",
@@ -17292,6 +18151,7 @@
       ]
     },
     {
+      "id": "focused-conjuration-wizard-conjuration-10-phb",
       "name": "Focused Conjuration",
       "source": "PHB",
       "className": "Wizard",
@@ -17304,6 +18164,7 @@
       ]
     },
     {
+      "id": "durable-summons-wizard-conjuration-14-phb",
       "name": "Durable Summons",
       "source": "PHB",
       "className": "Wizard",
@@ -17316,6 +18177,7 @@
       ]
     },
     {
+      "id": "school-of-divination-wizard-divination-2-phb",
       "name": "School of Divination",
       "source": "PHB",
       "className": "Wizard",
@@ -17336,6 +18198,7 @@
       ]
     },
     {
+      "id": "divination-savant-wizard-divination-2-phb",
       "name": "Divination Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17348,6 +18211,7 @@
       ]
     },
     {
+      "id": "portent-wizard-divination-2-phb",
       "name": "Portent",
       "source": "PHB",
       "className": "Wizard",
@@ -17361,6 +18225,7 @@
       ]
     },
     {
+      "id": "expert-divination-wizard-divination-6-phb",
       "name": "Expert Divination",
       "source": "PHB",
       "className": "Wizard",
@@ -17373,6 +18238,7 @@
       ]
     },
     {
+      "id": "the-third-eye-wizard-divination-10-phb",
       "name": "The Third Eye",
       "source": "PHB",
       "className": "Wizard",
@@ -17418,6 +18284,7 @@
       ]
     },
     {
+      "id": "greater-portent-wizard-divination-14-phb",
       "name": "Greater Portent",
       "source": "PHB",
       "className": "Wizard",
@@ -17430,6 +18297,7 @@
       ]
     },
     {
+      "id": "school-of-enchantment-wizard-enchantment-2-phb",
       "name": "School of Enchantment",
       "source": "PHB",
       "className": "Wizard",
@@ -17450,6 +18318,7 @@
       ]
     },
     {
+      "id": "enchantment-savant-wizard-enchantment-2-phb",
       "name": "Enchantment Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17462,6 +18331,7 @@
       ]
     },
     {
+      "id": "hypnotic-gaze-wizard-enchantment-2-phb",
       "name": "Hypnotic Gaze",
       "source": "PHB",
       "className": "Wizard",
@@ -17476,6 +18346,7 @@
       ]
     },
     {
+      "id": "instinctive-charm-wizard-enchantment-6-phb",
       "name": "Instinctive Charm",
       "source": "PHB",
       "className": "Wizard",
@@ -17489,6 +18360,7 @@
       ]
     },
     {
+      "id": "split-enchantment-wizard-enchantment-10-phb",
       "name": "Split Enchantment",
       "source": "PHB",
       "className": "Wizard",
@@ -17501,6 +18373,7 @@
       ]
     },
     {
+      "id": "alter-memories-wizard-enchantment-14-phb",
       "name": "Alter Memories",
       "source": "PHB",
       "className": "Wizard",
@@ -17514,6 +18387,7 @@
       ]
     },
     {
+      "id": "school-of-evocation-wizard-evocation-2-phb",
       "name": "School of Evocation",
       "source": "PHB",
       "className": "Wizard",
@@ -17534,6 +18408,7 @@
       ]
     },
     {
+      "id": "evocation-savant-wizard-evocation-2-phb",
       "name": "Evocation Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17546,6 +18421,7 @@
       ]
     },
     {
+      "id": "sculpt-spells-wizard-evocation-2-phb",
       "name": "Sculpt Spells",
       "source": "PHB",
       "className": "Wizard",
@@ -17558,6 +18434,7 @@
       ]
     },
     {
+      "id": "potent-cantrip-wizard-evocation-6-phb",
       "name": "Potent Cantrip",
       "source": "PHB",
       "className": "Wizard",
@@ -17570,6 +18447,7 @@
       ]
     },
     {
+      "id": "empowered-evocation-wizard-evocation-10-phb",
       "name": "Empowered Evocation",
       "source": "PHB",
       "className": "Wizard",
@@ -17582,6 +18460,7 @@
       ]
     },
     {
+      "id": "overchannel-wizard-evocation-14-phb",
       "name": "Overchannel",
       "source": "PHB",
       "className": "Wizard",
@@ -17595,6 +18474,7 @@
       ]
     },
     {
+      "id": "school-of-illusion-wizard-illusion-2-phb",
       "name": "School of Illusion",
       "source": "PHB",
       "className": "Wizard",
@@ -17615,6 +18495,7 @@
       ]
     },
     {
+      "id": "illusion-savant-wizard-illusion-2-phb",
       "name": "Illusion Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17627,6 +18508,7 @@
       ]
     },
     {
+      "id": "improved-minor-illusion-wizard-illusion-2-phb",
       "name": "Improved Minor Illusion",
       "source": "PHB",
       "className": "Wizard",
@@ -17640,6 +18522,7 @@
       ]
     },
     {
+      "id": "malleable-illusions-wizard-illusion-6-phb",
       "name": "Malleable Illusions",
       "source": "PHB",
       "className": "Wizard",
@@ -17652,6 +18535,7 @@
       ]
     },
     {
+      "id": "illusory-self-wizard-illusion-10-phb",
       "name": "Illusory Self",
       "source": "PHB",
       "className": "Wizard",
@@ -17665,6 +18549,7 @@
       ]
     },
     {
+      "id": "illusory-reality-wizard-illusion-14-phb",
       "name": "Illusory Reality",
       "source": "PHB",
       "className": "Wizard",
@@ -17678,6 +18563,7 @@
       ]
     },
     {
+      "id": "school-of-necromancy-wizard-necromancy-2-phb",
       "name": "School of Necromancy",
       "source": "PHB",
       "className": "Wizard",
@@ -17699,6 +18585,7 @@
       ]
     },
     {
+      "id": "grim-harvest-wizard-necromancy-2-phb",
       "name": "Grim Harvest",
       "source": "PHB",
       "className": "Wizard",
@@ -17711,6 +18598,7 @@
       ]
     },
     {
+      "id": "necromancy-savant-wizard-necromancy-2-phb",
       "name": "Necromancy Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17723,6 +18611,7 @@
       ]
     },
     {
+      "id": "undead-thralls-wizard-necromancy-6-phb",
       "name": "Undead Thralls",
       "source": "PHB",
       "className": "Wizard",
@@ -17743,6 +18632,7 @@
       ]
     },
     {
+      "id": "inured-to-undeath-wizard-necromancy-10-phb",
       "name": "Inured to Undeath",
       "source": "PHB",
       "className": "Wizard",
@@ -17755,6 +18645,7 @@
       ]
     },
     {
+      "id": "command-undead-wizard-necromancy-14-phb",
       "name": "Command Undead",
       "source": "PHB",
       "className": "Wizard",
@@ -17768,6 +18659,7 @@
       ]
     },
     {
+      "id": "school-of-transmutation-wizard-transmutation-2-phb",
       "name": "School of Transmutation",
       "source": "PHB",
       "className": "Wizard",
@@ -17789,6 +18681,7 @@
       ]
     },
     {
+      "id": "minor-alchemy-wizard-transmutation-2-phb",
       "name": "Minor Alchemy",
       "source": "PHB",
       "className": "Wizard",
@@ -17801,6 +18694,7 @@
       ]
     },
     {
+      "id": "transmutation-savant-wizard-transmutation-2-phb",
       "name": "Transmutation Savant",
       "source": "PHB",
       "className": "Wizard",
@@ -17813,6 +18707,7 @@
       ]
     },
     {
+      "id": "transmuter-s-stone-wizard-transmutation-6-phb",
       "name": "Transmuter's Stone",
       "source": "PHB",
       "className": "Wizard",
@@ -17836,6 +18731,7 @@
       ]
     },
     {
+      "id": "shapechanger-wizard-transmutation-10-phb",
       "name": "Shapechanger",
       "source": "PHB",
       "className": "Wizard",
@@ -17849,6 +18745,7 @@
       ]
     },
     {
+      "id": "master-transmuter-wizard-transmutation-14-phb",
       "name": "Master Transmuter",
       "source": "PHB",
       "className": "Wizard",
@@ -17894,6 +18791,7 @@
       ]
     },
     {
+      "id": "bladesinging-wizard-bladesinging-2-tce",
       "name": "Bladesinging",
       "source": "TCE",
       "className": "Wizard",
@@ -17919,6 +18817,7 @@
       ]
     },
     {
+      "id": "bladesinger-styles-wizard-bladesinging-2-tce",
       "name": "Bladesinger Styles",
       "source": "TCE",
       "className": "Wizard",
@@ -17953,6 +18852,7 @@
       ]
     },
     {
+      "id": "bladesong-wizard-bladesinging-2-tce",
       "name": "Bladesong",
       "source": "TCE",
       "className": "Wizard",
@@ -17977,6 +18877,7 @@
       ]
     },
     {
+      "id": "training-in-war-and-song-bladesinging-wizard-bladesinging-2-tce",
       "name": "Training in War and Song (Bladesinging)",
       "source": "TCE",
       "className": "Wizard",
@@ -17990,6 +18891,7 @@
       ]
     },
     {
+      "id": "extra-attack-wizard-bladesinging-6-tce",
       "name": "Extra Attack",
       "source": "TCE",
       "className": "Wizard",
@@ -18002,6 +18904,7 @@
       ]
     },
     {
+      "id": "song-of-defense-wizard-bladesinging-10-tce",
       "name": "Song of Defense",
       "source": "TCE",
       "className": "Wizard",
@@ -18014,6 +18917,7 @@
       ]
     },
     {
+      "id": "song-of-victory-wizard-bladesinging-14-tce",
       "name": "Song of Victory",
       "source": "TCE",
       "className": "Wizard",
@@ -18026,6 +18930,7 @@
       ]
     },
     {
+      "id": "order-of-scribes-wizard-scribes-2-tce",
       "name": "Order of Scribes",
       "source": "TCE",
       "className": "Wizard",
@@ -18047,6 +18952,7 @@
       ]
     },
     {
+      "id": "awakened-spellbook-wizard-scribes-2-tce",
       "name": "Awakened Spellbook",
       "source": "TCE",
       "className": "Wizard",
@@ -18070,6 +18976,7 @@
       ]
     },
     {
+      "id": "wizardly-quill-wizard-scribes-2-tce",
       "name": "Wizardly Quill",
       "source": "TCE",
       "className": "Wizard",
@@ -18092,6 +18999,7 @@
       ]
     },
     {
+      "id": "manifest-mind-wizard-scribes-6-tce",
       "name": "Manifest Mind",
       "source": "TCE",
       "className": "Wizard",
@@ -18110,6 +19018,7 @@
       ]
     },
     {
+      "id": "master-scrivener-wizard-scribes-10-tce",
       "name": "Master Scrivener",
       "source": "TCE",
       "className": "Wizard",
@@ -18125,6 +19034,7 @@
       ]
     },
     {
+      "id": "one-with-the-word-wizard-scribes-14-tce",
       "name": "One with the Word",
       "source": "TCE",
       "className": "Wizard",
@@ -18141,6 +19051,7 @@
       ]
     },
     {
+      "id": "war-magic-wizard-war-2-xge",
       "name": "War Magic",
       "source": "XGE",
       "className": "Wizard",
@@ -18163,6 +19074,7 @@
       ]
     },
     {
+      "id": "arcane-deflection-wizard-war-2-xge",
       "name": "Arcane Deflection",
       "source": "XGE",
       "className": "Wizard",
@@ -18176,6 +19088,7 @@
       ]
     },
     {
+      "id": "tactical-wit-wizard-war-2-xge",
       "name": "Tactical Wit",
       "source": "XGE",
       "className": "Wizard",
@@ -18188,6 +19101,7 @@
       ]
     },
     {
+      "id": "power-surge-wizard-war-6-xge",
       "name": "Power Surge",
       "source": "XGE",
       "className": "Wizard",
@@ -18202,6 +19116,7 @@
       ]
     },
     {
+      "id": "durable-magic-wizard-war-10-xge",
       "name": "Durable Magic",
       "source": "XGE",
       "className": "Wizard",
@@ -18214,6 +19129,7 @@
       ]
     },
     {
+      "id": "deflecting-shroud-wizard-war-14-xge",
       "name": "Deflecting Shroud",
       "source": "XGE",
       "className": "Wizard",

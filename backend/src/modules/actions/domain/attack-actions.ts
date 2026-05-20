@@ -90,7 +90,8 @@ export function deriveInventoryAttackActions(
       continue;
     }
 
-    const detail = itemLookup.get(slugify(item.baseItemId));
+    const lookupId = slugify(String(item.baseItemId).split('|')[0]);
+    const detail = itemLookup.get(lookupId);
     if (!detail || !isWeapon(detail)) {
       continue;
     }

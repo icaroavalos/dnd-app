@@ -8,7 +8,7 @@ import { RuleText } from '../ui/RuleText';
 import { ASISelector } from './asi-feat/ASISelector';
 import { FeatSelector } from './asi-feat/FeatSelector';
 import { HPGainSelector } from './HPGainSelector';
-import { filterSelectedFeatures, normalizeSubclassName } from '../../lib/character-rules';
+import { filterLevelUpChoicesForSubclass, filterSelectedFeatures, normalizeSubclassName } from '../../lib/character-rules';
 
 export const LevelUpModal: React.FC = () => {
   const { 
@@ -47,14 +47,7 @@ export const LevelUpModal: React.FC = () => {
 
   const selectedSubclassName = getSelectedSubclass();
 
-  // Filter choices based on selected subclass
-  const visibleChoices = choices.filter(choice => {
-    if (choice.type === 'subclass') return true;
-    if (choice.type === 'asi' || choice.type === 'feat') return false; // Handled separately
-    const feat = newFeatures.find(f => f.id === choice.featureId);
-    if (!feat || !feat.subclassShortName) return true;
-    return normalizeSubclassName(feat.subclassShortName) === selectedSubclassName;
-  });
+  const visibleChoices = filterLevelUpChoicesForSubclass(choices as any, newFeatures as any, selectedSubclassName);
 
   const asiChoice = choices.find(c => c.type === 'asi');
   const featChoice = choices.find(c => c.type === 'feat');

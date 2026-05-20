@@ -193,6 +193,8 @@ test('DerivedCharacterSheet structure', () => {
     savingThrows: { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
     skillBonuses: { perception: 2 },
     armorClass: 10,
+    armorClassOptions: [],
+    proficiencyWarnings: [],
     initiative: 0,
     speed: 30,
     maxHp: 12,

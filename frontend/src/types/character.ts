@@ -21,6 +21,7 @@ export interface Feature {
   description: string;
   meta?: string;
   level?: number;
+  originName?: string; // e.g., 'Barbarian', 'Actor', 'Acolyte'
   subclassShortName?: string;
   resource?: {
     id: string;
@@ -38,7 +39,9 @@ export interface Choice {
   name: string;
   count: number;
   options: string[];
-  type: 'weapon' | 'subclass' | 'feat' | 'asi' | 'generic';
+  type: 'weapon' | 'subclass' | 'feat' | 'asi' | 'generic' | 'selection' | 'expertise' | 'spell';
+  description?: string;
+  subclassShortName?: string;
 }
 
 export interface BackgroundChoices {
@@ -93,6 +96,7 @@ export interface Character {
   skillProficiencies: string[];
   attacks: Attack[];
   spells: any[];
+  preparedSpells?: string[];
   features: Feature[];
   pendingChoices: Choice[];
   notes: string;
@@ -100,6 +104,9 @@ export interface Character {
   bgChoices: BackgroundChoices;
   backgroundChoices?: any;
   currency?: Currency;
+  equippedSlots?: Record<string, string>;
+  acFormulaId?: string;
+  _needsPreparation?: boolean;
   deathSaves?: {
     successes: number;
     failures: number;

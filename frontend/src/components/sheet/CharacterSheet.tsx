@@ -5,6 +5,8 @@ import { InventoryTab } from './InventoryTab';
 import { AttacksTab } from './AttacksTab';
 import { SpellsTab } from './SpellsTab';
 import { FeaturesTab } from './FeaturesTab';
+import { SpellManagementModal } from './SpellManagementModal';
+import { useCharacterStore } from '../../store/useCharacterStore';
 import { cn } from '../../lib/utils';
 
 type TabId = 'summary' | 'skills' | 'inventory' | 'attacks' | 'spells' | 'features';
@@ -14,6 +16,7 @@ interface CharacterSheetProps {
 }
 
 export const CharacterSheet: React.FC<CharacterSheetProps> = ({ isWide = false }) => {
+  const { character, finalizePreparation } = useCharacterStore();
   const [activeTab, setActiveTab] = useState<TabId>('summary');
 
   const tabClass = (id: TabId) => cn(
@@ -71,6 +74,10 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({ isWide = false }
         {activeTab === 'spells' && <SpellsTab />}
         {activeTab === 'features' && <FeaturesTab />}
       </div>
+      
+      {character._needsPreparation && (
+        <SpellManagementModal onClose={finalizePreparation} />
+      )}
     </div>
   );
 };

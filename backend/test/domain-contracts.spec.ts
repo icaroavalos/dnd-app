@@ -127,6 +127,8 @@ test('domain contract examples satisfy the canonical shapes', () => {
       insight: 3
     },
     armorClass: 16,
+    armorClassOptions: [],
+    proficiencyWarnings: [],
     initiative: 2,
     speed: 30,
     maxHp: 12,

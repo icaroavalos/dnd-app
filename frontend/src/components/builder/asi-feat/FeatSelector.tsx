@@ -18,11 +18,12 @@ export const FeatSelector: React.FC<FeatSelectorProps> = ({
   selectedAbility,
   onSelectAbility
 }) => {
-  const { featsCatalog, character } = useCharacterStore();
+  const { featsCatalog, character, pendingLevelUp } = useCharacterStore();
   const { finalAbilities } = useDerivedState();
 
   const validateFeat = (feat: any) => {
     const reasons: string[] = [];
+    const targetLevel = pendingLevelUp?.nextLevel || character.level;
     
     // 1. Check if already possessed
     if (character.features.some(f => f.name === feat.name) && !feat.repeatable) {
@@ -33,7 +34,7 @@ export const FeatSelector: React.FC<FeatSelectorProps> = ({
     if (feat.prerequisite) {
       for (const pre of feat.prerequisite) {
         // Level
-        if (pre.level && character.level < pre.level) {
+        if (pre.level && targetLevel < pre.level) {
           reasons.push(`Nível mínimo: ${pre.level}`);
         }
         // Ability

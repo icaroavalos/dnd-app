@@ -10,6 +10,12 @@ export interface DerivedSpellcasting {
   attackBonus: number;
   saveDc: number;
 }
+export interface ArmorClassOption {
+  id: string;
+  name: string;
+  value: number;
+  description: string;
+}
 
 export interface DerivedCharacterSheet {
   ruleset: RulesetId;
@@ -20,6 +26,8 @@ export interface DerivedCharacterSheet {
   savingThrows: Record<AbilityKey, number>;
   skillBonuses: Record<string, number>;
   armorClass: number;
+  armorClassOptions: ArmorClassOption[];
+  proficiencyWarnings: string[]; // e.g. ["Wearing Heavy Armor without proficiency"]
   initiative: number;
   speed: number;
   maxHp: number;

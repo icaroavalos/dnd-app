@@ -154,6 +154,94 @@ export function buildFeatureTextChoices(features: Feature[], featsCatalog: any[]
   return choices;
 }
 
+export function stableFeatureId(feature: Partial<Feature> & Record<string, any>, fallbackLevel?: number): string {
+  if (feature.id) return String(feature.id);
+  return slugify([
+    feature.name,
+    feature.className || feature.originName,
+    feature.subclassShortName,
+    feature.level || fallbackLevel,
+    feature.source || feature.meta,
+  ].filter(Boolean).join('|'));
+}
+
+export function filterLevelUpChoicesForSubclass<T extends Choice & { subclassShortName?: string }>(
+  choices: T[],
+  features: Array<Feature & { subclassShortName?: string }>,
+  selectedSubclass: string | null
+): T[] {
+  const selectedSubclassName = selectedSubclass ? normalizeSubclassName(selectedSubclass) : null;
+
+  return choices.filter((choice) => {
+    if (choice.type === 'subclass') return true;
+    if (choice.type === 'asi' || choice.type === 'feat') return false;
+
+    const feat = features.find((feature) => feature.id === choice.featureId);
+    const scopedSubclass = choice.subclassShortName || feat?.subclassShortName;
+    if (!scopedSubclass) return true;
+    if (!selectedSubclassName) return false;
+    return normalizeSubclassName(scopedSubclass) === selectedSubclassName;
+  });
+}
+
+export function slotsWithoutSourceItems(
+  slots: Record<string, string> = {},
+  inventory: Array<{ instanceId?: string; source?: string }> = [],
+  source: 'class' | 'background'
+): Record<string, string> {
+  const sourceItemIds = new Set(
+    inventory
+      .filter((item) => item.source === source && item.instanceId)
+      .map((item) => item.instanceId as string)
+  );
+
+  return Object.fromEntries(
+    Object.entries(slots).filter(([, itemId]) => !sourceItemIds.has(itemId))
+  );
+}
+
+export function addCurrencies(current: Currency = ZERO_CURRENCY, delta: Currency = ZERO_CURRENCY): Currency {
+  return {
+    cp: (current.cp || 0) + (delta.cp || 0),
+    sp: (current.sp || 0) + (delta.sp || 0),
+    ep: (current.ep || 0) + (delta.ep || 0),
+    gp: (current.gp || 0) + (delta.gp || 0),
+    pp: (current.pp || 0) + (delta.pp || 0),
+  };
+}
+
+export function subtractCurrencies(current: Currency = ZERO_CURRENCY, delta: Currency = ZERO_CURRENCY): Currency {
+  return {
+    cp: Math.max(0, (current.cp || 0) - (delta.cp || 0)),
+    sp: Math.max(0, (current.sp || 0) - (delta.sp || 0)),
+    ep: Math.max(0, (current.ep || 0) - (delta.ep || 0)),
+    gp: Math.max(0, (current.gp || 0) - (delta.gp || 0)),
+    pp: Math.max(0, (current.pp || 0) - (delta.pp || 0)),
+  };
+}
+
+export function spellPreparedState(input: {
+  spell: any;
+  level: number;
+  characterClass: string;
+  preparedSpells?: string[];
+}): { isPrepared: boolean; canUsePreparedMarker: boolean } {
+  const isWizard = String(input.characterClass || '').toLowerCase() === 'wizard';
+  const isGrantedSpell = input.spell?.originKind === 'background'
+    || input.spell?.source === 'bg-feat'
+    || (input.spell?.originKind === 'feature' && input.spell?.resource);
+  const spellId = input.spell?.id || input.spell?.name;
+  const isPrepared = !isWizard
+    || input.level === 0
+    || isGrantedSpell
+    || (input.preparedSpells || []).includes(spellId);
+
+  return {
+    isPrepared,
+    canUsePreparedMarker: isWizard && input.level > 0 && isPrepared,
+  };
+}
+
 export function addSkillSelections(existing: string[], choices: Record<string, string[]>): string[] {
   const next = new Set(existing);
   Object.entries(choices).forEach(([id, values]) => {
